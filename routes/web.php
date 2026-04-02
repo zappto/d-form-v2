@@ -1,22 +1,10 @@
 <?php
 
-use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\Auth\OAuthController;
-use App\Http\Controllers\Auth\PageController as AuthPageController;
-use App\Http\Controllers\Dashboard\Events\EventController;
-use App\Http\Controllers\Dashboard\Events\Forms\FormController as EventFormController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/info', function () {
-    phpinfo();
-    die();
-});
+$path = __DIR__ . '/web';
 
-// Routes for Landing page
-Route::get('/', function () {
-    // return view('pages.home');
-    return inertia('index');
-})->name('home');
+$files = glob("{$path}/{*.php,**/*.php,**/**/*.php}", GLOB_BRACE);
 
 Route::get('/features', function () {
     return inertia('Features');
@@ -67,3 +55,6 @@ Route::name('dashboard.')->prefix('/dashboard')->middleware('auth')->group(funct
         ->names('events.forms');
 });
 // End of Routes for Dashboard
+foreach ($files as $file) {
+    require_once $file;
+}
