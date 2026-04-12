@@ -6,9 +6,10 @@ type Props = {
     type: 'text' | 'tel' | 'number';
     id: string;
     icon?: boolean;
+    focus?: boolean;
 };
 
-const { type, id, icon = false } = defineProps<Props>();
+const { type, id, icon = false, focus = false } = defineProps<Props>();
 </script>
 
 <template>
@@ -18,6 +19,6 @@ const { type, id, icon = false } = defineProps<Props>();
                 <UserIcon />
             </slot>
         </InputGroupAddon>
-        <InputGroupInput :type="type" :id="id" v-bind="$attrs" />
+        <InputGroupInput :type="type" :id="id" v-focus="focus" v-bind="$attrs" />
     </InputGroup>
 </template>

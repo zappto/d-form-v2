@@ -41,6 +41,7 @@ function submit() {
                 required
                 autocomplete="email"
                 placeholder="you@example.com"
+                :focus="true"
             />
             <AuthField
                 type="password"

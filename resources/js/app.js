@@ -41,6 +41,11 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
+            .directive('focus', {
+                mounted: (el, binding) => {
+                    if (binding.value) el.focus();
+                },
+            })
             .mount(el);
     },
 });
