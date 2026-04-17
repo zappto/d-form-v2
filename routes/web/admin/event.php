@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Dashboard\Events\EventController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Dashboard\Events\Forms\FieldOperationController;
 use App\Http\Controllers\Dashboard\Events\Forms\FormController as EventFormController;
 
 Route::name('dashboard.')->prefix('/dashboard')->middleware('auth')->group(function () {
@@ -22,4 +23,7 @@ Route::name('dashboard.')->prefix('/dashboard')->middleware('auth')->group(funct
     ]);
     Route::resource('/events/{event}/forms', EventFormController::class)->only(['index', 'create', 'show', 'edit'])
     ->names('events.forms');
+
+    Route::post('/forms/{form}/fields', FieldOperationController::class)
+        ->name('forms.fields');
 });
