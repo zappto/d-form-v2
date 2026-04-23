@@ -4,63 +4,85 @@ namespace App\Http\Controllers\Dashboard\Events\Forms;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FieldModifyRequest;
+use App\Models\Form;
 use App\Models\FormField;
-use Illuminate\Http\Request;
+use App\Models\Event;
+use App\Support\FormFieldTypeMapping;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class FieldOperationController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
-    public function __invoke(FieldModifyRequest $request)
+    public function __invoke(FieldModifyRequest $request, Event $event, Form $form)
     {
-        $newFields = collect($request->validated()['fields'])->keyBy('id');
-        $formId = $request->route('form');
+        abort_unless($form->event_id === $event->id, 404);
+
+        $formId = $form->id;
+        $rows = $request->validated()['fields'];
 
         try {
-            DB::transaction(function () use ($newFields, $formId) {
-                $oldFields = FormField::query()->where('form_id', $formId)->get()->keyBy('id');
+            DB::transaction(function () use ($rows, $formId) {
+                $oldById = FormField::query()->where('form_id', $formId)->get()->keyBy('id');
+                $incomingIds = collect($rows)->pluck('id')->filter()->all();
 
-                // check for delete
-                $keysToDelete = $oldFields->diffKeys($newFields)->keys();
-                FormField::query()->where('form_id', $formId)->whereIn('id', $keysToDelete)->delete();
+                $toDelete = $oldById->keys()->diff($incomingIds);
+                if ($toDelete->isNotEmpty()) {
+                    FormField::query()
+                        ->where('form_id', $formId)
+                        ->whereIn('id', $toDelete)
+                        ->delete();
+                }
 
-                // check for update and create
-                foreach ($newFields as $id => $field) {
-                    if ($oldFields->has($id)) {
-                        $oldFields->get($id)->fill($field);
-
-                        if ($oldFields->get($id)->isDirty()) {
-                            $oldFields->get($id)->save();
-                        }
+                foreach ($rows as $row) {
+                    $id = $row['id'] ?? null;
+                    $attrs = $this->rowToModelAttributes($row);
+                    if (is_string($id) && $id !== '' && $oldById->has($id)) {
+                        $oldById->get($id)->update($attrs);
 
                         continue;
                     }
 
-                    FormField::create(array_merge(
-                        $field,
-                        ['form_id' => $formId]
+                    FormField::query()->create(array_merge(
+                        $attrs,
+                        [
+                            'id' => (is_string($id) && $id !== '') ? $id : (string) Str::uuid(),
+                            'form_id' => $formId,
+                        ]
                     ));
                 }
             });
 
             Inertia::flash('toast', [
                 'type' => 'success',
-                'message' => 'Fields have been saved'
+                'message' => 'Fields have been saved',
             ]);
 
-            return to_route('dashboard.events.forms.show', ['event' => $request->route('event'), 'form' => $formId]);
-
+            return to_route('dashboard.events.forms.show', ['event' => $event, 'form' => $form]);
         } catch (\Exception $e) {
             Log::error('[FieldOperationController, __invoke]: ' . $e->getMessage());
 
             return Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Fields cannot be saved'
+                'message' => 'Fields cannot be saved',
             ])->back();
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>
+     */
+    private function rowToModelAttributes(array $row): array
+    {
+        return [
+            'input_type' => FormFieldTypeMapping::toInputType($row['type']),
+            'label' => $row['label'],
+            'description' => $row['description'] ?? null,
+            'name' => $row['name'],
+            'order' => (int) $row['order'],
+            'metadata' => $row['metadata'],
+        ];
     }
 }

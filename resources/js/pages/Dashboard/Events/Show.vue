@@ -430,14 +430,15 @@ const cardShadow = 'shadow-[0_1px_2px_rgb(15_23_42/0.04),0_8px_24px_-12px_rgb(15
                                 <Link :href="`/dashboard/events/${event.id}/forms`"><FileText class="mr-2 size-4" />Manage forms</Link>
                             </Button>
                             <div v-if="forms.length > 0" class="mt-1 flex flex-col gap-1">
-                                <div
+                                <Link
                                     v-for="form in forms"
                                     :key="form.id"
-                                    class="flex items-center gap-2 rounded-xl border border-border/50 bg-muted/30 px-3 py-2 text-xs"
+                                    :href="`/dashboard/events/${event.id}/forms/${form.id}`"
+                                    class="flex items-center gap-2 rounded-xl border border-border/50 bg-muted/30 px-3 py-2 text-xs transition-colors hover:bg-muted/50"
                                 >
                                     <FileText class="size-3.5 shrink-0 text-muted-foreground" />
                                     <span class="truncate font-medium text-foreground">{{ form.title }}</span>
-                                </div>
+                                </Link>
                             </div>
                         </CardContent>
                     </Card>

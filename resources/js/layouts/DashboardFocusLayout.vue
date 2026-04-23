@@ -28,7 +28,11 @@ import useAuth from '@/utils/composables/useAuth'
 const page = usePage()
 const user = useAuth(page.props)
 
-const pageProps = computed(() => page.props as Record<string, any>)
+type DashboardPageExtras = {
+    breadcrumbs?: { label: string; href?: string }[];
+    event?: { title?: string };
+};
+const pageProps = computed(() => page.props as DashboardPageExtras);
 
 const breadcrumbs = computed<{ label: string; href?: string }[]>(() => {
     if (pageProps.value.breadcrumbs) return pageProps.value.breadcrumbs

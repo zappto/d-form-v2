@@ -24,9 +24,10 @@ class FormField extends Model
         'input_type',
         'label',
         'description',
+        'name',
         'metadata',
         'form_id',
-        'order'
+        'order',
     ];
 
     public function casts()

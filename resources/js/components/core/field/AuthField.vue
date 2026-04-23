@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Label } from '@/components/ui/label';
-import { MailIcon, UserIcon } from 'lucide-vue-next';
 import { TextInput, EmailInput, PasswordInput } from '@/components/core/input';
 
 type Props = {

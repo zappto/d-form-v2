@@ -112,12 +112,6 @@ function removeTag(index: number) {
     nextTick(() => inputRef.value?.focus())
 }
 
-function removeLastTag() {
-    if (query.value === '' && tags.value.length > 0) {
-        removeTag(tags.value.length - 1)
-    }
-}
-
 function labelFor(value: string): string {
     const match = props.suggestions.find(s => s.value === value)
     return match?.label ?? value

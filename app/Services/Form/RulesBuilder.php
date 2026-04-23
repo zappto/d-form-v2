@@ -24,14 +24,25 @@ class RulesBuilder
     public static function extractRulesFromFields(Collection $fields): array
     {
         $result = $fields->mapWithKeys(function ($field) {
-            $rules = $field->metadata['rules'];
+            $metadata = $field->metadata;
+            if (is_object($metadata) && method_exists($metadata, 'get')) {
+                $ruleSet = $metadata->get('rules') ?? [];
+                $inputSubtype = $metadata->get('type') ?? null;
+            } else {
+                $md = (array) $metadata;
+                $ruleSet = $md['rules'] ?? [];
+                $inputSubtype = $md['type'] ?? null;
+            }
+            if (!is_array($ruleSet)) {
+                $ruleSet = [];
+            }
 
-            if ($field->type === 'input' && ($field->metadata['type'] ?? '') === 'email') {
-                $rules['email'] = true;
+            if ($field->input_type === 'input' && $inputSubtype === 'email') {
+                $ruleSet['email'] = true;
             }
 
             return [
-                $field->name => $rules ?? []
+                (string) $field->name => $ruleSet,
             ];
         })->all();
 

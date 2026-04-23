@@ -14,15 +14,8 @@ import ComboboxTagInput from '@/components/modules/dashboard/events/ComboboxTagI
 import { Upload, X, Save, Send } from 'lucide-vue-next';
 import { store as storeEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { showEventValidationToast } from '@/lib/eventValidationToast';
-import { cn } from '@/lib/utils';
 
 defineOptions({ layout: DashboardFocusLayout });
-
-const datetimeInputClass = cn(
-    'border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-xs shadow-xs transition-[color,box-shadow] outline-none',
-    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-    'dark:bg-input/30'
-);
 
 const props = defineProps<{
     options?: {

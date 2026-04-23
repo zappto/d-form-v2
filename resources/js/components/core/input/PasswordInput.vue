@@ -9,7 +9,7 @@ type Props = {
 
 const { id } = defineProps<Props>();
 
-let showPassword = ref(false);
+const showPassword = ref(false);
 </script>
 
 <template>

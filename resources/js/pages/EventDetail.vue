@@ -3,8 +3,8 @@ import LandingLayout from '@/layouts/LandingLayout.vue'
 import { computed, ref, onMounted } from 'vue'
 import { MapPin, CalendarDays, Users, ArrowLeft, ArrowRight, Check, Shield } from 'lucide-vue-next'
 import {
-    dummyEvents, formatDate, formatDateTime,
-    categoryLabelMap, categoryColorMap, sessionLabelMap, statusColorMap,
+    dummyEvents, formatDate,
+    categoryLabelMap, categoryColorMap, sessionLabelMap,
 } from '@/lib/dummyData'
 import { toCategoryList } from '@/lib/eventCategories'
 

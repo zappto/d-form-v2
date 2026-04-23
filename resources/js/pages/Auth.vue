@@ -27,7 +27,10 @@ function dismissToast() {
 
 // Watch for server errors
 const page = usePage();
-const errors = computed(() => (page.props as Record<string, any>).errors || {});
+const errors = computed((): Record<string, string> => {
+    const p = page.props as { errors?: Record<string, string> };
+    return p.errors ?? {};
+});
 watch(
     errors,
     (newErrors) => {

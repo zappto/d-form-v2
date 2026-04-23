@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-
-const props = defineProps<{
+defineProps<{
     toast: { type: 'success' | 'error'; message: string } | null;
 }>();
 

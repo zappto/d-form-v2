@@ -12,10 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
 import ComboboxTagInput from '@/components/modules/dashboard/events/ComboboxTagInput.vue';
 import { Upload, X, Save, Send } from 'lucide-vue-next';
-import {
-    update as updateEvent,
-    show as showEvent,
-} from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
+import { update as updateEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { dummyEvents } from '@/lib/dummyData';
 import { showEventValidationToast } from '@/lib/eventValidationToast';
 import { cn } from '@/lib/utils';

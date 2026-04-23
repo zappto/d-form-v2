@@ -45,7 +45,5 @@ Route::middleware('auth')->prefix('/dashboard/user')->name('dashboard.user.')->g
 
 Route::middleware('auth')->prefix('/dashboard/events/{event}')->name('dashboard.events.')->group(function () {
     Route::get('/scan', fn () => inertia('Dashboard/Events/Scan'))->name('scan');
-    Route::get('/forms', fn () => inertia('Dashboard/Events/Forms/Index'))->name('forms.index');
-    Route::get('/forms/create', fn () => inertia('Dashboard/Events/Forms/Create'))->name('forms.create');
     Route::get('/registrants', fn () => inertia('Dashboard/Events/Registrants'))->name('registrants');
 });

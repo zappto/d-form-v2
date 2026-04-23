@@ -31,11 +31,16 @@ declare global {
         event_id: string
     }
 
+    type FormFieldType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload'
+
     interface IFormField {
         id: string
-        input_type: 'textInput' | 'selectInput' | 'textarea' | 'datePicker' | 'fileUpload'
+        type: FormFieldType
+        label: string
+        description?: string | null
+        name: string
+        order: number
         metadata: Record<string, unknown>
-        form_id: string
     }
 
     interface IRegistrant {

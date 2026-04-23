@@ -19,7 +19,9 @@ class FormSubmissionController extends Controller
     {
         $formId = $request->route('form');
 
-        $fields = FormField::query()->where('form_id', $formId)->get(['name', 'metadata', 'id']);
+        $fields = FormField::query()
+            ->where('form_id', $formId)
+            ->get(['id', 'name', 'input_type', 'metadata']);
 
         $rawRules = RulesBuilder::extractRulesFromFields($fields);
 
@@ -27,7 +29,7 @@ class FormSubmissionController extends Controller
 
         $validatedAnswer = $validator->validate();
 
-        $userId = auth()->guard()->id;
+        $userId = (string) $request->user()->id;
 
         $data = array_merge(['answers' => $validatedAnswer], ['form_id' => $formId, 'user_id' => $userId]);
 
@@ -38,7 +40,7 @@ class FormSubmissionController extends Controller
             ]);
 
             return to_route('dashboard.events.forms.show', [
-                'event' => $request()->route('event'),
+                'event' => $request->route('event'),
                 'form' => $formId
             ]);
         }

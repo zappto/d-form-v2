@@ -22,18 +22,6 @@ const features = [
     { icon: 'notify', title: 'Smart Notifications', desc: 'Automated email and push notifications for new submissions, reminders, and status updates.' },
     { icon: 'mobile', title: 'Mobile Optimized', desc: 'Every form is fully responsive. Support for PWA and native-like experience on any screen.' },
 ];
-
-const iconPaths: Record<string, string> = {
-    form: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z|M14 2v6h6|M16 13H8|M16 17H8',
-    event: 'R3,4,18,18,2|M16 2v4|M8 2v4|M3 10h18',
-    chart: 'M3 3v18h18|M18 17V9|M13 17V5|M8 17v-3',
-    team: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2|C9,7,4|M22 21v-2a4 4 0 0 0-3-3.87|M16 3.13a4 4 0 0 1 0 7.75',
-    integrate: 'm16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z|m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z|M7 21h10|M12 3v18|M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2',
-    shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10|m9 12 2 2 4-4',
-    template: 'R3,3,18,18,2|M3 9h18|M9 21V9',
-    notify: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9|M10.3 21a1.94 1.94 0 0 0 3.4 0',
-    mobile: 'R5,2,14,20,2|M12 18h.01',
-};
 </script>
 
 <template>

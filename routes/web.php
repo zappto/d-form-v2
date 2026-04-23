@@ -41,5 +41,7 @@ $finder->files()->in("{$path}")->name('/^.*\.php$/');
 // });
 // End of Routes for Dashboard
 foreach ($finder as $file) {
-    require_once $file->getRealPath();
+    // Use `require` (not `require_once`) so route files load again for each
+    // new Application instance in PHPUnit, where the app is recreated per test.
+    require $file->getRealPath();
 }

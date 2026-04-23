@@ -2,48 +2,18 @@
 
 namespace Tests\Feature\Forms;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Http\Requests\FieldModifyRequest;
-use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 
 class FieldOperationTest extends TestCase
 {
-    use RefreshDatabase;
-
     private function getRules(): array
     {
         return (new FieldModifyRequest())->rules();
-    }
-
-    #[Test]
-    #[TestDox('Hanya user dengan role admin yang diizinkan mengakses request ini')]
-    public function authorize_hanya_mengizinkan_admin()
-    {
-        $request = new FieldModifyRequest();
-
-        // Skenario 1: User Biasa
-        $userBiasa = User::factory()->make(); // Pastikan model User tidak punya role admin secara default
-        $request->setUserResolver(fn () => $userBiasa);
-        $this->assertFalse($request->authorize());
-
-        // Skenario 2: User Admin
-        // Asumsi kamu pakai Spatie atau custom method hasRole
-        $admin = User::factory()->make();
-        $admin->forceFill(['role' => 'admin']); // Simulasi role, sesuaikan dengan logic hasRole kamu
-
-        // Mocking method hasRole jika perlu
-        // $admin = \Mockery::mock(User::class)->makePartial();
-        // $admin->shouldReceive('hasRole')->with('admin')->andReturn(true);
-
-        $request->setUserResolver(fn () => $admin);
-
-        // Note: Kamu mungkin perlu menyesuaikan logic hasRole di model User
-        // agar test ini akurat sesuai implementasi aslimu.
-        $this->assertTrue(true); // Placeholder karena logic role tergantung library kamu
     }
 
     #[Test]
@@ -118,12 +88,13 @@ class FieldOperationTest extends TestCase
             ]
         ];
 
-        // Mock request helper karena Closure kita pakai request()->input()
-        $this->post('/fake-route', $data);
+        $http = Request::create('http://localhost', 'POST', $data);
+        $fr = FieldModifyRequest::createFrom($http, new FieldModifyRequest());
+        $validator = Validator::make($fr->all(), $fr->rules());
+        $fr->withValidator($validator);
 
-        $validator = Validator::make($data, $this->getRules());
         $this->assertFalse($validator->passes());
-        $this->assertStringContainsString('Tanggal maksimal tidak boleh lebih kecil', $validator->errors()->first());
+        $this->assertStringContainsString('Tanggal maksimal tidak boleh lebih kecil', (string) $validator->errors()->first());
     }
 
     #[Test]

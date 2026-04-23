@@ -23,11 +23,20 @@ Route::name('dashboard.')->prefix('/dashboard')->middleware('auth')->group(funct
         'destroy',
     ]);
 
-    Route::resource('/events/{event}/forms', EventFormController::class)->only(['index', 'create', 'show', 'edit'])
-    ->names('events.forms');
+    Route::resource('/events/{event}/forms', EventFormController::class)
+        ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
+        ->names([
+            'index' => 'events.forms.index',
+            'create' => 'events.forms.create',
+            'store' => 'events.forms.store',
+            'show' => 'events.forms.show',
+            'edit' => 'events.forms.edit',
+            'update' => 'events.forms.update',
+            'destroy' => 'events.forms.destroy',
+        ]);
 
-    Route::post('/forms/{form}/fields', FieldOperationController::class)
-        ->name('forms.fields');
+    Route::post('/events/{event}/forms/{form}/fields', [FieldOperationController::class, '__invoke'])
+        ->name('events.forms.fields');
 
     Route::post('/events/{event}/forms/{form}/submit', FormSubmissionController::class)->name('forms.submission');
 });

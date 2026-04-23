@@ -13,9 +13,13 @@ const form = useForm({ email: '', password: '' }).dontRemember('password');
 function submit() {
     form.submit(login(), {
         onFinish: () => {
-            if (!page.flash.toast) return;
-
-            (toast as Record<string, any>)[page.flash.toast.type](page.flash.toast.message);
+            const t = page.flash.toast;
+            if (!t) return;
+            if (t.type === 'success') {
+                toast.success(t.message);
+            } else {
+                toast.error(t.message);
+            }
         },
     });
 }

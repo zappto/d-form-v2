@@ -14,7 +14,7 @@ class FormFieldFactory extends Factory
     {
         return [
             'id' => fake()->uuid(),
-            'type' => 'input', // Default
+            'input_type' => 'input',
             'label' => fake()->words(2, true),
             'name' => fake()->unique()->word(),
             'description' => fake()->sentence(),
@@ -37,7 +37,7 @@ class FormFieldFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'id' => fake()->uuid(),
-            'type' => 'input', // Default
+            'input_type' => 'input',
             'label' => fake()->words(2, true),
             'name' => fake()->unique()->word(),
             'description' => fake()->sentence(),
@@ -60,7 +60,7 @@ class FormFieldFactory extends Factory
     public function selectInput(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'selectInput',
+            'input_type' => 'selectInput',
             'metadata' => [
                 'rules' => [
                     'required' => true,
@@ -77,7 +77,7 @@ class FormFieldFactory extends Factory
     public function textarea(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'textarea',
+            'input_type' => 'textarea',
             'metadata' => [
                 'rules' => [
                     'required' => false,
@@ -89,7 +89,7 @@ class FormFieldFactory extends Factory
     public function datePicker(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'datePicker',
+            'input_type' => 'datePicker',
             'metadata' => [
                 'rules' => [
                     'max_date' => '2026-10-10'
@@ -101,7 +101,7 @@ class FormFieldFactory extends Factory
     public function fileUpload(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'fileUpload',
+            'input_type' => 'fileUpload',
             'metadata' => [
                 'rules' => [
                     'required' => true,

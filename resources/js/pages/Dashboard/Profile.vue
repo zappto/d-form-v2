@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import useAuth from '@/utils/composables/useAuth'
-import { User as UserIcon, Mail, Shield, CalendarDays, Save, Lock } from 'lucide-vue-next'
+import { User as UserIcon, Shield, CalendarDays, Save, Lock } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardLayout })
 

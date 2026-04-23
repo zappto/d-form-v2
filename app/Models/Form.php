@@ -31,7 +31,18 @@ class Form extends Model
     public function casts(): array
     {
         return [
+            'closed_at' => 'datetime',
             'visible_for' => AsEnumCollection::of(EventFormVisibility::class)
         ];
+    }
+
+    public function event(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function formFields(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FormField::class, 'form_id');
     }
 }

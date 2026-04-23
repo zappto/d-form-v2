@@ -4,7 +4,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { InertiaForm } from '@inertiajs/vue3';
 
 type Props = {
-    form: InertiaForm<Record<string, any>>;
+    form: InertiaForm<Record<string, unknown>>;
 };
 
 const { form } = defineProps<Props>();
