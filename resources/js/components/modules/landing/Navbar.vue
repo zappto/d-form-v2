@@ -24,9 +24,9 @@ const navLinks = [
 <template>
     <nav
         :class="[
-            'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+            'fixed top-0 right-0 left-0 z-50 transition-all duration-300',
             scrolled
-                ? 'bg-white/95 backdrop-blur-md shadow-[0_1px_3px_rgba(0,0,0,0.04)] border-b border-[#F3F4F6]'
+                ? 'border-b border-[#F3F4F6] bg-white/95 shadow-[0_1px_3px_rgba(0,0,0,0.04)] backdrop-blur-md'
                 : 'bg-white/80 backdrop-blur-sm',
         ]"
     >
@@ -34,7 +34,16 @@ const navLinks = [
             <!-- Logo -->
             <a href="/" class="flex items-center gap-2.5">
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A84DC]">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="white"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
                         <path d="M14 2v6h6" />
                         <path d="M16 13H8" />
@@ -66,11 +75,14 @@ const navLinks = [
 
             <!-- CTA -->
             <div class="hidden items-center gap-3 md:flex">
-                <a href="/auth" class="text-sm font-semibold text-[#6B7280] transition-colors hover:text-[#111827]">
+                <a
+                    href="/auth/login"
+                    class="text-sm font-semibold text-[#6B7280] transition-colors hover:text-[#111827]"
+                >
                     Sign In
                 </a>
                 <a
-                    href="/auth"
+                    href="/auth/register"
                     class="rounded-lg bg-[#0A84DC] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#0972c0] hover:shadow-md active:scale-[0.97]"
                 >
                     Get Started
@@ -82,12 +94,30 @@ const navLinks = [
                 class="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-[#F9FAFB] md:hidden"
                 @click="mobileMenuOpen = !mobileMenuOpen"
             >
-                <svg v-if="!mobileMenuOpen" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <svg
+                    v-if="!mobileMenuOpen"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                >
                     <line x1="3" y1="6" x2="21" y2="6" />
                     <line x1="3" y1="12" x2="21" y2="12" />
                     <line x1="3" y1="18" x2="21" y2="18" />
                 </svg>
-                <svg v-else width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <svg
+                    v-else
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                >
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -120,8 +150,14 @@ const navLinks = [
                         {{ link.label }}
                     </a>
                     <hr class="my-2 border-[#F3F4F6]" />
-                    <a href="/auth" class="rounded-lg px-3 py-2.5 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB]">Sign In</a>
-                    <a href="/auth" class="mt-1 rounded-lg bg-[#0A84DC] px-3 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#0972c0]">Get Started</a>
+                    <a href="/auth" class="rounded-lg px-3 py-2.5 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB]"
+                        >Sign In</a
+                    >
+                    <a
+                        href="/auth"
+                        class="mt-1 rounded-lg bg-[#0A84DC] px-3 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#0972c0]"
+                        >Get Started</a
+                    >
                 </div>
             </div>
         </transition>

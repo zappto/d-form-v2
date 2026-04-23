@@ -5,9 +5,10 @@ import { MailIcon } from 'lucide-vue-next';
 type Props = {
     id: string;
     icon?: boolean;
+    focus?: boolean;
 };
 
-const { id, icon = false } = defineProps<Props>();
+const { id, icon = false, focus = false } = defineProps<Props>();
 </script>
 
 <template>
@@ -17,6 +18,6 @@ const { id, icon = false } = defineProps<Props>();
                 <MailIcon />
             </slot>
         </InputGroupAddon>
-        <InputGroupInput type="email" :id="id" v-bind="$attrs" />
+        <InputGroupInput type="email" :id="id" v-focus="focus" v-bind="$attrs" />
     </InputGroup>
 </template>

@@ -86,6 +86,7 @@ function submit() {
                 required
                 autocomplete="name"
                 placeholder="Your name"
+                :focus="true"
             />
             <AuthField
                 label="E-mail"

@@ -6,6 +6,7 @@ interface IUser {
     name: string;
     email: string;
     avatar: string;
+    roles?: string[];
     created_at?: string;
     updated_at?: string;
     deleted_at?: string;

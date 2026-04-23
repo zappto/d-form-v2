@@ -4,42 +4,48 @@ set -e
 # Change to app directory
 cd /app
 
-# Check if vendor/autoload.php exists, if not, install dependencies
+echo "Checking dependencies..."
+
+# Fix dubious ownership for git
+git config --global --add safe.directory /app || true
+
+# Check if composer dependencies are installed
 if [ ! -f "vendor/autoload.php" ]; then
-    echo "vendor/autoload.php not found. Installing Composer dependencies..."
+    echo "Composer dependencies not found. Installing..."
     composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
-# Check if node_modules exists, if not, install npm dependencies
-if [ ! -d "node_modules" ]; then
-    echo "node_modules not found. Installing npm dependencies..."
-    npm install
+# Ensure node_modules/vite is actually working
+if [ "$APP_ENV" = "local" ]; then
+    if [ ! -x "node_modules/.bin/vite" ]; then
+        echo "Vite not found or not executable. Running npm install..."
+        npm install --no-interaction
+    fi
 fi
 
-# Set proper permissions for storage and bootstrap/cache
-if [ -d "storage" ]; then
-    chmod -R 775 storage bootstrap/cache 2>/dev/null || true
-fi
+# Ensure permissions
+echo "Setting permissions..."
+chmod -R 775 storage bootstrap/cache public 2>/dev/null || true
+
+# Public disk: symlink public/storage -> storage/app/public (banner URLs /storage/...)
+echo "Ensuring storage link..."
+php artisan storage:link 2>/dev/null || true
 
 # Generate APP_KEY if not set
-if grep -q "^APP_KEY=$" .env 2>/dev/null; then
-    echo "APP_KEY is empty. Generating a new key..."
+if [ -z "$(grep '^APP_KEY=' .env | cut -d '=' -f2)" ]; then
+    echo "Generating APP_KEY..."
     php artisan key:generate --force
 fi
 
-# Build frontend assets if manifest doesn't exist
-# if [ ! -f "public/build/manifest.json" ]; then
-#     echo "Vite manifest not found. Building frontend assets..."
-#     npm run build
-# fi
-
 if [ "$APP_ENV" = "local" ]; then
-    echo "Running in Development mode..."
-    npm run dev -- --host 0.0.0.0 & # Jalankan di background
+    echo "Starting Vite..."
+    # Run vite directly from node_modules
+    ./node_modules/.bin/vite --host 0.0.0.0 &
+    sleep 2
 else
-    echo "Running in Production mode..."
+    echo "Building assets..."
     npm run build
 fi
 
-# Execute the main command (octane:frankenphp with arguments)
+echo "Starting Octane..."
 exec php artisan octane:frankenphp "$@"

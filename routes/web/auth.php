@@ -21,7 +21,7 @@ Route::middleware('guest')->group(function () {
     ->middleware('guest')
     ->names([
         'index' => 'auth.login',
-        'store' => 'auth.login'
+        'store' => 'auth.login.store',
     ])->only(['index', 'store']);
 
     /**
@@ -33,7 +33,7 @@ Route::middleware('guest')->group(function () {
     ->middleware('guest')
     ->names([
         'index' => 'auth.register',
-        'store' => 'auth.register'
+        'store' => 'auth.register.store',
     ])->only(['index', 'store']);
 
     Route::get('/auth/google', [OAuthController::class, 'redirectToGoogle'])->name('auth.google');

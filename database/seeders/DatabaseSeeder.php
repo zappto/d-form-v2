@@ -15,30 +15,38 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        // User::factory(100)->create();
-
-        // testing user
-        // User::create([
-        //     'name' => 'user 1',
-        //     'email' => 'user@gmail.com',
-        //     'password' => 'password',
-        // ]);
-
-        // testing admin
         $admin = User::create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => 'admin password'
         ]);
 
+        $superAdmin = User::create([
+            'name' => 'super admin',
+            'email' => 'superadmin@gmail.com',
+            'password' => 'superadmin password'
+        ]);
+
         $this->call([
             RoleSeeder::class,
-            // EventCategorySeeder::class,
-            EventSeeder::class
+            EventSeeder::class,
+            FormSeeder::class,
         ]);
 
         $admin->assignRole('admin');
+        $superAdmin->assignRole('super-admin');
+
+        $memberData = [
+            ['name' => 'Ahmad Fauzi', 'email' => 'ahmad@student.dinus.ac.id'],
+            ['name' => 'Siti Nurhaliza', 'email' => 'siti@student.dinus.ac.id'],
+            ['name' => 'Budi Santoso', 'email' => 'budi@student.dinus.ac.id'],
+            ['name' => 'Dewi Lestari', 'email' => 'dewi@student.dinus.ac.id'],
+            ['name' => 'Rizky Pratama', 'email' => 'rizky@student.dinus.ac.id'],
+        ];
+
+        foreach ($memberData as $data) {
+            $member = User::create([...$data, 'password' => 'password']);
+            $member->assignRole('member');
+        }
     }
 }

@@ -14,8 +14,8 @@ RUN install-php-extensions \
     pdo_mysql \
     redis
 
-# Install Node.js and npm for frontend build (LTS version)
-RUN apk add --no-cache nodejs npm
+# Install Node.js, npm, and git
+RUN apk add --no-cache nodejs npm git
 
 # Install Composer (if not already available)
 RUN if ! command -v composer &> /dev/null; then \
@@ -35,11 +35,11 @@ RUN addgroup -g $GID -S appuser || true && \
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Set working directory ownership (will be overridden by volume mounts, but helps with initial setup)
-RUN chown -R appuser:appuser /app 2>/dev/null || true
+# Set working directory ownership
+RUN chown -R root:root /app 2>/dev/null || true
 
-# Switch to appuser for running commands
-USER appuser
+# Switch to root to ensure we have permissions for volume mounts
+USER root
 
 # Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

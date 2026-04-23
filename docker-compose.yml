@@ -12,6 +12,8 @@ services:
         volumes:
             # Use consistent path format for Windows compatibility
             - .:/app:cached
+            - /app/node_modules
+            - /app/vendor
             - ./bootstrap/cache:/app/bootstrap/cache:rw
             - ./storage:/app/storage:rw
             - caddy_data:/data
@@ -23,6 +25,9 @@ services:
         environment:
             - PHP_OPCACHE_VALIDATE_TIMESTAMPS=1
             - PHP_OPCACHE_REVALIDATE_FREQ=0
+        dns:
+            - 8.8.8.8
+            - 8.8.4.4
         networks:
             - default
         depends_on:
@@ -31,11 +36,9 @@ services:
         restart: unless-stopped
         ports:
             - '3000:8000'
-            - '443:443'
-            - '443:443/udp'
             - '5173:5173'
         # Command untuk development dengan watch mode
-        command: --watch --workers=1 --max-requests=1
+        command: --watch --workers=1
 
     db:
         container_name: d_form_db

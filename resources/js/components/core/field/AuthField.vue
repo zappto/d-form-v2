@@ -8,6 +8,7 @@ type Props = {
     error?: string;
     type: 'name' | 'email' | 'password';
     id: string;
+    focus: boolean;
 };
 
 const { error } = defineProps<Props>();
@@ -19,8 +20,8 @@ const { error } = defineProps<Props>();
             {{ label }}
         </Label>
 
-        <TextInput type="text" :id="id" v-if="type === 'name'" v-bind="$attrs" />
-        <EmailInput :id="id" v-else-if="type === 'email'" v-bind="$attrs" />
+        <TextInput type="text" :id="id" v-if="type === 'name'" :focus="focus" v-bind="$attrs" />
+        <EmailInput :id="id" v-else-if="type === 'email'" :focus="focus" v-bind="$attrs" />
         <PasswordInput v-else :id="id" v-bind="$attrs" />
 
         <p v-if="error" class="text-destructive mt-1.5 text-xs">{{ error }}</p>

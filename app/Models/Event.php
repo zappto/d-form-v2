@@ -2,20 +2,22 @@
 
 namespace App\Models;
 
-use App\Enums\EventCategory;
-use App\Enums\EventSession;
 use App\Enums\EventStatus;
 use App\Observers\EventObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy(EventObserver::class)]
 class Event extends Model
 {
+    /** @use HasFactory<\Database\Factories\EventFactory> */
+    use HasFactory;
     use HasUuids;
     use SoftDeletes;
 
@@ -30,6 +32,7 @@ class Event extends Model
         'registration_end',
         'location',
         'quota',
+        'registered_count',
         'banner',
         'price',
         'session',
@@ -40,12 +43,84 @@ class Event extends Model
     protected function casts(): array
     {
         return [
-            'session' => EventSession::class,
             'status' => EventStatus::class,
-            'category' => EventCategory::class,
             'price' => 'decimal:2',
-            'quota' => 'integer'
+            'quota' => 'integer',
+            'registered_count' => 'integer',
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'registration_start' => 'datetime',
+            'registration_end' => 'datetime',
         ];
+    }
+
+    public function forms(): HasMany
+    {
+        return $this->hasMany(Form::class);
+    }
+
+    /**
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $query = $this->where($field ?? $this->getRouteKeyName(), $value);
+
+        if (request()->routeIs('dashboard.events.*')) {
+            $query->withTrashed();
+        }
+
+        return $query->firstOrFail();
+    }
+
+    /**
+     * Match events whose `category` CSV contains every given backing value (e.g. `rkt` matches `rkt`, `rkt,etc`, `etc,rkt`).
+     *
+     * @param  list<string>  $tokens
+     */
+    #[Scope]
+    public function forCategoryTokens(Builder $query, array $tokens): void
+    {
+        if ($tokens === []) {
+            return;
+        }
+
+        $query->where(function (Builder $outer) use ($tokens): void {
+            foreach ($tokens as $cat) {
+                $outer->where(function (Builder $inner) use ($cat): void {
+                    $inner->where('category', $cat)
+                        ->orWhere('category', 'like', $cat.',%')
+                        ->orWhere('category', 'like', '%,'.$cat.',%')
+                        ->orWhere('category', 'like', '%,'.$cat);
+                });
+            }
+        });
+    }
+
+    /**
+     * Match events whose `session` CSV contains every given backing value.
+     *
+     * @param  list<string>  $tokens
+     */
+    #[Scope]
+    public function forSessionTokens(Builder $query, array $tokens): void
+    {
+        if ($tokens === []) {
+            return;
+        }
+
+        $query->where(function (Builder $outer) use ($tokens): void {
+            foreach ($tokens as $session) {
+                $outer->where(function (Builder $inner) use ($session): void {
+                    $inner->where('session', $session)
+                        ->orWhere('session', 'like', $session.',%')
+                        ->orWhere('session', 'like', '%,'.$session.',%')
+                        ->orWhere('session', 'like', '%,'.$session);
+                });
+            }
+        });
     }
 
     #[Scope]
@@ -59,6 +134,7 @@ class Event extends Model
             'start_date',
             'end_date',
             'quota',
+            'registered_count',
             'category',
             'session',
             'status',

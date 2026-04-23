@@ -23,12 +23,19 @@ class EventCategorySeeder extends Seeder
             ],
             [
                 'name' => 'Recruitment',
-                'description' => 'Recruitment member & Anggota aktif'
+                'description' => 'Recruitment member & Anggota aktif',
+            ],
+            [
+                'name' => 'Etc',
+                'description' => 'Kategori lainnya',
             ],
         ];
 
         foreach ($categories as $category) {
-            EventCategory::create($category);
+            EventCategory::query()->updateOrCreate(
+                ['name' => $category['name']],
+                ['description' => $category['description']]
+            );
         }
     }
 }
