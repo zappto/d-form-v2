@@ -4,7 +4,7 @@ import Footer from '@/components/modules/landing/Footer.vue';
 </script>
 
 <template>
-    <div class="min-h-screen bg-white font-sans antialiased">
+    <div class="min-h-screen bg-background font-sans antialiased">
         <Navbar />
         <main>
             <slot />

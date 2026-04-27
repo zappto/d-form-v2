@@ -6,7 +6,8 @@ onMounted(() => setTimeout(() => (visible.value = true), 100));
 </script>
 
 <template>
-    <section class="relative overflow-hidden bg-white pt-32 pb-24 lg:pt-40 lg:pb-28">
+    <section class="relative overflow-hidden bg-background pt-32 pb-24 lg:pt-40 lg:pb-28">
+        <div class="brutal-grid pointer-events-none absolute inset-0 opacity-[0.035]"></div>
         <div class="pointer-events-none absolute inset-0 opacity-[0.025]">
             <svg width="100%" height="100%">
                 <defs>
@@ -26,9 +27,7 @@ onMounted(() => setTimeout(() => (visible.value = true), 100));
                     visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
                 ]"
             >
-                <h1
-                    class="text-[2.75rem] leading-[1.1] font-semibold tracking-tight text-[#111827] sm:text-5xl lg:text-[3.75rem]"
-                >
+                <h1 class="font-display text-[3.1rem] leading-[0.96] font-extrabold tracking-[-0.055em] text-[#101014] sm:text-6xl lg:text-7xl">
                     Every tool you need,<br />
                     <span class="relative inline-block">
                         <span class="text-[#0A84DC]">one platform</span>
@@ -38,7 +37,7 @@ onMounted(() => setTimeout(() => (visible.value = true), 100));
                     </span>
                 </h1>
 
-                <p class="mx-auto mt-6 max-w-lg text-base leading-relaxed text-[#6B7280] lg:text-lg">
+                <p class="mx-auto mt-6 max-w-2xl text-base font-semibold leading-relaxed text-[#34343B] lg:text-lg">
                     From form building to real-time analytics, DForm gives event organizers everything they need to
                     deliver seamless experiences.
                 </p>

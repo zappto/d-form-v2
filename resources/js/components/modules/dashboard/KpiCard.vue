@@ -19,10 +19,10 @@ const isPositive = computed(() => (props.trend ?? 0) >= 0)
 
 const colorClasses = computed(() => {
     const map: Record<string, string> = {
-        primary: 'bg-primary/10 text-primary',
-        success: 'bg-success/10 text-success',
-        warning: 'bg-warning/10 text-warning',
-        destructive: 'bg-destructive/10 text-destructive',
+        primary: 'bg-[var(--brutal-blue)] text-white',
+        success: 'bg-[var(--brutal-mint)] text-foreground',
+        warning: 'bg-(--brutal-yellow) text-foreground',
+        destructive: 'bg-[var(--brutal-orange)] text-foreground',
     }
     return map[props.color ?? 'primary']
 })
@@ -31,29 +31,29 @@ const colorClasses = computed(() => {
 <template>
     <Card
         :class="cn(
-            'rounded-xl border shadow-xs transition-all duration-500',
+            'transition-all duration-500',
             visible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0',
         )"
     >
         <CardContent class="p-5">
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0 flex-1">
-                    <p class="text-xs font-medium tracking-wide text-muted-foreground">{{ label }}</p>
-                    <p class="mt-2 text-2xl font-semibold tracking-tight">{{ value }}</p>
+                    <p class="text-xs font-extrabold tracking-[0.16em] text-muted-foreground uppercase">{{ label }}</p>
+                    <p class="font-display mt-2 text-4xl font-extrabold tracking-[-0.04em]">{{ value }}</p>
                     <div v-if="trend !== undefined" class="mt-2 flex items-center gap-1">
                         <component
                             :is="isPositive ? TrendingUp : TrendingDown"
                             :class="cn('size-3.5', isPositive ? 'text-success' : 'text-destructive')"
                         />
                         <span
-                            :class="cn('text-xs font-medium', isPositive ? 'text-success' : 'text-destructive')"
+                            :class="cn('text-xs font-extrabold', isPositive ? 'text-success' : 'text-destructive')"
                         >
                             {{ isPositive ? '+' : '' }}{{ trend }}%
                         </span>
                         <span class="text-xs text-muted-foreground">vs last month</span>
                     </div>
                 </div>
-                <div :class="cn('flex size-10 shrink-0 items-center justify-center rounded-xl', colorClasses)">
+                <div :class="cn('flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-foreground shadow-[3px_3px_0_var(--brutal-ink)]', colorClasses)">
                     <component :is="icon" class="size-5" />
                 </div>
             </div>

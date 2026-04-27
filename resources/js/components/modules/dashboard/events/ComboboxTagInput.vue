@@ -198,8 +198,8 @@ watch(open, (val) => {
     <div ref="containerRef" class="relative">
         <div
             :class="[
-                'flex min-h-9 flex-wrap items-center gap-1 rounded-md border bg-background px-2.5 py-1.5 text-sm transition-colors',
-                open ? 'border-ring ring-1 ring-ring/30' : 'border-input',
+                'flex min-h-10 flex-wrap items-center gap-1 rounded-xl border-2 bg-white px-2.5 py-1.5 text-sm font-bold shadow-[3px_3px_0_var(--brutal-ink)] transition-colors',
+                open ? 'border-ring ring-2 ring-ring/30' : 'border-input',
                 disabled ? 'pointer-events-none opacity-50' : 'cursor-text',
             ]"
             @click="inputRef?.focus()"
@@ -207,7 +207,7 @@ watch(open, (val) => {
             <span
                 v-for="(tag, idx) in tags"
                 :key="tag"
-                class="inline-flex items-center gap-0.5 rounded bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground transition-colors"
+                class="inline-flex items-center gap-0.5 rounded-lg border-2 border-foreground bg-(--brutal-yellow) px-1.5 py-0.5 text-xs font-extrabold text-secondary-foreground shadow-[2px_2px_0_var(--brutal-ink)] transition-colors"
             >
                 {{ labelFor(tag) }}
                 <button
@@ -250,7 +250,7 @@ watch(open, (val) => {
         >
             <div
                 v-if="open && totalOptions > 0"
-                class="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md"
+                class="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-xl border-2 border-foreground bg-popover text-popover-foreground shadow-[6px_6px_0_var(--brutal-ink)]"
             >
                 <div class="max-h-48 overflow-y-auto p-1">
                     <button
@@ -258,7 +258,7 @@ watch(open, (val) => {
                         :key="s.value"
                         type="button"
                         :class="[
-                            'flex w-full items-center rounded-sm px-2 py-1.5 text-xs outline-none transition-colors',
+                            'flex w-full items-center rounded-lg px-2 py-1.5 text-xs font-extrabold outline-none transition-colors',
                             idx === highlightIndex
                                 ? 'bg-accent text-accent-foreground'
                                 : 'hover:bg-accent hover:text-accent-foreground',
@@ -273,7 +273,7 @@ watch(open, (val) => {
                         v-if="showCustomOption"
                         type="button"
                         :class="[
-                            'flex w-full items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs outline-none transition-colors',
+                            'flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-extrabold outline-none transition-colors',
                             filteredSuggestions.length === highlightIndex
                                 ? 'bg-accent text-accent-foreground'
                                 : 'hover:bg-accent hover:text-accent-foreground',

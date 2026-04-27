@@ -26,14 +26,16 @@ const navLinks = [
         :class="[
             'fixed top-0 right-0 left-0 z-50 transition-all duration-300',
             scrolled
-                ? 'border-b border-[#F3F4F6] bg-white/95 shadow-[0_1px_3px_rgba(0,0,0,0.04)] backdrop-blur-md'
+                ? 'border-b-2 border-[#101014] bg-white/95 shadow-[0_6px_0_rgba(16,16,20,0.9)] backdrop-blur-md'
                 : 'bg-white/80 backdrop-blur-sm',
         ]"
     >
         <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
             <!-- Logo -->
-            <a href="/" class="flex items-center gap-2.5">
-                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A84DC]">
+            <a href="/" class="group flex items-center gap-2.5">
+                <div
+                    class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#0A84DC] text-white shadow-[4px_4px_0_#101014] transition-transform group-hover:-rotate-6"
+                >
                     <svg
                         width="20"
                         height="20"
@@ -51,7 +53,7 @@ const navLinks = [
                         <path d="M10 9H8" />
                     </svg>
                 </div>
-                <span class="text-xl font-bold tracking-tight text-[#111827]">
+                <span class="font-display text-2xl font-extrabold tracking-tight text-[#101014]">
                     D<span class="text-[#0A84DC]">Form</span>
                 </span>
             </a>
@@ -63,10 +65,10 @@ const navLinks = [
                     :key="link.href"
                     :href="link.href"
                     :class="[
-                        'rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
+                        'rounded-xl border-2 px-4 py-2 text-sm font-extrabold transition-all duration-150',
                         currentPath === link.href
-                            ? 'bg-[#0A84DC]/8 text-[#0A84DC]'
-                            : 'text-[#6B7280] hover:bg-[#F9FAFB] hover:text-[#111827]',
+                            ? 'border-[#101014] bg-[#FFD84D] text-[#101014] shadow-[3px_3px_0_#101014]'
+                            : 'border-transparent text-[#101014] hover:border-[#101014] hover:bg-[#41F0B4] hover:shadow-[3px_3px_0_#101014]',
                     ]"
                 >
                     {{ link.label }}
@@ -77,13 +79,13 @@ const navLinks = [
             <div class="hidden items-center gap-3 md:flex">
                 <a
                     href="/auth/login"
-                    class="text-sm font-semibold text-[#6B7280] transition-colors hover:text-[#111827]"
+                    class="rounded-xl border-2 border-transparent px-4 py-2 text-sm font-extrabold text-[#101014] transition-all hover:border-[#101014] hover:bg-white hover:shadow-[3px_3px_0_#101014]"
                 >
                     Sign In
                 </a>
                 <a
                     href="/auth/register"
-                    class="rounded-lg bg-[#0A84DC] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#0972c0] hover:shadow-md active:scale-[0.97]"
+                    class="rounded-xl border-2 border-[#101014] bg-[#0A84DC] px-5 py-2.5 text-sm font-extrabold text-white shadow-[4px_4px_0_#101014] transition-all duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-[#FFD84D] hover:text-[#101014] active:translate-x-1 active:translate-y-1 active:shadow-[1px_1px_0_#101014]"
                 >
                     Get Started
                 </a>
@@ -91,7 +93,7 @@ const navLinks = [
 
             <!-- Mobile menu button -->
             <button
-                class="flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-[#F9FAFB] md:hidden"
+                class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#101014] bg-white shadow-[3px_3px_0_#101014] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none md:hidden"
                 @click="mobileMenuOpen = !mobileMenuOpen"
             >
                 <svg
@@ -133,29 +135,29 @@ const navLinks = [
             leave-from-class="opacity-100 translate-y-0"
             leave-to-class="opacity-0 -translate-y-2"
         >
-            <div v-if="mobileMenuOpen" class="border-t border-[#F3F4F6] bg-white px-6 py-4 shadow-lg md:hidden">
+            <div v-if="mobileMenuOpen" class="border-t-2 border-[#101014] bg-white px-6 py-4 shadow-[0_8px_0_#101014] md:hidden">
                 <div class="flex flex-col gap-1">
                     <a
                         v-for="link in navLinks"
                         :key="link.href"
                         :href="link.href"
                         :class="[
-                            'rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                            'rounded-xl border-2 px-3 py-2.5 text-sm font-extrabold transition-all',
                             currentPath === link.href
-                                ? 'bg-[#0A84DC]/8 text-[#0A84DC]'
-                                : 'text-[#111827] hover:bg-[#F9FAFB]',
+                                ? 'border-[#101014] bg-[#FFD84D] text-[#101014]'
+                                : 'border-transparent text-[#101014] hover:border-[#101014] hover:bg-[#41F0B4]',
                         ]"
                         @click="mobileMenuOpen = false"
                     >
                         {{ link.label }}
                     </a>
-                    <hr class="my-2 border-[#F3F4F6]" />
-                    <a href="/auth" class="rounded-lg px-3 py-2.5 text-sm font-medium text-[#111827] hover:bg-[#F9FAFB]"
+                    <hr class="my-2 border-[#101014]" />
+                    <a href="/auth" class="rounded-xl border-2 border-[#101014] px-3 py-2.5 text-sm font-extrabold text-[#111827]"
                         >Sign In</a
                     >
                     <a
                         href="/auth"
-                        class="mt-1 rounded-lg bg-[#0A84DC] px-3 py-2.5 text-center text-sm font-semibold text-white hover:bg-[#0972c0]"
+                        class="mt-1 rounded-xl border-2 border-[#101014] bg-[#0A84DC] px-3 py-2.5 text-center text-sm font-extrabold text-white shadow-[3px_3px_0_#101014]"
                         >Get Started</a
                     >
                 </div>

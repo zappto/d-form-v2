@@ -49,7 +49,7 @@ const features = [
 </script>
 
 <template>
-    <section id="features" class="relative bg-[#F8FAFC] py-24 lg:py-32">
+    <section id="features" class="relative border-y-4 border-[#101014] bg-[#FFD84D] py-24 lg:py-32">
         <!-- Top border decoration -->
         <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#0A84DC]/20 to-transparent" />
 
@@ -61,14 +61,14 @@ const features = [
                     isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
                 ]"
             >
-                <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-[#0A84DC]/15 bg-white px-4 py-1.5">
-                    <span class="text-xs font-semibold tracking-wide text-[#0A84DC] uppercase">Features</span>
+                <div class="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-[#101014] bg-white px-4 py-2 shadow-[4px_4px_0_#101014]">
+                    <span class="text-xs font-extrabold tracking-wide text-[#101014] uppercase">Features</span>
                 </div>
-                <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-[#101014] sm:text-5xl">
                     Everything you need to
                     <span class="text-[#0A84DC]">organize events</span>
                 </h2>
-                <p class="mt-4 text-lg leading-relaxed text-gray-500">
+                <p class="mt-4 text-lg font-semibold leading-relaxed text-[#34343B]">
                     Powerful tools designed to simplify every aspect of event management,
                     from registration to analytics.
                 </p>
@@ -80,13 +80,13 @@ const features = [
                     v-for="(feature, index) in features"
                     :key="feature.title"
                     :class="[
-                        'group rounded-2xl border border-gray-100 bg-white p-8 transition-all duration-500 hover:-translate-y-1 hover:border-[#0A84DC]/20 hover:shadow-xl hover:shadow-[#0A84DC]/5',
+                        'brutal-card group bg-white p-8 transition-all duration-500',
                         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
                     ]"
                     :style="{ transitionDelay: `${200 + index * 100}ms` }"
                 >
                     <!-- Icon -->
-                    <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0A84DC]/8 transition-colors group-hover:bg-[#0A84DC]/15">
+                    <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#41F0B4] text-[#101014] shadow-[3px_3px_0_#101014] transition-colors group-hover:bg-[#FF6BB5]">
                         <!-- Form icon -->
                         <svg v-if="feature.icon === 'form'" class="h-6 w-6 text-[#0A84DC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
@@ -114,8 +114,8 @@ const features = [
                         </svg>
                     </div>
 
-                    <h3 class="mb-2 text-lg font-bold text-gray-900">{{ feature.title }}</h3>
-                    <p class="text-sm leading-relaxed text-gray-500">{{ feature.description }}</p>
+                    <h3 class="font-display mb-2 text-xl font-extrabold text-[#101014]">{{ feature.title }}</h3>
+                    <p class="text-sm font-semibold leading-relaxed text-[#34343B]">{{ feature.description }}</p>
                 </div>
             </div>
         </div>

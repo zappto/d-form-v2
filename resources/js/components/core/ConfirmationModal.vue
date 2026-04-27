@@ -29,10 +29,10 @@ const emit = defineEmits<{
 
 <template>
     <AlertDialog :open="open" @update:open="(v) => emit('update:open', v)">
-        <AlertDialogContent class="rounded-xl">
+        <AlertDialogContent class="rounded-2xl border-2 border-foreground shadow-[8px_8px_0_var(--brutal-ink)]">
             <AlertDialogHeader>
-                <AlertDialogTitle class="text-base font-semibold">{{ title }}</AlertDialogTitle>
-                <AlertDialogDescription class="text-sm">{{ description }}</AlertDialogDescription>
+                <AlertDialogTitle class="font-display text-xl font-extrabold">{{ title }}</AlertDialogTitle>
+                <AlertDialogDescription class="text-sm font-semibold">{{ description }}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter class="gap-2">
                 <AlertDialogCancel @click="emit('cancel')">

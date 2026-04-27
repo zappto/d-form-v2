@@ -19,24 +19,25 @@ const steps = [
 </script>
 
 <template>
-    <section id="feat-how" class="bg-white py-24 lg:py-32">
+    <section id="feat-how" class="relative overflow-hidden bg-background py-24 lg:py-32">
+        <div class="absolute left-8 top-12 h-24 w-24 -rotate-12 rounded-3xl border-4 border-[#101014] bg-[#B9A4FF]"></div>
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div :class="['mx-auto max-w-2xl text-center transition-all duration-700', visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0']">
-                <h2 class="text-2xl font-extrabold tracking-tight text-[#111827] sm:text-3xl">
+                <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-[#101014] sm:text-5xl">
                     How it <span class="text-[#0A84DC]">works</span>
                 </h2>
-                <p class="mt-3 text-sm text-[#6B7280]">From design to insights in three simple steps.</p>
+                <p class="mt-3 text-base font-semibold text-[#34343B]">From design to insights in three punchy steps.</p>
             </div>
 
             <div class="mt-16 grid gap-8 lg:grid-cols-3">
                 <div
                     v-for="(s, i) in steps" :key="s.num"
-                    :class="['relative rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-8 transition-all duration-700', visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0']"
+                    :class="['brutal-card relative p-8 transition-all duration-700', visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0']"
                     :style="{ transitionDelay: `${200 + i * 150}ms` }"
                 >
-                    <span class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#0A84DC]/[0.06] text-sm font-extrabold text-[#0A84DC]">{{ s.num }}</span>
-                    <h3 class="mb-2 text-base font-bold text-[#111827]">{{ s.title }}</h3>
-                    <p class="text-sm leading-relaxed text-[#6B7280]">{{ s.desc }}</p>
+                    <span class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#FFD84D] text-sm font-extrabold text-[#101014] shadow-[3px_3px_0_#101014]">{{ s.num }}</span>
+                    <h3 class="font-display mb-2 text-xl font-extrabold text-[#101014]">{{ s.title }}</h3>
+                    <p class="text-sm font-semibold leading-relaxed text-[#34343B]">{{ s.desc }}</p>
                     <!-- Connector arrow between cards (desktop) -->
                     <div v-if="i < 2" class="pointer-events-none absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 lg:block">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#0A84DC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/></svg>

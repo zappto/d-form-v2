@@ -8,9 +8,9 @@ import { Link } from '@inertiajs/vue3';
     <div>
         <!-- Divider -->
         <div class="my-6 flex items-center gap-4">
-            <div class="h-px flex-1 bg-[#E5E7EB]"></div>
-            <span class="text-xs font-medium text-[#9CA3AF]">or continue with</span>
-            <div class="h-px flex-1 bg-[#E5E7EB]"></div>
+            <div class="h-0.5 flex-1 bg-[#101014]"></div>
+            <span class="rounded-full border-2 border-[#101014] bg-[#FFD84D] px-3 py-1 text-xs font-extrabold text-[#101014] shadow-[2px_2px_0_#101014]">or continue with</span>
+            <div class="h-0.5 flex-1 bg-[#101014]"></div>
         </div>
 
         <!-- OAuth buttons -->

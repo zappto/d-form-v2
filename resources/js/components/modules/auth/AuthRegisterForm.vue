@@ -73,11 +73,7 @@ function submit() {
 <template>
     <div>
         <div class="mb-8">
-            <h1 class="text-2xl font-extrabold tracking-tight text-[#111827]">Create account</h1>
-            <p class="mt-1.5 text-sm text-[#6B7280]">
-                Already have an account?
-                <Link :href="loginPage()" class="text-primary font-semibold hover:underline"> Sign In </Link>
-            </p>
+            <h1 class="font-display text-3xl font-extrabold tracking-[-0.04em] text-[#101014]">Create account</h1>
         </div>
 
         <form @submit.prevent="submit" class="space-y-4">
@@ -117,13 +113,18 @@ function submit() {
             <div v-if="form.password.length > 0" class="mt-3 space-y-2">
                 <!-- Progress bar -->
                 <div class="flex items-center gap-3">
-                    <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F3F4F6]">
+                    <div
+                        class="h-3 flex-1 overflow-hidden rounded-full border-2 border-[#101014] bg-white shadow-[2px_2px_0_#101014]"
+                    >
                         <div
                             class="h-full rounded-full transition-all duration-500 ease-out"
                             :style="{ width: strengthPercent + '%', backgroundColor: strengthColor }"
                         />
                     </div>
-                    <span class="text-xs font-semibold" :style="{ color: strengthColor }">{{ strengthLabel }}</span>
+                    <span
+                        class="rounded-lg border-2 border-[#101014] bg-[#FFD84D] px-2 py-0.5 text-xs font-extrabold text-[#101014] shadow-[2px_2px_0_#101014]"
+                        >{{ strengthLabel }}</span
+                    >
                 </div>
                 <!-- Rules checklist -->
                 <div class="grid grid-cols-2 gap-x-4 gap-y-1">
@@ -152,7 +153,7 @@ function submit() {
                         </svg>
                         <span
                             class="text-[11px]"
-                            :class="rule.met ? 'font-medium text-emerald-600' : 'text-[#9CA3AF]'"
+                            :class="rule.met ? 'font-extrabold text-emerald-600' : 'font-bold text-[#34343B]'"
                             >{{ rule.label }}</span
                         >
                     </div>
@@ -175,6 +176,15 @@ function submit() {
 
                 Submit
             </AuthSubmitButton>
+            <p class="mt-1.5 flex justify-center gap-1 text-sm font-semibold text-[#34343B]">
+                Already have an account?
+                <Link
+                    :href="loginPage()"
+                    class="text-primary font-extrabold underline decoration-[#FFD84D] decoration-4 underline-offset-4"
+                >
+                    Sign In
+                </Link>
+            </p>
         </form>
     </div>
 </template>

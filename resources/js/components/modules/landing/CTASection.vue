@@ -16,7 +16,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <section id="cta-section" class="relative overflow-hidden bg-[#0A84DC] py-24 lg:py-32">
+    <section id="cta-section" class="relative overflow-hidden border-y-4 border-[#101014] bg-[#0A84DC] py-24 lg:py-32">
+        <div class="brutal-grid pointer-events-none absolute inset-0 opacity-[0.08]"></div>
         <!-- Background decoration -->
         <div class="pointer-events-none absolute inset-0 opacity-10">
             <svg width="100%" height="100%">
@@ -40,17 +41,17 @@ onMounted(() => {
                     isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
                 ]"
             >
-                <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-white drop-shadow-[4px_4px_0_#101014] sm:text-5xl lg:text-6xl">
                     Ready to create your next event?
                 </h2>
-                <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
+                <p class="mx-auto mt-6 max-w-2xl text-lg font-semibold leading-relaxed text-white/80">
                     Join thousands of event organizers who trust DForm to handle
                     registrations, forms, and attendee management.
                 </p>
                 <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
                     <a
                         href="/auth"
-                        class="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-bold text-[#0A84DC] shadow-lg transition-all hover:shadow-xl active:scale-[0.97]"
+                        class="group inline-flex items-center gap-2 rounded-2xl border-2 border-[#101014] bg-white px-8 py-4 text-sm font-extrabold text-[#0A84DC] shadow-[6px_6px_0_#101014] transition-all hover:-translate-x-1 hover:-translate-y-1 hover:bg-[#FFD84D] hover:text-[#101014] active:translate-x-1 active:translate-y-1"
                     >
                         Get Started Free
                         <svg class="h-4 w-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -59,7 +60,7 @@ onMounted(() => {
                     </a>
                     <a
                         href="#features"
-                        class="inline-flex items-center gap-2 rounded-xl border border-white/25 px-8 py-4 text-sm font-semibold text-white transition-all hover:border-white/40 hover:bg-white/10"
+                        class="inline-flex items-center gap-2 rounded-2xl border-2 border-[#101014] bg-[#FF6BB5] px-8 py-4 text-sm font-extrabold text-[#101014] shadow-[6px_6px_0_#101014] transition-all hover:-translate-x-1 hover:-translate-y-1 hover:bg-[#41F0B4]"
                     >
                         Learn More
                     </a>
