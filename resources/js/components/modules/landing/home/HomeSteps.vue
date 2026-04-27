@@ -13,28 +13,29 @@ onMounted(() => {
 </script>
 
 <template>
-    <section id="steps-section" class="bg-[#F9FAFB] py-24 lg:py-32">
+    <section id="steps-section" class="relative overflow-hidden border-y-4 border-[#101014] bg-[#41F0B4] py-24 lg:py-32">
+        <div class="brutal-grid pointer-events-none absolute inset-0 opacity-[0.06]"></div>
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div :class="['mx-auto max-w-2xl text-center transition-all duration-700', visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0']">
-                <h2 class="text-3xl font-extrabold tracking-tight text-[#111827] sm:text-4xl">
+                <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-[#101014] sm:text-5xl">
                     Three steps to <span class="relative inline-block">
                         <span class="text-[#0A84DC]">launch</span>
-                        <span class="absolute -bottom-0.5 left-0 h-[2px] w-full rounded-full bg-[#0A84DC]/30"></span>
+                        <span class="absolute -bottom-1 left-0 -z-10 h-3 w-full rounded-full bg-[#FFD84D]"></span>
                     </span>
                 </h2>
-                <p class="mt-3 text-sm text-[#6B7280]">From idea to live event in minutes.</p>
+                <p class="mt-3 text-base font-semibold text-[#34343B]">From idea to live event in minutes.</p>
             </div>
 
             <!-- Steps with visual SVGs -->
             <div :class="['mt-16 transition-all duration-700', visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0']" style="transition-delay: 200ms;">
                 <div class="grid gap-8 lg:grid-cols-3">
                     <!-- Step 1: Create Event -->
-                    <div class="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                    <div class="brutal-card group relative overflow-hidden bg-white p-6 transition-all duration-300">
                         <div class="mb-5 flex items-center gap-3">
-                            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A84DC]/[0.06] text-sm font-extrabold text-[#0A84DC]">01</span>
-                            <h3 class="text-base font-bold text-[#111827]">Create Event</h3>
+                            <span class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#FFD84D] text-sm font-extrabold text-[#101014] shadow-[3px_3px_0_#101014]">01</span>
+                            <h3 class="font-display text-xl font-extrabold text-[#101014]">Create Event</h3>
                         </div>
-                        <p class="mb-6 text-xs leading-relaxed text-[#6B7280]">Set up your event with name, date, and capacity in under 2 minutes.</p>
+                        <p class="mb-6 text-sm font-semibold leading-relaxed text-[#34343B]">Set up your event with name, date, and capacity in under 2 minutes.</p>
 
                         <!-- SVG: Event creation form -->
                         <svg viewBox="0 0 280 180" fill="none" class="w-full rounded-xl bg-[#F9FAFB] border border-[#F3F4F6]">
@@ -67,12 +68,12 @@ onMounted(() => {
                     </div>
 
                     <!-- Step 2: Build Form -->
-                    <div class="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 150ms;">
+                    <div class="brutal-card group relative overflow-hidden bg-white p-6 transition-all duration-300" style="transition-delay: 150ms;">
                         <div class="mb-5 flex items-center gap-3">
-                            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A84DC]/[0.06] text-sm font-extrabold text-[#0A84DC]">02</span>
-                            <h3 class="text-base font-bold text-[#111827]">Build Form</h3>
+                            <span class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#FF6BB5] text-sm font-extrabold text-[#101014] shadow-[3px_3px_0_#101014]">02</span>
+                            <h3 class="font-display text-xl font-extrabold text-[#101014]">Build Form</h3>
                         </div>
-                        <p class="mb-6 text-xs leading-relaxed text-[#6B7280]">Design registration forms with our drag-and-drop builder.</p>
+                        <p class="mb-6 text-sm font-semibold leading-relaxed text-[#34343B]">Design registration forms with our drag-and-drop builder.</p>
 
                         <!-- SVG: Drag and drop builder -->
                         <svg viewBox="0 0 280 180" fill="none" class="w-full rounded-xl bg-[#F9FAFB] border border-[#F3F4F6]">
@@ -114,12 +115,12 @@ onMounted(() => {
                     </div>
 
                     <!-- Step 3: Go Live -->
-                    <div class="group overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md" style="transition-delay: 300ms;">
+                    <div class="brutal-card group overflow-hidden bg-white p-6 transition-all duration-300" style="transition-delay: 300ms;">
                         <div class="mb-5 flex items-center gap-3">
-                            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A84DC]/[0.06] text-sm font-extrabold text-[#0A84DC]">03</span>
-                            <h3 class="text-base font-bold text-[#111827]">Go Live</h3>
+                            <span class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#B9A4FF] text-sm font-extrabold text-[#101014] shadow-[3px_3px_0_#101014]">03</span>
+                            <h3 class="font-display text-xl font-extrabold text-[#101014]">Go Live</h3>
                         </div>
-                        <p class="mb-6 text-xs leading-relaxed text-[#6B7280]">Publish and start collecting responses instantly.</p>
+                        <p class="mb-6 text-sm font-semibold leading-relaxed text-[#34343B]">Publish and start collecting responses instantly.</p>
 
                         <!-- SVG: Live dashboard with chart -->
                         <svg viewBox="0 0 280 180" fill="none" class="w-full rounded-xl bg-[#F9FAFB] border border-[#F3F4F6]">

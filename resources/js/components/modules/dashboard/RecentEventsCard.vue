@@ -27,9 +27,9 @@ const baseHref = computed(() => props.eventBaseHref ?? '/dashboard/events')
 </script>
 
 <template>
-    <Card class="rounded-xl border shadow-xs">
+    <Card>
         <CardHeader class="flex flex-row items-center justify-between pb-3">
-            <CardTitle class="text-base font-medium">Recent Events</CardTitle>
+            <CardTitle class="font-display text-xl font-extrabold">Recent Events</CardTitle>
             <Button variant="ghost" size="sm" class="text-xs text-muted-foreground" as-child>
                 <Link :href="allHref">
                     View all
@@ -42,16 +42,16 @@ const baseHref = computed(() => props.eventBaseHref ?? '/dashboard/events')
                 v-for="event in recentEvents"
                 :key="event.id"
                 :href="`${baseHref}/${event.id}`"
-                class="group flex items-start gap-3 rounded-lg border border-transparent p-3 transition-colors hover:border-border hover:bg-muted/40"
+                class="group flex items-start gap-3 rounded-xl border-2 border-transparent p-3 transition-all hover:border-foreground hover:bg-(--brutal-yellow) hover:shadow-[3px_3px_0_var(--brutal-ink)]"
             >
                 <img
                     :src="event.banner_url ?? ''"
                     :alt="event.title"
-                    class="size-10 shrink-0 rounded-lg object-cover"
+                    class="size-12 shrink-0 rounded-xl border-2 border-foreground object-cover shadow-[2px_2px_0_var(--brutal-ink)]"
                 />
                 <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-medium group-hover:text-primary">{{ event.title }}</p>
-                    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                    <p class="truncate text-sm font-extrabold group-hover:text-primary">{{ event.title }}</p>
+                    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs font-semibold text-muted-foreground">
                         <span class="inline-flex items-center gap-1">
                             <CalendarDays class="size-3" />
                             {{ formatDate(event.start_date) }}
@@ -72,7 +72,7 @@ const baseHref = computed(() => props.eventBaseHref ?? '/dashboard/events')
                         </Badge>
                     </div>
                 </div>
-                <span class="shrink-0 text-xs tabular-nums text-muted-foreground">
+                <span class="shrink-0 rounded-lg border-2 border-foreground bg-white px-2 py-1 text-xs font-extrabold tabular-nums shadow-[2px_2px_0_var(--brutal-ink)]">
                     {{ event.registered_count }}/{{ event.quota }}
                 </span>
             </Link>

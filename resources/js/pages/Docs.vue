@@ -36,7 +36,8 @@ const apiEndpoints = [
 <template>
     <LandingLayout>
         <!-- Hero -->
-        <section class="relative overflow-hidden bg-white pt-28 pb-16 lg:pt-36 lg:pb-20">
+        <section class="relative overflow-hidden bg-background pt-28 pb-16 lg:pt-36 lg:pb-20">
+            <div class="brutal-grid pointer-events-none absolute inset-0 opacity-[0.035]"></div>
             <div class="pointer-events-none absolute inset-0 opacity-[0.02]">
                 <svg width="100%" height="100%"><defs><pattern id="dg" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M 48 0 L 0 0 0 48" fill="none" stroke="#000" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#dg)"/></svg>
             </div>
@@ -44,18 +45,18 @@ const apiEndpoints = [
             <div class="relative mx-auto max-w-7xl px-6 lg:px-8">
                 <div class="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
                     <div :class="['transition-all duration-700', heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0']">
-                        <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-[#0A84DC]/15 bg-[#0A84DC]/[0.04] px-4 py-1.5">
-                            <span class="text-xs font-semibold tracking-wide text-[#0A84DC]">Documentation</span>
+                        <div class="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-[#101014] bg-[#41F0B4] px-4 py-2 shadow-[4px_4px_0_#101014]">
+                            <span class="text-xs font-extrabold tracking-wide text-[#101014]">Documentation</span>
                         </div>
-                        <h1 class="text-4xl leading-[1.08] font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+                        <h1 class="font-display text-5xl leading-[0.96] font-extrabold tracking-[-0.055em] text-[#101014] sm:text-6xl">
                             Learn, build,<br/><span class="text-[#0A84DC]">ship faster.</span>
                         </h1>
-                        <p class="mt-6 max-w-md text-base leading-relaxed text-gray-400 lg:text-lg">
+                        <p class="mt-6 max-w-md text-base font-semibold leading-relaxed text-[#34343B] lg:text-lg">
                             Comprehensive guides, API references, and tutorials to help you get the most out of DForm.
                         </p>
 
                         <!-- Search bar -->
-                        <div class="mt-8 flex max-w-md items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-[#0A84DC]/30 focus-within:shadow-md">
+                        <div class="mt-8 flex max-w-md items-center gap-3 rounded-2xl border-2 border-[#101014] bg-white px-4 py-3 shadow-[5px_5px_0_#101014] transition-all focus-within:-translate-x-0.5 focus-within:-translate-y-0.5">
                             <svg class="h-4 w-4 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                             <input type="text" placeholder="Search documentation..." class="w-full bg-transparent text-sm text-gray-700 placeholder-gray-300 outline-none"/>
                         </div>
@@ -150,23 +151,23 @@ const apiEndpoints = [
         </section>
 
         <!-- Content -->
-        <section id="docs-content" class="bg-[#FAFAFA] py-20 lg:py-28">
+        <section id="docs-content" class="border-y-4 border-[#101014] bg-[#FFD84D] py-20 lg:py-28">
             <div class="mx-auto max-w-7xl px-6 lg:px-8">
                 <!-- Guides -->
                 <div class="mb-10">
-                    <h2 class="text-2xl font-extrabold tracking-tight text-gray-900">Guides & Tutorials</h2>
-                    <p class="mt-2 text-sm text-gray-400">Everything you need to get started and go further.</p>
+                    <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-[#101014]">Guides & Tutorials</h2>
+                    <p class="mt-2 text-base font-semibold text-[#34343B]">Everything you need to get started and go further.</p>
                 </div>
 
                 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     <a
                         v-for="(g, i) in guides" :key="g.title"
                         href="#"
-                        :class="['group flex flex-col rounded-2xl border border-gray-100 bg-white p-6 transition-all duration-500 hover:-translate-y-1 hover:border-[#0A84DC]/15 hover:shadow-xl hover:shadow-[#0A84DC]/[0.04]', contentVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0']"
+                        :class="['brutal-card group flex flex-col bg-white p-6 transition-all duration-500', contentVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0']"
                         :style="{ transitionDelay: `${i * 80}ms` }"
                     >
                         <div class="mb-3 flex items-center justify-between">
-                            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A84DC]/[0.06]">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#41F0B4] text-[#101014] shadow-[3px_3px_0_#101014]">
                                 <svg v-if="g.icon === 'rocket'" class="h-4 w-4 text-[#0A84DC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
                                 <svg v-if="g.icon === 'form'" class="h-4 w-4 text-[#0A84DC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
                                 <svg v-if="g.icon === 'webhook'" class="h-4 w-4 text-[#0A84DC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
@@ -174,10 +175,10 @@ const apiEndpoints = [
                                 <svg v-if="g.icon === 'chart'" class="h-4 w-4 text-[#0A84DC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/></svg>
                                 <svg v-if="g.icon === 'shield'" class="h-4 w-4 text-[#0A84DC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
                             </div>
-                            <span class="rounded-md bg-gray-50 px-2 py-0.5 text-[10px] font-semibold text-gray-400">{{ g.tag }}</span>
+                            <span class="rounded-lg border-2 border-[#101014] bg-[#FF6BB5] px-2 py-0.5 text-[10px] font-extrabold text-[#101014] shadow-[2px_2px_0_#101014]">{{ g.tag }}</span>
                         </div>
-                        <h3 class="mb-1 text-sm font-bold text-gray-900 transition-colors group-hover:text-[#0A84DC]">{{ g.title }}</h3>
-                        <p class="text-xs leading-relaxed text-gray-400">{{ g.desc }}</p>
+                        <h3 class="font-display mb-1 text-lg font-extrabold text-[#101014] transition-colors group-hover:text-[#0A84DC]">{{ g.title }}</h3>
+                        <p class="text-sm font-semibold leading-relaxed text-[#34343B]">{{ g.desc }}</p>
                         <div class="mt-auto flex items-center gap-1 pt-4 text-[11px] font-semibold text-[#0A84DC] opacity-0 transition-opacity group-hover:opacity-100">
                             Read guide
                             <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -188,15 +189,15 @@ const apiEndpoints = [
                 <!-- API Reference Preview -->
                 <div class="mt-20">
                     <div class="mb-8 flex items-center gap-3">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0A84DC]/[0.06]">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#41F0B4] text-[#101014] shadow-[3px_3px_0_#101014]">
                             <svg class="h-4 w-4 text-[#0A84DC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                         </div>
-                        <h2 class="text-xl font-bold tracking-tight text-gray-900">API Reference</h2>
+                        <h2 class="font-display text-3xl font-extrabold tracking-[-0.04em] text-[#101014]">API Reference</h2>
                     </div>
 
-                    <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
-                        <div class="border-b border-gray-50 bg-gray-50/50 px-6 py-3">
-                            <span class="text-xs font-mono font-medium text-gray-400">Base URL: https://api.dform.io/v1</span>
+                    <div class="brutal-card overflow-hidden bg-white">
+                        <div class="border-b-2 border-[#101014] bg-[#41F0B4] px-6 py-3">
+                            <span class="font-mono text-xs font-extrabold text-[#101014]">Base URL: https://api.dform.io/v1</span>
                         </div>
                         <div class="divide-y divide-gray-50">
                             <div v-for="ep in apiEndpoints" :key="ep.path" class="flex items-center gap-4 px-6 py-3.5 transition-colors hover:bg-gray-50/50">

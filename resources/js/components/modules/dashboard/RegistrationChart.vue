@@ -23,15 +23,18 @@ const chartData = {
             label: 'Registrations',
             data: dummyChartData.registrationTrends.map((d) => d.count),
             borderColor: 'oklch(0.59 0.14 242)',
-            backgroundColor: 'oklch(0.59 0.14 242 / 0.06)',
+            backgroundColor: 'rgba(255, 216, 77, 0.28)',
             fill: true,
             tension: 0.4,
-            pointRadius: 0,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: 'oklch(0.59 0.14 242)',
-            pointHoverBorderColor: '#fff',
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#FFD84D',
+            pointBorderColor: '#101014',
+            pointHoverBackgroundColor: '#41F0B4',
+            pointHoverBorderColor: '#101014',
+            pointBorderWidth: 2,
             pointHoverBorderWidth: 2,
-            borderWidth: 2,
+            borderWidth: 4,
         },
     ],
 }
@@ -47,7 +50,7 @@ const chartOptions = {
             titleFont: { size: 12, weight: 500 as const },
             bodyFont: { size: 11 },
             padding: 10,
-            cornerRadius: 8,
+            cornerRadius: 12,
             displayColors: false,
         },
     },
@@ -59,10 +62,10 @@ const chartOptions = {
 </script>
 
 <template>
-    <Card class="rounded-xl border shadow-xs">
+    <Card>
         <CardHeader class="pb-2">
-            <CardTitle class="text-base font-medium">Registration Trends</CardTitle>
-            <CardDescription class="text-xs">{{ total.toLocaleString() }} total registrations</CardDescription>
+            <CardTitle class="font-display text-xl font-extrabold">Registration Trends</CardTitle>
+            <CardDescription class="text-xs font-bold">{{ total.toLocaleString() }} total registrations</CardDescription>
         </CardHeader>
         <CardContent class="pt-0">
             <div class="h-52">

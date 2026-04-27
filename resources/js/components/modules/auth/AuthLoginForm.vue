@@ -28,10 +28,10 @@ function submit() {
 <template>
     <div>
         <div class="mb-8">
-            <h1 class="text-2xl font-extrabold tracking-tight text-[#111827]">Welcome back</h1>
-            <p class="mt-1.5 text-sm text-[#6B7280]">
+            <h1 class="font-display text-3xl font-extrabold tracking-[-0.04em] text-[#101014]">Welcome back</h1>
+            <p class="mt-1.5 text-sm font-semibold text-[#34343B]">
                 Don't have an account?
-                <Link :href="registerPage()" class="text-primary font-semibold hover:underline"> Sign Up </Link>
+                <Link :href="registerPage()" class="font-extrabold text-primary underline decoration-[#FFD84D] decoration-4 underline-offset-4"> Sign Up </Link>
             </p>
         </div>
 

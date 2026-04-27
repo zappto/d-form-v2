@@ -31,7 +31,7 @@ const resolvedSrc = computed(() => (props.src ? String(props.src) : ''))
 </script>
 
 <template>
-    <div class="relative size-full min-h-20 bg-muted">
+    <div class="brutal-noise relative size-full min-h-20 bg-(--brutal-yellow)">
         <img
             v-if="showImg"
             :src="resolvedSrc"
@@ -43,7 +43,7 @@ const resolvedSrc = computed(() => (props.src ? String(props.src) : ''))
         />
         <div
             v-else
-            class="flex size-full min-h-[inherit] flex-col items-center justify-center gap-1 px-2 text-center text-muted-foreground"
+            class="flex size-full min-h-[inherit] flex-col items-center justify-center gap-1 px-2 text-center font-bold text-foreground"
         >
             <ImageOff class="size-7 shrink-0 opacity-45" aria-hidden="true" />
             <span class="text-[10px] leading-tight">No banner</span>

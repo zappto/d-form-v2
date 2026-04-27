@@ -48,18 +48,19 @@ const filteredEvents = computed(() => {
 </script>
 
 <template>
-    <section id="event-list" class="bg-white py-20 lg:py-28">
+    <section id="event-list" class="relative overflow-hidden bg-background py-20 lg:py-28">
+        <div class="absolute right-8 top-10 h-24 w-24 rotate-12 rounded-full border-4 border-[#101014] bg-[#41F0B4]"></div>
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <!-- Header + Search -->
             <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <h2 class="text-2xl font-extrabold tracking-tight text-[#111827]">All Events</h2>
-                <div class="flex items-center gap-3 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 transition-all focus-within:border-[#0A84DC]/30 focus-within:shadow-sm">
-                    <svg class="h-4 w-4 text-[#9CA3AF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-[#101014]">All Events</h2>
+                <div class="flex items-center gap-3 rounded-2xl border-2 border-[#101014] bg-white px-4 py-2.5 shadow-[4px_4px_0_#101014] transition-all focus-within:-translate-x-0.5 focus-within:-translate-y-0.5">
+                    <svg class="h-4 w-4 text-[#101014]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                     <input
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search events..."
-                        class="w-full min-w-[200px] bg-transparent text-sm text-[#111827] placeholder-[#9CA3AF] outline-none"
+                        class="w-full min-w-[200px] border-0 bg-transparent text-sm font-bold text-[#101014] shadow-none placeholder-[#6B7280] outline-none"
                     />
                 </div>
             </div>
@@ -70,10 +71,10 @@ const filteredEvents = computed(() => {
                     v-for="cat in categories" :key="cat"
                     @click="activeCategory = cat"
                     :class="[
-                        'rounded-lg px-4 py-2 text-xs font-semibold transition-all duration-200',
+                        'rounded-xl border-2 border-[#101014] px-4 py-2 text-xs font-extrabold shadow-[3px_3px_0_#101014] transition-all duration-200 active:translate-x-1 active:translate-y-1 active:shadow-none',
                         activeCategory === cat
-                            ? 'bg-[#0A84DC] text-white shadow-sm'
-                            : 'border border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#D1D5DB] hover:bg-[#F9FAFB]',
+                            ? 'bg-[#0A84DC] text-white'
+                            : 'bg-white text-[#101014] hover:bg-[#FFD84D]',
                     ]"
                 >
                     {{ cat }}
@@ -86,7 +87,7 @@ const filteredEvents = computed(() => {
                     v-for="(event, i) in filteredEvents" :key="event.id"
                     :href="`/events/${event.id}`"
                     :class="[
-                        'group flex flex-col overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md',
+                        'brutal-card group flex flex-col overflow-hidden transition-all duration-300',
                         listVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
                     ]"
                     :style="{ transitionDelay: `${i * 60}ms` }"
@@ -94,17 +95,17 @@ const filteredEvents = computed(() => {
                     <!-- Card Image -->
                     <div class="relative aspect-[16/10] overflow-hidden">
                         <img :src="event.image" :alt="event.title" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-                        <span :class="['absolute top-3 right-3 rounded-md px-2 py-0.5 text-[10px] font-semibold', event.status === 'Open' ? 'bg-white text-[#059669]' : 'bg-white text-[#D97706]']">
+                        <span :class="['absolute top-3 right-3 rounded-lg border-2 border-[#101014] bg-white px-2 py-0.5 text-[10px] font-extrabold shadow-[2px_2px_0_#101014]', event.status === 'Open' ? 'text-[#059669]' : 'text-[#D97706]']">
                             {{ event.status }}
                         </span>
                     </div>
                     <!-- Card Content -->
                     <div class="flex flex-1 flex-col p-5">
-                        <span class="mb-3 w-fit rounded-md px-2 py-0.5 text-[10px] font-semibold" :style="{ backgroundColor: event.color + '12', color: event.color }">
+                        <span class="mb-3 w-fit rounded-lg border-2 border-[#101014] bg-[#FFD84D] px-2 py-0.5 text-[10px] font-extrabold text-[#101014] shadow-[2px_2px_0_#101014]">
                             {{ event.category }}
                         </span>
-                        <h3 class="mb-2 text-sm font-semibold text-[#111827] transition-colors group-hover:text-[#0A84DC]">{{ event.title }}</h3>
-                        <div class="mt-auto space-y-1.5 pt-3 text-[11px] text-[#6B7280]">
+                        <h3 class="font-display mb-2 text-base font-extrabold text-[#101014] transition-colors group-hover:text-[#0A84DC]">{{ event.title }}</h3>
+                        <div class="mt-auto space-y-1.5 pt-3 text-[11px] font-bold text-[#34343B]">
                             <div class="flex items-center gap-1.5">
                                 <svg class="h-3 w-3 text-[#9CA3AF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
                                 {{ event.date }}
@@ -124,9 +125,9 @@ const filteredEvents = computed(() => {
 
             <!-- Empty state -->
             <div v-else class="flex flex-col items-center justify-center py-20 text-center">
-                <svg class="mb-4 h-12 w-12 text-[#E5E7EB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <p class="text-sm font-semibold text-[#111827]">No events found</p>
-                <p class="mt-1 text-xs text-[#9CA3AF]">Try adjusting your search or filter.</p>
+                <svg class="mb-4 h-12 w-12 text-[#101014]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <p class="font-display text-lg font-extrabold text-[#101014]">No events found</p>
+                <p class="mt-1 text-sm font-semibold text-[#34343B]">Try adjusting your search or filter.</p>
             </div>
         </div>
     </section>

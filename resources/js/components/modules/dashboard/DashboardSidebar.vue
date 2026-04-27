@@ -71,36 +71,48 @@ function handleLogout() {
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="sidebar">
-        <SidebarHeader class="pb-0">
+    <Sidebar collapsible="icon" variant="sidebar" class="border-foreground bg-sidebar border-r-2">
+        <SidebarHeader class="px-3 pt-3 pb-1">
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <a href="/dashboard" class="flex items-center gap-3">
+                        <a
+                            href="/dashboard"
+                            class="border-foreground flex items-center gap-3 rounded-2xl border-2 bg-white p-2 shadow-[4px_4px_0_var(--brutal-ink)]"
+                        >
                             <div
-                                class="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg"
+                                class="bg-primary text-primary-foreground border-foreground flex size-9 items-center justify-center rounded-xl border-2 shadow-[3px_3px_0_var(--brutal-ink)]"
                             >
                                 <FileText class="size-4" />
                             </div>
                             <div class="grid leading-none">
-                                <span class="text-base font-bold tracking-tight">
+                                <span class="font-display text-lg font-extrabold tracking-tight">
                                     D<span class="text-primary">Form</span>
                                 </span>
-                                <span class="text-muted-foreground text-[10px] font-medium">Event Manager</span>
+                                <span
+                                    class="text-muted-foreground text-[10px] font-extrabold tracking-[0.12em] uppercase"
+                                    >Event Manager</span
+                                >
                             </div>
                         </a>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
+
+            <div
+                class="border-foreground text-foreground mt-2 rounded-xl border-2 bg-(--brutal-yellow) px-3 py-1.5 text-[10px] font-extrabold tracking-[0.12em] uppercase shadow-[3px_3px_0_var(--brutal-ink)]"
+            >
+                Workspace Ready
+            </div>
         </SidebarHeader>
 
-        <SidebarSeparator />
+        <SidebarSeparator class="mx-3 my-2" />
 
-        <SidebarContent>
-            <SidebarGroup>
-                <SidebarGroupLabel
-                    class="text-sidebar-foreground/50 text-[10px] font-semibold tracking-widest uppercase"
-                >
+        <SidebarContent class="px-2">
+            <SidebarGroup
+                class="border-foreground rounded-2xl border-2 bg-white p-2 shadow-[4px_4px_0_var(--brutal-ink)]"
+            >
+                <SidebarGroupLabel class="text-sidebar-foreground text-[10px] font-extrabold tracking-widest uppercase">
                     Main
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
@@ -117,10 +129,10 @@ function handleLogout() {
                 </SidebarGroupContent>
             </SidebarGroup>
 
-            <SidebarGroup>
-                <SidebarGroupLabel
-                    class="text-sidebar-foreground/50 text-[10px] font-semibold tracking-widest uppercase"
-                >
+            <SidebarGroup
+                class="border-foreground mt-3 rounded-2xl border-2 bg-white p-2 shadow-[4px_4px_0_var(--brutal-ink)]"
+            >
+                <SidebarGroupLabel class="text-sidebar-foreground text-[10px] font-extrabold tracking-widest uppercase">
                     Management
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
@@ -132,7 +144,10 @@ function handleLogout() {
                                     <span>{{ item.label }}</span>
                                 </Link>
                             </SidebarMenuButton>
-                            <SidebarMenuBadge v-if="'badge' in item && item.badge">
+                            <SidebarMenuBadge
+                                v-if="'badge' in item && item.badge"
+                                class="border-foreground text-foreground border-2 bg-(--brutal-mint) px-1.5 text-[10px] font-extrabold shadow-[2px_2px_0_var(--brutal-ink)]"
+                            >
                                 {{ item.badge }}
                             </SidebarMenuBadge>
                         </SidebarMenuItem>
@@ -140,10 +155,10 @@ function handleLogout() {
                 </SidebarGroupContent>
             </SidebarGroup>
 
-            <SidebarGroup class="mt-auto">
-                <SidebarGroupLabel
-                    class="text-sidebar-foreground/50 text-[10px] font-semibold tracking-widest uppercase"
-                >
+            <SidebarGroup
+                class="border-foreground mt-auto rounded-2xl border-2 bg-white p-2 shadow-[4px_4px_0_var(--brutal-ink)]"
+            >
+                <SidebarGroupLabel class="text-sidebar-foreground text-[10px] font-extrabold tracking-widest uppercase">
                     Account
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
@@ -159,7 +174,7 @@ function handleLogout() {
                         <SidebarMenuItem>
                             <SidebarMenuButton
                                 tooltip="Log out"
-                                class="text-sidebar-foreground/60 hover:text-destructive hover:bg-destructive/10 active:bg-destructive/15"
+                                class="text-sidebar-foreground/70 hover:text-destructive hover:bg-destructive/10 active:bg-destructive/15"
                                 @click="handleLogout"
                             >
                                 <LogOut />
@@ -171,21 +186,21 @@ function handleLogout() {
             </SidebarGroup>
         </SidebarContent>
 
-        <SidebarSeparator class="mx-3" />
+        <SidebarSeparator class="mx-3 my-2" />
 
-        <SidebarFooter>
+        <SidebarFooter class="px-3 pb-3">
             <SidebarMenu>
                 <SidebarMenuItem>
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
                             <SidebarMenuButton
                                 size="lg"
-                                class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                class="border-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-2xl border-2 bg-white shadow-[4px_4px_0_var(--brutal-ink)] data-[state=open]:shadow-[3px_3px_0_var(--brutal-ink)]"
                             >
                                 <Avatar class="size-7 rounded-md">
                                     <AvatarImage :src="user?.avatar ?? ''" :alt="user?.name ?? ''" />
                                     <AvatarFallback
-                                        class="bg-primary/10 text-primary rounded-md text-[10px] font-semibold"
+                                        class="bg-primary text-primary-foreground border-foreground rounded-md border-2 text-[10px] font-extrabold"
                                     >
                                         {{ getInitials(user?.name ?? 'U') }}
                                     </AvatarFallback>
@@ -210,7 +225,7 @@ function handleLogout() {
                                     <Avatar class="size-8 rounded-md">
                                         <AvatarImage :src="user?.avatar ?? ''" :alt="user?.name ?? ''" />
                                         <AvatarFallback
-                                            class="bg-primary/10 text-primary rounded-md text-xs font-semibold"
+                                            class="bg-primary text-primary-foreground border-foreground rounded-md border-2 text-xs font-extrabold"
                                         >
                                             {{ getInitials(user?.name ?? 'U') }}
                                         </AvatarFallback>

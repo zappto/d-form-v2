@@ -6,16 +6,18 @@ import { Toaster } from '@/components/ui/sonner';
 </script>
 
 <template>
-    <div class="grid min-h-dvh w-full grid-cols-1 lg:grid-cols-2">
+    <div class="grid min-h-dvh w-full grid-cols-1 bg-background lg:grid-cols-2">
         <!-- Left: Illustration -->
         <AuthIllustration />
 
         <!-- Right: Auth Forms -->
-        <div class="flex min-h-dvh flex-col items-center justify-center overflow-y-auto bg-white px-6 py-12 sm:px-12">
-            <div class="w-full max-w-sm">
+        <div class="flex min-h-dvh flex-col items-center justify-center overflow-y-auto px-6 py-12 sm:px-12">
+            <div class="brutal-card w-full max-w-md bg-white p-7 sm:p-8">
                 <!-- Logo -->
-                <a href="/" class="mb-10 flex items-center gap-2.5">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0A84DC]">
+                <a href="/" class="group mb-10 flex items-center gap-2.5">
+                    <div
+                        class="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#0A84DC] shadow-[4px_4px_0_#101014] transition-transform group-hover:-rotate-6"
+                    >
                         <svg
                             width="22"
                             height="22"
@@ -33,7 +35,7 @@ import { Toaster } from '@/components/ui/sonner';
                             <path d="M10 9H8" />
                         </svg>
                     </div>
-                    <span class="text-2xl font-bold tracking-tight text-[#111827]">
+                    <span class="font-display text-3xl font-extrabold tracking-tight text-[#111827]">
                         D<span class="text-[#0A84DC]">Form</span>
                     </span>
                 </a>
@@ -45,7 +47,9 @@ import { Toaster } from '@/components/ui/sonner';
                 <AuthOAuthButtons />
 
                 <!-- Mobile footer -->
-                <p class="mt-10 text-center text-xs text-[#9CA3AF] lg:hidden">Created by Dinus Open Source Community</p>
+                <p class="mt-10 text-center text-xs font-bold uppercase tracking-[0.14em] text-[#6B7280] lg:hidden">
+                    Created by Dinus Open Source Community
+                </p>
             </div>
         </div>
     </div>

@@ -22,7 +22,8 @@ const stats = [
 </script>
 
 <template>
-    <section id="stats-bar" class="relative bg-[#0A84DC] py-16 lg:py-20">
+    <section id="stats-bar" class="relative border-y-4 border-[#101014] bg-[#0A84DC] py-16 lg:py-20">
+        <div class="brutal-grid pointer-events-none absolute inset-0 opacity-[0.08]"></div>
         <!-- Dot pattern -->
         <div class="pointer-events-none absolute inset-0 opacity-[0.04]">
             <svg width="100%" height="100%">
@@ -41,16 +42,16 @@ const stats = [
                     v-for="(stat, i) in stats"
                     :key="stat.label"
                     :class="[
-                        'relative flex flex-col items-center py-4 transition-all duration-600',
+                        'relative flex flex-col items-center rounded-2xl border-2 border-[#101014] bg-white px-4 py-6 text-[#101014] shadow-[5px_5px_0_#101014] transition-all duration-600 lg:rounded-none lg:border-0 lg:bg-transparent lg:text-white lg:shadow-none',
                         visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                        i < 3 ? 'lg:border-r lg:border-white/[0.06]' : '',
+                        i < 3 ? 'lg:border-r-2 lg:border-white/30' : '',
                     ]"
                     :style="{ transitionDelay: `${i * 100}ms` }"
                 >
-                    <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.05]">
+                    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#101014] bg-[#FFD84D] text-[#101014] shadow-[3px_3px_0_#101014] lg:border-white lg:bg-white lg:text-[#0A84DC] lg:shadow-[3px_3px_0_#101014]">
                         <svg
                             v-if="stat.icon === 'calendar'"
-                            class="h-5 w-5 text-[#ffffff]"
+                            class="h-5 w-5"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -64,7 +65,7 @@ const stats = [
                         </svg>
                         <svg
                             v-if="stat.icon === 'form'"
-                            class="h-5 w-5 text-[#ffffff]"
+                            class="h-5 w-5"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -78,7 +79,7 @@ const stats = [
                         </svg>
                         <svg
                             v-if="stat.icon === 'chart'"
-                            class="h-5 w-5 text-[#ffffff]"
+                            class="h-5 w-5"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -92,7 +93,7 @@ const stats = [
                         </svg>
                         <svg
                             v-if="stat.icon === 'shield'"
-                            class="h-5 w-5 text-[#ffffff]"
+                            class="h-5 w-5"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -103,8 +104,8 @@ const stats = [
                             <path d="m9 12 2 2 4-4" />
                         </svg>
                     </div>
-                    <span class="text-3xl font-extrabold tracking-tight text-white">{{ stat.value }}</span>
-                    <span class="mt-1.5 text-[11px] font-medium tracking-wider text-gray-300 uppercase">{{
+                    <span class="font-display text-4xl font-extrabold tracking-tight">{{ stat.value }}</span>
+                    <span class="mt-1.5 text-[11px] font-extrabold tracking-wider uppercase opacity-80">{{
                         stat.label
                     }}</span>
                 </div>

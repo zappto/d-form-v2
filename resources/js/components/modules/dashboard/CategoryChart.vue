@@ -13,10 +13,10 @@ import { dummyChartData } from '@/lib/dummyData'
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip)
 
 const colors = [
-    'oklch(0.59 0.14 242)',
-    'oklch(0.58 0.18 280)',
-    'oklch(0.55 0.14 160)',
-    'oklch(0.65 0.16 65)',
+    '#0A84DC',
+    '#FF6BB5',
+    '#41F0B4',
+    '#FFD84D',
 ]
 
 const totalEvents = dummyChartData.categoryBreakdown.reduce((s, d) => s + d.count, 0)
@@ -28,7 +28,9 @@ const chartData = {
             label: 'Events',
             data: dummyChartData.categoryBreakdown.map((d) => d.count),
             backgroundColor: colors,
-            borderRadius: 8,
+            borderColor: '#101014',
+            borderWidth: 2,
+            borderRadius: 10,
             barThickness: 36,
         },
     ],
@@ -44,7 +46,7 @@ const chartOptions = {
             titleFont: { size: 12, weight: 500 as const },
             bodyFont: { size: 11 },
             padding: 10,
-            cornerRadius: 8,
+            cornerRadius: 12,
             displayColors: true,
         },
     },
@@ -56,10 +58,10 @@ const chartOptions = {
 </script>
 
 <template>
-    <Card class="rounded-xl border shadow-xs">
+    <Card>
         <CardHeader class="pb-2">
-            <CardTitle class="text-base font-medium">Events by Category</CardTitle>
-            <CardDescription class="text-xs">{{ totalEvents }} events total</CardDescription>
+            <CardTitle class="font-display text-xl font-extrabold">Events by Category</CardTitle>
+            <CardDescription class="text-xs font-bold">{{ totalEvents }} events total</CardDescription>
         </CardHeader>
         <CardContent class="pt-0">
             <div class="h-52">

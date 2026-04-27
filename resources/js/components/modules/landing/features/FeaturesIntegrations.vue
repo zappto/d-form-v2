@@ -15,7 +15,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <section id="feat-integrations" class="overflow-hidden bg-[#F9FAFB] py-24 lg:py-32">
+    <section id="feat-integrations" class="overflow-hidden border-y-4 border-[#101014] bg-[#B9A4FF] py-24 lg:py-32">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div
                 :class="[
@@ -23,10 +23,10 @@ onMounted(() => {
                     visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
                 ]"
             >
-                <h2 class="text-2xl font-extrabold tracking-tight text-[#111827] sm:text-3xl">
+                <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-[#101014] sm:text-5xl">
                     Connects with your <span class="text-[#0A84DC]">favorite tools</span>
                 </h2>
-                <p class="mt-3 text-sm text-[#6B7280]">
+                <p class="mt-3 text-base font-semibold text-[#34343B]">
                     Seamlessly integrate DForm with the tools you already use.
                 </p>
             </div>
@@ -157,15 +157,15 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 2px solid #101014;
+    box-shadow: 5px 5px 0 #101014;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: default;
 }
 
 .logo-tile:hover {
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translate(-3px, -3px) rotate(-2deg) scale(1.05);
+    box-shadow: 8px 8px 0 #101014;
 }
 
 .logo-icon {

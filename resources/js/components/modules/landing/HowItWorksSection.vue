@@ -34,7 +34,7 @@ const steps = [
 </script>
 
 <template>
-    <section id="how-it-works" class="relative bg-white py-24 lg:py-32">
+    <section id="how-it-works" class="relative bg-background py-24 lg:py-32">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <!-- Section header -->
             <div
@@ -43,14 +43,14 @@ const steps = [
                     isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
                 ]"
             >
-                <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-[#0A84DC]/15 bg-[#0A84DC]/5 px-4 py-1.5">
-                    <span class="text-xs font-semibold tracking-wide text-[#0A84DC] uppercase">How It Works</span>
+                <div class="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-[#101014] bg-[#B9A4FF] px-4 py-2 shadow-[4px_4px_0_#101014]">
+                    <span class="text-xs font-extrabold tracking-wide text-[#101014] uppercase">How It Works</span>
                 </div>
-                <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                <h2 class="font-display text-4xl font-extrabold tracking-[-0.04em] text-[#101014] sm:text-5xl">
                     Three simple steps to
                     <span class="text-[#0A84DC]">get started</span>
                 </h2>
-                <p class="mt-4 text-lg leading-relaxed text-gray-500">
+                <p class="mt-4 text-lg font-semibold leading-relaxed text-[#34343B]">
                     From event creation to data collection — everything is designed to be intuitive and fast.
                 </p>
             </div>
@@ -78,8 +78,8 @@ const steps = [
                     >
                         <!-- Step number circle -->
                         <div class="relative mx-auto mb-8">
-                            <div class="relative z-10 mx-auto flex h-[120px] w-[120px] items-center justify-center rounded-3xl border border-gray-100 bg-white shadow-lg shadow-gray-100/50">
-                                <span class="text-4xl font-extrabold text-[#0A84DC]/20">{{ step.number }}</span>
+                            <div class="relative z-10 mx-auto flex h-[120px] w-[120px] items-center justify-center rounded-3xl border-4 border-[#101014] bg-[#FFD84D] shadow-[8px_8px_0_#101014]">
+                                <span class="font-display text-4xl font-extrabold text-[#101014]">{{ step.number }}</span>
                             </div>
                             <!-- Animated ring -->
                             <div class="absolute inset-0 z-0 mx-auto h-[120px] w-[120px]">
@@ -91,8 +91,8 @@ const steps = [
                             </div>
                         </div>
 
-                        <h3 class="mb-3 text-xl font-bold text-gray-900">{{ step.title }}</h3>
-                        <p class="mx-auto max-w-xs text-sm leading-relaxed text-gray-500">{{ step.description }}</p>
+                        <h3 class="font-display mb-3 text-2xl font-extrabold text-[#101014]">{{ step.title }}</h3>
+                        <p class="mx-auto max-w-xs text-sm font-semibold leading-relaxed text-[#34343B]">{{ step.description }}</p>
                     </div>
                 </div>
             </div>

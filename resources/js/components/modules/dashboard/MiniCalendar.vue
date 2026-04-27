@@ -46,10 +46,10 @@ const calendarDays = computed(() => {
 </script>
 
 <template>
-    <Card class="rounded-xl border shadow-xs">
+    <Card>
         <CardHeader class="pb-2">
             <div class="flex items-center justify-between">
-                <CardTitle class="text-base font-medium">
+                <CardTitle class="font-display text-xl font-extrabold">
                     {{ monthNames[currentMonth] }} {{ currentYear }}
                 </CardTitle>
                 <div class="flex items-center gap-0.5">
@@ -64,7 +64,7 @@ const calendarDays = computed(() => {
         </CardHeader>
         <CardContent class="pt-0">
             <div class="grid grid-cols-7 gap-0">
-                <div v-for="day in dayNames" :key="day" class="py-2 text-center text-[11px] font-medium text-muted-foreground">
+                <div v-for="day in dayNames" :key="day" class="py-2 text-center text-[11px] font-extrabold text-muted-foreground">
                     {{ day }}
                 </div>
             </div>
@@ -72,9 +72,9 @@ const calendarDays = computed(() => {
                 <div v-for="(cell, idx) in calendarDays" :key="idx" class="relative flex h-9 items-center justify-center">
                     <span
                         :class="[
-                            'flex size-7 items-center justify-center rounded-lg text-xs transition-colors',
+                            'flex size-7 items-center justify-center rounded-lg border border-transparent text-xs font-bold transition-colors',
                             cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground/30',
-                            cell.isToday ? 'bg-primary font-semibold text-primary-foreground' : 'hover:bg-muted/60',
+                            cell.isToday ? 'border-foreground bg-primary font-extrabold text-primary-foreground shadow-[2px_2px_0_var(--brutal-ink)]' : 'hover:border-foreground hover:bg-(--brutal-yellow)',
                         ]"
                     >
                         {{ cell.day }}

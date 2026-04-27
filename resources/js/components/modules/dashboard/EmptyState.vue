@@ -10,17 +10,17 @@ defineProps<{
 </script>
 
 <template>
-    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-muted/20 px-6 py-14 text-center">
+    <div class="brutal-card brutal-noise flex flex-col items-center justify-center px-6 py-14 text-center">
         <Vue3Lottie
             v-if="animationUrl"
             :animation-link="animationUrl"
             :height="size ?? 180"
             :width="size ?? 180"
             :loop="true"
-            class="mb-2"
+            class="mb-2 drop-shadow-[5px_5px_0_var(--brutal-ink)]"
         />
-        <p class="text-sm font-medium text-foreground">{{ title }}</p>
-        <p v-if="description" class="mt-1 max-w-xs text-xs text-muted-foreground">{{ description }}</p>
+        <p class="font-display text-base font-extrabold text-foreground">{{ title }}</p>
+        <p v-if="description" class="mt-2 max-w-xs text-sm font-medium text-muted-foreground">{{ description }}</p>
         <div class="mt-4">
             <slot />
         </div>
