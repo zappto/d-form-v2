@@ -28,10 +28,12 @@ class RulesBuilder
             if (is_object($metadata) && method_exists($metadata, 'get')) {
                 $ruleSet = $metadata->get('rules') ?? [];
                 $inputSubtype = $metadata->get('type') ?? null;
+                $options = $metadata->get('options') ?? null;
             } else {
                 $md = (array) $metadata;
                 $ruleSet = $md['rules'] ?? [];
                 $inputSubtype = $md['type'] ?? null;
+                $options = $md['options'] ?? null;
             }
             if (!is_array($ruleSet)) {
                 $ruleSet = [];
@@ -39,6 +41,17 @@ class RulesBuilder
 
             if ($field->input_type === 'input' && $inputSubtype === 'email') {
                 $ruleSet['email'] = true;
+            }
+
+            if ($field->input_type === 'radio' && is_string($options) && $options !== '') {
+                $ruleSet['in'] = $options;
+            }
+
+            if ($field->input_type === 'checkbox') {
+                $ruleSet['is_checkbox'] = true;
+                if (is_string($options) && $options !== '') {
+                    $ruleSet['checkbox_in'] = $options;
+                }
             }
 
             return [
@@ -50,10 +63,10 @@ class RulesBuilder
     }
 
     /**
-    * Mengonversi custom rules array menjadi Laravel Validation rules.
-    * * @param array<string, array<string, mixed>> $customRules
-    * @return array<string, array<int, string>>
-    */
+     * Mengonversi custom rules array menjadi Laravel Validation rules.
+     * @param array<string, array<string, mixed>> $customRules
+     * @return array<string, array<int, string>>
+     */
     public static function build(array $customRules): array
     {
         $laravelRules = [];
@@ -61,8 +74,19 @@ class RulesBuilder
         foreach ($customRules as $fieldName => $rules) {
             $mappedRules = [];
 
-            // 1. Handling Required vs Nullable
             $isRequired = filter_var($rules['required'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $isCheckbox = !empty($rules['is_checkbox']);
+
+            if ($isCheckbox) {
+                $mappedRules[] = $isRequired ? 'required' : 'nullable';
+                $mappedRules[] = 'array';
+                if (!empty($rules['checkbox_in'])) {
+                    $allowedValues = implode(',', array_map('trim', explode(',', (string) $rules['checkbox_in'])));
+                    $laravelRules["{$fieldName}.*"] = ["string", "in:{$allowedValues}"];
+                }
+                $laravelRules[$fieldName] = $mappedRules;
+                continue;
+            }
 
             if ($isRequired) {
                 $mappedRules[] = 'required';
@@ -70,25 +94,24 @@ class RulesBuilder
                 $mappedRules[] = 'nullable';
             }
 
-            // 2. Handling custom key rules
             foreach (self::DIRECT_MAP as $customKey => $laravelKey) {
-                $val = $rules[$customKey] ?? ''; // Jika tidak ada atau null, jadi string kosong
-
+                $val = $rules[$customKey] ?? '';
                 if ($val !== '') {
                     $mappedRules[] = "{$laravelKey}:{$val}";
                 }
             }
 
-            // 3. Handling email rule
             if (!empty($rules['email'])) {
                 $mappedRules[] = 'email';
             }
 
-            // 4. Special Case: Regex
-            // Laravel butuh delimiter (biasanya /) agar tidak error saat diproses
             if (!empty($rules['regex'])) {
-                // Gabungkan trim dan penyambungan string dalam satu eksekusi
                 $mappedRules[] = 'regex:/' . trim($rules['regex'], '/') . '/';
+            }
+
+            if (!empty($rules['in'])) {
+                $allowedValues = implode(',', array_map('trim', explode(',', (string) $rules['in'])));
+                $mappedRules[] = "in:{$allowedValues}";
             }
 
             $laravelRules[$fieldName] = $mappedRules;
