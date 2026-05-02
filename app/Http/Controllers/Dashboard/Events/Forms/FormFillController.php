@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Dashboard\Events\Forms;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Form;
-use App\Models\FormAnswer;
 use App\Models\FormField;
+use App\Services\Form\FormAccessGuard;
 use App\Support\FormFieldTypeMapping;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,12 +18,8 @@ class FormFillController extends Controller
     {
         abort_unless($form->event_id === $event->id, 404);
 
-        $user = $request->user();
-
-        $alreadySubmitted = FormAnswer::query()
-            ->where('form_id', $form->id)
-            ->where('user_id', $user->id)
-            ->exists();
+        $user   = $request->user();
+        $status = FormAccessGuard::check($form, $event, $user);
 
         $form->load(['formFields' => fn ($q) => $q->orderBy('order')]);
 
@@ -35,16 +31,17 @@ class FormFillController extends Controller
         $closed = $form->closed_at;
 
         return Inertia::render('Dashboard/Events/Forms/Fill', [
-            'event'            => ['id' => $event->id, 'title' => $event->title],
-            'form'             => [
+            'event'        => ['id' => $event->id, 'title' => $event->title],
+            'form'         => [
                 'id'          => $form->id,
                 'title'       => $form->title,
                 'description' => $form->description,
                 'closed_at'   => $closed ? $closed->toISOString() : null,
             ],
-            'fields'           => $fields,
-            'submitUrl'        => route('dashboard.forms.submission', ['event' => $event, 'form' => $form]),
-            'alreadySubmitted' => $alreadySubmitted,
+            'fields'       => $fields,
+            'submitUrl'    => route('dashboard.forms.submission', ['event' => $event, 'form' => $form]),
+            'accessStatus' => $status->value,
+            'accessMessage' => $status->message(),
         ]);
     }
 

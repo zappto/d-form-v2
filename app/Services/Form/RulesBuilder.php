@@ -54,6 +54,16 @@ class RulesBuilder
                 }
             }
 
+            if ($field->input_type === 'selectInput') {
+                $isMultiple = is_object($metadata) && method_exists($metadata, 'get')
+                    ? $metadata->get('is_multiple')
+                    : (isset($md['is_multiple']) ? $md['is_multiple'] : false);
+
+                if (filter_var($isMultiple, FILTER_VALIDATE_BOOLEAN)) {
+                    $ruleSet['is_multiple'] = true;
+                }
+            }
+
             return [
                 (string) $field->name => $ruleSet,
             ];
@@ -74,8 +84,9 @@ class RulesBuilder
         foreach ($customRules as $fieldName => $rules) {
             $mappedRules = [];
 
-            $isRequired = filter_var($rules['required'] ?? false, FILTER_VALIDATE_BOOLEAN);
-            $isCheckbox = !empty($rules['is_checkbox']);
+            $isRequired   = filter_var($rules['required'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $isCheckbox   = !empty($rules['is_checkbox']);
+            $isMultiple   = !empty($rules['is_multiple']);
 
             if ($isCheckbox) {
                 $mappedRules[] = $isRequired ? 'required' : 'nullable';
@@ -84,6 +95,13 @@ class RulesBuilder
                     $allowedValues = implode(',', array_map('trim', explode(',', (string) $rules['checkbox_in'])));
                     $laravelRules["{$fieldName}.*"] = ["string", "in:{$allowedValues}"];
                 }
+                $laravelRules[$fieldName] = $mappedRules;
+                continue;
+            }
+
+            if ($isMultiple) {
+                $mappedRules[] = $isRequired ? 'required' : 'nullable';
+                $mappedRules[] = 'array';
                 $laravelRules[$fieldName] = $mappedRules;
                 continue;
             }
