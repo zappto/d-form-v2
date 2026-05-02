@@ -51,18 +51,20 @@ class FormSubmissionController extends Controller
                 ->withInput();
         }
 
+        $isAdmin = $user->can('events.list');
         $answers = $this->buildAnswers($request, $fields, $form);
 
-        DB::transaction(function () use ($answers, $form, $user, $event): void {
+        DB::transaction(function () use ($answers, $form, $user, $event, $isAdmin): void {
             // Lock the event row to prevent concurrent over-quota submissions.
             $lockedEvent = Event::query()->lockForUpdate()->find($event->id);
 
             // Re-check quota inside the transaction to handle race conditions.
-            if ($lockedEvent->quota !== null
+            // Admins are exempt — they may submit even when the event is full.
+            if (! $isAdmin
+                && $lockedEvent->quota !== null
                 && $lockedEvent->quota > 0
                 && $lockedEvent->registered_count >= $lockedEvent->quota
             ) {
-                // Release lock and bubble up as a validation-style redirect.
                 throw new \App\Exceptions\QuotaExceededException();
             }
 
