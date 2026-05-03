@@ -14,7 +14,7 @@ import { Progress } from '@/components/ui/progress'
 import { Plus, Search, MapPin, CalendarDays, Users, ChevronsLeft, ChevronsRight } from 'lucide-vue-next'
 import { index as eventsIndex } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController'
 import {
-    dummyEvents, formatDate, statusColorMap,
+    formatDate, statusColorMap,
     categoryLabelMap, categoryColorMap,
 } from '@/lib/dummyData'
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'

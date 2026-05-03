@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { X, Star, Upload, ImagePlus, Send, Sparkles } from 'lucide-vue-next'
+import { X, Star, Upload, ImagePlus, Send } from 'lucide-vue-next'
 import { optionLabel, optionImageUrl, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping'
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
 import PageHeader from '@/components/modules/dashboard/PageHeader.vue'

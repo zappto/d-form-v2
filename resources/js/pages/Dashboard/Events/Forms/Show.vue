@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted, type Component } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
@@ -21,28 +21,18 @@ import {
     normalizeBannerSrc,
     type FormBannerState,
 } from '@/components/modules/builder/formBanner';
+import {
+    cloneFormBuilderPalette,
+    ALL_FORM_BUILDER_FIELD_TEMPLATES,
+    FORM_VISIBILITY_OPTIONS,
+    type FormBuilderPaletteCategory,
+} from '@/components/modules/builder/formBuilderPalette';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import LocalLottie from '@/components/core/LocalLottie.vue';
 import {
-    Type,
-    AlignLeft,
-    Mail,
-    Phone,
-    Hash,
-    ChevronDown,
-    SquareCheck,
-    CircleDot,
-    ImagePlus,
-    Upload,
-    Calendar,
-    Clock,
-    Star,
-    Heading as HeadingIcon,
-    TextCursorInput,
-    Minus,
     GripVertical,
     ChevronRight,
     Search,
@@ -52,6 +42,7 @@ import {
     Plus,
     ArrowLeft,
     FileText,
+    Sparkles,
 } from 'lucide-vue-next';
 
 defineOptions({ layout: DashboardFocusLayout });
@@ -64,83 +55,11 @@ const props = defineProps<{
     updateFormUrl: string;
 }>();
 
-// ─── Field Categories ──────────────────────────────────────────
-interface FieldTemplate {
-    type: string;
-    label: string;
-    icon: Component;
-    description: string;
-}
-
-interface FieldCategory {
-    name: string;
-    icon: Component;
-    isOpen: boolean;
-    fields: FieldTemplate[];
-}
-
-const fieldCategories: FieldCategory[] = [
-    {
-        name: 'Text Inputs',
-        icon: Type,
-        isOpen: true,
-        fields: [
-            { type: 'short_text', label: 'Short Text', icon: Type, description: 'Single line text' },
-            { type: 'long_text', label: 'Long Text', icon: AlignLeft, description: 'Multi-line text area' },
-            { type: 'email', label: 'Email', icon: Mail, description: 'Email address input' },
-            { type: 'phone', label: 'Phone', icon: Phone, description: 'Phone number input' },
-            { type: 'number', label: 'Number', icon: Hash, description: 'Numeric value input' },
-        ],
-    },
-    {
-        name: 'Choice',
-        icon: ChevronDown,
-        isOpen: true,
-        fields: [
-            { type: 'dropdown', label: 'Dropdown', icon: ChevronDown, description: 'Select from a list' },
-            { type: 'checkbox', label: 'Checkbox', icon: SquareCheck, description: 'Multiple selection' },
-            { type: 'radio', label: 'Radio', icon: CircleDot, description: 'Single selection' },
-        ],
-    },
-    {
-        name: 'Media',
-        icon: ImagePlus,
-        isOpen: true,
-        fields: [
-            { type: 'image_upload', label: 'Image Upload', icon: ImagePlus, description: 'Upload an image file' },
-            { type: 'file_upload', label: 'File Upload', icon: Upload, description: 'Upload any document' },
-        ],
-    },
-    {
-        name: 'Date & Time',
-        icon: Calendar,
-        isOpen: false,
-        fields: [
-            { type: 'date', label: 'Date', icon: Calendar, description: 'Date picker' },
-            { type: 'time', label: 'Time', icon: Clock, description: 'Time picker' },
-        ],
-    },
-    {
-        name: 'Content',
-        icon: TextCursorInput,
-        isOpen: false,
-        fields: [
-            { type: 'heading', label: 'Heading', icon: HeadingIcon, description: 'Section title' },
-            { type: 'paragraph', label: 'Paragraph', icon: TextCursorInput, description: 'Descriptive text block' },
-            { type: 'divider', label: 'Divider', icon: Minus, description: 'Visual separator line' },
-            { type: 'rating', label: 'Star Rating', icon: Star, description: 'Rate with stars' },
-        ],
-    },
-];
-
-const visibilityOptions = [
-    { value: 'public', label: 'Public' },
-    { value: 'participant', label: 'Participant' },
-    { value: 'admin', label: 'Admin' },
-];
+// ─── Field palette (shared) ────────────────────────────────────
+const categories = ref<FormBuilderPaletteCategory[]>(cloneFormBuilderPalette());
+const visibilityOptions = [...FORM_VISIBILITY_OPTIONS];
 
 // ─── State ─────────────────────────────────────────────────────
-const categories = ref<FieldCategory[]>(fieldCategories.map((c) => ({ ...c })));
 const searchQuery = ref('');
 const selectedFieldId = ref<string | null>(null);
 const dropIndicatorIndex = ref(-1);
@@ -197,11 +116,6 @@ watch(
     { deep: true }
 );
 
-// Auto-save pending fields from Create flow (DEPRECATED: Now handled in Create.vue store)
-onMounted(() => {
-    // Left intentionally empty or remove if no other onMounted tasks exist.
-});
-
 // ─── Computed ──────────────────────────────────────────────────
 const filteredCategories = computed(() => {
     const q = searchQuery.value.toLowerCase().trim();
@@ -217,12 +131,12 @@ const filteredCategories = computed(() => {
 const selectedField = computed(() => formFields.value.find((f) => f.id === selectedFieldId.value) ?? null);
 const isEmpty = computed(() => formFields.value.length === 0);
 const mobileFieldType = ref('');
-const allFieldTypes = computed(() => fieldCategories.flatMap((cat) => cat.fields));
+const allFieldTypes = ALL_FORM_BUILDER_FIELD_TEMPLATES;
 const bannerPreviewSrc = computed(() => normalizeBannerSrc(bannerState.bannerUrl));
 
 // ─── Field factory ─────────────────────────────────────────────
 function addFieldFromPicker() {
-    const picked = allFieldTypes.value.find((field) => field.type === mobileFieldType.value);
+    const picked = allFieldTypes.find((field) => field.type === mobileFieldType.value);
     if (!picked) return;
     const nf = createField(picked.type, picked.label);
     formFields.value.push(nf);

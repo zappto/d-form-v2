@@ -70,7 +70,7 @@ const answerKeys = computed(() => {
     // Prefer keys from fields first to maintain order
     const keysFromFields = props.fields.map((f) => f.name);
 
-    // Add any other keys found in submissions that might not be in fields (fallback)
+    // Add other keys present in submissions that are not listed in fields (fallback)
     const keysInSubmissions = new Set<string>();
     for (const submission of props.submissions.data) {
         Object.keys(submission.answers).forEach((key) => keysInSubmissions.add(key));

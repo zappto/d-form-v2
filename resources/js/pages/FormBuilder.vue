@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, reactive, nextTick } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
 import DraggableItem from '@/components/modules/builder/DraggableItem.vue'
@@ -7,78 +7,25 @@ import FieldRenderer from '@/components/modules/builder/FieldRenderer.vue'
 import FieldEditor from '@/components/modules/builder/FieldEditor.vue'
 import FormBannerSettings from '@/components/modules/builder/FormBannerSettings.vue'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import LocalLottie from '@/components/core/LocalLottie.vue'
 import { defaultFormBannerState, normalizeBannerSrc, type FormBannerState } from '@/components/modules/builder/formBanner'
 import {
-    Type, AlignLeft, Mail, Phone, Hash,
-    ChevronDown, SquareCheck, CircleDot,
-    ImagePlus, Upload,
-    Calendar, Clock, Star,
-    Heading as HeadingIcon, TextCursorInput, Minus,
+    cloneFormBuilderPalette,
+    ALL_FORM_BUILDER_FIELD_TEMPLATES,
+    type FormBuilderPaletteCategory,
+    type FormBuilderPaletteField,
+} from '@/components/modules/builder/formBuilderPalette'
+import {
     GripVertical, ChevronRight, Search, Eye, Save,
-    Undo2, Redo2, Smartphone, Sparkles, Plus,
+    Smartphone, Sparkles, Plus,
 } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardFocusLayout })
 
-// ─── Field Categories for Sidebar Palette ───────────────────────
-const fieldCategories = [
-    {
-        name: 'Text Inputs',
-        icon: Type,
-        isOpen: true,
-        fields: [
-            { type: 'short_text', label: 'Short Text', icon: Type, description: 'Single line text' },
-            { type: 'long_text', label: 'Long Text', icon: AlignLeft, description: 'Multi-line text area' },
-            { type: 'email', label: 'Email', icon: Mail, description: 'Email address input' },
-            { type: 'phone', label: 'Phone', icon: Phone, description: 'Phone number input' },
-            { type: 'number', label: 'Number', icon: Hash, description: 'Numeric value input' },
-        ],
-    },
-    {
-        name: 'Choice',
-        icon: ChevronDown,
-        isOpen: true,
-        fields: [
-            { type: 'dropdown', label: 'Dropdown', icon: ChevronDown, description: 'Select from a list' },
-            { type: 'checkbox', label: 'Checkbox', icon: SquareCheck, description: 'Multiple selection' },
-            { type: 'radio', label: 'Radio', icon: CircleDot, description: 'Single selection' },
-        ],
-    },
-    {
-        name: 'Media',
-        icon: ImagePlus,
-        isOpen: true,
-        fields: [
-            { type: 'image_upload', label: 'Image Upload', icon: ImagePlus, description: 'Upload an image file' },
-            { type: 'file_upload', label: 'File Upload', icon: Upload, description: 'Upload any document' },
-        ],
-    },
-    {
-        name: 'Date & Time',
-        icon: Calendar,
-        isOpen: false,
-        fields: [
-            { type: 'date', label: 'Date', icon: Calendar, description: 'Date picker' },
-            { type: 'time', label: 'Time', icon: Clock, description: 'Time picker' },
-        ],
-    },
-    {
-        name: 'Content',
-        icon: TextCursorInput,
-        isOpen: false,
-        fields: [
-            { type: 'heading', label: 'Heading', icon: HeadingIcon, description: 'Section title' },
-            { type: 'paragraph', label: 'Paragraph', icon: TextCursorInput, description: 'Descriptive text block' },
-            { type: 'divider', label: 'Divider', icon: Minus, description: 'Visual separator line' },
-            { type: 'rating', label: 'Star Rating', icon: Star, description: 'Rate with stars' },
-        ],
-    },
-]
+// ─── Field palette (shared) ───────────────────────────────────────
+const categories = ref<FormBuilderPaletteCategory[]>(cloneFormBuilderPalette())
 
 // ─── State ──────────────────────────────────────────────────────
-const categories = ref(fieldCategories.map((c) => ({ ...c, isOpen: c.isOpen })))
 const searchQuery = ref('')
 
 const formTitle = ref('Untitled Form')
@@ -117,12 +64,12 @@ const selectedField = computed(() => {
 
 const isEmpty = computed(() => formFields.value.length === 0)
 const mobileFieldType = ref('')
-const allFieldTypes = computed(() => fieldCategories.flatMap((category) => category.fields))
+const allFieldTypes = ALL_FORM_BUILDER_FIELD_TEMPLATES
 const bannerPreviewSrc = computed(() => normalizeBannerSrc(formBanner.bannerUrl))
 
 // ─── Field factory ──────────────────────────────────────────────
 function addFieldFromPicker() {
-    const picked = allFieldTypes.value.find(field => field.type === mobileFieldType.value)
+    const picked = allFieldTypes.find((field) => field.type === mobileFieldType.value)
     if (!picked) return
     const nf = createField(picked.type, picked.label)
     formFields.value.push(nf)
@@ -159,7 +106,7 @@ function createField(type: string, label: string): IFormField {
 }
 
 // ─── Sidebar Drag Start ─────────────────────────────────────────
-function onSidebarDragStart(e: DragEvent, fieldData: (typeof allFieldTypes.value)[number]) {
+function onSidebarDragStart(e: DragEvent, fieldData: FormBuilderPaletteField) {
     if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = 'copy'
         e.dataTransfer.setData(

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, type Component } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
@@ -13,38 +13,20 @@ import {
     normalizeBannerSrc,
     prependFormBannerToBackendPayload,
 } from '@/components/modules/builder/formBanner';
-import { toBackendFields } from '@/components/modules/builder/fieldMapping';
+import {
+    cloneFormBuilderPalette,
+    FORM_VISIBILITY_OPTIONS,
+    type FormBuilderPaletteCategory,
+} from '@/components/modules/builder/formBuilderPalette';
+import { toBackendFields, type BuilderField } from '@/components/modules/builder/fieldMapping';
+import type { CreateDashboardFormPayload } from '@/types/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import LocalLottie from '@/components/core/LocalLottie.vue';
-import {
-    Type,
-    AlignLeft,
-    Mail,
-    Phone,
-    Hash,
-    ChevronDown,
-    SquareCheck,
-    CircleDot,
-    ImagePlus,
-    Upload,
-    Calendar,
-    Clock,
-    Star,
-    Heading as HeadingIcon,
-    TextCursorInput,
-    Minus,
-    GripVertical,
-    ChevronRight,
-    Search,
-    Save,
-    Eye,
-    Settings,
-    Plus,
-    ArrowLeft,
-} from 'lucide-vue-next';
+import { GripVertical, ChevronRight, Search, Save, Eye, Settings, Plus, ArrowLeft } from 'lucide-vue-next';
 
 defineOptions({ layout: DashboardFocusLayout });
 
@@ -52,83 +34,11 @@ const props = defineProps<{
     event: { id: string; title: string };
 }>();
 
-// ─── Categories ─────────────────────────────────────────────
-interface FieldTemplate {
-    type: FormBuilderType;
-    label: string;
-    icon: Component;
-    description: string;
-}
-
-interface FieldCategory {
-    name: string;
-    icon: Component;
-    isOpen: boolean;
-    fields: FieldTemplate[];
-}
-
-const fieldCategories: FieldCategory[] = [
-    {
-        name: 'Text Inputs',
-        icon: Type,
-        isOpen: true,
-        fields: [
-            { type: 'short_text', label: 'Short Text', icon: Type, description: 'Single line text' },
-            { type: 'long_text', label: 'Long Text', icon: AlignLeft, description: 'Multi-line text area' },
-            { type: 'email', label: 'Email', icon: Mail, description: 'Email address input' },
-            { type: 'phone', label: 'Phone', icon: Phone, description: 'Phone number input' },
-            { type: 'number', label: 'Number', icon: Hash, description: 'Numeric value input' },
-        ],
-    },
-    {
-        name: 'Choice',
-        icon: ChevronDown,
-        isOpen: true,
-        fields: [
-            { type: 'dropdown', label: 'Dropdown', icon: ChevronDown, description: 'Select from a list' },
-            { type: 'checkbox', label: 'Checkbox', icon: SquareCheck, description: 'Multiple selection' },
-            { type: 'radio', label: 'Radio', icon: CircleDot, description: 'Single selection' },
-        ],
-    },
-    {
-        name: 'Media',
-        icon: ImagePlus,
-        isOpen: true,
-        fields: [
-            { type: 'image_upload', label: 'Image Upload', icon: ImagePlus, description: 'Upload an image file' },
-            { type: 'file_upload', label: 'File Upload', icon: Upload, description: 'Upload any document' },
-        ],
-    },
-    {
-        name: 'Date & Time',
-        icon: Calendar,
-        isOpen: false,
-        fields: [
-            { type: 'date', label: 'Date', icon: Calendar, description: 'Date picker' },
-            { type: 'time', label: 'Time', icon: Clock, description: 'Time picker' },
-        ],
-    },
-    {
-        name: 'Content',
-        icon: TextCursorInput,
-        isOpen: false,
-        fields: [
-            { type: 'heading', label: 'Heading', icon: HeadingIcon, description: 'Section title' },
-            { type: 'paragraph', label: 'Paragraph', icon: TextCursorInput, description: 'Descriptive text block' },
-            { type: 'divider', label: 'Divider', icon: Minus, description: 'Visual separator line' },
-            { type: 'rating', label: 'Star Rating', icon: Star, description: 'Rate with stars' },
-        ],
-    },
-];
-
-const visibilityOptions = [
-    { value: 'public', label: 'Public' },
-    { value: 'participant', label: 'Participant' },
-    { value: 'admin', label: 'Admin' },
-];
+// ─── Field palette (shared) ────────────────────────────────────
+const categories = ref<FormBuilderPaletteCategory[]>(cloneFormBuilderPalette());
+const visibilityOptions = [...FORM_VISIBILITY_OPTIONS];
 
 // ─── State ─────────────────────────────────────────────────────
-const categories = ref<FieldCategory[]>(fieldCategories.map((c) => ({ ...c })));
 const searchQuery = ref('');
 const selectedFieldId = ref<string | null>(null);
 const dropIndicatorIndex = ref(-1);
@@ -140,7 +50,7 @@ const formTitle = ref('');
 const formDescription = ref('');
 const closedAt = ref('');
 const visibleFor = ref<string[]>([]);
-const formFields = ref<IFormField[]>([]);
+const formFields = ref<BuilderField[]>([]);
 const bannerState = reactive(defaultFormBannerState());
 const isSaving = ref(false);
 const showPreview = ref(false);
@@ -160,7 +70,6 @@ const filteredCategories = computed(() => {
 });
 const selectedField = computed(() => formFields.value.find((f) => f.id === selectedFieldId.value) ?? null);
 const isEmpty = computed(() => formFields.value.length === 0);
-const allFieldTypes = computed(() => fieldCategories.flatMap((cat) => cat.fields));
 const bannerPreviewSrc = computed(() => normalizeBannerSrc(bannerState.bannerUrl));
 
 // ─── Field factory ─────────────────────────────────────────────
@@ -171,8 +80,8 @@ function addField(type: FormBuilderType, label: string) {
     showMobileMenu.value = false;
 }
 
-function createField(type: FormBuilderType, label: string): IFormField {
-    const defaults: Record<string, Partial<IFormField>> = {
+function createField(type: FormBuilderType, label: string): BuilderField {
+    const defaults: Partial<Record<FormBuilderType, Partial<BuilderField>>> = {
         short_text: { placeholder: 'Enter answer...' },
         long_text: { placeholder: 'Enter detailed answer...' },
         dropdown: { options: [{ id: crypto.randomUUID(), type: 'text', label: 'Option 1' }] },
@@ -182,23 +91,24 @@ function createField(type: FormBuilderType, label: string): IFormField {
         heading: { metadata: { content: 'Section Heading' } },
         paragraph: { metadata: { content: 'Description text goes here...' } },
     };
-    return {
+    const base: BuilderField = {
         id: crypto.randomUUID(),
         type,
         label: label || 'Untitled Field',
         name: `field_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`,
         description: '',
-        order: 0,
-        metadata: {},
-        required: false,
         placeholder: '',
+        required: false,
         options: [],
-        ...(defaults[type] || {}),
-    } as IFormField;
+        metadata: {},
+    };
+    return { ...base, ...(defaults[type] || {}) };
 }
 
 // ─── DnD ───────────────────────────────────────────────────────
-function onGapDragEnter(index: number) { dropIndicatorIndex.value = index; }
+function onGapDragEnter(index: number) {
+    dropIndicatorIndex.value = index;
+}
 function onCanvasDragOver(e: DragEvent) {
     e.preventDefault();
     if (e.dataTransfer) e.dataTransfer.dropEffect = isDraggingOverCanvas.value ? 'move' : 'copy';
@@ -214,13 +124,13 @@ function onCanvasDrop(e: DragEvent) {
     e.preventDefault();
     const raw = e.dataTransfer?.getData('application/json');
     if (!raw) return;
-    const data = JSON.parse(raw);
+    const data = JSON.parse(raw) as { isNew?: boolean; type?: string; label?: string; id?: string };
     const insertAt = dropIndicatorIndex.value < 0 ? formFields.value.length : dropIndicatorIndex.value;
-    if (data.isNew) {
-        const nf = createField(data.type, data.label);
+    if (data.isNew && data.type && data.label) {
+        const nf = createField(data.type as FormBuilderType, data.label);
         formFields.value.splice(insertAt, 0, nf);
         selectedFieldId.value = nf.id;
-    } else {
+    } else if (data.id) {
         const from = formFields.value.findIndex((f) => f.id === data.id);
         if (from === -1) return;
         const [moved] = formFields.value.splice(from, 1);
@@ -231,13 +141,15 @@ function onCanvasDrop(e: DragEvent) {
     isDraggingOverCanvas.value = false;
     dragSourceId.value = null;
 }
-function onCanvasDragStart(e: DragEvent, field: IFormField, index: number) {
+function onCanvasDragStart(e: DragEvent, field: BuilderField, index: number) {
     dragSourceId.value = field.id;
     if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('application/json', JSON.stringify({ id: field.id, fromIndex: index, isNew: false }));
     }
-    requestAnimationFrame(() => { isDraggingOverCanvas.value = true; });
+    requestAnimationFrame(() => {
+        isDraggingOverCanvas.value = true;
+    });
 }
 function onDragEnd() {
     dropIndicatorIndex.value = -1;
@@ -246,7 +158,9 @@ function onDragEnd() {
 }
 
 // ─── Actions ───────────────────────────────────────────────────
-function selectField(id: string) { selectedFieldId.value = selectedFieldId.value === id ? null : id; }
+function selectField(id: string) {
+    selectedFieldId.value = selectedFieldId.value === id ? null : id;
+}
 function deleteField(id: string) {
     formFields.value = formFields.value.filter((f) => f.id !== id);
     if (selectedFieldId.value === id) selectedFieldId.value = null;
@@ -254,13 +168,13 @@ function deleteField(id: string) {
 function duplicateField(id: string) {
     const i = formFields.value.findIndex((f) => f.id === id);
     if (i === -1) return;
-    const copy = JSON.parse(JSON.stringify(formFields.value[i]));
+    const copy = JSON.parse(JSON.stringify(formFields.value[i])) as BuilderField;
     copy.id = crypto.randomUUID();
     copy.name = `field_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
     formFields.value.splice(i + 1, 0, copy);
     selectedFieldId.value = copy.id;
 }
-function updateField(updated: IFormField) {
+function updateField(updated: BuilderField) {
     const i = formFields.value.findIndex((f) => f.id === updated.id);
     if (i !== -1) formFields.value[i] = updated;
 }
@@ -270,14 +184,14 @@ function toggleVisibility(value: string, checked: boolean) {
 }
 
 // ─── Save ──────────────────────────────────────────────────────
-const createForm = useForm({
+const createForm = useForm<CreateDashboardFormPayload>({
     title: '',
     description: '',
     closed_at: '',
-    visible_for: [] as string[],
+    visible_for: [],
     banner_url: '',
     banner_caption: '',
-    fields: [] as any[],
+    fields: [],
 });
 function saveNewForm() {
     if (!formTitle.value.trim() || !formDescription.value.trim() || !closedAt.value || visibleFor.value.length === 0) {
@@ -292,8 +206,8 @@ function saveNewForm() {
     createForm.banner_url = bannerState.bannerUrl;
     createForm.banner_caption = bannerState.caption;
 
-    const merged = prependFormBannerToBackendPayload(formFields.value as any, bannerState);
-    createForm.fields = toBackendFields(merged as any);
+    const merged = prependFormBannerToBackendPayload(formFields.value, bannerState);
+    createForm.fields = toBackendFields(merged);
 
     isSaving.value = true;
     createForm.post(`/dashboard/events/${props.event.id}/forms`, {
@@ -301,7 +215,8 @@ function saveNewForm() {
         onSuccess: () => toast.success('Form created successfully!'),
         onError: (err) => {
             isSaving.value = false;
-            toast.error(Object.values(err)[0] || 'Failed to create form.');
+            const first = Object.values(err)[0];
+            toast.error(typeof first === 'string' ? first : 'Failed to create form.');
         },
     });
 }
@@ -333,7 +248,7 @@ function saveNewForm() {
                     </div>
                 </div>
                 <div class="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
-                    <div v-for="(cat, ci) in filteredCategories" :key="cat.name">
+                    <div v-for="cat in filteredCategories" :key="cat.name">
                         <button class="mb-2 flex w-full items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground" @click="cat.isOpen = !cat.isOpen">
                             <ChevronRight class="size-3 transition-transform" :class="cat.isOpen ? 'rotate-90' : ''" />
                             {{ cat.name }}
@@ -472,7 +387,7 @@ function saveNewForm() {
                 </div>
                 <div class="flex-1 overflow-y-auto p-6 bg-white">
                     <div v-show="activePanel === 'fields'" class="space-y-6">
-                        <div v-for="cat in fieldCategories" :key="cat.name">
+                        <div v-for="cat in categories" :key="cat.name">
                             <h4 class="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">{{ cat.name }}</h4>
                             <div class="grid grid-cols-2 gap-3">
                                 <button v-for="f in cat.fields" :key="f.type" @click="addField(f.type, f.label)" class="flex flex-col items-center gap-2 rounded-2xl border-2 border-foreground p-4 text-center transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-muted shadow-[3px_3px_0_var(--brutal-ink)]">

@@ -21,7 +21,7 @@ import {
     edit as editEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController'
 import {
-    dummyEvents, formatDate, formatDateTime,
+    formatDate, formatDateTime,
     categoryLabelMap, categoryColorMap, sessionLabelMap,
 } from '@/lib/dummyData'
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'

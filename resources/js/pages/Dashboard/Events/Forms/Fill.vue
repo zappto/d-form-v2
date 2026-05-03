@@ -8,31 +8,36 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { AlertCircle, CheckCircle2, Send, ArrowLeft, Star, ImagePlus, Upload, X } from 'lucide-vue-next'
+import { AlertCircle, CheckCircle2, Send, Star, ImagePlus, Upload, X } from 'lucide-vue-next'
 import { normalizeBannerSrc, pickFormBannerField } from '@/components/modules/builder/formBanner'
+import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata'
+import type {
+    FormAccessStatus,
+    FormFillAnswerMap,
+    FormFillOptionRow,
+    FormFillPageEvent,
+    FormFillPageForm,
+    FormFieldMetadataBag,
+    FormFieldRules,
+} from '@/types/form'
 
 defineOptions({ layout: FormFillLayout })
 
-type FormAccessStatus = 'allowed' | 'not_visible' | 'form_closed' | 'registration_not_open' | 'quota_full' | 'already_submitted'
-type AnswerValue = string | string[] | File | null
-type AnswerMap = Record<string, AnswerValue>
-
 const props = defineProps<{
-    event: { id: string; title: string }
-    form: { id: string; title: string; description: string | null; closed_at: string | null; banner_url: string | null; banner_caption: string | null }
+    event: FormFillPageEvent
+    form: FormFillPageForm
     fields: IFormField[]
     submitUrl: string
     accessStatus: FormAccessStatus
     accessMessage: string
 }>()
 
-function metadata(field: IFormField): Record<string, any> {
-    return field.metadata && typeof field.metadata === 'object' ? field.metadata : {}
+function metadata(field: IFormField): FormFieldMetadataBag {
+    return readFieldMetadata(field)
 }
 
-function rules(field: IFormField): Record<string, any> {
-    const value = metadata(field).rules
-    return value && typeof value === 'object' ? value : {}
+function rules(field: IFormField): FormFieldRules {
+    return readFieldRules(field)
 }
 
 function builderType(field: IFormField): string {
@@ -82,7 +87,7 @@ const blockCopy = computed(() => {
     return map[props.accessStatus]
 })
 
-const initialValues: AnswerMap = {}
+const initialValues: FormFillAnswerMap = {}
 for (const field of props.fields) {
     if (isDisplayOnly(field)) continue
     if (field.type === 'checkbox' || (field.type === 'select' && metadata(field).is_multiple)) {
@@ -94,7 +99,7 @@ for (const field of props.fields) {
     }
 }
 
-const answerForm = useForm<AnswerMap>(initialValues)
+const answerForm = useForm<FormFillAnswerMap>(initialValues)
 
 function listFromCsv(value: unknown): string[] {
     return typeof value === 'string' ? value.split(',').map((item) => item.trim()).filter(Boolean) : []
@@ -107,12 +112,10 @@ function getOptions(field: IFormField): string[] {
     return listFromCsv(ruleOptions)
 }
 
-type OptionRow = { type: 'text' | 'image'; label: string; imageSrc?: string }
-
-function getOptionRows(field: IFormField): OptionRow[] {
+function getOptionRows(field: IFormField): FormFillOptionRow[] {
     const oc = metadata(field).optionChoices
     if (Array.isArray(oc)) {
-        const rows: OptionRow[] = []
+        const rows: FormFillOptionRow[] = []
         for (const item of oc) {
             if (item && typeof item === 'object' && item !== null) {
                 const typedItem = item as { type?: string; label?: string; imageUrl?: string }
@@ -232,7 +235,7 @@ function fieldError(name: string): string | undefined {
 
         <div class="mb-10 text-center">
             <h1 class="font-display text-4xl font-black tracking-tight text-foreground">{{ props.form.title }}</h1>
-            <p v-if="props.form.description" class="mt-2 text-sm font-bold text-muted-foreground">{{ props.form.description }}</p>
+            <p v-if="formHasDescription" class="mt-2 text-sm font-bold text-muted-foreground">{{ props.form.description }}</p>
         </div>
 
         <Card v-if="isBlocked" class="mt-6 rounded-2xl border-[2px] border-foreground shadow-[6px_6px_0_var(--brutal-ink)]">
