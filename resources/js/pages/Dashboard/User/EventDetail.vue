@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { MapPin, CalendarDays, Clock, DollarSign, Users, Send } from 'lucide-vue-next'
+import { MapPin, CalendarDays, Clock, DollarSign, Users, Send, Mail, Server } from 'lucide-vue-next'
 import {
     formatDate, formatDateTime, statusColorMap,
     categoryLabelMap, categoryColorMap, sessionLabelMap,
@@ -152,16 +152,56 @@ const metaBlocks = [
                                 </Badge>
                             </div>
 
-                            <!-- QR Code Section -->
-                            <div class="flex flex-col items-center gap-2 rounded-xl border border-dashed p-4 bg-white shadow-sm">
-                                <p class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Your Entry Ticket</p>
-                                <div class="bg-muted size-32 rounded-lg flex items-center justify-center border">
-                                    <!-- Placeholder QR Code -->
+                            <!-- FE-only: guidance until BE exposes in-app QR + optional flash (see docs/be-m5-email-qr-backend-followups.md) -->
+                            <div
+                                class="grid gap-3 rounded-xl border border-border bg-muted/15 p-4 md:grid-cols-2 md:items-start"
+                            >
+                                <div class="min-w-0 space-y-2">
+                                    <p class="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                                        <Mail class="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+                                        Email confirmation
+                                    </p>
+                                    <ul class="text-muted-foreground list-inside list-disc space-y-1 text-[11px] font-medium leading-relaxed">
+                                        <li>Check your inbox and spam folder for the confirmation message.</li>
+                                        <li>The email includes your answers and a scannable QR for check-in.</li>
+                                        <li class="flex flex-wrap items-center gap-1.5">
+                                            <Server class="inline size-3.5 shrink-0 text-foreground/70" aria-hidden="true" />
+                                            If email never arrives, confirm a queue worker is running when the queue driver is not sync.
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="min-w-0 space-y-2">
+                                    <p class="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                                        At the venue
+                                    </p>
+                                    <p class="text-[11px] font-medium leading-relaxed text-foreground/85">
+                                        Bring the QR from your confirmation email. Staff will scan it at the entrance.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-center gap-2 rounded-xl border border-dashed bg-white p-4 shadow-sm">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Your entry ticket</p>
+                                <p class="max-w-[220px] text-center text-[10px] leading-snug text-muted-foreground">
+                                    Preview only. Your real QR is attached in the confirmation email.
+                                </p>
+                                <div class="bg-muted flex size-32 items-center justify-center rounded-lg border" aria-hidden="true">
                                     <svg class="size-24 text-muted-foreground/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/><path d="M12 12h.01"/><path d="M12 7h.01"/><path d="M12 17h.01"/><path d="M7 12h.01"/><path d="M17 12h.01"/>
+                                        <rect width="18" height="18" x="3" y="3" rx="2" />
+                                        <path d="M7 7h.01" />
+                                        <path d="M17 7h.01" />
+                                        <path d="M7 17h.01" />
+                                        <path d="M17 17h.01" />
+                                        <path d="M12 12h.01" />
+                                        <path d="M12 7h.01" />
+                                        <path d="M12 17h.01" />
+                                        <path d="M7 12h.01" />
+                                        <path d="M17 12h.01" />
                                     </svg>
                                 </div>
-                                <p class="text-[9px] text-center text-muted-foreground leading-tight">Show this QR code at the event entrance for check-in.</p>
+                                <p class="text-[9px] text-center text-muted-foreground leading-tight">
+                                    Show the QR from your email at the event entrance for check-in.
+                                </p>
                             </div>
                         </div>
                     </CardContent>
