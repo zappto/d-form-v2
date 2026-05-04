@@ -237,27 +237,21 @@ function toggleCategory(index: number) {
         <!-- ════════════════════════════════════════════════════════
              LEFT SIDEBAR — Component Palette
              ════════════════════════════════════════════════════════ -->
-        <aside
-            class="hidden w-[260px] shrink-0 flex-col border-r-[1.5px] border-[var(--brutal-ink)]/10 bg-white lg:flex"
-        >
-            <!-- Sidebar header -->
-            <div class="border-b border-[var(--brutal-ink)]/8 px-4 pt-4 pb-3">
-                <h2 class="font-display text-sm font-bold tracking-tight text-[var(--brutal-ink)]">
-                    <Sparkles class="mr-1.5 inline size-4 text-[var(--brutal-yellow)]" />
+        <aside class="hidden w-[260px] shrink-0 flex-col border-r border-border bg-card lg:flex">
+            <div class="border-b border-border px-4 pt-4 pb-3">
+                <h2 class="font-display flex items-center gap-1.5 text-sm font-semibold tracking-[-0.01em] text-foreground">
+                    <Sparkles class="size-4 text-primary" />
                     Components
                 </h2>
-                <p class="mt-0.5 text-[10px] text-muted-foreground">
-                    Drag a component to the form canvas
-                </p>
+                <p class="mt-0.5 text-[10px] text-muted-foreground">Drag a component to the form canvas</p>
 
-                <!-- Search -->
                 <div class="relative mt-3">
-                    <Search class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground/50" />
+                    <Search class="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground/70" />
                     <input
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search components..."
-                        class="w-full rounded-lg border-[1.5px] border-[var(--brutal-ink)]/10 bg-muted/20 py-2 pr-3 pl-8 text-xs font-medium text-[var(--brutal-ink)] placeholder:text-muted-foreground/50 transition-all focus:border-[var(--brutal-blue)] focus:outline-none focus:ring-2 focus:ring-[var(--brutal-blue)]/20"
+                        class="w-full rounded-lg border border-border bg-card py-2 pr-3 pl-8 text-xs font-medium text-foreground shadow-xs transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15"
                     />
                 </div>
             </div>
@@ -271,9 +265,8 @@ function toggleCategory(index: number) {
                     />
                 </div>
                 <div v-for="(category, catIdx) in filteredCategories" :key="category.name" class="mb-3 last:mb-0">
-                    <!-- Category header (collapsible) -->
                     <button
-                        class="mb-1.5 flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-[var(--brutal-ink)]"
+                        class="mb-1.5 flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
                         @click="toggleCategory(catIdx)"
                     >
                         <ChevronRight
@@ -282,7 +275,7 @@ function toggleCategory(index: number) {
                         />
                         <component :is="category.icon" class="size-3.5 shrink-0" />
                         {{ category.name }}
-                        <span class="ml-auto text-[10px] font-medium text-muted-foreground/50">
+                        <span class="ml-auto text-[10px] font-medium text-muted-foreground">
                             {{ category.fields.length }}
                         </span>
                     </button>
@@ -309,9 +302,9 @@ function toggleCategory(index: number) {
                     v-if="filteredCategories.length === 0"
                     class="flex flex-col items-center py-8 text-center"
                 >
-                    <Search class="mb-2 size-8 text-muted-foreground/30" />
+                    <Search class="mb-2 size-8 text-muted-foreground/50" />
                     <p class="text-xs font-medium text-muted-foreground">No components found</p>
-                    <p class="mt-0.5 text-[10px] text-muted-foreground/60">Try a different search term</p>
+                    <p class="mt-0.5 text-[10px] text-muted-foreground/70">Try a different search term</p>
                 </div>
             </div>
         </aside>
@@ -319,15 +312,12 @@ function toggleCategory(index: number) {
         <!-- ════════════════════════════════════════════════════════
              CENTER — Mobile Canvas
              ════════════════════════════════════════════════════════ -->
-        <main class="relative flex-1 overflow-y-auto bg-[var(--background)]">
-            <!-- Top toolbar -->
-            <div
-                class="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--brutal-ink)]/8 bg-white/90 px-6 py-2 backdrop-blur-md"
-            >
+        <main class="relative flex-1 overflow-y-auto bg-background">
+            <div class="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card/85 px-6 py-2 backdrop-blur-xl">
                 <div class="flex items-center gap-2">
                     <Smartphone class="size-4 text-muted-foreground" />
                     <span class="text-xs font-semibold text-muted-foreground">Mobile Preview</span>
-                    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                    <span class="rounded-full border border-primary/15 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                         {{ formFields.length }} field{{ formFields.length !== 1 ? 's' : '' }}
                     </span>
                 </div>
@@ -340,10 +330,10 @@ function toggleCategory(index: number) {
                     </Button>
                 </div>
             </div>
-            <div class="border-b border-[var(--brutal-ink)]/8 bg-[var(--brutal-cream)]/70 px-4 py-3 lg:hidden">
-                <label class="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Add field on mobile</label>
+            <div class="border-b border-border bg-muted/30 px-4 py-3 lg:hidden">
+                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Add field on mobile</label>
                 <div class="flex gap-2">
-                    <select v-model="mobileFieldType" class="min-w-0 flex-1 rounded-xl border-[1.5px] border-[var(--brutal-ink)] bg-white px-3 py-2 text-xs font-semibold">
+                    <select v-model="mobileFieldType" class="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-xs transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15">
                         <option value="">Choose field type</option>
                         <option v-for="fieldType in allFieldTypes" :key="fieldType.type" :value="fieldType.type">{{ fieldType.label }}</option>
                     </select>
@@ -356,14 +346,10 @@ function toggleCategory(index: number) {
             <!-- Canvas area -->
             <div class="flex justify-center px-6 py-8">
                 <div class="w-full max-w-[420px]">
-                    <!-- Phone frame -->
-                    <div
-                        class="rounded-2xl border-[1.5px] border-[var(--brutal-ink)]/12 bg-white shadow-[var(--shadow-md)]"
-                    >
-                        <!-- Form header (always visible) -->
+                    <div class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
                         <div
                             v-if="bannerPreviewSrc || formBanner.caption.trim()"
-                            class="border-b border-[var(--brutal-ink)]/10 bg-muted/20"
+                            class="border-b border-border bg-muted/30"
                         >
                             <img
                                 v-if="bannerPreviewSrc"
@@ -379,18 +365,17 @@ function toggleCategory(index: number) {
                             </p>
                         </div>
                         <div
-                            class="border-b border-[var(--brutal-ink)]/8 bg-gradient-to-br from-primary/5 via-transparent to-[var(--brutal-yellow)]/5 px-5 pt-6 pb-5"
-                            :class="bannerPreviewSrc || formBanner.caption.trim() ? 'rounded-none' : 'rounded-t-2xl'"
+                            class="border-b border-border bg-gradient-to-br from-primary/5 via-transparent to-primary/0 px-5 pt-6 pb-5"
                         >
                             <input
                                 v-model="formTitle"
-                                class="w-full bg-transparent font-display text-xl font-bold tracking-tight text-[var(--brutal-ink)] placeholder:text-[var(--brutal-ink)]/30 focus:outline-none"
+                                class="w-full bg-transparent font-display text-xl font-bold tracking-[-0.02em] text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
                                 placeholder="Form Title"
                             />
                             <textarea
                                 v-model="formDescription"
                                 rows="2"
-                                class="mt-2 w-full resize-none bg-transparent text-[13px] leading-relaxed text-muted-foreground placeholder:text-muted-foreground/40 focus:outline-none"
+                                class="mt-2 w-full resize-none bg-transparent text-[13px] leading-relaxed text-muted-foreground placeholder:text-muted-foreground/50 focus:outline-none"
                                 placeholder="Add a description to help users understand the form..."
                             ></textarea>
                         </div>
@@ -402,7 +387,7 @@ function toggleCategory(index: number) {
                                 isEmpty && !isDraggingOverCanvas
                                     ? 'flex items-center justify-center'
                                     : '',
-                                isDraggingOverCanvas && isEmpty ? 'bg-[var(--brutal-blue)]/[0.03]' : '',
+                                isDraggingOverCanvas && isEmpty ? 'bg-primary/[0.03]' : '',
                             ]"
                             @dragover.prevent="onCanvasDragOver"
                             @dragleave="onCanvasDragLeave"
@@ -413,37 +398,31 @@ function toggleCategory(index: number) {
                                 v-if="isEmpty && !isDraggingOverCanvas"
                                 class="flex flex-col items-center py-6 text-center"
                             >
-                                <div
-                                    class="mb-4 rounded-2xl border-2 border-dashed border-[var(--brutal-ink)]/15 px-8 py-8"
-                                >
+                                <div class="mb-4 rounded-2xl border border-dashed border-border bg-muted/30 px-8 py-8">
                                     <LocalLottie name="builderEmpty" :height="140" :width="140" />
                                 </div>
-                                <h3 class="font-display text-base font-bold text-[var(--brutal-ink)]">
+                                <h3 class="font-display text-base font-bold tracking-[-0.01em] text-foreground">
                                     Start building your form
                                 </h3>
                                 <p class="mt-1.5 max-w-[260px] text-xs leading-relaxed text-muted-foreground">
-                                    Drag components from the left panel and drop them here.
-                                    You can rearrange them anytime.
+                                    Drag components from the left panel and drop them here. You can rearrange them anytime.
                                 </p>
-                                <div class="mt-4 flex items-center gap-2 rounded-full bg-muted/40 px-3 py-1.5">
-                                    <GripVertical class="size-3.5 text-muted-foreground/50" />
+                                <div class="mt-4 flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1.5">
+                                    <GripVertical class="size-3.5 text-muted-foreground/70" />
                                     <span class="text-[10px] font-medium text-muted-foreground">
                                         Tip: Drag the handle to reorder fields
                                     </span>
                                 </div>
                             </div>
 
-                            <!-- ─── Drop here placeholder (when empty + dragging) ─── -->
                             <div
                                 v-if="isEmpty && isDraggingOverCanvas"
-                                class="flex min-h-[200px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--brutal-blue)]/40 bg-[var(--brutal-blue)]/[0.05] transition-all"
+                                class="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-primary/40 bg-primary/[0.05] transition-colors"
                             >
-                                <div class="size-10 rounded-full bg-[var(--brutal-blue)]/10 p-2.5">
-                                    <Plus class="size-full text-[var(--brutal-blue)]" />
+                                <div class="grid size-10 place-items-center rounded-full bg-primary/10">
+                                    <Plus class="size-5 text-primary" />
                                 </div>
-                                <p class="mt-2 text-xs font-semibold text-[var(--brutal-blue)]">
-                                    Drop here to add
-                                </p>
+                                <p class="mt-2 text-xs font-semibold text-primary">Drop here to add</p>
                             </div>
 
                             <!-- ─── Field List ─── -->
@@ -459,7 +438,7 @@ function toggleCategory(index: number) {
                                             class="pointer-events-none h-0.5 rounded-full transition-all duration-200"
                                             :class="
                                                 dropIndicatorIndex === index
-                                                    ? 'bg-[var(--brutal-blue)] shadow-[0_0_8px_rgba(37,99,235,0.3)]'
+                                                    ? 'bg-primary shadow-sm'
                                                     : 'bg-transparent'
                                             "
                                         ></div>
@@ -479,9 +458,7 @@ function toggleCategory(index: number) {
                                             @dragstart="(e) => onCanvasDragStart(e, field, index)"
                                             @dragend="onDragEnd"
                                         >
-                                            <div
-                                                class="flex size-7 items-center justify-center rounded-lg bg-white text-muted-foreground/60 shadow-[var(--shadow-sm)] ring-1 ring-[var(--brutal-ink)]/8 transition-colors hover:text-[var(--brutal-ink)]"
-                                            >
+                                            <div class="grid size-7 place-items-center rounded-lg border border-border bg-card text-muted-foreground shadow-xs transition-colors hover:border-primary/30 hover:text-foreground">
                                                 <GripVertical class="size-4" />
                                             </div>
                                         </div>
@@ -506,7 +483,7 @@ function toggleCategory(index: number) {
                                         class="pointer-events-none h-0.5 rounded-full transition-all duration-200"
                                         :class="
                                             dropIndicatorIndex === formFields.length
-                                                ? 'bg-[var(--brutal-blue)] shadow-[0_0_8px_rgba(37,99,235,0.3)]'
+                                                ? 'bg-primary shadow-sm'
                                                 : 'bg-transparent'
                                         "
                                     ></div>
@@ -515,8 +492,7 @@ function toggleCategory(index: number) {
                         </div>
                     </div>
 
-                    <!-- Bottom hint -->
-                    <p class="mt-4 text-center text-[10px] text-muted-foreground/50">
+                    <p class="mt-4 text-center text-[10px] text-muted-foreground/70">
                         Form preview · Mobile size (420px). On mobile, use the add-field dropdown above.
                     </p>
                 </div>
@@ -526,13 +502,9 @@ function toggleCategory(index: number) {
         <!-- ════════════════════════════════════════════════════════
              RIGHT SIDEBAR — Properties Panel
              ════════════════════════════════════════════════════════ -->
-        <aside
-            class="hidden w-[300px] shrink-0 flex-col border-l-[1.5px] border-[var(--brutal-ink)]/10 bg-white lg:flex"
-        >
-            <div class="border-b border-[var(--brutal-ink)]/8 px-4 pt-4 pb-3">
-                <h2 class="font-display text-sm font-bold tracking-tight text-[var(--brutal-ink)]">
-                    Properties
-                </h2>
+        <aside class="hidden w-[300px] shrink-0 flex-col border-l border-border bg-card lg:flex">
+            <div class="border-b border-border px-4 pt-4 pb-3">
+                <h2 class="font-display text-sm font-semibold tracking-[-0.01em] text-foreground">Properties</h2>
                 <p class="mt-0.5 text-[10px] text-muted-foreground">
                     {{ selectedField ? 'Edit the selected field' : 'Select a field to edit' }}
                 </p>
@@ -547,18 +519,13 @@ function toggleCategory(index: number) {
                 />
 
                 <!-- Empty state -->
-                <div
-                    v-else
-                    class="flex h-full flex-col items-center justify-center text-center"
-                >
-                    <div class="rounded-2xl border-2 border-dashed border-[var(--brutal-ink)]/10 p-6">
+                <div v-else class="flex h-full flex-col items-center justify-center text-center">
+                    <div class="rounded-2xl border border-dashed border-border bg-muted/30 p-6">
                         <LocalLottie name="fieldSelected" :height="100" :width="100" />
                     </div>
-                    <p class="mt-4 text-xs font-semibold text-[var(--brutal-ink)]/60">
-                        No field selected
-                    </p>
+                    <p class="mt-4 text-xs font-semibold text-foreground">No field selected</p>
                     <p class="mt-1 max-w-[200px] text-[10px] leading-relaxed text-muted-foreground">
-                        Click on any field in the form canvas to edit its properties here.
+                        Select a field in the form canvas to edit its properties here.
                     </p>
                 </div>
             </div>

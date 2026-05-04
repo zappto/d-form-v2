@@ -128,7 +128,7 @@ function handleImport() {
     showImportModal.value = false
 }
 
-const cardShadow = 'shadow-[0_1px_2px_rgb(15_23_42/0.04),0_8px_24px_-12px_rgb(15_23_42/0.08)]'
+const cardShadow = 'shadow-sm'
 </script>
 
 <template>

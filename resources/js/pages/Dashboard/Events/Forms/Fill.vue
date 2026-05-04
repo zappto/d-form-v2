@@ -214,10 +214,9 @@ function fieldError(name: string): string | undefined {
     <Head :title="`Register: ${props.form.title}`" />
 
     <div class="mx-auto max-w-2xl px-2">
-        <!-- Static Banner Section -->
         <div
             v-if="formBannerImageSrc || formBannerCaption"
-            class="overflow-hidden rounded-2xl border-[2px] border-foreground bg-white shadow-[6px_6px_0_var(--brutal-ink)] mb-10"
+            class="mb-10 overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
         >
             <img
                 v-if="formBannerImageSrc"
@@ -227,24 +226,24 @@ function fieldError(name: string): string | undefined {
             />
             <p
                 v-if="formBannerCaption"
-                class="border-t-2 border-foreground px-5 py-4 text-sm font-bold leading-relaxed text-muted-foreground"
+                class="border-t border-border px-5 py-4 text-sm leading-relaxed text-muted-foreground"
             >
                 {{ formBannerCaption }}
             </p>
         </div>
 
         <div class="mb-10 text-center">
-            <h1 class="font-display text-4xl font-black tracking-tight text-foreground">{{ props.form.title }}</h1>
-            <p v-if="formHasDescription" class="mt-2 text-sm font-bold text-muted-foreground">{{ props.form.description }}</p>
+            <h1 class="font-display text-balance text-4xl font-bold tracking-[-0.035em] text-foreground">{{ props.form.title }}</h1>
+            <p v-if="formHasDescription" class="mt-3 text-sm leading-relaxed text-muted-foreground">{{ props.form.description }}</p>
         </div>
 
-        <Card v-if="isBlocked" class="mt-6 rounded-2xl border-[2px] border-foreground shadow-[6px_6px_0_var(--brutal-ink)]">
+        <Card v-if="isBlocked" class="mt-6">
             <CardContent class="flex flex-col items-center gap-3 py-12 text-center">
                 <CheckCircle2 v-if="blockCopy.success" class="size-10 text-success" />
                 <AlertCircle v-else class="size-10 text-warning" />
-                <p class="text-xl font-black">{{ blockCopy.title }}</p>
-                <p class="max-w-md text-sm font-bold text-muted-foreground">{{ blockCopy.body }}</p>
-                <Button variant="outline" size="sm" class="mt-6 border-2 rounded-xl h-11 px-8 font-black" as-child>
+                <p class="font-display text-xl font-bold tracking-[-0.02em] text-foreground">{{ blockCopy.title }}</p>
+                <p class="max-w-md text-sm text-muted-foreground">{{ blockCopy.body }}</p>
+                <Button variant="outline" size="lg" class="mt-6" as-child>
                     <Link :href="`/dashboard/events/${event.id}`">View event</Link>
                 </Button>
             </CardContent>
@@ -256,33 +255,28 @@ function fieldError(name: string): string | undefined {
             @submit.prevent="submit"
         >
             <template v-for="field in fields" :key="field.id">
-                <!-- Heading -->
-                <div v-if="builderType(field) === 'heading'" class="rounded-2xl border-[2px] border-foreground bg-(--brutal-yellow) px-5 py-4 shadow-[4px_4px_0_var(--brutal-ink)]">
-                    <h2 class="font-display text-2xl font-black tracking-tight text-foreground">
+                <div v-if="builderType(field) === 'heading'" class="rounded-2xl border border-border bg-primary/8 px-5 py-4 shadow-xs">
+                    <h2 class="font-display text-2xl font-bold tracking-[-0.025em] text-foreground">
                         {{ metadata(field).content || field.label }}
                     </h2>
-                    <p v-if="field.description" class="mt-1 text-sm font-bold text-foreground/70">{{ field.description }}</p>
+                    <p v-if="field.description" class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{{ field.description }}</p>
                 </div>
 
-                <!-- Paragraph -->
-                <div v-else-if="builderType(field) === 'paragraph'" class="rounded-2xl border-[2px] border-foreground bg-white px-5 py-4 text-sm font-bold leading-relaxed text-muted-foreground shadow-[4px_4px_0_var(--brutal-ink)]">
+                <div v-else-if="builderType(field) === 'paragraph'" class="rounded-2xl border border-border bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground shadow-xs">
                     {{ metadata(field).content || field.description || field.label }}
                 </div>
 
-                <!-- Divider -->
-                <hr v-else-if="builderType(field) === 'divider'" class="brutal-divider my-2" />
+                <hr v-else-if="builderType(field) === 'divider'" class="app-divider my-2" />
 
-                <!-- Banner -->
                 <div v-else-if="builderType(field) === 'banner'" class="hidden" />
 
-                <!-- Input Fields -->
-                <Card v-else class="rounded-2xl border-[2px] border-foreground shadow-[6px_6px_0_var(--brutal-ink)] overflow-hidden">
+                <Card v-else class="overflow-hidden">
                     <CardHeader class="pb-2 pt-4">
-                        <CardTitle class="flex items-start gap-1 text-sm font-black text-foreground">
+                        <CardTitle class="flex items-start gap-1 text-sm font-semibold tracking-[-0.005em] text-foreground">
                             {{ field.label }}
                             <span v-if="isRequired(field)" class="text-destructive">*</span>
                         </CardTitle>
-                        <p v-if="field.description" class="text-xs font-bold leading-relaxed text-muted-foreground">{{ field.description }}</p>
+                        <p v-if="field.description" class="text-xs leading-relaxed text-muted-foreground">{{ field.description }}</p>
                     </CardHeader>
                     <CardContent class="pb-4 pt-0">
                         <Input
@@ -291,7 +285,6 @@ function fieldError(name: string): string | undefined {
                             :type="getInputSubtype(field)"
                             :placeholder="getPlaceholder(field)"
                             v-model="answerForm[field.name]"
-                            class="text-sm border-2 border-foreground"
                         />
 
                         <div v-else-if="builderType(field) === 'rating'" class="flex flex-col gap-3">
@@ -300,13 +293,13 @@ function fieldError(name: string): string | undefined {
                                     v-for="rating in Number(metadata(field).maxStars ?? 5)"
                                     :key="rating"
                                     type="button"
-                                    class="rounded-lg p-1 transition active:scale-95"
+                                    class="rounded-lg p-1 transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-90"
                                     @click="answerForm[field.name] = String(rating)"
                                 >
-                                    <Star class="size-7" :class="Number(answerForm[field.name] || 0) >= rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/40'" />
+                                    <Star class="size-7 transition-colors" :class="Number(answerForm[field.name] || 0) >= rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/50'" />
                                 </button>
                             </div>
-                            <p class="text-xs font-bold text-muted-foreground">Choose one rating.</p>
+                            <p class="text-xs text-muted-foreground">Choose one rating.</p>
                         </div>
 
                         <Textarea
@@ -315,7 +308,6 @@ function fieldError(name: string): string | undefined {
                             :placeholder="getPlaceholder(field)"
                             v-model="answerForm[field.name]"
                             rows="4"
-                            class="text-sm border-2 border-foreground"
                         />
 
                         <Input
@@ -323,22 +315,20 @@ function fieldError(name: string): string | undefined {
                             :id="field.name"
                             type="date"
                             v-model="answerForm[field.name]"
-                            class="text-sm border-2 border-foreground"
                         />
 
                         <div v-else-if="isCheckboxLike(field)" class="flex flex-col gap-2">
                             <label
                                 v-for="row in getOptionRows(field)"
                                 :key="row.label"
-                                class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-foreground px-3 py-2 text-sm font-bold hover:bg-(--brutal-mint)/20"
+                                class="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground shadow-xs transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-primary/30 hover:bg-muted/40"
                             >
                                 <Checkbox
                                     :id="`${field.name}-${row.label}`"
                                     :checked="((answerForm[field.name] as string[]) ?? []).includes(row.label)"
                                     @update:checked="(value) => onCheckboxToggle(field.name, row.label, Boolean(value))"
-                                    class="border-2"
                                 />
-                                <div v-if="row.type === 'image' && row.imageSrc" class="size-16 shrink-0 overflow-hidden rounded-md border-2 border-foreground">
+                                <div v-if="row.type === 'image' && row.imageSrc" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
                                     <img :src="row.imageSrc" alt="" class="size-full object-cover" />
                                 </div>
                                 <span v-else>{{ row.label }}</span>
@@ -349,17 +339,17 @@ function fieldError(name: string): string | undefined {
                             <label
                                 v-for="row in getOptionRows(field)"
                                 :key="row.label"
-                                class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-foreground px-3 py-2 text-sm font-bold hover:bg-(--brutal-mint)/20"
+                                class="flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground shadow-xs transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-primary/30 hover:bg-muted/40"
                             >
                                 <input
                                     type="radio"
                                     :name="field.name"
                                     :value="row.label"
                                     :checked="(answerForm[field.name] as string) === row.label"
-                                    class="accent-primary size-5"
+                                    class="size-4 accent-primary"
                                     @change="() => (answerForm[field.name] = row.label)"
                                 />
-                                <div v-if="row.type === 'image' && row.imageSrc" class="size-16 shrink-0 overflow-hidden rounded-md border-2 border-foreground">
+                                <div v-if="row.type === 'image' && row.imageSrc" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
                                     <img :src="row.imageSrc" alt="" class="size-full object-cover" />
                                 </div>
                                 <span v-else>{{ row.label }}</span>
@@ -370,7 +360,7 @@ function fieldError(name: string): string | undefined {
                             v-else-if="builderType(field) === 'dropdown' || field.type === 'select'"
                             v-model="answerForm[field.name]"
                         >
-                            <SelectTrigger class="text-sm border-2 border-foreground h-12">
+                            <SelectTrigger>
                                 <SelectValue placeholder="Select an option">
                                     <template v-if="answerForm[field.name]">
                                         <span class="flex items-center gap-2">
@@ -378,21 +368,21 @@ function fieldError(name: string): string | undefined {
                                                 v-if="getSelectedOptionRow(field)?.imageSrc"
                                                 :src="getSelectedOptionRow(field)?.imageSrc"
                                                 alt=""
-                                                class="size-6 rounded border border-foreground object-cover"
+                                                class="size-6 rounded border border-border object-cover"
                                             />
                                             {{ answerForm[field.name] }}
                                         </span>
                                     </template>
                                 </SelectValue>
                             </SelectTrigger>
-                            <SelectContent class="border-2 border-foreground shadow-[4px_4px_0_var(--brutal-ink)]">
-                                <SelectItem v-for="row in getOptionRows(field)" :key="row.label" :value="row.label" class="font-bold">
+                            <SelectContent>
+                                <SelectItem v-for="row in getOptionRows(field)" :key="row.label" :value="row.label">
                                     <span class="flex items-center gap-2">
                                         <img
                                             v-if="row.imageSrc"
                                             :src="row.imageSrc"
                                             alt=""
-                                            class="size-7 rounded border border-foreground object-cover"
+                                            class="size-7 rounded border border-border object-cover"
                                         />
                                         {{ row.label }}
                                     </span>
@@ -400,14 +390,14 @@ function fieldError(name: string): string | undefined {
                             </SelectContent>
                         </Select>
 
-                        <div v-else-if="['file_upload', 'image_upload', 'fileUpload'].includes(builderType(field))" class="rounded-xl border-2 border-dashed border-foreground bg-muted/20 p-6 text-center relative hover:bg-muted/30 transition-colors">
+                        <div v-else-if="['file_upload', 'image_upload', 'fileUpload'].includes(builderType(field))" class="relative rounded-xl border border-dashed border-border bg-muted/20 p-6 text-center transition-colors hover:border-primary/30 hover:bg-muted/30">
                             <div class="flex flex-col items-center gap-2">
-                                <div class="size-12 rounded-full bg-white flex items-center justify-center border-2 border-foreground shadow-[2px_2px_0_var(--brutal-ink)]">
-                                    <component :is="builderType(field) === 'image_upload' ? ImagePlus : Upload" class="size-6 text-foreground" />
+                                <div class="grid size-12 place-items-center rounded-full border border-border bg-card shadow-xs">
+                                    <component :is="builderType(field) === 'image_upload' ? ImagePlus : Upload" class="size-5 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p class="text-sm font-black">Click to upload</p>
-                                    <p class="text-[10px] font-bold text-muted-foreground">{{ fileHint(field) }}</p>
+                                    <p class="text-sm font-semibold text-foreground">Click to upload</p>
+                                    <p class="mt-0.5 text-[10px] text-muted-foreground">{{ fileHint(field) }}</p>
                                 </div>
                                 <input
                                     type="file"
@@ -416,36 +406,28 @@ function fieldError(name: string): string | undefined {
                                     @change="onFileChange(field.name, $event)"
                                 />
                             </div>
-                            <div v-if="answerForm[field.name]" class="mt-4 flex items-center justify-center gap-2 rounded-xl bg-white p-3 border-2 border-foreground shadow-[2px_2px_0_var(--brutal-ink)] relative z-10">
-                                <span class="text-xs font-bold truncate max-w-[200px]">{{ (answerForm[field.name] as File).name }}</span>
-                                <button type="button" @click="answerForm[field.name] = null" class="text-destructive hover:scale-110 transition-transform">
+                            <div v-if="answerForm[field.name]" class="relative z-10 mt-4 flex items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 shadow-xs">
+                                <span class="max-w-[200px] truncate text-xs font-medium text-foreground">{{ (answerForm[field.name] as File).name }}</span>
+                                <button type="button" @click="answerForm[field.name] = null" class="text-destructive transition-transform hover:scale-110">
                                     <X class="size-4" />
                                 </button>
                             </div>
                         </div>
 
-                        <p v-if="fieldError(field.name)" class="mt-2 text-xs font-black text-destructive">{{ fieldError(field.name) }}</p>
+                        <p v-if="fieldError(field.name)" class="mt-2 text-xs font-medium text-destructive">{{ fieldError(field.name) }}</p>
                     </CardContent>
                 </Card>
             </template>
 
-            <div class="flex items-center justify-end gap-3 pt-6 border-t-2 border-foreground mb-20">
-                <Button variant="ghost" class="rounded-xl px-8 h-12 shadow-none border-transparent hover:bg-muted/50 font-black" as-child>
+            <div class="mb-20 flex items-center justify-end gap-3 border-t border-border pt-6">
+                <Button variant="ghost" size="lg" as-child>
                     <Link :href="`/dashboard/events/${event.id}`">Cancel</Link>
                 </Button>
-                <Button type="submit" :disabled="answerForm.processing" class="rounded-xl px-10 h-12 gap-2 text-base font-black">
-                    <Send class="size-5" />
+                <Button type="submit" size="lg" :disabled="answerForm.processing" class="gap-2">
+                    <Send class="size-4" />
                     Submit registration
                 </Button>
             </div>
         </form>
     </div>
 </template>
-
-<style scoped>
-.brutal-divider {
-    border: none;
-    border-top: 2px solid var(--brutal-ink);
-    opacity: 0.15;
-}
-</style>

@@ -3,13 +3,9 @@
  * Backend API_TYPES: input, select, textarea, datePicker, fileUpload
  */
 
-/** Choice label only, or label + optional image (URL or data URL) for dropdown / radio / checkbox. */
-export interface FieldOptionEntry {
-    id: string
-    type: 'text' | 'image'
-    label: string
-    imageUrl?: string
-}
+import type { BackendField, BuilderField, FieldOptionEntry } from '@/types/form-builder'
+
+export type { BackendField, BuilderField, FieldOptionEntry }
 
 export function optionLabel(entry: FieldOptionEntry): string {
     return String(entry.label ?? '').trim()
@@ -44,28 +40,6 @@ function parseOptionChoices(raw: unknown): FieldOptionEntry[] | null {
         }
     }
     return out.length > 0 ? out : null
-}
-
-export interface BuilderField {
-    id: string
-    type: string
-    label: string
-    description: string
-    name: string
-    placeholder: string
-    required: boolean
-    options: FieldOptionEntry[]
-    metadata: Record<string, unknown>
-}
-
-export interface BackendField {
-    id: string
-    type: 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'checkbox' | 'radio'
-    label: string
-    description: string | null
-    name: string
-    order: number
-    metadata: Record<string, unknown>
 }
 
 export function toBackendField(f: BuilderField, order: number): BackendField {

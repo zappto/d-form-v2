@@ -283,27 +283,18 @@ function saveAll() {
     <Head :title="`Edit: ${form.title}`" />
     <div class="flex h-[calc(100svh-3.5rem)] flex-col overflow-hidden lg:flex-row">
         <!-- LEFT SIDEBAR -->
-        <aside class="hidden w-[260px] shrink-0 flex-col border-r-[1.5px] border-(--brutal-ink)/10 bg-white lg:flex">
-            <!-- Tabs: Components / Settings -->
-            <div class="flex border-b border-(--brutal-ink)/8">
+        <aside class="hidden w-[260px] shrink-0 flex-col border-r border-border bg-card lg:flex">
+            <div class="flex border-b border-border">
                 <button
-                    class="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-bold tracking-wider uppercase transition-colors"
-                    :class="
-                        activePanel === 'fields'
-                            ? 'border-primary text-primary border-b-2'
-                            : 'text-muted-foreground hover:text-(--brutal-ink)'
-                    "
+                    class="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors"
+                    :class="activePanel === 'fields' ? 'border-b-2 border-primary text-foreground' : 'border-b-2 border-transparent text-muted-foreground hover:text-foreground'"
                     @click="activePanel = 'fields'"
                 >
                     <Sparkles class="size-3.5" />Components
                 </button>
                 <button
-                    class="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-bold tracking-wider uppercase transition-colors"
-                    :class="
-                        activePanel === 'settings'
-                            ? 'border-primary text-primary border-b-2'
-                            : 'text-muted-foreground hover:text-(--brutal-ink)'
-                    "
+                    class="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors"
+                    :class="activePanel === 'settings' ? 'border-b-2 border-primary text-foreground' : 'border-b-2 border-transparent text-muted-foreground hover:text-foreground'"
                     @click="activePanel = 'settings'"
                 >
                     <Settings class="size-3.5" />Settings
@@ -314,35 +305,32 @@ function saveAll() {
             <div v-show="activePanel === 'fields'" class="flex flex-1 flex-col overflow-hidden">
                 <div class="px-3 pt-3 pb-2">
                     <div class="relative">
-                        <Search class="text-muted-foreground/50 absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
+                        <Search class="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
                         <input
                             v-model="searchQuery"
                             type="text"
                             placeholder="Search components..."
-                            class="bg-muted/20 placeholder:text-muted-foreground/50 w-full rounded-lg border-[1.5px] border-(--brutal-ink)/10 py-2 pr-3 pl-8 text-xs font-medium text-(--brutal-ink) transition-all focus:border-(--brutal-blue) focus:ring-2 focus:ring-(--brutal-blue)/20 focus:outline-none"
+                            class="w-full rounded-lg border border-border bg-card py-2 pr-3 pl-8 text-xs font-medium text-foreground shadow-xs transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15"
                         />
                     </div>
                 </div>
                 <div class="flex-1 overflow-y-auto px-3 pb-3">
                     <div v-for="(cat, ci) in filteredCategories" :key="cat.name" class="mb-3 last:mb-0">
                         <button
-                            class="text-muted-foreground mb-1.5 flex w-full items-center gap-2 px-1 py-1 text-left text-[11px] font-bold tracking-[0.08em] uppercase hover:text-(--brutal-ink)"
+                            class="mb-1.5 flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
                             @click="toggleCategory(ci)"
                         >
-                            <ChevronRight
-                                class="size-3 shrink-0 transition-transform duration-200"
-                                :class="cat.isOpen ? 'rotate-90' : ''"
-                            />
+                            <ChevronRight class="size-3 shrink-0 transition-transform duration-200" :class="cat.isOpen ? 'rotate-90' : ''" />
                             <component :is="cat.icon" class="size-3.5 shrink-0" />{{ cat.name }}
-                            <span class="text-muted-foreground/50 ml-auto text-[10px]">{{ cat.fields.length }}</span>
+                            <span class="ml-auto text-[10px] font-medium text-muted-foreground">{{ cat.fields.length }}</span>
                         </button>
                         <div v-show="cat.isOpen" class="flex flex-col gap-1.5">
                             <DraggableItem v-for="f in cat.fields" :key="f.type" v-bind="f" />
                         </div>
                     </div>
                     <div v-if="filteredCategories.length === 0" class="flex flex-col items-center py-8 text-center">
-                        <Search class="text-muted-foreground/30 mb-2 size-8" />
-                        <p class="text-muted-foreground text-xs font-medium">No components found</p>
+                        <Search class="mb-2 size-8 text-muted-foreground/50" />
+                        <p class="text-xs font-medium text-muted-foreground">No components found</p>
                     </div>
                 </div>
             </div>
@@ -387,9 +375,9 @@ function saveAll() {
                         :model-value="bannerState"
                         @update:model-value="(value: FormBannerState) => Object.assign(bannerState, value)"
                     />
-                    <p class="text-muted-foreground text-[10px] leading-relaxed">
-                        Simpan banner bersama struktur formulir menggunakan tombol
-                        <span class="text-foreground font-semibold">Save All</span> di atas.
+                    <p class="text-[10px] leading-relaxed text-muted-foreground">
+                        Save banner alongside form structure using
+                        <span class="font-semibold text-foreground">Save All</span> above.
                     </p>
                 </div>
             </div>
@@ -397,54 +385,45 @@ function saveAll() {
 
         <!-- CENTER CANVAS -->
         <main class="bg-background relative flex-1 overflow-y-auto">
-            <div class="border-b border-(--brutal-ink)/8 bg-(--brutal-cream)/70 px-4 py-3 lg:hidden">
-                <label class="text-muted-foreground mb-1 block text-[10px] font-bold tracking-[0.16em] uppercase"
-                    >Add field on mobile</label
-                >
+            <div class="border-b border-border bg-muted/30 px-4 py-3 lg:hidden">
+                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Add field on mobile</label>
                 <div class="flex gap-2">
                     <select
                         v-model="mobileFieldType"
-                        class="min-w-0 flex-1 rounded-xl border-[1.5px] border-(--brutal-ink) bg-white px-3 py-2 text-xs font-semibold"
+                        class="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-xs transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15"
                     >
                         <option value="">Choose field type</option>
                         <option v-for="fieldType in allFieldTypes" :key="fieldType.type" :value="fieldType.type">
                             {{ fieldType.label }}
                         </option>
                     </select>
-                    <Button
-                        size="sm"
-                        class="h-9 shrink-0 text-xs"
-                        :disabled="!mobileFieldType"
-                        @click="addFieldFromPicker"
-                    >
+                    <Button size="sm" class="h-9 shrink-0 text-xs" :disabled="!mobileFieldType" @click="addFieldFromPicker">
                         <Plus class="mr-1 size-3.5" />Add
                     </Button>
                 </div>
             </div>
 
-            <div
-                class="sticky top-0 z-20 border-b border-(--brutal-ink)/8 bg-white/90 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-2"
-            >
+            <div class="sticky top-0 z-20 border-b border-border bg-card/85 px-4 py-3 backdrop-blur-xl sm:px-6 sm:py-2">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex min-w-0 flex-wrap items-center gap-2">
                         <Link
                             :href="`/dashboard/events/${event.id}/forms`"
-                            class="text-foreground hover:border-foreground hover:bg-accent inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-transparent px-3 text-xs font-extrabold tracking-tight transition-all hover:shadow-[4px_4px_0_var(--brutal-ink)]"
+                            class="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-transparent px-3 text-xs font-semibold tracking-tight text-foreground transition-all hover:border-border hover:bg-accent hover:shadow-sm"
                         >
                             <ArrowLeft class="size-3.5" />
                             Back
                         </Link>
-                        <span class="text-muted-foreground min-w-0 truncate text-xs font-semibold">
+                        <span class="min-w-0 truncate text-xs font-semibold text-foreground">
                             {{ settingsForm.title || 'Untitled' }}
                         </span>
-                        <span class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-bold">
+                        <span class="rounded-full border border-primary/15 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                             {{ formFields.length }} field{{ formFields.length !== 1 ? 's' : '' }}
                         </span>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5 sm:justify-end">
                         <Link
                             :href="`/dashboard/events/${event.id}/forms/${form.id}/submissions`"
-                            class="border-foreground bg-background text-foreground inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border-2 px-3 text-xs font-extrabold tracking-tight shadow-[4px_4px_0_var(--brutal-ink)] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-(--brutal-mint) hover:shadow-[6px_6px_0_var(--brutal-ink)] active:translate-x-1 active:translate-y-1 active:shadow-[1px_1px_0_var(--brutal-ink)]"
+                            class="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-semibold tracking-tight text-foreground shadow-sm transition-all hover:-translate-y-px hover:bg-accent active:scale-[0.98]"
                         >
                             <FileText class="size-3.5" />
                             Submissions
@@ -471,34 +450,21 @@ function saveAll() {
             </div>
             <div class="flex justify-center px-3 py-6 sm:px-6 sm:py-8">
                 <div class="w-full max-w-full sm:max-w-[420px]">
-                    <div
-                        class="overflow-hidden rounded-2xl border-[1.5px] border-(--brutal-ink)/12 bg-white shadow-(--shadow-md)"
-                    >
+                    <div class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
                         <div
                             v-if="bannerPreviewSrc || bannerState.caption.trim()"
-                            class="bg-muted/20 border-b border-(--brutal-ink)/10"
+                            class="border-b border-border bg-muted/30"
                         >
-                            <img
-                                v-if="bannerPreviewSrc"
-                                :src="bannerPreviewSrc"
-                                alt=""
-                                class="aspect-3/1 w-full object-cover"
-                            />
-                            <p
-                                v-if="bannerState.caption.trim()"
-                                class="text-muted-foreground px-5 py-3 text-[12px] leading-relaxed"
-                            >
+                            <img v-if="bannerPreviewSrc" :src="bannerPreviewSrc" alt="" class="aspect-3/1 w-full object-cover" />
+                            <p v-if="bannerState.caption.trim()" class="px-5 py-3 text-[12px] leading-relaxed text-muted-foreground">
                                 {{ bannerState.caption }}
                             </p>
                         </div>
-                        <div
-                            class="from-primary/5 border-b border-(--brutal-ink)/8 bg-linear-to-br via-transparent to-(--brutal-yellow)/5 px-5 pt-6 pb-5"
-                            :class="bannerPreviewSrc || bannerState.caption.trim() ? '' : 'rounded-t-2xl'"
-                        >
-                            <h2 class="font-display text-xl font-bold tracking-tight text-(--brutal-ink)">
+                        <div class="border-b border-border bg-gradient-to-br from-primary/5 via-transparent to-primary/0 px-5 pt-6 pb-5">
+                            <h2 class="font-display text-xl font-bold tracking-[-0.02em] text-foreground">
                                 {{ settingsForm.title || 'Untitled Form' }}
                             </h2>
-                            <p class="text-muted-foreground mt-2 text-[13px] leading-relaxed">
+                            <p class="mt-2 text-[13px] leading-relaxed text-muted-foreground">
                                 {{ settingsForm.description || 'No description' }}
                             </p>
                         </div>
@@ -506,42 +472,33 @@ function saveAll() {
                             class="min-h-[400px] px-4 py-4"
                             :class="[
                                 isEmpty && !isDraggingOverCanvas ? 'flex items-center justify-center' : '',
-                                isDraggingOverCanvas && isEmpty ? 'bg-(--brutal-blue)/3' : '',
+                                isDraggingOverCanvas && isEmpty ? 'bg-primary/[0.03]' : '',
                             ]"
                             @dragover.prevent="onCanvasDragOver"
                             @dragleave="onCanvasDragLeave"
                             @drop="onCanvasDrop"
                         >
-                            <!-- Empty state -->
-                            <div
-                                v-if="isEmpty && !isDraggingOverCanvas"
-                                class="flex flex-col items-center py-6 text-center"
-                            >
-                                <div class="mb-4 rounded-2xl border-2 border-dashed border-(--brutal-ink)/15 px-8 py-8">
+                            <div v-if="isEmpty && !isDraggingOverCanvas" class="flex flex-col items-center py-6 text-center">
+                                <div class="mb-4 rounded-2xl border border-dashed border-border bg-muted/30 px-8 py-8">
                                     <LocalLottie name="builderEmpty" :height="140" :width="140" />
                                 </div>
-                                <h3 class="font-display text-base font-bold text-(--brutal-ink)">
-                                    Start building your form
-                                </h3>
-                                <p class="text-muted-foreground mt-1.5 max-w-[260px] text-xs leading-relaxed">
+                                <h3 class="font-display text-base font-bold tracking-[-0.01em] text-foreground">Start building your form</h3>
+                                <p class="mt-1.5 max-w-[260px] text-xs leading-relaxed text-muted-foreground">
                                     Drag components from the left panel and drop them here.
                                 </p>
-                                <div class="bg-muted/40 mt-4 flex items-center gap-2 rounded-full px-3 py-1.5">
-                                    <GripVertical class="text-muted-foreground/50 size-3.5" />
-                                    <span class="text-muted-foreground text-[10px] font-medium"
-                                        >Tip: Drag the handle to reorder fields</span
-                                    >
+                                <div class="mt-4 flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1.5">
+                                    <GripVertical class="size-3.5 text-muted-foreground/70" />
+                                    <span class="text-[10px] font-medium text-muted-foreground">Tip: Drag the handle to reorder fields</span>
                                 </div>
                             </div>
-                            <!-- Drop placeholder -->
                             <div
                                 v-if="isEmpty && isDraggingOverCanvas"
-                                class="flex min-h-[200px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-(--brutal-blue)/40 bg-(--brutal-blue)/5"
+                                class="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-primary/40 bg-primary/[0.05] transition-colors"
                             >
-                                <div class="size-10 rounded-full bg-(--brutal-blue)/10 p-2.5">
-                                    <Plus class="size-full text-(--brutal-blue)" />
+                                <div class="grid size-10 place-items-center rounded-full bg-primary/10">
+                                    <Plus class="size-5 text-primary" />
                                 </div>
-                                <p class="mt-2 text-xs font-semibold text-(--brutal-blue)">Drop here to add</p>
+                                <p class="mt-2 text-xs font-semibold text-primary">Drop here to add</p>
                             </div>
                             <!-- Field list -->
                             <div v-if="!isEmpty" class="flex flex-col">
@@ -555,7 +512,7 @@ function saveAll() {
                                             class="pointer-events-none h-0.5 rounded-full transition-all duration-200"
                                             :class="
                                                 dropIndicatorIndex === index
-                                                    ? 'bg-(--brutal-blue) shadow-[0_0_8px_rgba(37,99,235,0.3)]'
+                                                    ? 'bg-primary shadow-sm'
                                                     : 'bg-transparent'
                                             "
                                         ></div>
@@ -567,9 +524,7 @@ function saveAll() {
                                             @dragstart="(e) => onCanvasDragStart(e, field, index)"
                                             @dragend="onDragEnd"
                                         >
-                                            <div
-                                                class="text-muted-foreground/60 flex size-7 items-center justify-center rounded-lg bg-white shadow-(--shadow-sm) ring-1 ring-(--brutal-ink)/8 hover:text-(--brutal-ink)"
-                                            >
+                                            <div class="grid size-7 place-items-center rounded-lg border border-border bg-card text-muted-foreground shadow-xs transition-colors hover:border-primary/30 hover:text-foreground">
                                                 <GripVertical class="size-4" />
                                             </div>
                                         </div>
@@ -591,7 +546,7 @@ function saveAll() {
                                         class="pointer-events-none h-0.5 rounded-full transition-all duration-200"
                                         :class="
                                             dropIndicatorIndex === formFields.length
-                                                ? 'bg-(--brutal-blue) shadow-[0_0_8px_rgba(37,99,235,0.3)]'
+                                                ? 'bg-primary shadow-sm'
                                                 : 'bg-transparent'
                                         "
                                     ></div>
@@ -599,30 +554,29 @@ function saveAll() {
                             </div>
                         </div>
                     </div>
-                    <p class="text-muted-foreground/50 mt-4 text-center text-[10px]">
+                    <p class="mt-4 text-center text-[10px] text-muted-foreground/70">
                         Form preview · Mobile size (420px). On mobile, use the add-field dropdown above.
                     </p>
                 </div>
             </div>
         </main>
 
-        <!-- RIGHT SIDEBAR -->
-        <aside class="hidden w-[300px] shrink-0 flex-col border-l-[1.5px] border-(--brutal-ink)/10 bg-white lg:flex">
-            <div class="border-b border-(--brutal-ink)/8 px-4 pt-4 pb-3">
-                <h2 class="font-display text-sm font-bold tracking-tight text-(--brutal-ink)">Properties</h2>
-                <p class="text-muted-foreground mt-0.5 text-[10px]">
+        <aside class="hidden w-[300px] shrink-0 flex-col border-l border-border bg-card lg:flex">
+            <div class="border-b border-border px-4 pt-4 pb-3">
+                <h2 class="font-display text-sm font-semibold tracking-[-0.01em] text-foreground">Properties</h2>
+                <p class="mt-0.5 text-[10px] text-muted-foreground">
                     {{ selectedField ? 'Edit the selected field' : 'Select a field to edit' }}
                 </p>
             </div>
             <div class="flex-1 overflow-y-auto px-4 py-4">
                 <FieldEditor v-if="selectedField" :field="selectedField" @update:field="updateField" />
                 <div v-else class="flex h-full flex-col items-center justify-center text-center">
-                    <div class="rounded-2xl border-2 border-dashed border-(--brutal-ink)/10 p-6">
+                    <div class="rounded-2xl border border-dashed border-border bg-muted/30 p-6">
                         <LocalLottie name="fieldSelected" :height="100" :width="100" />
                     </div>
-                    <p class="mt-4 text-xs font-semibold text-(--brutal-ink)/60">No field selected</p>
-                    <p class="text-muted-foreground mt-1 max-w-[200px] text-[10px] leading-relaxed">
-                        Click on any field in the canvas to edit its properties here.
+                    <p class="mt-4 text-xs font-semibold text-foreground">No field selected</p>
+                    <p class="mt-1 max-w-[200px] text-[10px] leading-relaxed text-muted-foreground">
+                        Select a field in the canvas to edit its properties here.
                     </p>
                 </div>
             </div>

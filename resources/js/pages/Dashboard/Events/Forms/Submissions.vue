@@ -146,101 +146,75 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
 <template>
     <Head :title="`${form.title} Submissions`" />
 
-    <div class="neo-page">
+    <div class="app-page">
         <div class="flex flex-col gap-8">
-            <!-- ─── Page Header ────────────────────────────────────────────── -->
             <PageHeader
                 :title="form.title"
                 :subtitle="`Collected responses for ${event.title}`"
                 :back-href="`/dashboard/events/${event.id}/forms/${form.id}`"
             >
                 <template #actions>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2.5">
                         <Tabs v-model="viewType" class="w-auto">
-                            <TabsList class="border-foreground/20 bg-muted/30 h-10 border-[1.5px] p-1">
-                                <TabsTrigger
-                                    value="table"
-                                    class="h-7 px-3 text-[10px] font-black tracking-widest uppercase"
-                                >
+                            <TabsList>
+                                <TabsTrigger value="table">
                                     <List class="mr-1.5 size-3.5" />
                                     Table
                                 </TabsTrigger>
-                                <TabsTrigger
-                                    value="form"
-                                    class="h-7 px-3 text-[10px] font-black tracking-widest uppercase"
-                                >
+                                <TabsTrigger value="form">
                                     <LayoutGrid class="mr-1.5 size-3.5" />
                                     Cards
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-                        <Button variant="outline" size="sm" class="h-10 gap-2 border-2 px-4 font-bold">
-                            <Download class="size-4" />
+                        <Button variant="outline" size="sm">
+                            <Download class="mr-1.5 size-4" />
                             Export
                         </Button>
                     </div>
                 </template>
             </PageHeader>
 
-            <!-- ─── KPI Summary ────────────────────────────────────────────── -->
             <div v-if="submissions.total > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <KpiCard
-                    label="Total Submissions"
-                    :value="submissions.total"
-                    :icon="Users"
-                    color="primary"
-                    class="border-2"
-                />
-                <KpiCard
-                    label="Latest Response"
-                    :value="latestSubmissionDate"
-                    :icon="CalendarClock"
-                    color="warning"
-                    class="border-2"
-                />
+                <KpiCard label="Total Submissions" :value="submissions.total" :icon="Users" color="primary" />
+                <KpiCard label="Latest Response" :value="latestSubmissionDate" :icon="CalendarClock" color="warning" />
             </div>
 
-            <!-- ─── Empty State ────────────────────────────────────────────── -->
             <div
                 v-if="submissions.data.length === 0"
-                class="neo-muted-panel flex flex-col items-center justify-center py-24 text-center"
+                class="app-surface-soft flex flex-col items-center justify-center py-24 text-center"
             >
-                <div class="neo-surface flex size-16 items-center justify-center bg-white shadow-sm">
-                    <Inbox class="text-muted-foreground/30 size-8" />
+                <div class="grid size-16 place-items-center rounded-2xl border border-border bg-card shadow-xs">
+                    <Inbox class="size-7 text-muted-foreground" />
                 </div>
-                <h3 class="mt-6 text-xl font-black tracking-tight">No responses yet</h3>
-                <p class="text-muted-foreground mt-2 max-w-sm text-sm font-semibold">
+                <h3 class="font-display mt-6 text-xl font-bold tracking-[-0.02em] text-foreground">No responses yet</h3>
+                <p class="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
                     When people submit this form, you'll see their detailed answers here in real-time.
                 </p>
             </div>
 
             <template v-else>
-                <!-- ─── Table View ─────────────────────────────────────────────── -->
-                <div v-if="viewType === 'table'" class="neo-surface overflow-hidden bg-white shadow-sm">
+                <div v-if="viewType === 'table'" class="app-surface overflow-hidden p-0">
                     <div class="overflow-x-auto">
                         <Table>
                             <TableHeader>
                                 <TableRow class="hover:bg-transparent">
                                     <TableHead
-                                        class="bg-muted/40 text-muted-foreground sticky left-0 z-20 h-14 px-6 text-[10px] font-black tracking-widest uppercase"
+                                        class="sticky left-0 z-20 h-12 bg-muted/40 px-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
                                     >
                                         Member
                                     </TableHead>
                                     <TableHead
                                         v-for="key in answerKeys"
                                         :key="key"
-                                        class="bg-muted/20 text-muted-foreground h-14 min-w-[180px] px-6 text-[10px] font-black tracking-widest uppercase"
+                                        class="h-12 min-w-[180px] bg-muted/30 px-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
                                     >
                                         {{ humanizeKey(key) }}
                                     </TableHead>
-                                    <TableHead
-                                        class="bg-muted/20 text-muted-foreground h-14 px-6 text-[10px] font-black tracking-widest uppercase"
-                                    >
+                                    <TableHead class="h-12 bg-muted/30 px-6 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                         Submitted
                                     </TableHead>
-                                    <TableHead
-                                        class="bg-muted/20 text-muted-foreground h-14 px-6 text-center text-[10px] font-black tracking-widest uppercase"
-                                    >
+                                    <TableHead class="h-12 bg-muted/30 px-6 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                         Actions
                                     </TableHead>
                                 </TableRow>
@@ -249,24 +223,22 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                 <TableRow
                                     v-for="(submission, idx) in submissions.data"
                                     :key="submission.id"
-                                    class="border-border/10 hover:bg-muted/10 animate-brutal-pop border-b-[1.5px] transition-colors"
+                                    class="animate-app-fade-in border-b border-border/60 transition-colors hover:bg-muted/30"
                                     :style="{ animationDelay: `${idx * 50}ms` }"
                                 >
-                                    <TableCell
-                                        class="border-border/10 sticky left-0 z-10 border-r-[1.5px] bg-white px-6 py-4"
-                                    >
+                                    <TableCell class="sticky left-0 z-10 border-r border-border/60 bg-card px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <Avatar class="size-9 rounded-lg border-2 border-foreground/10">
+                                            <Avatar class="size-9 rounded-lg border border-border">
                                                 <AvatarImage :src="''" :alt="submission.user?.name ?? 'U'" />
-                                                <AvatarFallback class="bg-primary/10 text-primary rounded-lg text-xs font-black">
+                                                <AvatarFallback class="rounded-lg bg-primary/10 text-xs font-semibold text-primary">
                                                     {{ getInitials(submission.user?.name ?? 'An') }}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div class="min-w-0">
-                                                <p class="font-display truncate text-sm font-extrabold tracking-tight">
+                                                <p class="truncate text-sm font-semibold tracking-[-0.005em] text-foreground">
                                                     {{ submission.user?.name ?? 'Anonymous' }}
                                                 </p>
-                                                <p class="text-muted-foreground truncate text-[10px] font-bold">
+                                                <p class="truncate text-[10px] text-muted-foreground">
                                                     {{ submission.user?.email ?? '-' }}
                                                 </p>
                                             </div>
@@ -275,19 +247,17 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                     <TableCell
                                         v-for="key in answerKeys"
                                         :key="key"
-                                        class="max-w-[240px] px-6 py-4 text-xs leading-relaxed font-semibold"
+                                        class="max-w-[240px] px-6 py-4 text-xs leading-relaxed"
                                     >
                                         <div v-if="fileUrl(submission.answers[key])" class="flex items-center gap-1.5 text-primary">
                                             <FileText class="size-3.5" />
-                                            <span class="font-bold underline underline-offset-4">Attachment</span>
+                                            <span class="font-medium underline underline-offset-4">Attachment</span>
                                         </div>
-                                        <span v-else class="line-clamp-2 text-foreground/80">
+                                        <span v-else class="line-clamp-2 text-foreground/85">
                                             {{ answerPreview(submission.answers[key]) }}
                                         </span>
                                     </TableCell>
-                                    <TableCell
-                                        class="text-muted-foreground px-6 py-4 text-[10px] font-bold whitespace-nowrap"
-                                    >
+                                    <TableCell class="whitespace-nowrap px-6 py-4 text-[11px] text-muted-foreground">
                                         {{ formatDate(submission.submitted_at) }}
                                     </TableCell>
                                     <TableCell class="px-6 py-4 text-center">
@@ -295,9 +265,9 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                             <Button
                                                 type="button"
                                                 variant="ghost"
-                                                size="icon"
-                                                title="Terima (UI only — backend belum ada)"
-                                                class="size-8 rounded-lg border-2 border-transparent text-success transition-all hover:border-success/30 hover:bg-success/10"
+                                                size="icon-sm"
+                                                title="Accept (UI only)"
+                                                class="text-success hover:bg-success/10 hover:text-success"
                                                 @click="submissionReviewStub('accept', submission)"
                                             >
                                                 <CheckCircle2 class="size-4" />
@@ -305,17 +275,17 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                             <Button
                                                 type="button"
                                                 variant="ghost"
-                                                size="icon"
-                                                title="Tolak (UI only — backend belum ada)"
-                                                class="size-8 rounded-lg border-2 border-transparent text-destructive transition-all hover:border-destructive/30 hover:bg-destructive/10"
+                                                size="icon-sm"
+                                                title="Reject (UI only)"
+                                                class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                 @click="submissionReviewStub('reject', submission)"
                                             >
                                                 <XCircle class="size-4" />
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="icon"
-                                                class="size-8 rounded-lg hover:bg-primary/10 hover:text-primary border-2 border-transparent transition-all hover:border-primary/20"
+                                                size="icon-sm"
+                                                class="hover:bg-primary/10 hover:text-primary"
                                                 @click="openDetail(submission)"
                                             >
                                                 <Eye class="size-4" />
@@ -328,49 +298,48 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                     </div>
                 </div>
 
-                <!-- ─── Card View ──────────────────────────────────────────────── -->
                 <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <div
                         v-for="(submission, idx) in submissions.data"
                         :key="submission.id"
-                        class="brutal-card animate-brutal-pop flex flex-col p-6"
+                        class="app-surface animate-app-fade-in flex flex-col p-6"
                         :style="{ animationDelay: `${idx * 100}ms` }"
                     >
-                        <div class="border-border/10 flex items-center gap-3 border-b-[1.5px] pb-5">
-                            <Avatar class="size-11 rounded-xl border-2 border-foreground/10">
-                                <AvatarFallback class="bg-primary/10 text-primary rounded-xl text-sm font-black">
+                        <div class="flex items-center gap-3 border-b border-border pb-5">
+                            <Avatar class="size-11 rounded-xl border border-border">
+                                <AvatarFallback class="rounded-xl bg-primary/10 text-sm font-semibold text-primary">
                                     {{ getInitials(submission.user?.name ?? 'An') }}
                                 </AvatarFallback>
                             </Avatar>
                             <div class="min-w-0 flex-1">
-                                <h4 class="font-display truncate text-base leading-none font-extrabold tracking-tight">
+                                <h4 class="font-display truncate text-base font-bold tracking-[-0.015em] text-foreground">
                                     {{ submission.user?.name ?? 'Anonymous' }}
                                 </h4>
-                                <p class="text-muted-foreground mt-1.5 truncate text-xs font-bold">
+                                <p class="mt-1 truncate text-xs text-muted-foreground">
                                     {{ submission.user?.email ?? 'No email address' }}
                                 </p>
                             </div>
                         </div>
 
-                        <div class="flex-1 space-y-5 pt-5">
+                        <div class="flex-1 space-y-4 pt-5">
                             <div v-for="key in answerKeys" :key="key" class="space-y-1.5">
-                                <div class="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+                                <div class="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                     {{ humanizeKey(key) }}
                                 </div>
-                                <div class="text-xs leading-relaxed font-bold">
+                                <div class="text-xs leading-relaxed">
                                     <div v-if="fileUrl(submission.answers[key])" class="flex items-center gap-2 text-primary">
                                         <FileText class="size-4" />
                                         <span class="underline underline-offset-4">Attached Document</span>
                                     </div>
-                                    <span v-else class="text-foreground/90 line-clamp-2 break-words">
+                                    <span v-else class="line-clamp-2 break-words text-foreground/85">
                                         {{ answerPreview(submission.answers[key]) }}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-6 flex flex-col gap-4">
-                            <div class="flex items-center justify-between text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                        <div class="mt-6 flex flex-col gap-3">
+                            <div class="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                                 <span class="flex items-center gap-1.5"><Clock class="size-3" /> Submitted</span>
                                 <span>{{ formatDate(submission.submitted_at) }}</span>
                             </div>
@@ -379,7 +348,7 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                     <Button
                                         type="button"
                                         variant="outline"
-                                        class="gap-1 border-2 border-success/40 font-black text-success hover:bg-success/10"
+                                        class="gap-1.5 border-success/30 text-success hover:bg-success/10"
                                         @click="submissionReviewStub('accept', submission)"
                                     >
                                         <CheckCircle2 class="size-4" />
@@ -388,7 +357,7 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                     <Button
                                         type="button"
                                         variant="outline"
-                                        class="gap-1 border-2 border-destructive/40 font-black text-destructive hover:bg-destructive/10"
+                                        class="gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10"
                                         @click="submissionReviewStub('reject', submission)"
                                     >
                                         <XCircle class="size-4" />
@@ -397,7 +366,7 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                 </div>
                                 <Button
                                     variant="outline"
-                                    class="w-full gap-2 border-2 font-black tracking-widest uppercase"
+                                    class="w-full gap-2"
                                     @click="openDetail(submission)"
                                 >
                                     <Eye class="size-4" />
@@ -408,20 +377,19 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                     </div>
                 </div>
 
-                <!-- ─── Pagination ─────────────────────────────────────────────── -->
                 <div
                     v-if="submissions.links && submissions.last_page > 1"
-                    class="flex items-center justify-center gap-2 pt-8"
+                    class="flex items-center justify-center gap-1.5 pt-8"
                 >
                     <Button
                         v-for="link in submissions.links"
                         :key="link.label"
                         variant="outline"
                         size="sm"
-                        class="hover:bg-primary/5 h-10 min-w-10 rounded-xl font-black tracking-widest uppercase transition-all"
                         :class="[
-                            link.active ? 'bg-primary/10 !border-primary text-primary !shadow-none' : 'bg-white',
-                            !link.url ? 'opacity-30' : '',
+                            'h-9 min-w-9',
+                            link.active ? 'border-primary bg-primary/10 text-primary' : '',
+                            !link.url ? 'opacity-40' : '',
                         ]"
                         :disabled="!link.url"
                         as-child
@@ -434,21 +402,20 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
         </div>
     </div>
 
-    <!-- ─── Submission Detail Slideover ─────────────────────────────────── -->
     <Sheet v-model:open="isDetailOpen">
         <SheetContent class="sm:max-w-md md:max-w-lg">
-            <SheetHeader class="border-b-[1.5px] border-foreground/10 pb-6">
+            <SheetHeader class="border-b border-border pb-6">
                 <div class="flex items-center gap-4">
-                    <Avatar class="size-14 rounded-2xl border-2 border-foreground/10">
-                        <AvatarFallback class="bg-primary/10 text-primary rounded-2xl text-lg font-black">
+                    <Avatar class="size-14 rounded-2xl border border-border">
+                        <AvatarFallback class="rounded-2xl bg-primary/10 text-lg font-semibold text-primary">
                             {{ getInitials(selectedSubmission?.user?.name ?? 'An') }}
                         </AvatarFallback>
                     </Avatar>
-                    <div class="flex-1 min-w-0">
-                        <SheetTitle class="font-display text-2xl font-black tracking-tight leading-none">
+                    <div class="min-w-0 flex-1">
+                        <SheetTitle class="font-display text-2xl font-bold tracking-[-0.025em] text-foreground">
                             Submission Details
                         </SheetTitle>
-                        <SheetDescription class="mt-2 text-sm font-bold text-muted-foreground truncate">
+                        <SheetDescription class="mt-1.5 truncate text-sm text-muted-foreground">
                             From {{ selectedSubmission?.user?.name ?? 'Anonymous' }}
                         </SheetDescription>
                     </div>
@@ -456,19 +423,18 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
             </SheetHeader>
 
             <div class="mt-8 space-y-8 overflow-y-auto px-1 pb-20 pr-3">
-                <!-- Submitter Info Section -->
                 <section class="space-y-4">
-                    <h5 class="text-[10px] font-black tracking-[0.2em] text-primary uppercase">
+                    <h5 class="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                         Member Information
                     </h5>
-                    <div class="neo-surface-soft space-y-4 p-5">
+                    <div class="app-surface-soft space-y-4 p-5">
                         <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-black text-muted-foreground uppercase">Email Address</span>
-                            <span class="text-sm font-extrabold">{{ selectedSubmission?.user?.email ?? 'No email provided' }}</span>
+                            <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Email Address</span>
+                            <span class="text-sm font-semibold text-foreground">{{ selectedSubmission?.user?.email ?? 'No email provided' }}</span>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-black text-muted-foreground uppercase">Submitted At</span>
-                            <div class="flex items-center gap-2 text-sm font-extrabold">
+                            <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Submitted At</span>
+                            <div class="flex items-center gap-2 text-sm font-semibold text-foreground">
                                 <Clock class="size-4 text-muted-foreground" />
                                 <span>{{ selectedSubmission ? formatDate(selectedSubmission.submitted_at) : '-' }}</span>
                             </div>
@@ -476,18 +442,17 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                     </div>
                 </section>
 
-                <!-- Form Responses Section -->
                 <section class="space-y-4">
-                    <h5 class="text-[10px] font-black tracking-[0.2em] text-primary uppercase">
+                    <h5 class="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                         Form Responses
                     </h5>
-                    <div class="grid grid-cols-1 gap-4">
+                    <div class="grid grid-cols-1 gap-3">
                         <div
                             v-for="key in allAnswerKeys"
                             :key="key"
-                            class="neo-surface flex flex-col gap-2 bg-white p-5 transition-transform hover:scale-[1.02]"
+                            class="app-surface flex flex-col gap-2 p-5"
                         >
-                            <span class="neo-kicker !px-2 !py-0.5 !text-[9px]">
+                            <span class="app-kicker">
                                 {{ humanizeKey(key) }}
                             </span>
                             <div class="mt-1">
@@ -495,14 +460,14 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                                     v-if="fileUrl(selectedSubmission?.answers[key])"
                                     :href="fileUrl(selectedSubmission?.answers[key]) ?? undefined"
                                     target="_blank"
-                                    class="text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-2.5 font-black underline underline-offset-4 transition-all"
+                                    class="inline-flex items-center gap-2.5 font-semibold text-primary decoration-primary/30 underline underline-offset-4 transition-colors hover:decoration-primary"
                                 >
-                                    <div class="bg-primary/10 flex size-10 items-center justify-center rounded-lg border-2 border-primary/20">
+                                    <div class="grid size-10 place-items-center rounded-lg border border-primary/20 bg-primary/10">
                                         <FileText class="size-5" />
                                     </div>
                                     <span>Download Attachment</span>
                                 </a>
-                                <p v-else class="text-foreground whitespace-pre-wrap text-sm leading-relaxed font-bold">
+                                <p v-else class="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                                     {{ answerPreview(selectedSubmission?.answers[key]) }}
                                 </p>
                             </div>
@@ -510,15 +475,15 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                     </div>
                 </section>
 
-                <section v-if="selectedSubmission" class="space-y-3 border-t-[1.5px] border-foreground/10 pt-6">
-                    <h5 class="text-[10px] font-black tracking-[0.2em] text-primary uppercase">Review (preview)</h5>
-                    <p class="text-xs font-semibold text-muted-foreground">
-                        Tombol ini memanggil notifikasi saja sampai backend menambah kolom status dan route approve/reject.
+                <section v-if="selectedSubmission" class="space-y-3 border-t border-border pt-6">
+                    <h5 class="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">Review (preview)</h5>
+                    <p class="text-xs leading-relaxed text-muted-foreground">
+                        These actions only trigger a notification until the backend adds status columns and approve/reject routes.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <Button
                             type="button"
-                            class="flex-1 gap-2 border-2 border-success/50 font-black text-success min-w-[120px]"
+                            class="min-w-[120px] flex-1 gap-2 border-success/30 text-success hover:bg-success/10"
                             variant="outline"
                             @click="submissionReviewStub('accept', selectedSubmission)"
                         >
@@ -527,7 +492,7 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
                         </Button>
                         <Button
                             type="button"
-                            class="flex-1 gap-2 border-2 border-destructive/50 font-black text-destructive min-w-[120px]"
+                            class="min-w-[120px] flex-1 gap-2 border-destructive/30 text-destructive hover:bg-destructive/10"
                             variant="outline"
                             @click="submissionReviewStub('reject', selectedSubmission)"
                         >
@@ -540,11 +505,4 @@ function submissionReviewStub(action: 'accept' | 'reject', submission: IFormSubm
         </SheetContent>
     </Sheet>
 </template>
-
-<style scoped>
-.animate-brutal-pop {
-    opacity: 0;
-    animation: brutal-pop 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
-}
-</style>
 
