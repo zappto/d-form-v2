@@ -4,6 +4,7 @@ import FormPreviewDialog from '@/components/modules/builder/FormPreviewDialog.vu
 import type { FormBannerState } from '@/components/modules/builder/formBanner'
 import { FORM_VISIBILITY_OPTIONS } from '@/components/modules/builder/formBuilderPalette'
 import type { BuilderField } from '@/types/form-builder'
+import type { FormRegistrationMetadata } from '@/types/form'
 import { useFormBuilderWorkspace } from '@/utils/composables/useFormBuilderWorkspace'
 import FormBuilderToolbar from './FormBuilderToolbar.vue'
 import FormBuilderMobileTabBar from './FormBuilderMobileTabBar.vue'
@@ -44,6 +45,7 @@ const closedAt = defineModel<string>('closedAt', { required: true })
 const visibleFor = defineModel<string[]>('visibleFor', { required: true })
 const banner = defineModel<FormBannerState>('banner', { required: true })
 const formFields = defineModel<BuilderField[]>('formFields', { required: true })
+const formMetadata = defineModel<FormRegistrationMetadata>('formMetadata', { required: true })
 
 const wb = reactive(
     useFormBuilderWorkspace(
@@ -136,6 +138,7 @@ const visibilityOptions = FORM_VISIBILITY_OPTIONS
                             v-model:form-description="formDescription"
                             v-model:closed-at="closedAt"
                             v-model:visible-for="visibleFor"
+                            v-model:form-metadata="formMetadata"
                             id-prefix="m"
                             :field-errors="fieldErrors"
                             :visibility-options="visibilityOptions"
@@ -154,6 +157,7 @@ const visibilityOptions = FORM_VISIBILITY_OPTIONS
                 v-model:closed-at="closedAt"
                 v-model:visible-for="visibleFor"
                 v-model:banner="banner"
+                v-model:form-metadata="formMetadata"
                 :selected-field="wb.selectedField"
                 :is-ready-to-save="wb.isReadyToSave"
                 :validation-issues="wb.validationIssues"

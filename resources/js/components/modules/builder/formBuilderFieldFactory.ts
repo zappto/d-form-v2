@@ -24,6 +24,7 @@ export function createFormBuilderField(type: FormBuilderType, label: string): Bu
         required: false,
         options: [],
         metadata: {},
+        is_append: false,
     }
     return { ...base, ...(defaults[type] || {}) }
 }

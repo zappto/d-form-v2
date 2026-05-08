@@ -28,14 +28,16 @@ class Form extends Model
         'visible_for',
         'event_id',
         'banner_url',
-        'banner_caption'
+        'banner_caption',
+        'metadata',
     ];
 
     public function casts(): array
     {
         return [
             'closed_at' => 'datetime',
-            'visible_for' => AsEnumCollection::of(EventFormVisibility::class)
+            'visible_for' => AsEnumCollection::of(EventFormVisibility::class),
+            'metadata' => 'array',
         ];
     }
 

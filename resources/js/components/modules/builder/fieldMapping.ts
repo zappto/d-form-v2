@@ -42,6 +42,16 @@ function parseOptionChoices(raw: unknown): FieldOptionEntry[] | null {
     return out.length > 0 ? out : null
 }
 
+function preservedMeta(f: BuilderField): Record<string, unknown> {
+    return f.metadata && typeof f.metadata === 'object' && !Array.isArray(f.metadata)
+        ? { ...f.metadata }
+        : {}
+}
+
+function withMeta(f: BuilderField, specific: Record<string, unknown>): Record<string, unknown> {
+    return { ...preservedMeta(f), ...specific }
+}
+
 export function toBackendField(f: BuilderField, order: number): BackendField {
     const base = {
         id: f.id,
@@ -49,21 +59,22 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
         description: f.description || null,
         name: f.name || `field_${f.id.replace(/-/g, '').slice(0, 12)}`,
         order,
+        is_append: f.is_append === true,
     }
     const req: Record<string, unknown> = f.required ? { required: true } : {}
 
     switch (f.type) {
-        case 'short_text': return { ...base, type: 'input', metadata: { type: 'text', placeholder: f.placeholder || '', rules: req, builderType: 'short_text' } }
-        case 'email':      return { ...base, type: 'input', metadata: { type: 'email', placeholder: f.placeholder || '', rules: req, builderType: 'email' } }
-        case 'phone':      return { ...base, type: 'input', metadata: { type: 'tel', placeholder: f.placeholder || '', rules: req, builderType: 'phone' } }
-        case 'number':     return { ...base, type: 'input', metadata: { type: 'number', placeholder: f.placeholder || '', rules: req, builderType: 'number' } }
-        case 'time':       return { ...base, type: 'input', metadata: { type: 'text', placeholder: 'HH:MM', rules: req, builderType: 'time' } }
-        case 'rating':     return { ...base, type: 'input', metadata: { type: 'number', placeholder: '', rules: { ...req, min: 1, max: (f.metadata?.maxStars as number) ?? 5 }, builderType: 'rating', maxStars: (f.metadata?.maxStars as number) ?? 5 } }
-        case 'heading':    return { ...base, type: 'input', metadata: { type: 'text', placeholder: '', rules: {}, builderType: 'heading', content: (f.metadata?.content as string) || 'Section Heading' } }
-        case 'divider':    return { ...base, type: 'input', metadata: { type: 'text', placeholder: '', rules: {}, builderType: 'divider' } }
+        case 'short_text': return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: f.placeholder || '', rules: req, builderType: 'short_text' }) }
+        case 'email':      return { ...base, type: 'input', metadata: withMeta(f, { type: 'email', placeholder: f.placeholder || '', rules: req, builderType: 'email' }) }
+        case 'phone':      return { ...base, type: 'input', metadata: withMeta(f, { type: 'tel', placeholder: f.placeholder || '', rules: req, builderType: 'phone' }) }
+        case 'number':     return { ...base, type: 'input', metadata: withMeta(f, { type: 'number', placeholder: f.placeholder || '', rules: req, builderType: 'number' }) }
+        case 'time':       return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: 'HH:MM', rules: req, builderType: 'time' }) }
+        case 'rating':     return { ...base, type: 'input', metadata: withMeta(f, { type: 'number', placeholder: '', rules: { ...req, min: 1, max: (f.metadata?.maxStars as number) ?? 5 }, builderType: 'rating', maxStars: (f.metadata?.maxStars as number) ?? 5 }) }
+        case 'heading':    return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: '', rules: {}, builderType: 'heading', content: (f.metadata?.content as string) || 'Section Heading' }) }
+        case 'divider':    return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: '', rules: {}, builderType: 'divider' }) }
 
-        case 'long_text':  return { ...base, type: 'textarea', metadata: { placeholder: f.placeholder || '', rules: req, builderType: 'long_text' } }
-        case 'paragraph':  return { ...base, type: 'textarea', metadata: { placeholder: '', rules: {}, builderType: 'paragraph', content: (f.metadata?.content as string) || '' } }
+        case 'long_text':  return { ...base, type: 'textarea', metadata: withMeta(f, { placeholder: f.placeholder || '', rules: req, builderType: 'long_text' }) }
+        case 'paragraph':  return { ...base, type: 'textarea', metadata: withMeta(f, { placeholder: '', rules: {}, builderType: 'paragraph', content: (f.metadata?.content as string) || '' }) }
 
         case 'dropdown': {
             const choices = serializeOptionChoices(f.options || [])
@@ -71,12 +82,12 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
             return {
                 ...base,
                 type: 'select',
-                metadata: {
+                metadata: withMeta(f, {
                     is_multiple: false,
                     rules: { ...req, in: inCsv },
                     builderType: 'dropdown',
                     optionChoices: choices,
-                },
+                }),
             }
         }
         case 'checkbox': {
@@ -85,12 +96,12 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
             return {
                 ...base,
                 type: 'checkbox',
-                metadata: {
+                metadata: withMeta(f, {
                     is_multiple: true,
                     rules: { ...req, in: inCsv },
                     builderType: 'checkbox',
                     optionChoices: choices,
-                },
+                }),
             }
         }
         case 'radio': {
@@ -99,23 +110,23 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
             return {
                 ...base,
                 type: 'radio',
-                metadata: {
+                metadata: withMeta(f, {
                     is_multiple: false,
                     rules: { ...req, in: inCsv },
                     builderType: 'radio',
                     optionChoices: choices,
-                },
+                }),
             }
         }
 
-        case 'date':         return { ...base, type: 'datePicker', metadata: { rules: req, builderType: 'date' } }
-        case 'image_upload': return { ...base, type: 'fileUpload', metadata: { rules: { ...req, mimes: 'png,jpg,jpeg', max_size: 5120 }, builderType: 'image_upload' } }
-        case 'file_upload':  return { ...base, type: 'fileUpload', metadata: { rules: { ...req, mimes: 'pdf,doc,xls', max_size: 10240 }, builderType: 'file_upload' } }
+        case 'date':         return { ...base, type: 'datePicker', metadata: withMeta(f, { rules: req, builderType: 'date' }) }
+        case 'image_upload': return { ...base, type: 'fileUpload', metadata: withMeta(f, { rules: { ...req, mimes: 'png,jpg,jpeg', max_size: 5120 }, builderType: 'image_upload' }) }
+        case 'file_upload':  return { ...base, type: 'fileUpload', metadata: withMeta(f, { rules: { ...req, mimes: 'pdf,doc,xls', max_size: 10240 }, builderType: 'file_upload' }) }
         case 'banner':
             return {
                 ...base,
                 type: 'fileUpload',
-                metadata: {
+                metadata: withMeta(f, {
                     rules: {},
                     builderType: 'banner',
                     accepts: 'gif, png, jpg, jpeg',
@@ -123,10 +134,10 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
                     bannerFileName: (f.metadata?.bannerFileName as string) || '',
                     content: (f.metadata?.content as string) || '',
                     formBanner: Boolean(f.metadata?.formBanner),
-                },
+                }),
             }
 
-        default: return { ...base, type: 'input', metadata: { type: 'text', placeholder: '', rules: req } }
+        default: return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: '', rules: req }) }
     }
 }
 
@@ -147,7 +158,7 @@ function guessType(apiType: string, m: Record<string, unknown>): string {
 }
 
 export function fromBackendField(bf: BackendField): BuilderField {
-    const m: Record<string, unknown> = (bf.metadata && typeof bf.metadata === 'object') ? bf.metadata : {}
+    const m: Record<string, unknown> = (bf.metadata && typeof bf.metadata === 'object') ? (bf.metadata as Record<string, unknown>) : {}
     const rules = (m.rules as Record<string, unknown>) || {}
     const bt = (m.builderType as string) || guessType(bf.type, m)
     const inStr = (rules.in as string) || ''
@@ -171,10 +182,9 @@ export function fromBackendField(bf: BackendField): BuilderField {
         placeholder: (m.placeholder as string) || '',
         required: !!rules.required,
         options: opts,
+        is_append: bf.is_append === true,
         metadata: {
-            content: (m.content as string) || '',
-            bannerUrl: (m.bannerUrl as string) || '',
-            bannerFileName: (m.bannerFileName as string) || '',
+            ...m,
             maxStars: (m.maxStars as number) || 5,
             accepts: ((rules.mimes as string) || '').replace(/,/g, ', '),
             formBanner: m.formBanner === true,

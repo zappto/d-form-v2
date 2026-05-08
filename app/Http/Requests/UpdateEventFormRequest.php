@@ -5,9 +5,11 @@ namespace App\Http\Requests;
 use App\Enums\EventFormVisibility;
 use App\Models\Event;
 use App\Models\Form;
+use App\Support\FormFieldsRequestValidation;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdateEventFormRequest extends FormRequest
 {
@@ -38,21 +40,28 @@ class UpdateEventFormRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => 'required|string|max:100',
-            'description' => 'required|string',
-            'closed_at' => 'required|date',
-            'visible_for' => 'required|array|min:1',
-            'visible_for.*' => [Rule::enum(EventFormVisibility::class)],
-            'banner_url' => 'nullable|string',
-            'banner_caption' => 'nullable|string|max:255',
-            'fields' => 'nullable|array',
-            'fields.*.id' => 'nullable|string',
-            'fields.*.type' => 'required|string',
-            'fields.*.label' => 'required|string',
-            'fields.*.name' => 'required|string',
-            'fields.*.order' => 'required|integer',
-            'fields.*.metadata' => 'nullable|array',
-        ];
+        return array_merge(
+            [
+                'title' => 'required|string|max:100',
+                'description' => 'required|string',
+                'closed_at' => 'required|date',
+                'visible_for' => 'required|array|min:1',
+                'visible_for.*' => [Rule::enum(EventFormVisibility::class)],
+                'banner_url' => 'nullable|string',
+                'banner_caption' => 'nullable|string|max:255',
+                'fields' => 'nullable|array',
+            ],
+            FormFieldsRequestValidation::formMetadataRules(),
+            FormFieldsRequestValidation::nestedFieldRules(),
+        );
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $formParam = $this->route('form');
+        $form = $formParam instanceof Form
+            ? $formParam
+            : Form::query()->find($formParam);
+        FormFieldsRequestValidation::afterForFields($validator, $this, $form);
     }
 }

@@ -66,7 +66,7 @@ class EventReportingTest extends TestCase
     {
         $this->actingAs($this->member())
             ->get(route('dashboard.reports.index'))
-            ->assertForbidden();
+            ->assertRedirect(route('dashboard.user.events'));
     }
 
     public function test_admin_can_view_reports_dashboard(): void
@@ -114,7 +114,7 @@ class EventReportingTest extends TestCase
 
         $this->actingAs($this->member())
             ->get(route('dashboard.events.exports.registrations-csv', $event))
-            ->assertForbidden();
+            ->assertRedirect(route('dashboard.user.events'));
     }
 
     public function test_admin_can_download_attendance_csv(): void

@@ -28,12 +28,14 @@ class FormField extends Model
         'metadata',
         'form_id',
         'order',
+        'is_append',
     ];
 
     public function casts()
     {
         return [
-            'metadata' => AsCollection::class
+            'metadata' => AsCollection::class,
+            'is_append' => 'boolean',
         ];
     }
 }

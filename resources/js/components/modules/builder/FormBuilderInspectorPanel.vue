@@ -2,6 +2,7 @@
 import FieldEditor from '@/components/modules/builder/FieldEditor.vue'
 import type { FormBuilderInspectorMode, FormBuilderValidationIssue } from '@/utils/composables/useFormBuilderWorkspace'
 import type { BuilderField } from '@/types/form-builder'
+import type { FormRegistrationMetadata } from '@/types/form'
 import FormBuilderValidationSummary from './FormBuilderValidationSummary.vue'
 import FormBuilderFormDetailsCard from './FormBuilderFormDetailsCard.vue'
 import FormBuilderBannerBlock from './FormBuilderBannerBlock.vue'
@@ -13,6 +14,7 @@ const formDescription = defineModel<string>('formDescription', { required: true 
 const closedAt = defineModel<string>('closedAt', { required: true })
 const visibleFor = defineModel<string[]>('visibleFor', { required: true })
 const banner = defineModel<FormBannerState>('banner', { required: true })
+const formMetadata = defineModel<FormRegistrationMetadata>('formMetadata', { required: true })
 
 defineProps<{
     selectedField: BuilderField | null
@@ -90,6 +92,7 @@ const emit = defineEmits<{
                     v-model:form-description="formDescription"
                     v-model:closed-at="closedAt"
                     v-model:visible-for="visibleFor"
+                    v-model:form-metadata="formMetadata"
                     id-prefix="d"
                     :field-errors="fieldErrors"
                     :visibility-options="visibilityOptions"

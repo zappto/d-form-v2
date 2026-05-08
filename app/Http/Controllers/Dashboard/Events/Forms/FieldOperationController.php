@@ -83,6 +83,7 @@ class FieldOperationController extends Controller
             'name' => $row['name'],
             'order' => (int) $row['order'],
             'metadata' => $row['metadata'],
+            'is_append' => (bool) ($row['is_append'] ?? false),
         ];
     }
 }

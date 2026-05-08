@@ -32,6 +32,7 @@ declare global {
         event_id: string
         banner_url: string | null
         banner_caption: string | null
+        metadata?: Record<string, unknown>
     }
 
     type FormFieldOptionType = 'text' | 'image'

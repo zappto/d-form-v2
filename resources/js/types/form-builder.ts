@@ -17,6 +17,8 @@ export interface BuilderField {
     required: boolean
     options: FieldOptionEntry[]
     metadata: Record<string, unknown>
+    /** Field may be edited by invited members (team flow); persisted as `form_fields.is_append`. */
+    is_append?: boolean
 }
 
 export type BackendFieldType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'checkbox' | 'radio'
@@ -29,4 +31,5 @@ export interface BackendField {
     name: string
     order: number
     metadata: Record<string, unknown>
+    is_append?: boolean
 }

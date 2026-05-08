@@ -34,7 +34,7 @@ class EventManagementTest extends TestCase
 
         $this->actingAs($member)
             ->get(route('dashboard.events.index'))
-            ->assertForbidden();
+            ->assertRedirect(route('dashboard.user.events'));
     }
 
     public function test_admin_can_view_events_index(): void

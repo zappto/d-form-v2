@@ -51,6 +51,7 @@ class FormController extends Controller
             'visible_for' => $data['visible_for'],
             'banner_url' => $data['banner_url'] ?? null,
             'banner_caption' => $data['banner_caption'] ?? null,
+            'metadata' => $data['metadata'] ?? null,
         ]);
 
         if (!empty($data['fields'])) {
@@ -59,9 +60,11 @@ class FormController extends Controller
                     'id' => $fieldData['id'] ?? \Illuminate\Support\Str::uuid()->toString(),
                     'input_type' => FormFieldTypeMapping::toInputType($fieldData['type']),
                     'label' => $fieldData['label'],
+                    'description' => $fieldData['description'] ?? null,
                     'name' => $fieldData['name'],
                     'metadata' => $fieldData['metadata'] ?? [],
                     'order' => $fieldData['order'],
+                    'is_append' => (bool) ($fieldData['is_append'] ?? false),
                 ]);
             }
         }
@@ -116,6 +119,7 @@ class FormController extends Controller
                 'visible_for' => $data['visible_for'],
                 'banner_url' => $data['banner_url'] ?? null,
                 'banner_caption' => $data['banner_caption'] ?? null,
+                'metadata' => $data['metadata'] ?? null,
             ]);
 
             if (isset($data['fields'])) {
@@ -136,6 +140,7 @@ class FormController extends Controller
                         'metadata' => $fieldData['metadata'] ?? [],
                         'order' => $fieldData['order'],
                         'description' => $fieldData['description'] ?? null,
+                        'is_append' => (bool) ($fieldData['is_append'] ?? false),
                     ];
 
                     if (is_string($id) && $id !== '' && $oldById->has($id)) {
@@ -191,6 +196,13 @@ class FormController extends Controller
             ? $closed->format('Y-m-d\TH:i')
             : null;
 
+        $meta = $form->metadata;
+        if ($meta === null) {
+            $meta = [];
+        } elseif (!is_array($meta)) {
+            $meta = (array) $meta;
+        }
+
         return [
             'id' => $form->id,
             'title' => $form->title,
@@ -202,6 +214,7 @@ class FormController extends Controller
             'event_id' => $form->event_id,
             'banner_url' => $form->banner_url,
             'banner_caption' => $form->banner_caption,
+            'metadata' => $meta,
         ];
     }
 
@@ -224,6 +237,7 @@ class FormController extends Controller
             'name' => $f->name,
             'order' => $f->order,
             'metadata' => $meta,
+            'is_append' => (bool) $f->is_append,
         ];
     }
 }

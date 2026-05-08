@@ -24,6 +24,7 @@ class FormFactory extends Factory
             'event_id' => Event::factory(),
             'banner_url' => null,
             'banner_caption' => null,
+            'metadata' => null,
         ];
     }
 }
