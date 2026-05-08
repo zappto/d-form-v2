@@ -22,6 +22,13 @@ class HomeController extends Controller
     public function __invoke(Request $request): Response
     {
         $user = $request->user();
+
+        if ($user !== null
+            && ! $user->can('events.list')
+            && $user->hasRole('member')) {
+            return redirect()->route('dashboard.user.events');
+        }
+
         $adminScope = $user !== null && $user->can('events.list');
 
         $allEvents = $adminScope

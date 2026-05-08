@@ -159,7 +159,14 @@ export function useFormBuilderWorkspace(
 
     function onCanvasDragOver(e: DragEvent): void {
         e.preventDefault()
-        if (e.dataTransfer) e.dataTransfer.dropEffect = isDraggingOverCanvas.value ? 'move' : 'copy'
+        const dt = e.dataTransfer
+        if (dt) {
+            /** Drag dari palet: belum ada dragSourceId; tandai agar UI drop (ring kanvas) muncul */
+            if (!dragSourceId.value && Array.from(dt.types).includes('application/json')) {
+                isDraggingOverCanvas.value = true
+            }
+            dt.dropEffect = dragSourceId.value ? 'move' : 'copy'
+        }
         if (dropIndicatorIndex.value === -1 && isEmpty.value) dropIndicatorIndex.value = 0
     }
 

@@ -32,7 +32,13 @@ type DashboardPageExtras = {
     breadcrumbs?: { label: string; href?: string }[];
     event?: { title?: string };
 };
-const pageProps = computed(() => page.props as DashboardPageExtras);
+const pageProps = computed(() => page.props as DashboardPageExtras)
+
+/** Form builder: navbar digabung editor (teleport), tanpa breadcrumb & profil. */
+const isFormBuilderPage = computed(() => {
+    const c = page.component
+    return c === 'Dashboard/Events/Forms/Show' || c === 'Dashboard/Events/Forms/Create'
+})
 
 const breadcrumbs = computed<{ label: string; href?: string }[]>(() => {
     if (pageProps.value.breadcrumbs) return pageProps.value.breadcrumbs
@@ -87,7 +93,7 @@ function getInitials(name: string): string {
     return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
 }
 
-function handleLogout() {
+function handleLogout(): void {
     router.post(logout().url)
 }
 </script>
@@ -98,9 +104,28 @@ function handleLogout() {
             aria-hidden="true"
             class="pointer-events-none absolute inset-x-0 top-0 z-0 h-[360px] bg-[radial-gradient(120%_60%_at_50%_0%,color-mix(in_oklab,var(--primary)_6%,transparent),transparent_70%)]"
         />
-        <header class="sticky top-0 z-30 border-b border-border bg-card/85 backdrop-blur-xl">
+
+        <header
+            v-if="isFormBuilderPage"
+            class="sticky top-0 z-40 border-b border-transparent bg-background/80 px-3 pt-3 pb-2 backdrop-blur-xl sm:px-5 lg:px-8"
+        >
+            <div
+                class="border-border/70 from-card/95 to-card/80 mx-auto flex max-w-7xl flex-col gap-2.5 rounded-2xl border bg-gradient-to-b px-3 py-2.5 shadow-sm sm:flex-row sm:items-center sm:gap-3 sm:p-3 sm:shadow-md"
+            >
+                <div id="dashboard-fb-nav-left" class="min-w-0 w-full sm:flex-1" />
+                <div
+                    id="dashboard-fb-nav-right"
+                    class="flex w-full shrink-0 flex-wrap items-center justify-end gap-2 sm:w-auto sm:gap-2.5"
+                />
+            </div>
+        </header>
+
+        <header
+            v-else
+            class="sticky top-0 z-30 border-b border-border bg-card/85 backdrop-blur-xl"
+        >
             <div class="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 lg:px-8">
-                <div class="flex items-center gap-3 min-w-0">
+                <div class="flex min-w-0 items-center gap-3">
                     <Breadcrumb class="min-w-0 hidden sm:flex">
                         <BreadcrumbList>
                             <template v-for="(crumb, idx) in breadcrumbs" :key="idx">
@@ -159,8 +184,11 @@ function handleLogout() {
             </div>
         </header>
 
-        <main class="relative z-10 flex-1 px-4 pb-14 pt-6 lg:px-8">
-            <div class="mx-auto max-w-7xl">
+        <main
+            class="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-14 lg:px-8"
+            :class="isFormBuilderPage ? 'pt-3 sm:pt-4 lg:pt-5' : 'pt-6'"
+        >
+            <div class="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">
                 <slot />
             </div>
         </main>

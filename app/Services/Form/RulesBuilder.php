@@ -29,11 +29,13 @@ class RulesBuilder
                 $ruleSet = $metadata->get('rules') ?? [];
                 $inputSubtype = $metadata->get('type') ?? null;
                 $options = $metadata->get('options') ?? null;
+                $builderType = $metadata->get('builderType') ?? null;
             } else {
                 $md = (array) $metadata;
                 $ruleSet = $md['rules'] ?? [];
                 $inputSubtype = $md['type'] ?? null;
                 $options = $md['options'] ?? null;
+                $builderType = $md['builderType'] ?? null;
             }
             if (!is_array($ruleSet)) {
                 $ruleSet = [];
@@ -41,6 +43,10 @@ class RulesBuilder
 
             if ($field->input_type === 'input' && $inputSubtype === 'email') {
                 $ruleSet['email'] = true;
+            }
+
+            if ($field->input_type === 'input' && $builderType === 'url') {
+                $ruleSet['url'] = true;
             }
 
             if ($field->input_type === 'radio' && is_string($options) && $options !== '') {
@@ -121,6 +127,10 @@ class RulesBuilder
 
             if (!empty($rules['email'])) {
                 $mappedRules[] = 'email';
+            }
+
+            if (!empty($rules['url'])) {
+                $mappedRules[] = 'url';
             }
 
             if (!empty($rules['regex'])) {

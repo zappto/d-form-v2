@@ -16,7 +16,6 @@ import {
     extractFormBannerFromBuilderFields,
 } from '@/components/modules/builder/formBanner'
 import { Button } from '@/components/ui/button'
-import { FileText } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardFocusLayout })
 
@@ -147,10 +146,15 @@ function onSave(): void {
         @save="onSave"
     >
         <template #toolbar-extra>
-            <Button variant="outline" size="sm" as-child>
-                <Link :href="submissionsHref">
-                    <FileText class="size-4 sm:mr-2" />
-                    <span class="hidden sm:inline">Submissions</span>
+            <Button
+                variant="outline"
+                size="sm"
+                class="rounded-full border-border/80 px-2.5 text-xs font-medium shadow-sm sm:px-3 sm:text-sm"
+                as-child
+            >
+                <Link :href="submissionsHref" title="Lihat pengiriman form">
+                    <span class="max-sm:hidden">Pengiriman</span>
+                    <span class="sm:hidden">Kiriman</span>
                 </Link>
             </Button>
         </template>

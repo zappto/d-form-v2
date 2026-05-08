@@ -17,6 +17,7 @@ flowchart LR
   M3[M3_FormBuilder]
   M4[M4_Registration]
   M4b[M4b_TeamInvite]
+  M4c[M4c_BundleRegistration]
   M5[M5_EmailQR]
   M6[M6_Attendance]
   M7[M7_Dashboard]
@@ -25,6 +26,9 @@ flowchart LR
   M2 --> M3 --> M4 --> M5 --> M6
   M4 --> M4b
   M4b --> M5
+  M4 --> M4c
+  M4b --> M4c
+  M4c --> M5
   M4 --> M7
   M6 --> M7
   M7 --> M8
@@ -32,8 +36,7 @@ flowchart LR
 
 - **M4 → M7** dan **M6 → M7**: dasbor dapat mulai diisi data dummy/contract API paralel dengan penyelesaian M4/M6, asal kontrak response disepakati di M0.
 - **M4b**: perluasan **pendaftaran tim** (metadata form, `is_append`, banyak `form_answer` per submit, konfirmasi anggota, notifikasi undangan); mengikat **M4** ke **M5** untuk pengiriman notifikasi/email terkait undangan.
-
----
+- **M4c**: **pendaftaran bundle** (`group_token`, `registration_mode` / `max_team_size`, metadata `duplicatable` per field, konfirmasi undangan dengan kedaluwarsa tanpa cron, gate review admin); bergantung pada **M4** dan disarankan setelah pola **M4b** stabil; mengikat ke **M5** untuk email undangan.
 
 ## Migrasi Livewire → Vue (lintas fase)
 
@@ -89,7 +92,7 @@ Modul yang masih memakai Livewire di repositori harus mencapai **parity perilaku
 |---|---|
 | **Tujuan** | Admin mengonfigurasi field per event: label, nama, tipe, urutan (sortable), aturan validasi. |
 | **Owner (saran)** | FE (UI builder) + BE (skema simpan & validasi) |
-| **Deliverable** | UI builder; persist ke **`form_fields`** (bukan nama tabel lama); validasi server untuk konfigurasi (mis. nama field unik per form); dukungan penyimpanan **`is_append`** per field dan (bersama halaman pengaturan form) pengisian **`metadata`** form untuk **mode pendaftaran** / **`team_size`** sesuai PRD. |
+| **Deliverable** | UI builder; persist ke **`form_fields`** (bukan nama tabel lama); validasi server untuk konfigurasi (mis. nama field unik per form); dukungan penyimpanan **`is_append`** per field, metadata **`duplicatable`** (untuk **M4c** / bundle), dan (bersama halaman pengaturan form) pengisian **`metadata`** form untuk **mode pendaftaran** / **`max_team_size`** / **`team_size`** sesuai PRD. |
 | **Kriteria selesai** | Form dapat disusun dan disimpan ulang tanpa kehilangan urutan; tipe field sesuai PRD. |
 | **Paralelisasi** | Mock data field untuk M4 jika penyimpanan M3 belum merge (hindari blokir panjang). |
 | **Cek migrasi** | Modul form admin Livewire (`EditForm`, `FormDetail`, `create-form`, dll.) tergantikan atau diarahkan ke rute Vue. |
@@ -100,9 +103,9 @@ Modul yang masih memakai Livewire di repositori harus mencapai **parity perilaku
 
 | | |
 |---|---|
-| **Tujuan** | Member memilih event, mengisi form dinamis, submit; data jawaban disimpan (JSON); upload file dengan validasi. Mendukung **mode individu**; **mode tim** dijabarkan di **M4b**. |
+| **Deliverable** | Member memilih event, mengisi form dinamis, submit; data jawaban disimpan (JSON); upload file dengan validasi. Mendukung **mode individu**; **mode tim** dijabarkan di **M4b**; **mode bundle** (satu pendaftaran banyak peserta, §4.3 PRD) di **M4c**. |
 | **Owner (saran)** | Fullstack |
-| **Deliverable** | Render field dari definisi M3; **`form_answers`**; storage file; validasi dinamis server-side mencerminkan rules admin. Untuk tim: skema simpan diperluas di M4b (banyak baris per submit leader). |
+| **Deliverable** | Render field dari definisi M3; **`form_answers`**; storage file; validasi dinamis server-side mencerminkan rules admin. Untuk tim: skema simpan diperluas di **M4b**; untuk **bundle** di **M4c** (banyak baris per submit leader, `group_token`, dsb.). |
 | **Kriteria selesai** | Satu alur pendaftaran end-to-end untuk semua tipe field MVP; gagal validasi menampilkan error per field. |
 | **Paralelisasi** | Kontrak payload submission untuk M5 (email) dan M6 (QR menempel pada submission). |
 | **Cek migrasi** | Tidak ada duplikasi form pendaftaran di Blade/Livewire untuk event yang sama. |
@@ -123,13 +126,27 @@ Modul yang masih memakai Livewire di repositori harus mencapai **parity perilaku
 
 ---
 
+## M4c — Pendaftaran bundle: `group_token`, field `duplicatable`, konfirmasi anggota & gate review
+
+| | |
+|---|---|
+| **Tujuan** | Mendukung **1 pendaftaran = banyak peserta**: satu **leader** mengirim satu formulir, sistem menciptakan **banyak `form_answer`** (masing-masing **1 peserta = 1 baris**) dengan **`group_token` yang sama**, mempertahankan **absensi/QR/approval per individu** dan jawaban **JSON** tanpa mengubah inti arsitektur form dinamis. |
+| **Acuan produk** | [PRD D-Form v2 — §4.3 Pendaftaran bundle](prd.md). |
+| **Owner (saran)** | Fullstack (migrasi, transaksi, policy, builder, halaman isi form bundle, halaman konfirmasi anggota, notifikasi). |
+| **Deliverable** | **Migrasi / skema:** `forms` — `registration_mode` (`single` \| `bundle`) dan **`max_team_size`** (di `metadata` atau kolom dedikasi, disepakati); `form_fields.metadata` — flag **`duplicatable`**; `form_answers` — **`group_token`**, **`registration_role`** (`leader` \| `member`), **`member_confirmation_status`** (`pending` \| `accepted` \| `rejected` \| `expired`), **`invited_email`**, **`member_confirmed_at`**, **`invitation_expired_at`**; penyelarasan dengan kolom §4.2 yang sudah ada (mis. `status_confirmation_member`) agar tidak dobel logika. **Backend:** validasi **email anggota terdaftar**, batas **`max_team_size`**, transaksi pembuatan banyak `form_answer`, endpoint konfirmasi **`/confirm/{token}`** (atau pola setara) dengan cek kedaluwarsa **saat request** (tanpa cron). **Email:** undangan anggota (antrean M5 + audit jika relevan). **Admin:** review/submission hanya jika **`member_confirmation_status == accepted`** untuk baris anggota (leader menurut aturan). **Frontend:** builder — set mode bundle + max tim + metadata `duplicatable`; halaman isi — tambah peserta & duplikasi field; portal anggota — lihat/ubah data diizinkan, terima/tolak undangan. **Dokumentasi:** aturan apakah leader dihitung dalam `max_team_size`. |
+| **Kriteria selesai** | Satu submit bundle menghasilkan N `form_answer` dengan `group_token` konsisten; anggota tidak bisa “siap direview” sebelum **accepted**; link kedaluwarsa menolak akses dan men-set **expired**; tidak ada regresi mode `single` / alur absensi; **tanpa** mengubah polis scan QR inti (tetap per submission). |
+| **Paralelisasi** | Buka setelah **M4** stabil; manfaatkan pola **M4b** untuk multi-row submit & notifikasi; template email dapat berbagi infrastruktur **M5**. |
+| **Cek migrasi** | Semua alur di Inertia/Vue; tidak ada jalur Livewire paralel untuk bundle. |
+
+---
+
 ## M5 — Email & QR
 
 | | |
 |---|---|
 | **Tujuan** | Email konfirmasi berisi detail event, data peserta, QR unik; antrean; log di `email_logs`. |
 | **Owner (saran)** | BE + FE (template/preview opsional) |
-| **Deliverable** | Job queue; Mailable; generate QR terikat submission ID; konfigurasi SMTP; entri log sukses/gagal; **(perluasan M4b)** notifikasi/email **undangan anggota tim** mengikuti pola terkirim yang disepakati (queue, log bila relevan). |
+| **Deliverable** | Job queue; Mailable; generate QR terikat submission ID; konfigurasi SMTP; entri log sukses/gagal; **(perluasan M4b / M4c)** notifikasi/email **undangan anggota** (tim & bundle) mengikuti pola terkirim yang disepakati (queue, log bila relevan). |
 | **Kriteria selesai** | Pendaftaran sukses memicu email (via queue); QR dapat ditampilkan/diuji di email test. |
 | **Paralelisasi** | Template email bisa dipoles paralel dengan M6 setelah payload QR final. |
 | **Cek migrasi** | N/A khusus Livewire; pastikan trigger email dari controller/Inertia bukan dari komponen LW. |
@@ -184,6 +201,9 @@ Modul yang masih memakai Livewire di repositori harus mencapai **parity perilaku
 | M7 UI + M4/M6 | Mock JSON atau seed data; kontrak response dasbor. |
 | M3 + M4b UI | Metadata form & `is_append` tersimpan dari builder; tidak konflik dengan penyimpanan field eksisting. |
 | M4b + M5 | Template/payload email undangan disepakati; worker queue sama untuk email registrasi dan undangan (jika keduanya email). |
+| M4c + M3 | Builder menyimpan `registration_mode`, `max_team_size`, dan `duplicatable` per field tanpa merusak field eksisting. |
+| M4c + M5 | Email undangan bundle memakai queue & pola log yang sama; token konfirmasi aman dan tidak bocor di log. |
+| M4b + M4c | Penyelarasan kolom konfirmasi anggota (`status_confirmation_member` vs `member_confirmation_status`) diselesaikan di satu PRD/migrasi. |
 | Dokumentasi + fitur | Perubahan README hanya menyentuh bagian yang relevan agar tidak konflik merge. |
 
 ---

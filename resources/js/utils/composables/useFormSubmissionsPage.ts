@@ -4,6 +4,7 @@ import { toast } from 'vue-sonner'
 import {
     answerPreview,
     formatSubmissionDate,
+    formSubmissionReviewIsPending,
     humanizeSubmissionKey,
     submissionFileUrl,
 } from '@/lib/formSubmissionsUi'
@@ -72,6 +73,10 @@ export function useFormSubmissionsPage(props: {
         const dates = props.submissions.data.map((s) => new Date(s.submitted_at).getTime())
         return formatSubmissionDate(new Date(Math.max(...dates)).toISOString())
     })
+
+    const pendingReviewCount = computed(
+        () => props.submissions.data.filter((s) => formSubmissionReviewIsPending(s)).length,
+    )
 
     function humanizeKey(value: string): string {
         return humanizeSubmissionKey(fieldLabelMap.value, value)
@@ -174,6 +179,7 @@ export function useFormSubmissionsPage(props: {
         answerKeys,
         allAnswerKeys,
         latestSubmissionDate,
+        pendingReviewCount,
         formatDate: formatSubmissionDate,
         humanizeKey,
         answerPreview,

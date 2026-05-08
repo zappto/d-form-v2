@@ -50,6 +50,7 @@ declare global {
         | 'image_upload' | 'file_upload'
         | 'date' | 'rating'
         | 'heading' | 'paragraph' | 'divider' | 'banner'
+        | 'url' | 'address' | 'yes_no'
 
     // Simple types stored in the Database
     type FormApiType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'radio' | 'checkbox'

@@ -185,7 +185,14 @@ function formatDt(iso: string) {
                             </TableRow>
                         </TableBody>
                     </Table>
-                    <FormSubmissionsPagination v-if="attendanceLog" :links="attendanceLog.links" :last-page="attendanceLog.last_page" />
+                    <FormSubmissionsPagination
+                        v-if="attendanceLog"
+                        :links="attendanceLog.links"
+                        :current-page="attendanceLog.current_page"
+                        :last-page="attendanceLog.last_page"
+                        :total="attendanceLog.total"
+                        total-label="rekaman"
+                    />
                 </CardContent>
             </Card>
         </template>

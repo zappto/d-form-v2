@@ -10,6 +10,14 @@ use App\Http\Controllers\Dashboard\Events\Forms\FormSubmissionController;
 use App\Http\Controllers\Dashboard\Events\Forms\FormSubmissionsController;
 
 Route::name('dashboard.')->prefix('/dashboard')->middleware('auth')->group(function () {
+    Route::get('/events/{event}/forms/{form}/fill', FormFillController::class)
+        ->name('events.forms.fill');
+
+    Route::post('/events/{event}/forms/{form}/submit', FormSubmissionController::class)
+        ->name('forms.submission');
+});
+
+Route::name('dashboard.')->prefix('/dashboard')->middleware(['auth', 'organizer'])->group(function () {
     Route::get('/events/{event}/registration-status', [EventController::class, 'registrationStatus'])
         ->name('events.registration-status');
 
@@ -40,12 +48,6 @@ Route::name('dashboard.')->prefix('/dashboard')->middleware('auth')->group(funct
 
     Route::post('/events/{event}/forms/{form}/fields', [FieldOperationController::class, '__invoke'])
         ->name('events.forms.fields');
-
-    Route::get('/events/{event}/forms/{form}/fill', FormFillController::class)
-        ->name('events.forms.fill');
-
-    Route::post('/events/{event}/forms/{form}/submit', FormSubmissionController::class)
-        ->name('forms.submission');
 
     Route::get('/events/{event}/forms/{form}/submissions', FormSubmissionsController::class)
         ->name('events.forms.submissions');

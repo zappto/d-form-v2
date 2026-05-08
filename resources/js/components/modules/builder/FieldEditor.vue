@@ -119,56 +119,54 @@ const isContent = computed(() =>
 </script>
 
 <template>
-    <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-6 rounded-2xl border border-border/60 bg-card/50 px-5 py-6">
         <!-- Header -->
         <div class="flex items-center gap-3">
             <div
-                class="grid size-9 shrink-0 place-items-center rounded-xl text-white"
+                class="grid size-10 shrink-0 place-items-center rounded-xl text-white shadow-sm"
                 :style="{ backgroundColor: config.accent }"
             >
                 <component :is="config.icon" class="size-4" :stroke-width="2" />
             </div>
             <div>
-                <h3 class="font-display text-base font-bold tracking-[-0.02em] text-foreground">Field properties</h3>
-                <p class="text-[11px] text-muted-foreground">{{ config.label }} field</p>
+                <h3 class="font-display text-base font-bold tracking-tight text-foreground">Properti field</h3>
+                <p class="text-xs text-muted-foreground">Tipe: {{ config.label }}</p>
             </div>
         </div>
 
         <hr class="app-divider" />
 
         <!-- Label -->
-        <div class="flex flex-col gap-1.5">
-            <Label class="text-xs font-semibold">Label</Label>
+        <div class="flex flex-col gap-2">
+            <Label class="text-sm font-medium">Label</Label>
             <Input
                 :model-value="field.label"
-                placeholder="e.g. Full Name"
-                class="text-xs"
+                placeholder="e.g. Nama lengkap"
+                class="h-11 text-sm"
                 @update:model-value="(v) => update('label', String(v))"
             />
-            <p class="text-[10px] text-muted-foreground">
-                The label shown above the field.
-            </p>
+            <p class="text-xs text-muted-foreground">Teks yang tampil di atas field.</p>
         </div>
 
         <!-- Description -->
-        <div v-if="!isContent" class="flex flex-col gap-1.5">
-            <Label class="text-xs font-semibold">Help Text</Label>
+        <div v-if="!isContent" class="flex flex-col gap-2">
+            <Label class="text-sm font-medium">Teks bantu</Label>
             <Textarea
                 :model-value="field.description"
-                placeholder="Brief instruction for the user"
+                placeholder="Instruksi singkat untuk pengguna"
                 rows="2"
-                class="text-xs"
+                class="min-h-[4.5rem] text-sm"
                 @update:model-value="(v) => update('description', String(v))"
             />
         </div>
 
         <!-- Placeholder (text fields only) -->
-        <div v-if="hasPlaceholder" class="flex flex-col gap-1.5">
-            <Label class="text-xs font-semibold">Placeholder</Label>
+        <div v-if="hasPlaceholder" class="flex flex-col gap-2">
+            <Label class="text-sm font-medium">Placeholder</Label>
             <Input
                 :model-value="field.placeholder"
-                placeholder="e.g. Enter your name..."
-                class="text-xs"
+                placeholder="e.g. Contoh: Jhon Doe"
+                class="h-11 text-sm"
                 @update:model-value="(v) => update('placeholder', String(v))"
             />
         </div>
@@ -315,12 +313,12 @@ const isContent = computed(() =>
         </div>
 
         <!-- Required toggle (not for content types) -->
-        <div v-if="!isContent" class="mt-1">
-            <hr class="app-divider mb-4" />
-            <div class="flex items-center justify-between gap-3">
+        <div v-if="!isContent" class="mt-2">
+            <hr class="app-divider mb-5" />
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
                 <div>
-                    <Label class="text-xs font-semibold">Required</Label>
-                    <p class="text-[10px] text-muted-foreground">User must fill this field</p>
+                    <Label class="text-sm font-medium">Wajib diisi</Label>
+                    <p class="text-xs text-muted-foreground">Pengguna harus mengisi field ini</p>
                 </div>
                 <Switch
                     :checked="!!field.required"

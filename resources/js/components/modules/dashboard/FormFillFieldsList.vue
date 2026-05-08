@@ -89,7 +89,7 @@ function setTextAnswer(ctx: UnwrapNestedRefs<FormFillPageContext>, name: string,
                     </div>
 
                     <Textarea
-                        v-else-if="ctx.builderType(field) === 'long_text' || field.type === 'textarea'"
+                        v-else-if="ctx.builderType(field) === 'long_text' || ctx.builderType(field) === 'address' || field.type === 'textarea'"
                         :id="field.name"
                         :placeholder="ctx.getPlaceholder(field)"
                         :model-value="textAnswer(ctx, field.name)"

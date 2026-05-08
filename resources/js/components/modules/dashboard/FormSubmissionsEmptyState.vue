@@ -7,9 +7,10 @@ import { Inbox } from 'lucide-vue-next'
         <div class="grid size-16 place-items-center rounded-2xl border border-border bg-card shadow-xs">
             <Inbox class="size-7 text-muted-foreground" />
         </div>
-        <h3 class="font-display mt-6 text-xl font-bold tracking-[-0.02em] text-foreground">No responses yet</h3>
-        <p class="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-            When people submit this form, you'll see their detailed answers here in real-time.
+        <h3 class="font-display mt-6 text-xl font-bold tracking-[-0.02em] text-foreground">Belum ada pengiriman</h3>
+        <p class="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+            Saat ada yang mengisi dan mengirim formulir ini, daftar jawaban akan muncul di sini. Anda bisa meninjau status,
+            membuka detail, dan memutuskan diterima atau ditolak jika formulir memakai review.
         </p>
     </div>
 </template>

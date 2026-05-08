@@ -136,6 +136,8 @@ export function useFormFillPage(props: {
             if (type === 'phone') return 'tel'
             return type
         }
+        const bt = builderType(field)
+        if (bt === 'url') return 'url'
         return 'text'
     }
 
@@ -154,7 +156,7 @@ export function useFormFillPage(props: {
 
     function isRadioLike(field: IFormField): boolean {
         const bt = builderType(field)
-        return field.type === 'radio' || bt === 'radio'
+        return field.type === 'radio' || bt === 'radio' || bt === 'yes_no'
     }
 
     function isCheckboxLike(field: IFormField): boolean {

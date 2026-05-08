@@ -1,14 +1,28 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import FieldRenderer from '@/components/modules/builder/FieldRenderer.vue'
 import LocalLottie from '@/components/core/LocalLottie.vue'
 import { Button } from '@/components/ui/button'
-import { GripVertical, Plus, Sparkles, ArrowUp, ArrowDown, Pencil, Trash2 } from 'lucide-vue-next'
+import {
+    GripVertical,
+    ArrowUp,
+    ArrowDown,
+    Pencil,
+    Trash2,
+    ChevronLeft,
+    ChevronRight,
+    ChevronUp,
+    ChevronDown,
+    PlusCircle,
+} from 'lucide-vue-next'
 import type { BuilderField } from '@/types/form-builder'
+
+const PAGE_SIZE = 5
 
 const formTitle = defineModel<string>('formTitle', { required: true })
 const formDescription = defineModel<string>('formDescription', { required: true })
 
-defineProps<{
+const props = defineProps<{
     hideOnMobileSettings: boolean
     bannerPreviewSrc: string
     isEmpty: boolean
@@ -32,44 +46,115 @@ defineEmits<{
     moveField: [id: string, dir: -1 | 1]
     openAddSheet: []
 }>()
+
+const currentPage = ref(1)
+
+const totalPages = computed(() => {
+    if (props.formFields.length === 0) return 1
+    return Math.max(1, Math.ceil(props.formFields.length / PAGE_SIZE))
+})
+
+const sliceStart = computed(() => (currentPage.value - 1) * PAGE_SIZE)
+
+const paginatedFields = computed(() =>
+    props.formFields.slice(sliceStart.value, sliceStart.value + PAGE_SIZE),
+)
+
+const trailingGapIndex = computed(() => sliceStart.value + paginatedFields.value.length)
+
+function goPrev(): void {
+    currentPage.value = Math.max(1, currentPage.value - 1)
+}
+
+function goNext(): void {
+    currentPage.value = Math.min(totalPages.value, currentPage.value + 1)
+}
+
+watch(
+    () => props.formFields.length,
+    (n, prev) => {
+        const maxPage = Math.max(1, n === 0 ? 1 : Math.ceil(n / PAGE_SIZE))
+        if (currentPage.value > maxPage) currentPage.value = maxPage
+        if (prev !== undefined && n > prev) {
+            currentPage.value = maxPage
+        }
+    },
+)
+
+watch(
+    () => [props.selectedFieldId, props.formFields.length] as const,
+    () => {
+        const id = props.selectedFieldId
+        if (!id || props.formFields.length === 0) return
+        const idx = props.formFields.findIndex((f) => f.id === id)
+        if (idx === -1) return
+        const p = Math.floor(idx / PAGE_SIZE) + 1
+        if (p !== currentPage.value) currentPage.value = p
+    },
+)
+
+function gapActive(globalIdx: number): boolean {
+    return props.dropIndicatorIndex === globalIdx
+}
+
+/** Ada aktivitas drag (dari palet atau reorder) — tampilkan UI bantu penyisipan */
+const showDropChrome = computed(
+    () => props.dropIndicatorIndex >= 0 || props.dragSourceId != null || props.isDraggingOverCanvas,
+)
 </script>
 
 <template>
     <div
         :class="[
-            'flex justify-center px-3 pt-6 pb-32 sm:px-6 lg:pb-10',
+            'flex min-h-0 justify-center px-4 py-5 pb-28 sm:px-6 sm:py-6 lg:pb-12',
             hideOnMobileSettings && 'hidden lg:flex',
         ]"
     >
-        <div class="w-full max-w-[440px]">
+        <div class="w-full max-w-[480px] sm:max-w-[520px]">
             <div
                 v-if="isEmpty"
-                class="border-border bg-muted/30 text-muted-foreground mb-4 hidden items-center gap-2.5 rounded-xl border border-dashed px-4 py-2.5 text-[11px] lg:flex"
+                class="border-border bg-muted/30 text-muted-foreground mb-4 hidden rounded-xl border border-dashed px-4 py-3 text-sm leading-snug lg:block"
             >
-                <Sparkles class="text-primary size-3.5 shrink-0" />
-                Drag any component from the left to start. You can reorder anytime.
+                Tarik komponen dari panel kiri. Letakkan pada garis penyisip biru. Gunakan grip di kiri tiap kartu untuk
+                mengubah urutan.
             </div>
 
-            <div class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm">
-                <div v-if="bannerPreviewSrc" class="border-border border-b">
+            <!-- Kartu utama: tanpa overflow-hidden agar bayangan/transisi tidak terpotong -->
+            <div class="border-border bg-card rounded-2xl border shadow-sm">
+                <div v-if="bannerPreviewSrc" class="border-border overflow-hidden rounded-t-2xl border-b">
                     <img :src="bannerPreviewSrc" alt="Form banner" class="aspect-[3/1] w-full object-cover" />
                 </div>
-                <div class="border-border from-primary/5 to-primary/0 border-b bg-gradient-to-br via-transparent px-5 pt-6 pb-5">
-                    <input
-                        v-model="formTitle"
-                        placeholder="Untitled form"
-                        class="font-display text-foreground placeholder:text-muted-foreground/60 w-full bg-transparent text-2xl font-bold tracking-[-0.025em] focus:outline-none"
-                    />
-                    <textarea
-                        v-model="formDescription"
-                        rows="2"
-                        placeholder="Add a short description so registrants know what this form is for..."
-                        class="text-muted-foreground placeholder:text-muted-foreground/60 mt-2 w-full resize-none bg-transparent text-sm leading-relaxed focus:outline-none"
-                    ></textarea>
+                <div
+                    class="border-border from-primary/5 to-primary/0 space-y-4 border-b bg-gradient-to-br via-transparent px-5 py-6 sm:space-y-5 sm:px-7 sm:py-8"
+                >
+                    <div
+                        class="rounded-xl border border-border/90 bg-background px-4 py-3.5 shadow-sm sm:px-5 sm:py-4"
+                    >
+                        <input
+                            v-model="formTitle"
+                            placeholder="Judul form"
+                            class="font-display text-foreground placeholder:text-muted-foreground/65 w-full border-0 bg-transparent p-0 text-xl font-semibold leading-snug tracking-tight focus:outline-none focus:ring-0 sm:text-2xl"
+                        />
+                    </div>
+                    <div
+                        class="rounded-xl border border-border/90 bg-background px-4 py-3.5 shadow-sm sm:px-5 sm:py-4"
+                    >
+                        <textarea
+                            v-model="formDescription"
+                            rows="3"
+                            placeholder="Deskripsi singkat untuk peserta…"
+                            class="text-muted-foreground placeholder:text-muted-foreground/65 min-h-[5.25rem] w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed focus:outline-none focus:ring-0 sm:text-[15px]"
+                        ></textarea>
+                    </div>
                 </div>
 
                 <div
-                    class="min-h-[400px] space-y-1 p-4"
+                    class="min-h-[400px] px-5 py-7 transition-[box-shadow,background-color] duration-300 sm:px-7 sm:py-8"
+                    :class="
+                        showDropChrome && !isEmpty
+                            ? 'rounded-b-xl bg-primary/[0.03] ring-2 ring-inset ring-primary/20'
+                            : ''
+                    "
                     @dragover.prevent="$emit('canvasDragOver', $event)"
                     @dragleave="$emit('canvasDragLeave', $event)"
                     @drop="$emit('canvasDrop', $event)"
@@ -79,125 +164,252 @@ defineEmits<{
                         class="flex flex-col items-center justify-center py-16 text-center"
                     >
                         <LocalLottie name="builderEmpty" :height="120" :width="120" class="opacity-80" />
-                        <p class="text-foreground mt-4 text-sm font-semibold">Your canvas is empty</p>
-                        <p class="text-muted-foreground mt-1 max-w-[260px] text-xs leading-relaxed">
-                            <span class="hidden lg:inline">Drag components from the left to add them.</span>
-                            <span class="lg:hidden">Tap the button below to add your first field.</span>
+                        <p class="text-foreground mt-4 text-sm font-semibold">Kanvas masih kosong</p>
+                        <p class="text-muted-foreground mt-1 max-w-[260px] text-sm leading-relaxed">
+                            <span class="hidden lg:inline">Tarik komponen dari kiri untuk menambah field.</span>
+                            <span class="lg:hidden">Gunakan tombol di bawah untuk menambah field pertama.</span>
                         </p>
                         <Button size="sm" class="mt-5 lg:hidden" @click="$emit('openAddSheet')">
-                            <Plus class="mr-1.5 size-4" />
-                            Add field
+                            Tambah field
                         </Button>
                     </div>
 
                     <div
                         v-if="isEmpty && isDraggingOverCanvas"
-                        class="border-primary/40 bg-primary/[0.05] hidden min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed transition-colors lg:flex"
+                        class="border-primary/50 bg-primary/[0.08] hidden min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed text-primary transition-all duration-300 lg:flex"
                     >
-                        <div class="bg-primary/10 grid size-10 place-items-center rounded-full">
-                            <Plus class="text-primary size-5" />
+                        <div class="bg-primary/15 grid size-12 place-items-center rounded-full">
+                            <PlusCircle class="size-6" />
                         </div>
-                        <p class="text-primary mt-2 text-xs font-semibold">Drop here to add</p>
+                        <p class="text-sm font-semibold">Lepaskan di sini</p>
+                        <p class="text-muted-foreground max-w-xs px-4 text-center text-xs">Field baru akan ditambahkan pada posisi ini.</p>
                     </div>
-
-                    <template v-for="(field, index) in formFields" :key="field.id">
-                        <div
-                            class="relative hidden h-1 w-full lg:block"
-                            @dragenter.prevent="$emit('gapDragEnter', index)"
-                            @dragover.prevent
-                        >
-                            <div
-                                class="pointer-events-none h-0.5 rounded-full transition-all duration-200"
-                                :class="dropIndicatorIndex === index ? 'bg-primary' : 'bg-transparent'"
-                            ></div>
-                        </div>
-
-                        <div class="group relative" :class="dragSourceId === field.id ? 'opacity-30' : ''">
-                            <div class="absolute top-1/2 -left-10 hidden -translate-y-1/2 lg:block">
-                                <div
-                                    class="border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground grid size-7 cursor-grab place-items-center rounded-lg border shadow-xs transition-colors active:cursor-grabbing"
-                                    draggable="true"
-                                    @dragstart="$emit('canvasDragStart', $event, field, index)"
-                                    @dragend="$emit('dragEnd')"
-                                    aria-label="Drag to reorder"
-                                >
-                                    <GripVertical class="size-4" />
-                                </div>
-                            </div>
-
-                            <FieldRenderer
-                                :field="field"
-                                :is-selected="selectedFieldId === field.id"
-                                @select="$emit('selectField', field.id)"
-                                @delete="$emit('deleteField', field.id)"
-                                @duplicate="$emit('duplicateField', field.id)"
-                            />
-
-                            <div
-                                class="border-border bg-muted/30 mt-1.5 flex items-center justify-between gap-1 rounded-lg border px-1.5 py-1 lg:hidden"
-                            >
-                                <div class="flex items-center gap-0.5">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon-sm"
-                                        :disabled="index === 0"
-                                        aria-label="Move field up"
-                                        @click="$emit('moveField', field.id, -1)"
-                                    >
-                                        <ArrowUp class="size-4" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon-sm"
-                                        :disabled="index === formFields.length - 1"
-                                        aria-label="Move field down"
-                                        @click="$emit('moveField', field.id, 1)"
-                                    >
-                                        <ArrowDown class="size-4" />
-                                    </Button>
-                                </div>
-                                <div class="flex items-center gap-0.5">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        class="h-8 gap-1 px-2 text-[11px] font-semibold"
-                                        @click="$emit('selectField', field.id, true)"
-                                    >
-                                        <Pencil class="size-3.5" />
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon-sm"
-                                        class="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                        aria-label="Delete field"
-                                        @click="$emit('deleteField', field.id)"
-                                    >
-                                        <Trash2 class="size-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
 
                     <div
                         v-if="!isEmpty"
-                        class="hidden h-4 w-full lg:block"
-                        @dragenter.prevent="$emit('gapDragEnter', formFields.length)"
-                    />
+                        class="flex min-h-[min(28rem,58vh)] flex-col sm:min-h-[min(30rem,55vh)] lg:min-h-[32rem]"
+                    >
+                        <div class="min-h-0 flex-1 overflow-y-auto overflow-x-visible pr-0.5">
+                            <TransitionGroup name="fb-field" tag="div" class="flex flex-col gap-6 lg:gap-7">
+                                <div
+                                    v-for="(field, localIdx) in paginatedFields"
+                                    :key="field.id"
+                                    class="fb-field-row"
+                                >
+                                    <!-- Zona drop: area besar + chip saat aktif -->
+                                    <div
+                                        class="relative z-10 -my-1 hidden min-h-5 w-full py-1 lg:block"
+                                        @dragenter.prevent="$emit('gapDragEnter', sliceStart + localIdx)"
+                                        @dragover.prevent
+                                    >
+                                        <div
+                                            class="flex min-h-[1.25rem] w-full items-center justify-center transition-all duration-200"
+                                            :class="
+                                                gapActive(sliceStart + localIdx)
+                                                    ? 'py-1'
+                                                    : showDropChrome
+                                                      ? 'py-0.5'
+                                                      : ''
+                                            "
+                                        >
+                                            <div
+                                                v-if="gapActive(sliceStart + localIdx)"
+                                                class="flex w-full max-w-full scale-[1.01] items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary bg-primary/15 px-3 py-2.5 text-primary shadow-md transition-transform duration-200"
+                                            >
+                                                <PlusCircle class="size-4 shrink-0" />
+                                                <span class="text-xs font-bold tracking-wide">Sisipkan di sini</span>
+                                            </div>
+                                            <div
+                                                v-else-if="showDropChrome"
+                                                class="h-1 w-full max-w-[90%] rounded-full border border-dashed border-muted-foreground/35 bg-muted/40"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="flex flex-col gap-3 transition-[opacity,transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:flex-row lg:items-start lg:gap-4"
+                                        :class="[
+                                            dragSourceId === field.id
+                                                ? 'scale-[0.99] opacity-45'
+                                                : 'opacity-100',
+                                        ]"
+                                    >
+                                        <div
+                                            class="hidden shrink-0 flex-col items-center gap-1.5 pt-1 lg:flex"
+                                            :class="dragSourceId === field.id ? 'scale-[0.98]' : ''"
+                                        >
+                                            <div
+                                                class="border-border bg-card text-muted-foreground hover:border-primary/45 hover:bg-primary/8 hover:text-primary grid size-10 cursor-grab place-items-center rounded-xl border-2 border-transparent shadow-sm ring-1 ring-border/60 transition-all duration-200 hover:ring-primary/25 active:cursor-grabbing active:scale-95"
+                                                draggable="true"
+                                                title="Seret untuk memindahkan urutan — atau pakai tombol naik/turun"
+                                                @dragstart="$emit('canvasDragStart', $event, field, sliceStart + localIdx)"
+                                                @dragend="$emit('dragEnd')"
+                                            >
+                                                <GripVertical class="size-4" />
+                                            </div>
+                                            <div class="flex flex-col gap-0.5">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    class="size-8 rounded-lg border-border/80 shadow-sm transition-all duration-200 hover:border-primary/40 hover:bg-primary/5 active:scale-90"
+                                                    :disabled="sliceStart + localIdx === 0"
+                                                    title="Pindah ke atas"
+                                                    @click="$emit('moveField', field.id, -1)"
+                                                >
+                                                    <ChevronUp class="size-4" />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    class="size-8 rounded-lg border-border/80 shadow-sm transition-all duration-200 hover:border-primary/40 hover:bg-primary/5 active:scale-90"
+                                                    :disabled="sliceStart + localIdx === formFields.length - 1"
+                                                    title="Pindah ke bawah"
+                                                    @click="$emit('moveField', field.id, 1)"
+                                                >
+                                                    <ChevronDown class="size-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <div class="min-w-0 flex-1 transition-[transform] duration-300">
+                                            <FieldRenderer
+                                                :field="field"
+                                                :is-selected="selectedFieldId === field.id"
+                                                @select="$emit('selectField', field.id)"
+                                                @delete="$emit('deleteField', field.id)"
+                                                @duplicate="$emit('duplicateField', field.id)"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="border-border bg-muted/30 mt-2 flex items-center justify-between gap-1 rounded-xl border px-2 py-1.5 lg:hidden"
+                                    >
+                                        <div class="flex items-center gap-0.5">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon-sm"
+                                                class="transition-transform duration-200 active:scale-90"
+                                                :disabled="sliceStart + localIdx === 0"
+                                                aria-label="Naikkan field"
+                                                @click="$emit('moveField', field.id, -1)"
+                                            >
+                                                <ArrowUp class="size-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon-sm"
+                                                class="transition-transform duration-200 active:scale-90"
+                                                :disabled="sliceStart + localIdx === formFields.length - 1"
+                                                aria-label="Turunkan field"
+                                                @click="$emit('moveField', field.id, 1)"
+                                            >
+                                                <ArrowDown class="size-4" />
+                                            </Button>
+                                        </div>
+                                        <div class="flex items-center gap-0.5">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                class="h-8 gap-1 px-2 text-xs font-semibold transition-transform duration-200 active:scale-95"
+                                                @click="$emit('selectField', field.id, true)"
+                                            >
+                                                <Pencil class="size-3.5" />
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon-sm"
+                                                class="text-destructive transition-transform duration-200 active:scale-90 hover:bg-destructive/10 hover:text-destructive"
+                                                aria-label="Hapus field"
+                                                @click="$emit('deleteField', field.id)"
+                                            >
+                                                <Trash2 class="size-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </TransitionGroup>
+
+                            <div
+                                class="relative z-10 mt-1 hidden min-h-5 w-full py-1 lg:block"
+                                @dragenter.prevent="$emit('gapDragEnter', trailingGapIndex)"
+                                @dragover.prevent
+                            >
+                                <div class="flex min-h-[1.25rem] w-full items-center justify-center">
+                                    <div
+                                        v-if="gapActive(trailingGapIndex)"
+                                        class="flex w-full scale-[1.01] items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary bg-primary/15 px-3 py-2.5 text-primary shadow-md transition-transform duration-200"
+                                    >
+                                        <PlusCircle class="size-4 shrink-0" />
+                                        <span class="text-xs font-bold tracking-wide">Sisipkan di akhir</span>
+                                    </div>
+                                    <div
+                                        v-else-if="showDropChrome"
+                                        class="h-1 w-full max-w-[90%] rounded-full border border-dashed border-muted-foreground/35 bg-muted/40"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <nav
+                            v-if="totalPages > 1"
+                            class="border-border/80 mt-5 flex shrink-0 flex-wrap items-center justify-between gap-3 border-t pt-5"
+                            aria-label="Halaman field"
+                        >
+                            <p class="text-muted-foreground text-xs font-medium">
+                                Field {{ sliceStart + 1 }}–{{ Math.min(sliceStart + paginatedFields.length, formFields.length) }} dari
+                                {{ formFields.length }}
+                            </p>
+                            <div class="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    class="h-9 gap-1 rounded-full px-3 transition-transform duration-200 active:scale-95"
+                                    :disabled="currentPage <= 1"
+                                    @click="goPrev"
+                                >
+                                    <ChevronLeft class="size-4" />
+                                    <span class="hidden sm:inline">Sebelumnya</span>
+                                </Button>
+                                <span class="text-muted-foreground tabular-nums text-xs font-semibold">
+                                    {{ currentPage }} / {{ totalPages }}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    class="h-9 gap-1 rounded-full px-3 transition-transform duration-200 active:scale-95"
+                                    :disabled="currentPage >= totalPages"
+                                    @click="goNext"
+                                >
+                                    <span class="hidden sm:inline">Berikutnya</span>
+                                    <ChevronRight class="size-4" />
+                                </Button>
+                            </div>
+                        </nav>
+                    </div>
                 </div>
 
                 <div v-if="!isEmpty" class="border-border bg-muted/30 border-t p-3 lg:hidden">
-                    <Button class="w-full gap-1.5" @click="$emit('openAddSheet')">
-                        <Plus class="size-4" />
-                        Add another field
+                    <Button class="w-full rounded-xl text-sm transition-transform duration-200 active:scale-[0.99]" @click="$emit('openAddSheet')">
+                        Tambah field lagi
                     </Button>
                 </div>
             </div>
 
-            <p class="text-muted-foreground/70 mt-4 hidden text-center text-[10px] lg:block">
-                Live mobile preview · 420px wide
+            <p class="text-muted-foreground/80 mt-5 hidden text-center text-xs leading-relaxed lg:block">
+                Lebar pratinjau mengikuti tampilan form di perangkat seluler. Maks. {{ PAGE_SIZE }} field per halaman.
             </p>
         </div>
     </div>
 </template>
+
+<style scoped>
+.fb-field-move {
+    transition:
+        transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.28s ease;
+}
+</style>

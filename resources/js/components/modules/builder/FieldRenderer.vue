@@ -79,33 +79,33 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
 
 <template>
     <div
-        class="group relative cursor-pointer rounded-xl border transition-[border-color,background-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        class="group relative cursor-pointer rounded-2xl border transition-[border-color,background-color,box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         :class="[
             isSelected
-                ? 'border-primary bg-primary/[0.04] shadow-sm ring-3 ring-primary/15'
-                : 'border-border bg-card shadow-xs hover:border-primary/30',
+                ? 'border-primary bg-primary/[0.04] shadow-md ring-2 ring-primary/20'
+                : 'border-border bg-card shadow-sm hover:border-primary/35 hover:shadow-md',
         ]"
         @click="emit('select')"
     >
         <!-- Type badge + actions bar -->
-        <div class="flex items-center justify-between px-4 pt-3 pb-1">
+        <div class="flex items-center justify-between px-5 pt-4 pb-2">
             <span
-                class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+                class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white"
                 :style="{ backgroundColor: config.accent }"
             >
-                <component :is="config.icon" class="size-3" />
+                <component :is="config.icon" class="size-3.5" />
                 {{ config.label }}
             </span>
-            <div class="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+            <div class="flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                 <button
-                    class="grid size-7 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    class="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
                     title="Duplicate"
                     @click.stop="emit('duplicate')"
                 >
                     <Copy class="size-3.5" />
                 </button>
                 <button
-                    class="grid size-7 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    class="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-destructive/10 hover:text-destructive"
                     title="Delete"
                     @click.stop="emit('delete')"
                 >
@@ -115,52 +115,49 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
         </div>
 
         <!-- Field content -->
-        <div class="px-4 pt-1 pb-4">
+        <div class="space-y-3 px-5 pb-5 pt-1">
             <!-- Label -->
-            <label class="mb-0.5 block font-display text-sm font-semibold tracking-[-0.01em] text-foreground">
+            <label class="block font-display text-[15px] font-semibold tracking-tight text-foreground">
                 {{ field.label || 'Untitled Field' }}
                 <span v-if="field.required" class="text-destructive">*</span>
             </label>
-            <p v-if="field.description" class="mb-2 text-[11px] leading-snug text-muted-foreground">
+            <p v-if="field.description" class="-mt-1 text-xs leading-relaxed text-muted-foreground">
                 {{ field.description }}
             </p>
 
             <!-- Preview by type -->
-            <div class="mt-2">
+            <div class="mt-1">
                 <!-- Short text / Email / Phone / Number -->
                 <div
                     v-if="['short_text', 'email', 'phone', 'number'].includes(field.type)"
-                    class="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
+                    class="rounded-xl border border-border bg-muted/25 px-4 py-3"
                 >
-                    <component :is="config.icon" class="size-4 shrink-0 text-muted-foreground/50" />
-                    <span class="text-xs text-muted-foreground/60">
-                        {{ field.placeholder || `Enter ${config.label.toLowerCase()}...` }}
+                    <span class="text-sm text-muted-foreground/75">
+                        {{ field.placeholder || `Masukkan ${config.label.toLowerCase()}…` }}
                     </span>
                 </div>
 
                 <!-- Long text -->
                 <div
                     v-else-if="field.type === 'long_text'"
-                    class="rounded-lg border border-border bg-muted/30 px-3 py-2.5"
+                    class="rounded-xl border border-border bg-muted/25 px-4 py-3"
                 >
-                    <span class="text-xs text-muted-foreground/60">
-                        {{ field.placeholder || 'Enter your answer here...' }}
+                    <span class="text-sm text-muted-foreground/75">
+                        {{ field.placeholder || 'Jawaban panjang…' }}
                     </span>
-                    <div class="mt-3 border-t border-dashed border-border/60 pt-2">
-                        <div class="h-1.5 w-2/3 rounded-full bg-muted/60"></div>
-                    </div>
-                    <div class="mt-1.5">
-                        <div class="h-1.5 w-1/2 rounded-full bg-muted/40"></div>
+                    <div class="mt-4 space-y-2 border-t border-dashed border-border/70 pt-3">
+                        <div class="h-2 w-2/3 rounded-full bg-muted/70"></div>
+                        <div class="h-2 w-1/2 rounded-full bg-muted/50"></div>
                     </div>
                 </div>
 
                 <!-- Dropdown -->
                 <div
                     v-else-if="field.type === 'dropdown'"
-                    class="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2.5"
+                    class="flex items-center justify-between rounded-xl border border-border bg-muted/25 px-4 py-3"
                 >
-                    <span class="text-xs text-muted-foreground/60">Select an option...</span>
-                    <ChevronDown class="size-4 text-muted-foreground/40" />
+                    <span class="text-sm text-muted-foreground/75">Pilih opsi…</span>
+                    <ChevronDown class="size-4 text-muted-foreground/50" />
                 </div>
 
                 <!-- Checkbox -->

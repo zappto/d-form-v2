@@ -61,13 +61,13 @@ const wb = reactive(
 
 const backHref = computed(() => `/dashboard/events/${props.event.id}/forms`)
 const shellHeightClass = computed(() =>
-    props.shell === 'fullscreen' ? 'h-svh' : 'h-[calc(100svh-3.5rem)]',
+    props.shell === 'fullscreen' ? 'h-svh' : 'min-h-0 flex-1',
 )
 const visibilityOptions = FORM_VISIBILITY_OPTIONS
 </script>
 
 <template>
-    <div :class="['flex flex-col overflow-hidden', shellHeightClass]">
+    <div :class="['flex min-h-0 flex-col overflow-hidden', shellHeightClass]">
         <FormBuilderToolbar
             :back-href="backHref"
             :toolbar-subtitle="toolbarSubtitle"

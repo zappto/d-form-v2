@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DraggableItem from '@/components/modules/builder/DraggableItem.vue'
-import { ChevronRight, Search, Sparkles } from 'lucide-vue-next'
+import { ChevronRight, Search } from 'lucide-vue-next'
 import type { FormBuilderPaletteCategory } from '@/components/modules/builder/formBuilderPalette'
 
 const searchQuery = defineModel<string>('searchQuery', { required: true })
@@ -19,46 +19,47 @@ defineEmits<{
         class="border-border bg-card hidden w-[260px] shrink-0 flex-col border-r lg:flex"
         aria-label="Component palette"
     >
-        <div class="border-border border-b px-4 pt-4 pb-3">
-            <h2 class="font-display text-foreground flex items-center gap-1.5 text-sm font-semibold tracking-[-0.01em]">
-                <Sparkles class="text-primary size-4" />
-                Components
+        <div class="border-border border-b px-4 pt-5 pb-4">
+            <h2 class="font-display text-foreground text-sm font-semibold tracking-tight">
+                Komponen
             </h2>
-            <p class="text-muted-foreground mt-0.5 text-[10px]">Drag a block onto the canvas</p>
-            <div class="relative mt-3">
+            <p class="text-muted-foreground mt-1 text-xs leading-snug">
+                Tarik ke kanvas di tengah.
+            </p>
+            <div class="relative mt-4">
                 <Search
-                    class="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2"
+                    class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
                 />
                 <input
                     v-model="searchQuery"
                     type="text"
-                    placeholder="Search components..."
-                    class="border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/15 w-full rounded-lg border py-2 pr-3 pl-8 text-xs font-medium shadow-xs transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus:ring-3 focus:outline-none"
+                    placeholder="Cari komponen…"
+                    class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 h-11 w-full rounded-lg border py-2.5 pr-3 pl-10 text-sm shadow-sm transition-[border-color,box-shadow] focus:ring-2 focus:outline-none"
                 />
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto px-3 py-3">
-            <div v-for="cat in categories" :key="cat.name" class="mb-3 last:mb-0">
+        <div class="flex-1 overflow-y-auto px-3 py-4">
+            <div v-for="cat in categories" :key="cat.name" class="mb-4 last:mb-0">
                 <button
                     type="button"
-                    class="text-muted-foreground hover:text-foreground mb-1.5 flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left text-[11px] font-semibold tracking-[0.12em] uppercase transition-colors"
+                    class="text-muted-foreground hover:text-foreground mb-2 flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-xs font-semibold uppercase tracking-wide transition-colors"
                     @click="$emit('toggleCategory', cat)"
                 >
                     <ChevronRight
-                        class="size-3 shrink-0 transition-transform duration-200"
+                        class="size-3.5 shrink-0 transition-transform duration-200"
                         :class="cat.isOpen ? 'rotate-90' : ''"
                     />
-                    <component :is="cat.icon" class="size-3.5 shrink-0" />
-                    {{ cat.name }}
-                    <span class="text-muted-foreground ml-auto text-[10px] font-medium">{{ cat.fields.length }}</span>
+                    <span class="min-w-0 flex-1 truncate">{{ cat.name }}</span>
+                    <span class="text-muted-foreground shrink-0 text-[11px] font-medium tabular-nums">
+                        {{ cat.fields.length }}
+                    </span>
                 </button>
-                <div v-show="cat.isOpen" class="flex flex-col gap-1.5">
+                <div v-show="cat.isOpen" class="flex flex-col gap-2">
                     <DraggableItem v-for="f in cat.fields" :key="f.type" v-bind="f" />
                 </div>
             </div>
-            <div v-if="categories.length === 0" class="flex flex-col items-center py-8 text-center">
-                <Search class="text-muted-foreground/50 mb-2 size-8" />
-                <p class="text-muted-foreground text-xs font-medium">No components found</p>
+            <div v-if="categories.length === 0" class="flex flex-col items-center py-10 text-center">
+                <p class="text-muted-foreground text-sm">Tidak ada komponen yang cocok</p>
             </div>
         </div>
     </aside>

@@ -21,11 +21,11 @@ Route::middleware('auth')->get('/admin', fn () => to_route('dashboard.home'));
 
 Route::middleware('auth')->get('/dashboard', DashboardHomeController::class)->name('dashboard.home');
 
-Route::middleware('auth')->get('/dashboard/reports', EventReportingController::class)->name('dashboard.reports.index');
+Route::middleware(['auth', 'organizer'])->get('/dashboard/reports', EventReportingController::class)->name('dashboard.reports.index');
 
 Route::middleware('auth')->get('/dashboard/profile', fn () => inertia('Dashboard/Profile'))->name('dashboard.profile');
 
-Route::middleware('auth')->prefix('/dashboard/user')->name('dashboard.user.')->group(function () {
+Route::middleware(['auth', 'member_portal'])->prefix('/dashboard/user')->name('dashboard.user.')->group(function () {
     Route::get('/events', function (EventService $eventService) {
         $events = Event::query()
             ->where('status', EventStatus::Published)
@@ -92,7 +92,7 @@ Route::middleware('auth')->prefix('/dashboard/user')->name('dashboard.user.')->g
     })->name('events.show');
 });
 
-Route::middleware('auth')->prefix('/dashboard/events/{event}')->name('dashboard.events.')->group(function () {
+Route::middleware(['auth', 'organizer'])->prefix('/dashboard/events/{event}')->name('dashboard.events.')->group(function () {
     Route::get('/exports/registrations.csv', EventRegistrationsCsvExportController::class)->name('exports.registrations-csv');
     Route::get('/exports/attendance.csv', EventAttendanceCsvExportController::class)->name('exports.attendance-csv');
     Route::get('/scan', [AttendanceScanController::class, 'show'])->name('scan');

@@ -22,6 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class
         ]);
+
+        $middleware->alias([
+            'organizer' => \App\Http\Middleware\EnsureOrganizerDashboardAccess::class,
+            'member_portal' => \App\Http\Middleware\EnsureMemberPortalAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
