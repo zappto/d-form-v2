@@ -116,6 +116,9 @@ const hasOptions = computed(() =>
 const isContent = computed(() =>
     ['heading', 'paragraph', 'divider'].includes(props.field.type),
 )
+const hasAdvancedFlags = computed(
+    () => !['heading', 'paragraph', 'divider', 'banner'].includes(props.field.type),
+)
 </script>
 
 <template>
@@ -309,6 +312,32 @@ const isContent = computed(() =>
                 <Button variant="outline" size="sm" class="w-full text-xs font-bold" type="button" @click="addOption">
                     <Plus class="mr-1 size-3.5" />Add New Option
                 </Button>
+            </div>
+        </div>
+
+        <!-- Advanced (team / bundle) -->
+        <div v-if="hasAdvancedFlags" class="mt-2 space-y-4">
+            <hr class="app-divider" />
+            <p class="text-sm font-semibold text-foreground">Advanced</p>
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
+                <div class="min-w-0">
+                    <Label class="text-sm font-medium">Member can edit (append)</Label>
+                    <p class="text-xs text-muted-foreground">Team flow: invited members may change this field when confirming.</p>
+                </div>
+                <Switch
+                    :checked="!!field.is_append"
+                    @update:checked="(v: boolean) => update('is_append', v)"
+                />
+            </div>
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
+                <div class="min-w-0">
+                    <Label class="text-sm font-medium">Duplicatable (bundle)</Label>
+                    <p class="text-xs text-muted-foreground">Repeat for each additional participant in bundle registration.</p>
+                </div>
+                <Switch
+                    :checked="field.metadata?.duplicatable === true"
+                    @update:checked="(v: boolean) => updateMeta('duplicatable', v)"
+                />
             </div>
         </div>
 

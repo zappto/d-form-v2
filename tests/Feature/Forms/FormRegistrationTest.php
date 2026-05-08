@@ -727,7 +727,7 @@ class FormRegistrationTest extends TestCase
             ->patchJson($this->reviewPath($event, $form, $answer), [
                 'review_status' => FormAnswerReviewStatus::Accepted->value,
             ])
-            ->assertForbidden();
+            ->assertRedirect(route('dashboard.user.events'));
     }
 
     public function test_review_returns_404_when_submission_not_belong_to_form_or_event(): void
@@ -760,7 +760,7 @@ class FormRegistrationTest extends TestCase
 
         $this->actingAs($member)
              ->get($this->submissionsPath($event, $form))
-             ->assertForbidden();
+             ->assertRedirect(route('dashboard.user.events'));
     }
 
     public function test_submissions_list_404_when_form_does_not_belong_to_event(): void

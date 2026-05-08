@@ -16,6 +16,7 @@ import {
     extractFormBannerFromBuilderFields,
 } from '@/components/modules/builder/formBanner'
 import { Button } from '@/components/ui/button'
+import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form'
 
 defineOptions({ layout: DashboardFocusLayout })
 
@@ -39,6 +40,7 @@ const settingsForm = useForm({
 
 const bannerState = reactive(defaultFormBannerState())
 const formFields = ref<BuilderField[]>([])
+const formMetadata = reactive(emptyFormRegistrationMetadata())
 
 const formTitle = computed({
     get: () => settingsForm.title,
@@ -101,8 +103,9 @@ watch(
         settingsForm.visible_for = [...f.visible_for]
         settingsForm.banner_url = f.banner_url ?? ''
         settingsForm.banner_caption = f.banner_caption ?? ''
+        Object.assign(formMetadata, parseFormRegistrationMetadata(f.metadata))
     },
-    { deep: true },
+    { deep: true, immediate: true },
 )
 
 const submissionsHref = computed(
@@ -120,6 +123,7 @@ function onSave(): void {
         .transform((data) => ({
             ...data,
             fields: backendFields,
+            metadata: toFormMetadataPayload(formMetadata),
         }))
         .put(props.updateFormUrl, {
             preserveScroll: true,
@@ -138,6 +142,7 @@ function onSave(): void {
         v-model:visible-for="visibleFor"
         v-model:banner="bannerState"
         v-model:form-fields="formFields"
+        v-model:form-metadata="formMetadata"
         :event="event"
         :toolbar-subtitle="`Edit form · ${event.title}`"
         save-label="Save All"
