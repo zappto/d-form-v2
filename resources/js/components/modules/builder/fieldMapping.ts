@@ -120,8 +120,14 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
         }
 
         case 'date':         return { ...base, type: 'datePicker', metadata: withMeta(f, { rules: req, builderType: 'date' }) }
-        case 'image_upload': return { ...base, type: 'fileUpload', metadata: withMeta(f, { rules: { ...req, mimes: 'png,jpg,jpeg', max_size: 5120 }, builderType: 'image_upload' }) }
-        case 'file_upload':  return { ...base, type: 'fileUpload', metadata: withMeta(f, { rules: { ...req, mimes: 'pdf,doc,xls', max_size: 10240 }, builderType: 'file_upload' }) }
+        case 'image_upload': {
+            const mimes = ((f.metadata?.accepts as string) || '').trim().replace(/\s+/g, '') || 'png,jpg,jpeg'
+            return { ...base, type: 'fileUpload', metadata: withMeta(f, { rules: { ...req, mimes, max_size: 5120 }, builderType: 'image_upload' }) }
+        }
+        case 'file_upload': {
+            const mimes = ((f.metadata?.accepts as string) || '').trim().replace(/\s+/g, '') || 'pdf,doc,xls'
+            return { ...base, type: 'fileUpload', metadata: withMeta(f, { rules: { ...req, mimes, max_size: 10240 }, builderType: 'file_upload' }) }
+        }
         case 'banner':
             return {
                 ...base,

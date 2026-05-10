@@ -128,6 +128,10 @@ function onSave(): void {
         .put(props.updateFormUrl, {
             preserveScroll: true,
             onSuccess: () => toast.success('Form and fields saved successfully.'),
+            onError: (errors) => {
+                const first = Object.values(errors)[0]
+                toast.error(typeof first === 'string' ? first : 'Failed to save form. Please check your fields.')
+            },
         })
 }
 </script>
