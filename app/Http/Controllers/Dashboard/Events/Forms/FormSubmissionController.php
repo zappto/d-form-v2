@@ -222,10 +222,15 @@ class FormSubmissionController extends Controller
             $isAdmin,
         );
 
-        SendRegistrationConfirmationJob::dispatch($result['leader']->id)->afterCommit();
+        // For bundle mode the QR code is only sent after admin acceptance
+        // (SendRegistrationAcceptedJob). No confirmation email is dispatched here.
 
-        foreach ($result['members'] as $memberAnswer) {
-            SendTeamInvitationJob::dispatch($memberAnswer->id)->afterCommit();
+        $delaySeconds = (int) config('registration.email_send_delay_seconds', 2);
+
+        foreach ($result['members'] as $index => $memberAnswer) {
+            SendTeamInvitationJob::dispatch($memberAnswer->id)
+                ->delay(now()->addSeconds($index * $delaySeconds))
+                ->afterCommit();
         }
 
         Inertia::flash('toast', [
