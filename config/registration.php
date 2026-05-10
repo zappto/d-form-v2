@@ -22,5 +22,18 @@ return [
     | triggering per-second SMTP rate limits. Set to 0 to disable staggering.
     |
     */
-    'email_send_delay_seconds' => (int) env('REGISTRATION_EMAIL_SEND_DELAY_SECONDS', 2),
+    'email_send_delay_seconds' => (int) env('REGISTRATION_EMAIL_SEND_DELAY_SECONDS', 7),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Per-email jitter before SMTP send (seconds)
+    |--------------------------------------------------------------------------
+    |
+    | Each mail job waits a random duration in this inclusive range before
+    | calling the mailer. Skipped when APP_ENV=testing. Set min or max to 0
+    | to disable jitter in other environments.
+    |
+    */
+    'email_jitter_min_seconds' => (int) env('REGISTRATION_EMAIL_JITTER_MIN_SECONDS', 5),
+    'email_jitter_max_seconds' => (int) env('REGISTRATION_EMAIL_JITTER_MAX_SECONDS', 10),
 ];

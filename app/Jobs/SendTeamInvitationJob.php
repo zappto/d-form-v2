@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\AppliesOutgoingEmailDelay;
 use App\Enums\EmailLogStatus;
 use App\Enums\EmailNotificationType;
 use App\Mail\TeamInvitationMail;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 
 class SendTeamInvitationJob implements ShouldQueue
 {
+    use AppliesOutgoingEmailDelay;
     use Queueable;
 
     public function __construct(
@@ -54,10 +56,16 @@ class SendTeamInvitationJob implements ShouldQueue
                 'sent_at' => null,
             ]);
 
+            Log::warning('[SendTeamInvitationJob] No recipient email.', [
+                'form_answer_id' => $submission->id,
+            ]);
+
             return;
         }
 
         try {
+            $this->applyOutgoingEmailJitter();
+
             Mail::to($user->email)->send(new TeamInvitationMail($submission));
 
             EmailLog::query()->create([
@@ -82,8 +90,13 @@ class SendTeamInvitationJob implements ShouldQueue
                 'sent_at' => null,
             ]);
 
-            Log::error('[SendTeamInvitationJob] Send failed.', [
+            Log::error('[SendTeamInvitationJob] Email send failed.', [
+                'notification_type' => EmailNotificationType::TeamInvitation->value,
                 'form_answer_id' => $submission->id,
+                'event_id' => $event->id,
+                'recipient_email' => $user->email,
+                'exception_class' => $e::class,
+                'exception_message' => $e->getMessage(),
                 'exception' => $e,
             ]);
 

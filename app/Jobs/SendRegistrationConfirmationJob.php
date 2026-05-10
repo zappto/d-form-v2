@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\AppliesOutgoingEmailDelay;
 use App\Enums\EmailLogStatus;
 use App\Enums\EmailNotificationType;
 use App\Mail\RegistrationConfirmationMail;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 
 class SendRegistrationConfirmationJob implements ShouldQueue
 {
+    use AppliesOutgoingEmailDelay;
     use Queueable;
 
     public function __construct(
@@ -73,6 +75,8 @@ class SendRegistrationConfirmationJob implements ShouldQueue
         $qrPng = $qrGenerator->pngForSubmission($submission->id);
 
         try {
+            $this->applyOutgoingEmailJitter();
+
             Mail::to($user->email)->send(
                 new RegistrationConfirmationMail($submission, $answersSummary, $qrPng)
             );
@@ -99,8 +103,13 @@ class SendRegistrationConfirmationJob implements ShouldQueue
                 'sent_at' => null,
             ]);
 
-            Log::error('[SendRegistrationConfirmationJob] Send failed.', [
+            Log::error('[SendRegistrationConfirmationJob] Email send failed.', [
+                'notification_type' => EmailNotificationType::RegistrationSubmitted->value,
                 'form_answer_id' => $submission->id,
+                'event_id' => $event->id,
+                'recipient_email' => $user->email,
+                'exception_class' => $e::class,
+                'exception_message' => $e->getMessage(),
                 'exception' => $e,
             ]);
 

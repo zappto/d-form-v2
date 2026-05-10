@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\AppliesOutgoingEmailDelay;
 use App\Enums\EmailLogStatus;
 use App\Enums\EmailNotificationType;
 use App\Enums\FormAnswerReviewStatus;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 
 class SendRegistrationRejectedJob implements ShouldQueue
 {
+    use AppliesOutgoingEmailDelay;
     use Queueable;
 
     public function __construct(
@@ -76,6 +78,8 @@ class SendRegistrationRejectedJob implements ShouldQueue
         }
 
         try {
+            $this->applyOutgoingEmailJitter();
+
             Mail::to($user->email)->send(new RegistrationRejectedMail($submission));
 
             EmailLog::query()->create([
@@ -100,8 +104,13 @@ class SendRegistrationRejectedJob implements ShouldQueue
                 'sent_at' => null,
             ]);
 
-            Log::error('[SendRegistrationRejectedJob] Send failed.', [
+            Log::error('[SendRegistrationRejectedJob] Email send failed.', [
+                'notification_type' => EmailNotificationType::RegistrationRejected->value,
                 'form_answer_id' => $submission->id,
+                'event_id' => $event->id,
+                'recipient_email' => $user->email,
+                'exception_class' => $e::class,
+                'exception_message' => $e->getMessage(),
                 'exception' => $e,
             ]);
 

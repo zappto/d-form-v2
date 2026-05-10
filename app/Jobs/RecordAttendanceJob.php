@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\AppliesOutgoingEmailDelay;
 use App\Enums\EmailLogStatus;
 use App\Enums\EmailNotificationType;
 use App\Enums\FormAnswerReviewStatus;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Mail;
 
 class RecordAttendanceJob implements ShouldQueue
 {
+    use AppliesOutgoingEmailDelay;
     use Dispatchable;
     use Queueable;
 
@@ -89,6 +91,8 @@ class RecordAttendanceJob implements ShouldQueue
         }
 
         try {
+            $this->applyOutgoingEmailJitter();
+
             Mail::to($user->email)->send(new AttendanceConfirmedMail($submission, $attendance));
 
             EmailLog::query()->create([
@@ -113,8 +117,13 @@ class RecordAttendanceJob implements ShouldQueue
                 'sent_at' => null,
             ]);
 
-            Log::error('[RecordAttendanceJob] Attendance confirmation mail failed.', [
+            Log::error('[RecordAttendanceJob] Email send failed.', [
+                'notification_type' => EmailNotificationType::AttendanceConfirmed->value,
                 'form_answer_id' => $submission->id,
+                'event_id' => $event->id,
+                'recipient_email' => $user->email,
+                'exception_class' => $e::class,
+                'exception_message' => $e->getMessage(),
                 'exception' => $e,
             ]);
 
