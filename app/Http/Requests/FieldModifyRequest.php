@@ -49,6 +49,19 @@ class FieldModifyRequest extends FormRequest
         );
     }
 
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'fields.required' => 'Please provide form fields to update.',
+            'fields.array' => 'Form fields must be a valid list.',
+        ];
+    }
+
     public function withValidator(Validator $validator): void
     {
         $formParam = $this->route('form');

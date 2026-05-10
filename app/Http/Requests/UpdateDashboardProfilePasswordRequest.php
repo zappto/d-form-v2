@@ -50,4 +50,22 @@ class UpdateDashboardProfilePasswordRequest extends FormRequest
 
         return $rules;
     }
+
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'current_password.required' => 'Please enter your current password to confirm this change.',
+            'current_password.string' => 'Current password must be valid text.',
+            'password.required' => 'Please enter your new password.',
+            'password.string' => 'Password must be valid text.',
+            'password.confirmed' => 'The new password confirmation does not match. Please re-enter your password.',
+            'password_confirmation.required' => 'Please confirm your new password.',
+            'password_confirmation.string' => 'Password confirmation must be valid text.',
+        ];
+    }
 }

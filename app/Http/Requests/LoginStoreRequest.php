@@ -27,4 +27,18 @@ class LoginStoreRequest extends FormRequest
             'password' => 'required'
         ];
     }
+
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address format (e.g., user@example.com).',
+            'password.required' => 'Please enter your password.',
+        ];
+    }
 }

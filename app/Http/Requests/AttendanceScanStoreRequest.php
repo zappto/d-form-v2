@@ -28,6 +28,23 @@ class AttendanceScanStoreRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'submission_id.string' => 'Submission ID must be valid text.',
+            'submission_id.uuid' => 'Submission ID must be a valid UUID format.',
+            'registration_code.string' => 'Registration code must be valid text.',
+            'registration_code.max' => 'Registration code cannot be longer than 32 characters.',
+            'raw_payload.string' => 'QR code payload must be valid text.',
+            'raw_payload.max' => 'QR code payload is too large (maximum 65,535 characters).',
+        ];
+    }
+
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {

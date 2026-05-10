@@ -21,4 +21,17 @@ class ForgotPasswordStoreRequest extends FormRequest
             'email' => ['required', 'email'],
         ];
     }
+
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Please enter your email address to reset your password.',
+            'email.email' => 'Please enter a valid email address format (e.g., user@example.com).',
+        ];
+    }
 }

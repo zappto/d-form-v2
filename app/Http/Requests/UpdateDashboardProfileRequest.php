@@ -39,6 +39,26 @@ class UpdateDashboardProfileRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Please enter your name.',
+            'name.string' => 'Your name must be valid text.',
+            'name.max' => 'Your name cannot be longer than 150 characters.',
+            'email.required' => 'Please enter your email address.',
+            'email.string' => 'Email address must be valid text.',
+            'email.lowercase' => 'Email address must be in lowercase.',
+            'email.email' => 'Please enter a valid email address format (e.g., user@example.com).',
+            'email.max' => 'Email address cannot be longer than 255 characters.',
+            'email.unique' => 'This email address is already in use by another account. Please use a different email.',
+        ];
+    }
+
     protected function prepareForValidation(): void
     {
         if ($this->has('email') && is_string($this->input('email'))) {

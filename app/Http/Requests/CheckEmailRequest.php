@@ -26,4 +26,17 @@ class CheckEmailRequest extends FormRequest
             'email' => 'required|email',
         ];
     }
+
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Please enter an email address to check.',
+            'email.email' => 'Please enter a valid email address format (e.g., user@example.com).',
+        ];
+    }
 }

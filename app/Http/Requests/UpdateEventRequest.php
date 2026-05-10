@@ -42,6 +42,54 @@ class UpdateEventRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'Please enter the event title.',
+            'title.string' => 'Event title must be valid text.',
+            'title.max' => 'Event title cannot be longer than 100 characters.',
+            'location.required' => 'Please enter the event location.',
+            'location.string' => 'Event location must be valid text.',
+            'location.max' => 'Event location cannot be longer than 100 characters.',
+            'description.required' => 'Please enter a description for the event.',
+            'description.string' => 'Event description must be valid text.',
+            'registration_start.required' => 'Please select when registration opens.',
+            'registration_start.date' => 'Registration start must be a valid date.',
+            'registration_start.before_or_equal' => 'Registration must open before or on the event start date.',
+            'registration_end.required' => 'Please select when registration closes.',
+            'registration_end.date' => 'Registration end must be a valid date.',
+            'registration_end.after' => 'Registration close date must be after registration open date.',
+            'registration_end.before_or_equal' => 'Registration must close before or on the event end date.',
+            'start_date.required' => 'Please select when the event starts.',
+            'start_date.date' => 'Event start date must be a valid date.',
+            'start_date.after_or_equal' => 'Event cannot start before registration opens.',
+            'end_date.required' => 'Please select when the event ends.',
+            'end_date.date' => 'Event end date must be a valid date.',
+            'end_date.after_or_equal' => 'Event end date must be on or after the start date.',
+            'quota.required' => 'Please enter the maximum number of participants.',
+            'quota.integer' => 'Participant quota must be a whole number.',
+            'quota.min' => 'Participant quota must be at least 1.',
+            'quota.max' => 'Participant quota cannot exceed 65,535.',
+            'price.required' => 'Please enter the event price (enter 0 for free events).',
+            'price.numeric' => 'Price must be a valid number.',
+            'price.min' => 'Price cannot be negative.',
+            'session.required' => 'Please select at least one event session.',
+            'session.string' => 'Event session must be valid text.',
+            'session.max' => 'Event sessions cannot exceed 2,048 characters.',
+            'category.required' => 'Please select at least one event category.',
+            'category.string' => 'Event category must be valid text.',
+            'category.max' => 'Event categories cannot exceed 2,048 characters.',
+            'banner.image' => 'Banner must be an image file (JPG, PNG, etc.).',
+            'banner.max' => 'Banner image size cannot exceed 10 MB.',
+            'publish.boolean' => 'Publish status must be true or false.',
+        ];
+    }
+
     protected function prepareForValidation(): void
     {
         $this->mergeNormalizedCategoryFromRequest();

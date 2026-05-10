@@ -56,6 +56,31 @@ class UpdateEventFormRequest extends FormRequest
         );
     }
 
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'Please enter the form title.',
+            'title.string' => 'Form title must be valid text.',
+            'title.max' => 'Form title cannot be longer than 100 characters.',
+            'description.required' => 'Please enter a description for the form.',
+            'description.string' => 'Form description must be valid text.',
+            'closed_at.required' => 'Please select when the form closes.',
+            'closed_at.date' => 'Form close date must be a valid date.',
+            'visible_for.required' => 'Please select who can see this form.',
+            'visible_for.array' => 'Form visibility must be a list of options.',
+            'visible_for.min' => 'Please select at least one visibility option.',
+            'banner_url.string' => 'Banner URL must be valid text.',
+            'banner_caption.string' => 'Banner caption must be valid text.',
+            'banner_caption.max' => 'Banner caption cannot be longer than 255 characters.',
+            'fields.array' => 'Form fields must be a valid list.',
+        ];
+    }
+
     public function withValidator(Validator $validator): void
     {
         $formParam = $this->route('form');
