@@ -55,7 +55,7 @@ final class FormFieldsRequestValidation
             ],
             'fields.*.metadata.is_multiple' => [
                 'required_if:fields.*.type,select',
-                'prohibited_unless:fields.*.type,select',
+                'prohibited_unless:fields.*.type,select,checkbox,radio',
                 'boolean',
             ],
             'fields.*.metadata.options' => [
