@@ -126,6 +126,8 @@ class TeamInvitationController extends Controller
                 'message' => __('You have declined this registration invitation.'),
             ]);
 
+            $answer->delete();
+
             return redirect()->route('dashboard.user.events.show', ['event_segment' => $form->event->slug]);
         }
 
