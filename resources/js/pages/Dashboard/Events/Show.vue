@@ -23,6 +23,8 @@ const props = defineProps<{
     exports: { registrations: string; attendance: string }
 }>()
 
+const laporanHref = `/admin/dashboard/events/${props.event.id}/laporan`
+
 const p = reactive(useDashboardEventShowPage(props.event, props.forms))
 </script>
 
@@ -62,6 +64,7 @@ const p = reactive(useDashboardEventShowPage(props.event, props.forms))
                     :card-shadow="p.cardShadow"
                     :registrations-csv-href="props.exports.registrations"
                     :attendance-csv-href="props.exports.attendance"
+                    :laporan-href="laporanHref"
                     @export-excel="p.handleExport('Excel')"
                     @open-import="p.showImportModal = true"
                     @open-archive="p.showDeleteModal = true"

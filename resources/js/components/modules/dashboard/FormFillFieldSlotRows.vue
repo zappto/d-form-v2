@@ -75,6 +75,7 @@ const showDescription = computed(() => {
 function fillReady(): boolean {
     return props.imageUploadFillReadyFn(props.storageKey)
 }
+
 </script>
 
 <template>
@@ -188,33 +189,20 @@ function fillReady(): boolean {
             </label>
         </div>
 
-        <Select v-else-if="ctx.builderType(field) === 'dropdown' || field.type === 'select'" v-model="ctx.answerForm[storageKey]">
+        <Select
+            v-else-if="ctx.builderType(field) === 'dropdown' || field.type === 'select'"
+            v-model="(ctx.answerForm[storageKey] as string)"
+        >
             <SelectTrigger>
-                <SelectValue placeholder="Select an option">
-                    <template v-if="ctx.answerForm[storageKey]">
-                        <span class="flex items-center gap-2">
-                            <img
-                                v-if="ctx.getSelectedOptionRow(field, storageKey)?.imageSrc"
-                                :src="ctx.getSelectedOptionRow(field, storageKey)?.imageSrc"
-                                alt=""
-                                class="size-6 rounded border border-border object-cover"
-                            />
-                            {{ ctx.answerForm[storageKey] }}
-                        </span>
-                    </template>
-                </SelectValue>
+                <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem v-for="row in ctx.getOptionRows(field)" :key="row.label" :value="row.label">
-                    <span class="flex items-center gap-2">
-                        <img
-                            v-if="row.imageSrc"
-                            :src="row.imageSrc"
-                            alt=""
-                            class="size-7 rounded border border-border object-cover"
-                        />
-                        {{ row.label }}
-                    </span>
+                <SelectItem
+                    v-for="row in ctx.getOptionRows(field)"
+                    :key="row.label"
+                    :value="String(row.label)"
+                >
+                    {{ row.label }}
                 </SelectItem>
             </SelectContent>
         </Select>

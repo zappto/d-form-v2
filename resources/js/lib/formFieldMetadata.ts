@@ -5,7 +5,13 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 export function readFieldMetadata(field: IFormField): FormFieldMetadataBag {
-    const m = field.metadata
+    let m: unknown = field.metadata
+    if (typeof m === 'string' && m.trim()) {
+        try { m = JSON.parse(m) } catch { /* not valid JSON, keep as-is */ }
+    }
+    if (Array.isArray(m)) {
+        m = m.find((item) => isPlainObject(item)) ?? {}
+    }
     return isPlainObject(m) ? m : {}
 }
 

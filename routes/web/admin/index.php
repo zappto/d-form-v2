@@ -12,7 +12,6 @@ use App\Services\Event\EventService;
 use App\Services\Event\UserPortalEventResolver;
 use App\Services\Registration\RegistrationQrPngGenerator;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Dashboard\EventReportingController;
 use App\Http\Controllers\Dashboard\Events\Exports\EventAttendanceCsvExportController;
 use App\Http\Controllers\Dashboard\Events\Exports\EventRegistrationsCsvExportController;
 use App\Http\Controllers\Dashboard\HomeController as DashboardHomeController;
@@ -31,17 +30,43 @@ Route::permanentRedirect('/dashboard/user/events', '/user/dashboard');
 
 Route::middleware('auth')->get('/dashboard/profile', fn () => inertia('Dashboard/Profile'))->name('dashboard.profile');
 Route::middleware(['auth', 'throttle:10,1'])->patch('/dashboard/profile', [ProfileController::class, 'update'])->name('dashboard.profile.update');
+Route::middleware(['auth', 'throttle:10,1'])->post('/dashboard/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('dashboard.profile.avatar.update');
+Route::middleware(['auth', 'throttle:10,1'])->delete('/dashboard/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('dashboard.profile.avatar.destroy');
 Route::middleware(['auth', 'throttle:10,1'])->put('/dashboard/profile/password', [ProfileController::class, 'updatePassword'])->name('dashboard.profile.password.update');
 Route::middleware(['auth', 'organizer'])->prefix('/admin/dashboard')->group(function () {
     Route::get('/', DashboardHomeController::class)->name('dashboard.home');
-    Route::get('/reports', EventReportingController::class)->name('dashboard.reports.index');
+    Route::get('/reports', fn () => redirect()->route('dashboard.events.index'))->name('dashboard.reports.index');
     Route::get('/recruitment', fn () => inertia('Dashboard/Recruitment/Index'))->name('dashboard.recruitment.index');
 });
 
-Route::middleware('auth')->get('/user/dashboard/profile', fn () => inertia('Dashboard/Profile'))->name('dashboard.profile');
+Route::middleware('auth')->get('/user/dashboard/profile', fn () => inertia('Dashboard/Profile'))->name('dashboard.user.profile');
 
 Route::middleware(['auth', 'member_portal'])->prefix('/user/dashboard')->name('dashboard.user.')->group(function () {
+    Route::get('/overview', fn () => inertia('Dashboard/User/Index'))->name('overview');
+
     Route::get('/', function (EventService $eventService) {
+        $userId = auth()->id();
+        $events = Event::query()
+            ->where('status', EventStatus::Published)
+            ->whereHas('forms', function ($q) use ($userId): void {
+                $q->whereHas('formAnswers', function ($aq) use ($userId): void {
+                    $aq->where('user_id', $userId)
+                        ->excludeTerminatedInvitationMembers();
+                });
+            })
+            ->orderByDesc('start_date')
+            ->get()
+            ->map(fn (Event $e) => $eventService->eventToInertiaArray($e))
+            ->values()
+            ->all();
+
+        return inertia('Dashboard/User/Events', [
+            'events' => $events,
+            'listMode' => 'mine',
+        ]);
+    })->name('events');
+
+    Route::get('/events/browse', function (EventService $eventService) {
         $events = Event::query()
             ->where('status', EventStatus::Published)
             ->orderByDesc('start_date')
@@ -52,8 +77,9 @@ Route::middleware(['auth', 'member_portal'])->prefix('/user/dashboard')->name('d
 
         return inertia('Dashboard/User/Events', [
             'events' => $events,
+            'listMode' => 'browse',
         ]);
-    })->name('events');
+    })->name('events.browse');
 
     Route::get('/events/{event_segment}/registration', UserEventRegistrationController::class)
         ->name('events.registration');
