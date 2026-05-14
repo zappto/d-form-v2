@@ -1,0 +1,103 @@
+# ============================================
+# Stage 1: Install PHP dependencies
+# ============================================
+FROM composer:latest AS composer-builder
+
+WORKDIR /build
+
+COPY composer.json composer.lock ./
+RUN composer install --no-scripts --no-autoloader --prefer-dist --ignore-platform-reqs
+
+COPY . .
+RUN composer dump-autoload --optimize --no-scripts
+
+# ============================================
+# Stage 2: Production image (PHP + Node build)
+# ============================================
+# Pin to FrankenPHP 1.x stable — the unversioned 'php8.4-alpine' tag resolves to
+# FrankenPHP 2.x nightly which changed the PHP worker API and is NOT yet
+# compatible with Laravel Octane 2.x (which targets FrankenPHP 1.x API).
+FROM dunglas/frankenphp:1-php8.4-alpine
+
+WORKDIR /app
+
+# Install PHP extensions
+RUN install-php-extensions \
+    pcntl \
+    zip \
+    bcmath \
+    intl \
+    imagick \
+    pdo_mysql \
+    redis \
+    gd \
+    opcache
+
+# Install Composer (needed for dump-autoload in this stage)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install Node.js (v22.12+), npm, and netcat
+RUN apk add --no-cache nodejs npm netcat-openbsd
+
+# Copy PHP configuration
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-custom.ini
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/99-opcache.ini
+
+# Copy application code
+COPY . .
+
+# Copy PHP vendor from composer stage
+COPY --from=composer-builder /build/vendor /app/vendor
+
+# Create minimal .env and directories for artisan commands during build
+# Also clear any stale cached providers/services from source
+RUN mkdir -p storage/framework/{cache/data,sessions,views} \
+             storage/logs \
+             bootstrap/cache && \
+    rm -f bootstrap/cache/*.php && \
+    echo "APP_KEY=base64:$(head -c 32 /dev/urandom | base64)" > .env && \
+    echo "APP_ENV=production" >> .env && \
+    echo "APP_DEBUG=false" >> .env
+
+# Regenerate autoload classmap in runtime image (proper PHP extensions available)
+RUN composer dump-autoload --optimize --no-scripts 2>/dev/null || true
+
+# Run package discovery (only discovers actually installed prod packages)
+RUN php artisan package:discover --ansi
+
+# Publish Octane worker file (frankenphp-worker.php is gitignored)
+# Note: stderr is kept visible so failures are caught during build
+RUN php artisan octane:install --server=frankenphp --no-interaction || true
+
+# Build frontend assets (wayfinder plugin needs php artisan)
+RUN npm ci && npm run build && rm -rf node_modules
+
+# Remove build-time .env (runtime will use .env.production via env_file)
+RUN rm -f .env
+
+# Copy production entrypoint
+COPY docker/entrypoint.prod.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Ensure storage and bootstrap/cache directories exist
+RUN mkdir -p storage/app/public \
+             storage/framework/cache/data \
+             storage/framework/sessions \
+             storage/framework/views \
+             storage/logs \
+             bootstrap/cache \
+             bootstrap/cache/filament && \
+    chown -R www-data:www-data /app && \
+    chmod -R 775 storage bootstrap/cache
+
+# Set environment variables
+ENV OCTANE_SERVER=frankenphp
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+
+USER root
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Production: more workers, no watch
+CMD ["--workers=4"]

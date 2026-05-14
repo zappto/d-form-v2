@@ -134,9 +134,9 @@ return [
         ...Octane::defaultServicesToWarm(),
     ],
 
-    'flush' => [
-        env('APP_DEBUG') ? \Barryvdh\Debugbar\LaravelDebugbar::class : null
-    ],
+    'flush' => array_filter([
+        env('APP_DEBUG') ? \Barryvdh\Debugbar\LaravelDebugbar::class : null,
+    ]),
 
     /*
     |--------------------------------------------------------------------------
