@@ -39,7 +39,6 @@ const backHref = `/admin/dashboard/events/${props.event.id}`
 
     <div class="flex flex-col gap-8 md:gap-10">
         <PageHeader
-            eyebrow="Pendaftar"
             :title="props.event.title"
             subtitle="Semua pengiriman dari formulir pada acara ini. Filter menurut status review dan formulir, atau gunakan kotak cari."
             :back-href="backHref"

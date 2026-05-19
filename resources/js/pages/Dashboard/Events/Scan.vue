@@ -27,6 +27,7 @@ const s = reactive(
         <PageHeader
             title="Scanner Absensi QR"
             subtitle="Pindai QR atau masukkan kode registrasi. Check-in valid akan diproses di latar belakang; peserta mendapat email konfirmasi setelah antrean selesai."
+            :back-href="`/admin/dashboard/events/${props.event.id}`"
         />
 
         <QrScanInstructionsCard />

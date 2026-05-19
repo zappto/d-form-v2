@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { Head } from '@inertiajs/vue3'
-import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
-import { Button } from '@/components/ui/button'
-import KpiCard from '@/components/modules/dashboard/KpiCard.vue'
-import PageHeader from '@/components/modules/dashboard/PageHeader.vue'
-import FormSubmissionsEmptyState from '@/components/modules/dashboard/FormSubmissionsEmptyState.vue'
-import FormSubmissionsCardGridView from '@/components/modules/dashboard/FormSubmissionsCardGridView.vue'
-import FormSubmissionsPagination from '@/components/modules/dashboard/FormSubmissionsPagination.vue'
-import FormSubmissionDetailSheet from '@/components/modules/dashboard/FormSubmissionDetailSheet.vue'
-import { Download, Users, CalendarClock, ListChecks } from 'lucide-vue-next'
-import { useFormSubmissionsPage } from '@/utils/composables/useFormSubmissionsPage'
+import { reactive } from 'vue';
+import { Head } from '@inertiajs/vue3';
+import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
+import { Button } from '@/components/ui/button';
+import PageHeader from '@/components/modules/dashboard/PageHeader.vue';
+import FormSubmissionsEmptyState from '@/components/modules/dashboard/FormSubmissionsEmptyState.vue';
+import FormSubmissionsCardGridView from '@/components/modules/dashboard/FormSubmissionsCardGridView.vue';
+import FormSubmissionsPagination from '@/components/modules/dashboard/FormSubmissionsPagination.vue';
+import FormSubmissionDetailSheet from '@/components/modules/dashboard/FormSubmissionDetailSheet.vue';
+import { Download } from 'lucide-vue-next';
+import { useFormSubmissionsPage } from '@/utils/composables/useFormSubmissionsPage';
 
-defineOptions({ layout: DashboardFocusLayout })
+defineOptions({ layout: DashboardFocusLayout });
 
 const props = defineProps<{
-    event: { id: string; title: string }
-    form: { id: string; title: string }
-    fields: IFormField[]
+    event: { id: string; title: string };
+    form: { id: string; title: string };
+    fields: IFormField[];
     submissions: {
-        data: IFormSubmission[]
-        current_page: number
-        last_page: number
-        per_page: number
-        total: number
-        links?: { url: string | null; label: string; active: boolean }[]
-    }
-}>()
+        data: IFormSubmission[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links?: { url: string | null; label: string; active: boolean }[];
+    };
+    exportSubmissionsCsvUrl: string;
+}>();
 
-const s = reactive(useFormSubmissionsPage(props))
+const s = reactive(useFormSubmissionsPage(props));
 
 function onReview(payload: { action: 'accept' | 'reject'; submission: IFormSubmission }) {
-    s.submitSubmissionReview(payload.action, payload.submission)
+    s.submitSubmissionReview(payload.action, payload.submission);
 }
 </script>
 
@@ -39,46 +39,21 @@ function onReview(payload: { action: 'accept' | 'reject'; submission: IFormSubmi
     <Head :title="`Pengiriman — ${form.title}`" />
 
     <div class="app-page">
-        <div class="flex flex-col gap-8">
+        <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:gap-8">
             <PageHeader
-                :title="`Pengiriman formulir`"
-                :subtitle="`${event.title} · ${form.title}`"
+                :title="form.title"
+                :subtitle="event.title"
                 :back-href="`/admin/dashboard/events/${event.id}/forms/${form.id}`"
             >
                 <template #actions>
-                    <Button variant="outline" size="sm" class="h-11 w-full justify-center rounded-xl md:h-9 md:w-auto md:rounded-md">
-                        <Download class="mr-1.5 size-4 shrink-0" />
-                        Ekspor
+                    <Button variant="outline" size="sm" class="h-10 w-full gap-2 rounded-xl md:w-auto" as-child>
+                        <a :href="exportSubmissionsCsvUrl" class="inline-flex items-center justify-center" download>
+                            <Download class="size-4 shrink-0 opacity-90" aria-hidden="true" />
+                            Ekspor CSV
+                        </a>
                     </Button>
                 </template>
             </PageHeader>
-
-            <p v-if="submissions.total > 0" class="text-sm leading-relaxed text-muted-foreground">
-                Daftar pengiriman untuk formulir ini. Setiap kartu menunjukkan pengirim dan status review; buka
-                <span class="font-medium text-foreground">Lihat detail</span> untuk jawaban dan lampiran lengkap. Gunakan
-                <span class="font-medium text-foreground">Terima</span> /
-                <span class="font-medium text-foreground">Tolak</span> bila masih menunggu review.
-            </p>
-
-            <div v-if="submissions.total > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <KpiCard label="Total pengiriman" :value="submissions.total" :icon="Users" color="primary" />
-                <KpiCard
-                    label="Pengiriman terbaru (halaman ini)"
-                    :value="s.latestSubmissionDate"
-                    :icon="CalendarClock"
-                    color="success"
-                />
-                <KpiCard
-                    label="Menunggu review (halaman ini)"
-                    :value="s.pendingReviewCount"
-                    :icon="ListChecks"
-                    color="warning"
-                />
-            </div>
-            <p v-if="submissions.total > 0 && submissions.last_page > 1" class="-mt-4 text-xs text-muted-foreground">
-                Angka &quot;menunggu review&quot; hanya menghitung baris di halaman saat ini. Gunakan navigasi di bawah untuk
-                halaman lain.
-            </p>
 
             <FormSubmissionsEmptyState v-if="submissions.data.length === 0" />
 
@@ -86,9 +61,7 @@ function onReview(payload: { action: 'accept' | 'reject'; submission: IFormSubmi
                 <FormSubmissionsCardGridView
                     :submissions="submissions.data"
                     :format-date="s.formatDate"
-                    :is-submission-reviewing="s.isSubmissionReviewing"
                     @open-detail="s.openDetail"
-                    @review="onReview"
                 />
 
                 <FormSubmissionsPagination

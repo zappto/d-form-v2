@@ -91,8 +91,8 @@ const formatDate = (d: string) => {
                     ]"
                     :style="{ transitionDelay: `${60 + i * 30}ms` }"
                 >
-                    <div class="flex items-center gap-4 p-4 sm:p-5">
-                        <div class="hidden size-14 shrink-0 overflow-hidden rounded-lg bg-muted sm:block">
+                    <div class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
+                        <div class="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-muted sm:aspect-[4/3] sm:w-24">
                             <img
                                 v-if="ev.banner_url"
                                 :src="ev.banner_url"

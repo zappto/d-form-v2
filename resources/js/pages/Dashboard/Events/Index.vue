@@ -22,13 +22,7 @@ import {
     ArrowUpRight,
 } from 'lucide-vue-next';
 import { index as eventsIndex } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
-import {
-    formatDate,
-    statusColorMap,
-    categoryLabelMap,
-    categoryColorMap,
-    sessionLabelMap,
-} from '@/lib/dummyData';
+import { formatDate, statusColorMap, categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummyData';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 
 defineOptions({ layout: DashboardLayout });
@@ -89,12 +83,16 @@ readQueryFromProps();
 watch(
     () => props.query,
     () => readQueryFromProps(),
-    { deep: true },
+    { deep: true }
 );
 
 function eventTokenList(v: unknown): string[] {
     if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
-    if (typeof v === 'string') return v.split(',').map((s) => s.trim()).filter(Boolean);
+    if (typeof v === 'string')
+        return v
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
     return [];
 }
 
@@ -197,7 +195,7 @@ const lastPage = computed(() => props.events.last_page);
 const totalEvents = computed(() => props.events.total);
 
 const hasActiveFilters = computed(
-    () => searchQuery.value.trim() !== '' || filterCategory.value !== 'all' || filterSession.value !== 'all',
+    () => searchQuery.value.trim() !== '' || filterCategory.value !== 'all' || filterSession.value !== 'all'
 );
 
 function statusLabel(status: string) {
@@ -208,14 +206,13 @@ function statusLabel(status: string) {
 <template>
     <Head title="Daftar acara" />
 
-    <div class="flex w-full max-w-full flex-col gap-8 pb-10 pt-0">
+    <div class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
         <PageHeader
-            eyebrow="Manajemen"
             title="Acara"
             subtitle="Kelola acara dan pantau pendaftaran — cari judul, lalu saring per kategori atau sesi."
         >
             <template #actions>
-                <Button as-child class="rounded-xl shadow-sm">
+                <Button as-child class="w-full rounded-xl shadow-sm sm:w-auto">
                     <Link href="/admin/dashboard/events/create" class="inline-flex items-center gap-2">
                         <Plus class="size-4" />
                         Buat acara
@@ -225,23 +222,21 @@ function statusLabel(status: string) {
         </PageHeader>
 
         <section
-            class="app-surface overflow-hidden rounded-2xl border border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]"
+            class="app-surface border-border/70 overflow-hidden rounded-2xl border shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]"
         >
             <div class="flex flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5">
-                <div
-                    class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-4"
-                >
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
                     <div class="grid min-w-0 flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
                         <div class="relative sm:col-span-2 lg:col-span-5">
                             <Search
-                                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                                class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
                                 aria-hidden="true"
                             />
                             <Input
                                 v-model="searchQuery"
                                 type="search"
                                 placeholder="Cari judul acara…"
-                                class="h-10 w-full rounded-xl border-border/80 bg-background/80 pl-9 shadow-inner"
+                                class="border-border/80 bg-background/80 h-10 w-full rounded-xl pl-9 shadow-inner"
                                 autocomplete="off"
                                 aria-label="Cari judul acara"
                                 @input="onSearchInput"
@@ -250,7 +245,7 @@ function statusLabel(status: string) {
                         <div class="lg:col-span-3">
                             <Select v-model="filterCategory">
                                 <SelectTrigger
-                                    class="h-10 w-full rounded-xl border-border/80 bg-background/80 text-xs sm:text-sm"
+                                    class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
                                 >
                                     <SelectValue placeholder="Kategori" />
                                 </SelectTrigger>
@@ -265,7 +260,7 @@ function statusLabel(status: string) {
                         <div class="lg:col-span-4">
                             <Select v-model="filterSession">
                                 <SelectTrigger
-                                    class="h-10 w-full rounded-xl border-border/80 bg-background/80 text-xs sm:text-sm"
+                                    class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
                                 >
                                     <SelectValue placeholder="Sesi" />
                                 </SelectTrigger>
@@ -282,7 +277,7 @@ function statusLabel(status: string) {
                         v-if="hasActiveFilters"
                         variant="outline"
                         size="sm"
-                        class="h-10 shrink-0 gap-2 rounded-xl border-dashed lg:self-end"
+                        class="h-10 w-full shrink-0 gap-2 rounded-xl border-dashed sm:w-auto lg:self-end"
                         type="button"
                         @click="clearFilters"
                     >
@@ -293,27 +288,30 @@ function statusLabel(status: string) {
             </div>
         </section>
 
-        <p v-if="eventsList.length > 0" class="text-sm text-muted-foreground">
+        <p v-if="eventsList.length > 0" class="text-muted-foreground text-sm leading-relaxed">
             Menampilkan
-            <span class="font-medium text-foreground tabular-nums">{{ props.events.from ?? 0 }}</span>
+            <span class="text-foreground font-medium tabular-nums">{{ props.events.from ?? 0 }}</span>
             –
-            <span class="font-medium text-foreground tabular-nums">{{ props.events.to ?? 0 }}</span>
+            <span class="text-foreground font-medium tabular-nums">{{ props.events.to ?? 0 }}</span>
             dari
-            <span class="font-medium text-foreground tabular-nums">{{ totalEvents }}</span>
+            <span class="text-foreground font-medium tabular-nums">{{ totalEvents }}</span>
             acara
         </p>
 
-        <div v-if="eventsList.length > 0" class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div
+            v-if="eventsList.length > 0"
+            class="grid min-w-0 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4"
+        >
             <Link
                 v-for="event in eventsList"
                 :key="event.id"
                 :href="`/admin/dashboard/events/${event.id}`"
-                class="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                class="group focus-visible:ring-ring block min-w-0 rounded-2xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
                 <Card
-                    class="relative h-full overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm ring-1 ring-black/[0.03] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md dark:ring-white/[0.06]"
+                    class="border-border/70 bg-card hover:border-primary/30 relative h-full gap-0 overflow-hidden rounded-2xl border p-0 shadow-sm ring-1 ring-black/[0.03] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:ring-white/[0.06]"
                 >
-                    <div class="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+                    <div class="bg-muted relative aspect-video w-full overflow-hidden sm:aspect-[4/3]">
                         <div class="absolute inset-0 z-0">
                             <EventBannerImage
                                 :src="event.banner_url"
@@ -324,7 +322,9 @@ function statusLabel(status: string) {
                         <div
                             class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/60 via-black/15 to-transparent"
                         />
-                        <div class="absolute left-3 top-3 z-[2] flex max-w-[88%] flex-wrap gap-1">
+                        <div
+                            class="absolute top-2.5 right-2.5 left-2.5 z-[2] flex flex-wrap gap-1 pr-16 sm:top-3 sm:right-auto sm:left-3 sm:max-w-[88%] sm:pr-14"
+                        >
                             <Badge
                                 v-for="(cat, idx) in eventTokenList(event.category)"
                                 :key="`${event.id}-cat-${idx}`"
@@ -337,7 +337,7 @@ function statusLabel(status: string) {
                                 v-for="(sess, idx) in eventTokenList(event.session)"
                                 :key="`${event.id}-sess-${idx}`"
                                 variant="secondary"
-                                class="border-0 bg-white/90 text-[10px] font-semibold text-foreground/90 shadow-sm backdrop-blur-sm dark:bg-background/90"
+                                class="text-foreground/90 dark:bg-background/90 border-0 bg-white/90 text-[10px] font-semibold shadow-sm backdrop-blur-sm"
                             >
                                 {{ sessionLabelMap[sess] ?? sess }}
                             </Badge>
@@ -345,20 +345,20 @@ function statusLabel(status: string) {
                                 Terarsip
                             </Badge>
                         </div>
-                        <div class="absolute right-3 top-3 z-[2]">
+                        <div class="absolute top-2.5 right-2.5 z-[2] sm:top-3 sm:right-3">
                             <Badge
                                 variant="secondary"
-                                class="border-0 bg-white/95 text-[10px] font-semibold shadow-sm backdrop-blur-sm dark:bg-background/95"
+                                class="dark:bg-background/95 border-0 bg-white/95 text-[10px] font-semibold shadow-sm backdrop-blur-sm"
                                 :style="{ color: statusColorMap[event.status] }"
                             >
                                 {{ statusLabel(event.status) }}
                             </Badge>
                         </div>
                         <div
-                            class="absolute bottom-0 left-0 right-0 z-[2] flex items-end justify-between gap-2 px-3 pb-2.5 pt-8 text-white sm:px-4 sm:pb-3"
+                            class="absolute right-0 bottom-0 left-0 z-[2] flex items-end justify-between gap-2 px-3 pt-14 pb-2.5 text-white sm:px-4 sm:pb-3"
                         >
                             <h3
-                                class="line-clamp-2 min-w-0 flex-1 text-sm font-semibold leading-snug tracking-tight text-white drop-shadow sm:text-[0.95rem]"
+                                class="line-clamp-2 min-w-0 flex-1 text-sm leading-snug font-semibold tracking-tight text-white drop-shadow sm:text-[0.95rem]"
                             >
                                 {{ event.title }}
                             </h3>
@@ -368,26 +368,29 @@ function statusLabel(status: string) {
                             />
                         </div>
                     </div>
-                    <CardContent class="space-y-4 border-t border-border/50 p-4 sm:p-5">
+                    <CardContent class="border-border/50 space-y-4 border-t p-3.5 sm:p-5">
                         <div
-                            class="flex flex-col gap-3 text-xs text-muted-foreground sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:text-[13px]"
+                            class="text-muted-foreground flex flex-col gap-3 text-xs sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:text-[13px]"
                         >
                             <div class="min-w-0 flex-1 space-y-2">
                                 <div class="flex items-start gap-2">
-                                    <CalendarDays class="mt-0.5 size-3.5 shrink-0 text-primary/80" aria-hidden="true" />
+                                    <CalendarDays class="text-primary/80 mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
                                     <span class="leading-snug">
                                         {{ formatDate(event.start_date) }} — {{ formatDate(event.end_date) }}
                                     </span>
                                 </div>
                                 <div class="flex items-start gap-2">
-                                    <MapPin class="mt-0.5 size-3.5 shrink-0 text-primary/80" aria-hidden="true" />
+                                    <MapPin class="text-primary/80 mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
                                     <span class="line-clamp-2 leading-snug">{{ event.location }}</span>
                                 </div>
                             </div>
-                            <div class="shrink-0 sm:pt-0.5">
+                            <div class="min-w-0 shrink-0 sm:pt-0.5">
                                 <Badge
                                     variant="outline"
-                                    :class="['whitespace-nowrap text-[10px] font-medium', registrationUi(event).badgeClass]"
+                                    :class="[
+                                        'max-w-full text-[10px] font-medium whitespace-normal sm:whitespace-nowrap',
+                                        registrationUi(event).badgeClass,
+                                    ]"
                                 >
                                     {{ registrationUi(event).label }}
                                 </Badge>
@@ -395,28 +398,28 @@ function statusLabel(status: string) {
                         </div>
 
                         <div
-                            class="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs sm:text-[13px]"
+                            class="border-border/60 bg-muted/20 flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-xs sm:text-[13px]"
                         >
                             <span class="text-muted-foreground">Biaya</span>
-                            <span class="font-semibold tabular-nums text-foreground">
+                            <span class="text-foreground text-right font-semibold break-words tabular-nums">
                                 {{ formatPriceIdr(event.price) }}
                             </span>
                         </div>
 
-                        <div class="rounded-xl border border-border/60 bg-muted/25 p-3">
+                        <div class="border-border/60 bg-muted/25 rounded-xl border p-3">
                             <div class="mb-2 flex items-center justify-between text-xs">
-                                <span class="flex items-center gap-1.5 font-medium text-foreground">
-                                    <Users class="size-3.5 text-muted-foreground" aria-hidden="true" />
+                                <span class="text-foreground flex items-center gap-1.5 font-medium">
+                                    <Users class="text-muted-foreground size-3.5" aria-hidden="true" />
                                     Pendaftar
                                 </span>
-                                <span class="tabular-nums font-semibold text-foreground">
+                                <span class="text-foreground font-semibold tabular-nums">
                                     {{ event.registered_count }}/{{ event.quota }}
                                 </span>
                             </div>
                             <Progress
                                 :model-value="Math.min(event.registered_count, Math.max(event.quota, 1))"
                                 :max="Math.max(event.quota, 1)"
-                                class="h-2 bg-muted/80"
+                                class="bg-muted/80 h-2"
                             />
                         </div>
                     </CardContent>
@@ -433,19 +436,25 @@ function statusLabel(status: string) {
 
         <Card
             v-if="lastPage > 1"
-            class="flex flex-col gap-3 rounded-2xl border border-border/70 px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5"
+            class="border-border/70 flex flex-col gap-3 rounded-2xl border px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5"
         >
-            <p class="text-center text-sm text-muted-foreground sm:text-left">
+            <p class="text-muted-foreground text-center text-sm sm:text-left">
                 Halaman
-                <span class="font-medium text-foreground tabular-nums">{{ currentPage }}</span>
+                <span class="text-foreground font-medium tabular-nums">{{ currentPage }}</span>
                 /
                 <span class="tabular-nums">{{ lastPage }}</span>
                 — total
-                <span class="font-medium text-foreground tabular-nums">{{ totalEvents }}</span>
+                <span class="text-foreground font-medium tabular-nums">{{ totalEvents }}</span>
                 acara
             </p>
             <div class="flex flex-wrap items-center justify-center gap-2">
-                <Button variant="outline" size="icon" class="size-9 rounded-xl" :disabled="currentPage <= 1" @click="goToPage(1)">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    class="size-9 rounded-xl"
+                    :disabled="currentPage <= 1"
+                    @click="goToPage(1)"
+                >
                     <ChevronsLeft class="size-4" />
                 </Button>
                 <Button

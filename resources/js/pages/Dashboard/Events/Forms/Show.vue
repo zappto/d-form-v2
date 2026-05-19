@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue'
-import { Head, Link, useForm } from '@inertiajs/vue3'
+import { Head, useForm } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
-import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
+import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue'
 import {
     fromBackendField,
@@ -15,10 +15,9 @@ import {
     prependFormBannerToBackendPayload,
     extractFormBannerFromBuilderFields,
 } from '@/components/modules/builder/formBanner'
-import { Button } from '@/components/ui/button'
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form'
 
-defineOptions({ layout: DashboardFocusLayout })
+defineOptions({ layout: DashboardLayout })
 
 const props = defineProps<{
     event: { id: string; title: string }
@@ -108,10 +107,6 @@ watch(
     { deep: true, immediate: true },
 )
 
-const submissionsHref = computed(
-    () => `/admin/dashboard/events/${props.event.id}/forms/${props.form.id}/submissions`,
-)
-
 function onSave(): void {
     settingsForm.banner_url = bannerState.bannerUrl
     settingsForm.banner_caption = bannerState.caption
@@ -153,19 +148,5 @@ function onSave(): void {
         :processing="settingsForm.processing"
         :field-errors="fieldErrors"
         @save="onSave"
-    >
-        <template #toolbar-extra>
-            <Button
-                variant="outline"
-                size="sm"
-                class="rounded-full border-border/80 px-2.5 text-xs font-medium shadow-sm sm:px-3 sm:text-sm"
-                as-child
-            >
-                <Link :href="submissionsHref" title="Lihat pengiriman form">
-                    <span class="max-sm:hidden">Pengiriman</span>
-                    <span class="sm:hidden">Kiriman</span>
-                </Link>
-            </Button>
-        </template>
-    </FormBuilderWorkspace>
+    />
 </template>

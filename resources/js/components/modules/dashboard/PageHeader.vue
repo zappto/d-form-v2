@@ -1,15 +1,24 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-vue-next'
-import { Link } from '@inertiajs/vue3'
+import { router } from '@inertiajs/vue3'
 
 defineProps<{
     title: string
     subtitle?: string
-    /** Label kecil di atas judul, mis. konteks halaman */
-    eyebrow?: string
     backHref?: string
 }>()
+
+function goBack(fallbackHref?: string): void {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+        window.history.back()
+        return
+    }
+
+    if (fallbackHref) {
+        router.visit(fallbackHref)
+    }
+}
 </script>
 
 <template>
@@ -22,23 +31,17 @@ defineProps<{
                 variant="ghost"
                 size="icon-sm"
                 class="mt-0.5 shrink-0 rounded-lg md:mt-0"
-                as-child
+                type="button"
+                @click="goBack(backHref)"
             >
-                <Link :href="backHref" aria-label="Kembali">
-                    <ArrowLeft class="size-4" aria-hidden="true" />
-                </Link>
+                <ArrowLeft class="size-4" aria-hidden="true" />
+                <span class="sr-only">Kembali</span>
             </Button>
             <div class="min-w-0 flex-1 space-y-1.5">
-                <p
-                    v-if="eyebrow"
-                    class="text-primary text-[11px] font-semibold uppercase tracking-[0.14em]"
-                >
-                    {{ eyebrow }}
-                </p>
-                <h1 class="font-display text-xl font-bold tracking-[-0.025em] sm:text-2xl md:text-3xl">
+                <h1 class="font-display text-[1.35rem] font-bold leading-tight tracking-tight text-balance sm:text-2xl lg:text-[1.875rem]">
                     {{ title }}
                 </h1>
-                <p v-if="subtitle" class="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                <p v-if="subtitle" class="max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">
                     {{ subtitle }}
                 </p>
             </div>

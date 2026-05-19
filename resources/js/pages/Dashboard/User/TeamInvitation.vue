@@ -15,7 +15,7 @@ import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
 import FormFieldAnswerDisplay from '@/components/modules/dashboard/FormFieldAnswerDisplay.vue'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { CheckCircle2, Send, Users } from 'lucide-vue-next'
+import { CheckCircle2, Users } from 'lucide-vue-next'
 
 defineOptions({ layout: FormFillLayout })
 
@@ -171,7 +171,7 @@ function submitDeclineFromDialog() {
                             v-if="typeof metadata(field).bannerUrl === 'string' && metadata(field).bannerUrl.trim()"
                             :src="normalizeBannerSrc(metadata(field).bannerUrl as string)"
                             alt=""
-                            class="max-h-72 w-full object-cover"
+                            class="aspect-video w-full object-cover sm:aspect-[3/1]"
                             loading="lazy"
                         />
                         <p

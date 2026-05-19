@@ -13,9 +13,9 @@ defineOptions({ layout: DashboardLayout })
 
     <div class="flex flex-col gap-8 md:gap-10">
         <PageHeader
-            eyebrow="Tim"
             title="Rekrutmen"
             subtitle="Modul kampanye anggota sedang disiapkan."
+            back-href="/admin/dashboard"
         />
 
         <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]">

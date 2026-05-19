@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { X, Star, Upload, ImagePlus, Send } from 'lucide-vue-next'
-import { optionLabel, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping'
+import { optionLabel, optionImageUrl, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping'
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
 import PageHeader from '@/components/modules/dashboard/PageHeader.vue'
 import { Button } from '@/components/ui/button'
@@ -226,9 +226,7 @@ function ratingStars(field: FormPreviewField): number[] {
                                                             ? 'text'
                                                             : field.type
                                                 "
-                                                :placeholder="
-                                                    field.placeholder || `Enter ${field.label.toLowerCase()}…`
-                                                "
+                                                :placeholder="field.placeholder ?? ''"
                                                 disabled
                                                 class="pointer-events-none text-sm opacity-90"
                                                 tabindex="-1"
@@ -236,7 +234,7 @@ function ratingStars(field: FormPreviewField): number[] {
 
                                             <Textarea
                                                 v-else-if="field.type === 'long_text'"
-                                                :placeholder="field.placeholder || `Enter ${field.label.toLowerCase()}…`"
+                                                :placeholder="field.placeholder ?? ''"
                                                 rows="4"
                                                 disabled
                                                 class="pointer-events-none resize-none text-sm opacity-90"
@@ -252,9 +250,9 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         <SelectItem
                                                             v-for="(opt, oi) in optionEntries(field)"
                                                             :key="optKey(opt, oi)"
-                                                            :value="optionLabel(opt) || `option-${oi + 1}`"
+                                                            :value="String(opt.id || `option-${oi}`)"
                                                         >
-                                                            <span class="py-0.5">{{ optionLabel(opt) || `Option ${oi + 1}` }}</span>
+                                                            <span class="min-h-[1em] py-0.5">{{ optionLabel(opt) }}</span>
                                                         </SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -264,7 +262,7 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         :key="`dropdown-preview-${optKey(opt, oi)}`"
                                                         class="flex items-center gap-2 rounded-lg border border-border/60 bg-card px-2.5 py-1.5 text-xs"
                                                     >
-                                                        <span>{{ optionLabel(opt) || `Option ${oi + 1}` }}</span>
+                                                        <span>{{ optionLabel(opt) }}</span>
                                                     </div>
                                                 </div>
                                             </div>

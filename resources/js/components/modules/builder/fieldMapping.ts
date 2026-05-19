@@ -16,13 +16,12 @@ export function optionImageUrl(entry: FieldOptionEntry): string | undefined {
 }
 
 function serializeOptionChoices(options: readonly FieldOptionEntry[]): Record<string, unknown>[] {
-    return options.map((o, i) => {
+    return options.map((o) => {
         const label = String(o.label ?? '').trim()
         return {
             id: o.id,
             type: o.type,
-            // Select item value must never be empty.
-            label: label || `Option ${i + 1}`,
+            label,
             imageUrl: o.imageUrl ?? ''
         }
     })
@@ -31,17 +30,17 @@ function serializeOptionChoices(options: readonly FieldOptionEntry[]): Record<st
 function parseOptionChoices(raw: unknown): FieldOptionEntry[] | null {
     if (!Array.isArray(raw)) return null
     const out: FieldOptionEntry[] = []
-    for (const [i, item] of raw.entries()) {
+    for (const item of raw) {
         if (item && typeof item === 'object' && item !== null) {
             const row = item as Record<string, unknown>
             const id = String(row.id ?? crypto.randomUUID())
             const type = row.type === 'image' ? 'image' : 'text'
             const label = String(row.label ?? '').trim()
             const imageUrl = String(row.imageUrl ?? '').trim()
-            out.push({ id, type, label: label || `Option ${i + 1}`, imageUrl })
+            out.push({ id, type, label, imageUrl })
         } else if (typeof item === 'string') {
             const label = item.trim()
-            out.push({ id: crypto.randomUUID(), type: 'text', label: label || `Option ${i + 1}` })
+            out.push({ id: crypto.randomUUID(), type: 'text', label })
         }
     }
     return out.length > 0 ? out : null
@@ -62,6 +61,23 @@ function withMeta(f: BuilderField, specific: Record<string, unknown>): Record<st
     return { ...preservedMeta(f), ...specific }
 }
 
+/** Batas panjang teks untuk short/long — disimpan sebagai rules.min (0) + rules.max di API. */
+function mergeTextRules(req: Record<string, unknown>, f: BuilderField): Record<string, unknown> {
+    const merged = { ...req }
+    const raw = f.metadata?.maxLength
+    const n =
+        typeof raw === 'number'
+            ? raw
+            : raw != null && String(raw).trim() !== ''
+              ? parseInt(String(raw), 10)
+              : NaN
+    if (Number.isFinite(n) && n > 0) {
+        merged.min = 0
+        merged.max = Math.min(Math.floor(n), 100_000)
+    }
+    return merged
+}
+
 export function toBackendField(f: BuilderField, order: number): BackendField {
     const base = {
         id: f.id,
@@ -74,7 +90,17 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
     const req: Record<string, unknown> = f.required ? { required: true } : {}
 
     switch (f.type) {
-        case 'short_text': return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: f.placeholder || '', rules: req, builderType: 'short_text' }) }
+        case 'short_text':
+            return {
+                ...base,
+                type: 'input',
+                metadata: withMeta(f, {
+                    type: 'text',
+                    placeholder: f.placeholder || '',
+                    rules: mergeTextRules(req, f),
+                    builderType: 'short_text',
+                }),
+            }
         case 'email':      return { ...base, type: 'input', metadata: withMeta(f, { type: 'email', placeholder: f.placeholder || '', rules: req, builderType: 'email' }) }
         case 'phone':      return { ...base, type: 'input', metadata: withMeta(f, { type: 'tel', placeholder: f.placeholder || '', rules: req, builderType: 'phone' }) }
         case 'number':     return { ...base, type: 'input', metadata: withMeta(f, { type: 'number', placeholder: f.placeholder || '', rules: req, builderType: 'number' }) }
@@ -83,16 +109,27 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
         case 'heading':    return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: '', rules: {}, builderType: 'heading', content: (f.metadata?.content as string) || 'Section Heading' }) }
         case 'divider':    return { ...base, type: 'input', metadata: withMeta(f, { type: 'text', placeholder: '', rules: {}, builderType: 'divider' }) }
 
-        case 'long_text':  return { ...base, type: 'textarea', metadata: withMeta(f, { placeholder: f.placeholder || '', rules: req, builderType: 'long_text' }) }
+        case 'long_text':
+            return {
+                ...base,
+                type: 'textarea',
+                metadata: withMeta(f, {
+                    placeholder: f.placeholder || '',
+                    rules: mergeTextRules(req, f),
+                    builderType: 'long_text',
+                }),
+            }
         case 'paragraph':  return { ...base, type: 'textarea', metadata: withMeta(f, { placeholder: '', rules: {}, builderType: 'paragraph', content: (f.metadata?.content as string) || '' }) }
 
         case 'dropdown': {
-            const choices = serializeOptionChoices((f.options || []).map((opt, i) => ({
-                ...opt,
-                type: 'text',
-                imageUrl: '',
-                label: String(opt.label ?? '').trim() || `Option ${i + 1}`,
-            })))
+            const choices = serializeOptionChoices(
+                (f.options || []).map((opt) => ({
+                    ...opt,
+                    type: 'text',
+                    imageUrl: '',
+                    label: String(opt.label ?? '').trim(),
+                })),
+            )
             const inCsv = choices.map((c) => c.label).join(',')
             return {
                 ...base,
@@ -181,7 +218,8 @@ function guessType(apiType: string, m: Record<string, unknown>): string {
 export function fromBackendField(bf: BackendField): BuilderField {
     const mFull: Record<string, unknown> =
         bf.metadata && typeof bf.metadata === 'object' ? (bf.metadata as Record<string, unknown>) : {}
-    const { options: _droppedOptions, ...m }: Record<string, unknown> = mFull
+    const m: Record<string, unknown> = { ...mFull }
+    delete m.options
     const rules = (m.rules as Record<string, unknown>) || {}
     const bt = (m.builderType as string) || guessType(bf.type, m)
     const inStr = (rules.in as string) || ''
@@ -197,13 +235,22 @@ export function fromBackendField(bf: BackendField): BuilderField {
             : [])
     const opts: FieldOptionEntry[] =
         bt === 'dropdown'
-            ? optsRaw.map((opt, i) => ({
+            ? optsRaw.map((opt) => ({
                   ...opt,
                   type: 'text',
                   imageUrl: '',
-                  label: String(opt.label ?? '').trim() || `Option ${i + 1}`,
+                  label: String(opt.label ?? '').trim(),
               }))
             : optsRaw
+
+    const maxFromRules = rules.max
+    let maxLengthForMeta: number | undefined
+    if (['short_text', 'long_text'].includes(bt) && maxFromRules != null && String(maxFromRules) !== '') {
+        const n = Number(maxFromRules)
+        if (Number.isFinite(n) && n > 0) {
+            maxLengthForMeta = n
+        }
+    }
 
     return {
         id: bf.id,
@@ -220,6 +267,7 @@ export function fromBackendField(bf: BackendField): BuilderField {
             maxStars: (m.maxStars as number) || 5,
             accepts: ((rules.mimes as string) || '').replace(/,/g, ', '),
             formBanner: m.formBanner === true,
+            ...(maxLengthForMeta != null ? { maxLength: maxLengthForMeta } : {}),
         },
     }
 }

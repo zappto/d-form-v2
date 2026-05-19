@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import type { FormBannerState } from '@/components/modules/builder/formBanner'
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
@@ -54,6 +53,17 @@ const previewSrc = () => normalizeBannerSrc(props.modelValue.bannerUrl)
     <div class="flex flex-col gap-3 rounded-xl border border-border bg-muted/30 p-3.5">
         <div>
             <p class="text-xs font-semibold text-foreground">Banner form</p>
+            <div class="mt-2 flex flex-wrap gap-1.5">
+                <span class="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                    3:1
+                </span>
+                <span class="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                    1800 x 600
+                </span>
+                <span class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                    center safe
+                </span>
+            </div>
         </div>
 
         <div class="flex flex-col gap-1.5">
@@ -64,7 +74,7 @@ const previewSrc = () => normalizeBannerSrc(props.modelValue.bannerUrl)
                 class="text-xs"
                 @change="onBannerFile"
             />
-            <p class="text-[10px] text-muted-foreground">PNG, JPG, JPEG</p>
+            <p class="text-[10px] text-muted-foreground">PNG, JPG, JPEG, GIF</p>
             <p v-if="bannerUploadError" class="text-[10px] font-semibold text-destructive">{{ bannerUploadError }}</p>
         </div>
 
@@ -84,7 +94,13 @@ const previewSrc = () => normalizeBannerSrc(props.modelValue.bannerUrl)
             v-if="previewSrc() !== ''"
             class="overflow-hidden rounded-xl border border-border bg-card"
         >
-            <img :src="previewSrc()" alt="Banner form" class="aspect-[3/1] w-full object-cover" />
+            <div class="relative">
+                <img :src="previewSrc()" alt="Banner form" class="aspect-video w-full object-cover sm:aspect-[3/1]" />
+                <div
+                    class="pointer-events-none absolute inset-y-[18%] left-[18%] right-[18%] rounded-lg border border-white/80 shadow-[0_0_0_999px_rgba(0,0,0,0.14)]"
+                    aria-hidden="true"
+                />
+            </div>
             <p
                 v-if="modelValue.bannerFileName && modelValue.bannerUrl.startsWith('data:')"
                 class="border-t border-border px-3 py-1.5 text-[10px] text-muted-foreground"

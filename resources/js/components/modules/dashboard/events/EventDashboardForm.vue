@@ -138,9 +138,7 @@ function buildFormPayload():
 const form = useForm(buildFormPayload())
 
 const bannerHelpPrimary = computed(() =>
-    props.variant === 'create'
-        ? 'Tampil memanjang di hero acara. Disarankan gambar lebar (mis. 1600×680) agar tidak blur.'
-        : 'Banner saat ini tampil di bawah. Unggah file baru hanya jika ingin mengganti — kosongkan pratinjau untuk menghapus sementara dari formulir (butuh konfirmasi simpan).',
+    props.variant === 'create' ? 'Upload banner acara' : 'Ganti banner acara',
 )
 
 const bannerEmptyTitle = computed(() =>
@@ -148,15 +146,11 @@ const bannerEmptyTitle = computed(() =>
 )
 
 const bannerEmptyHint = computed(() =>
-    props.variant === 'create'
-        ? 'PNG, JPG, atau WebP — maks. 10MB'
-        : 'Zona ini dipakai jika Anda menghapus pratinjau atau belum ada gambar',
+    props.variant === 'create' ? 'PNG, JPG, WebP - maks. 10MB' : 'PNG, JPG, WebP - maks. 10MB',
 )
 
 const bannerFootnote = computed(() =>
-    props.variant === 'create'
-        ? 'Kotak ini memperkirakan tampilan banner mendatar; pada halaman sungguhan bisa sedikit dipotong tepinya.'
-        : 'Rasio lebar mirip tampilan di halaman acara; area gelap di atas hanya bantu membaca teks jika ada overlay.',
+    props.variant === 'create' ? 'Area aman di tengah' : 'Area aman di tengah - simpan untuk menerapkan',
 )
 
 const classificationDescription = computed(() =>
@@ -297,13 +291,19 @@ function submitForm(publish: boolean): void {
 
                     <div class="flex flex-col gap-2">
                         <Label class="text-sm font-medium">Banner</Label>
-                        <p class="text-muted-foreground text-xs leading-relaxed">
-                            {{ bannerHelpPrimary }}
-                        </p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="rounded-full border border-primary/20 bg-primary/8 px-2.5 py-1 text-[10px] font-semibold text-primary">
+                                Target 3:1
+                            </span>
+                            <span class="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">
+                                1920 x 640 px
+                            </span>
+                            <span class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                                Safe center
+                            </span>
+                        </div>
                         <div class="overflow-hidden rounded-xl border-2 border-border bg-muted/25 shadow-sm">
-                            <div
-                                class="relative aspect-[2.35/1] w-full min-h-[10.5rem] max-h-[17rem] sm:min-h-[12rem] sm:max-h-[19rem]"
-                            >
+                            <div class="relative aspect-video w-full sm:aspect-[3/1]">
                                 <template v-if="bannerPreview">
                                     <img
                                         :src="bannerPreview"
@@ -316,8 +316,12 @@ function submitForm(publish: boolean): void {
                                     <span
                                         class="absolute top-3 left-3 rounded-md bg-background/92 px-2 py-1 text-[10px] font-semibold tracking-wide text-foreground uppercase shadow-sm backdrop-blur-md"
                                     >
-                                        Pratinjau banner
+                                        {{ bannerHelpPrimary }}
                                     </span>
+                                    <div
+                                        class="pointer-events-none absolute inset-y-[18%] left-[18%] right-[18%] rounded-xl border border-white/80 shadow-[0_0_0_999px_rgba(0,0,0,0.18)]"
+                                        aria-hidden="true"
+                                    />
                                     <div class="absolute top-3 right-3 flex gap-2">
                                         <Button
                                             variant="secondary"
@@ -357,6 +361,15 @@ function submitForm(publish: boolean): void {
                                     <p class="text-muted-foreground mt-1 max-w-xs text-xs">
                                         {{ bannerEmptyHint }}
                                     </p>
+                                    <div class="mt-4 w-full max-w-[260px] rounded-lg border border-border bg-background/70 p-2">
+                                        <div class="relative aspect-[3/1] overflow-hidden rounded-md border border-dashed border-primary/45 bg-primary/8">
+                                            <div class="absolute inset-y-[18%] left-[18%] right-[18%] rounded border border-primary/70 bg-primary/10" />
+                                        </div>
+                                        <div class="mt-1.5 flex items-center justify-between text-[10px] font-medium text-muted-foreground">
+                                            <span>3:1 banner</span>
+                                            <span>safe center</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <input
@@ -366,7 +379,7 @@ function submitForm(publish: boolean): void {
                                 class="hidden"
                                 @change="handleBannerChange"
                             />
-                            <p class="text-muted-foreground border-t border-border bg-muted/20 px-3 py-2 text-xs leading-snug">
+                            <p class="border-t border-border bg-muted/20 px-3 py-2 text-xs font-medium text-muted-foreground">
                                 {{ bannerFootnote }}
                             </p>
                         </div>

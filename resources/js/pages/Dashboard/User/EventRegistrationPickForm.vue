@@ -102,7 +102,7 @@ function statusLabel(s: FormAccessStatus): string {
                             </div>
                             <div class="flex w-full shrink-0 sm:w-auto sm:justify-end">
                                 <Button v-if="form.can_start" as-child class="w-full rounded-xl sm:w-auto">
-                                    <Link :href="form.fill_url" class="justify-center">
+                                    <Link :href="form.fill_url" :prefetch="false" class="justify-center">
                                         Isi formulir
                                         <ChevronRight class="ml-1 size-4" />
                                     </Link>

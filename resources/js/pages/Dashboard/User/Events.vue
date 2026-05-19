@@ -63,7 +63,7 @@ const emptyDescription = computed(() =>
     <Head :title="headTitle" />
 
     <div class="flex flex-col gap-6">
-        <PageHeader :title="pageTitle" :subtitle="pageSubtitle" />
+        <PageHeader :title="pageTitle" :subtitle="pageSubtitle" back-href="/user/dashboard" />
 
         <div class="flex flex-wrap items-center gap-3 rounded-xl border border-border/60 bg-muted/30 p-3 shadow-xs">
             <div class="relative w-full max-w-xs">
@@ -89,8 +89,8 @@ const emptyDescription = computed(() =>
                 :href="`/user/dashboard/events/${event.slug}`"
                 class="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-                <Card class="overflow-hidden rounded-xl border shadow-xs transition-colors duration-150 hover:border-primary/25 hover:shadow-sm">
-                    <div class="relative aspect-video w-full overflow-hidden bg-muted">
+                <Card class="overflow-hidden rounded-xl border p-0 gap-0 shadow-xs transition-colors duration-150 hover:border-primary/25 hover:shadow-sm">
+                    <div class="relative aspect-video w-full overflow-hidden bg-muted sm:aspect-[4/3]">
                         <div class="absolute inset-0 z-0">
                             <EventBannerImage :src="event.banner_url" :alt="event.title" />
                         </div>

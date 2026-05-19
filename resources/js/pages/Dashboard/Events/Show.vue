@@ -27,7 +27,7 @@ const p = reactive(useDashboardEventShowPage(props.event, props.forms))
 <template>
     <Head :title="props.event.title" />
     <TooltipProvider :delay-duration="150">
-        <div class="flex flex-col gap-8">
+        <div class="flex min-w-0 flex-col gap-6 pb-6 sm:gap-8">
             <EventShowHeroSection
                 :event="props.event"
                 :status-pill="p.statusPill"
@@ -35,8 +35,8 @@ const p = reactive(useDashboardEventShowPage(props.event, props.forms))
                 :card-shadow="p.cardShadow"
             />
 
-            <div class="grid gap-6 lg:grid-cols-3">
-                <div class="flex flex-col gap-6 lg:col-span-2">
+            <div class="grid min-w-0 gap-5 sm:gap-6 xl:grid-cols-3">
+                <div class="order-2 flex min-w-0 flex-col gap-5 sm:gap-6 xl:order-1 xl:col-span-2">
                     <EventShowRegistrationPulseCard
                         :event="props.event"
                         :fill-percent="p.fillPercent"
@@ -55,6 +55,7 @@ const p = reactive(useDashboardEventShowPage(props.event, props.forms))
                 </div>
 
                 <EventShowAsideRail
+                    class="order-1 xl:order-2"
                     :event="props.event"
                     :forms="p.forms"
                     :card-shadow="p.cardShadow"

@@ -96,17 +96,27 @@ function fillReady(): boolean {
         </p>
     </CardHeader>
     <CardContent :class="cardContentSpacingClass">
-        <Input
+        <template
             v-if="
                 ['short_text', 'email', 'phone', 'number', 'time', 'input'].includes(ctx.builderType(field)) &&
                 !ctx.isMultipleSelect(field)
             "
-            :id="storageKey"
-            :type="ctx.getInputSubtype(field)"
-            :placeholder="ctx.getPlaceholder(field)"
-            :model-value="textAnswer(storageKey)"
-            @update:model-value="setTextAnswer(storageKey, $event)"
-        />
+        >
+            <Input
+                :id="storageKey"
+                :type="ctx.getInputSubtype(field)"
+                :placeholder="ctx.getPlaceholder(field)"
+                :maxlength="ctx.maxLengthForField(field) ?? undefined"
+                :model-value="textAnswer(storageKey)"
+                @update:model-value="setTextAnswer(storageKey, $event)"
+            />
+            <p
+                v-if="ctx.maxLengthForField(field)"
+                class="mt-1 text-right text-[10px] tabular-nums text-muted-foreground"
+            >
+                {{ textAnswer(storageKey).length }} / {{ ctx.maxLengthForField(field) }}
+            </p>
+        </template>
 
         <div v-else-if="ctx.builderType(field) === 'rating'" class="flex flex-col gap-2">
             <div class="flex gap-1.5">
@@ -130,14 +140,26 @@ function fillReady(): boolean {
             <p class="text-xs text-muted-foreground">Choose one rating.</p>
         </div>
 
-        <Textarea
-            v-else-if="ctx.builderType(field) === 'long_text' || ctx.builderType(field) === 'address' || field.type === 'textarea'"
-            :id="storageKey"
-            :placeholder="ctx.getPlaceholder(field)"
-            :model-value="textAnswer(storageKey)"
-            @update:model-value="setTextAnswer(storageKey, $event)"
-            rows="4"
-        />
+        <template
+            v-else-if="
+                ctx.builderType(field) === 'long_text' || ctx.builderType(field) === 'address' || field.type === 'textarea'
+            "
+        >
+            <Textarea
+                :id="storageKey"
+                :placeholder="ctx.getPlaceholder(field)"
+                :maxlength="ctx.maxLengthForField(field) ?? undefined"
+                :model-value="textAnswer(storageKey)"
+                @update:model-value="setTextAnswer(storageKey, $event)"
+                rows="4"
+            />
+            <p
+                v-if="ctx.maxLengthForField(field)"
+                class="mt-1 text-right text-[10px] tabular-nums text-muted-foreground"
+            >
+                {{ textAnswer(storageKey).length }} / {{ ctx.maxLengthForField(field) }}
+            </p>
+        </template>
 
         <DatePicker
             v-else-if="ctx.builderType(field) === 'date' || field.type === 'datePicker'"
@@ -206,7 +228,7 @@ function fillReady(): boolean {
             class="relative overflow-hidden rounded-xl border border-dashed border-border bg-muted/20 transition-colors hover:border-primary/30"
             :class="fillReady() ? 'p-0' : variant === 'bundleParticipant' ? 'p-4 text-center hover:bg-muted/30' : 'p-6 text-center hover:bg-muted/30'"
         >
-            <div v-if="fillReady()" class="relative aspect-[4/3] w-full bg-muted/30">
+            <div v-if="fillReady()" class="relative aspect-video w-full bg-muted/30 sm:aspect-[4/3]">
                 <button
                     type="button"
                     class="absolute inset-0 z-10 flex w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"

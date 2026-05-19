@@ -26,22 +26,27 @@ defineEmits<{
 </script>
 
 <template>
-    <aside class="flex flex-col gap-5 lg:sticky lg:top-20 lg:self-start">
+    <aside class="flex min-w-0 flex-col gap-5 xl:sticky xl:top-20 xl:self-start">
         <Card :class="['rounded-2xl border-border/60', cardShadow]">
             <CardHeader class="pb-3">
-                <CardTitle class="text-[13px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Manage event</CardTitle>
+                <CardTitle class="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Manage event</CardTitle>
             </CardHeader>
             <CardContent class="flex flex-col gap-2 pt-0">
-                <Button class="w-full justify-start rounded-xl" as-child>
+                <Button class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal" as-child>
                     <Link :href="editEvent.url(event.id)"><Pencil class="mr-2 size-4" />Edit details</Link>
                 </Button>
-                <Button variant="outline" class="w-full justify-start rounded-xl" as-child>
+                <Button variant="outline" class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal" as-child>
                     <Link :href="`/admin/dashboard/events/${event.id}/scan`"><QrCode class="mr-2 size-4" />Check-in scanner</Link>
                 </Button>
-                <Button variant="outline" class="w-full justify-start rounded-xl" as-child>
+                <Button variant="outline" class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal" as-child>
                     <Link :href="`/admin/dashboard/events/${event.id}/registrants`"><Users class="mr-2 size-4" />Manage registrants</Link>
                 </Button>
-                <Button v-if="laporanHref" variant="outline" class="w-full justify-start rounded-xl" as-child>
+                <Button
+                    v-if="laporanHref"
+                    variant="outline"
+                    class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal"
+                    as-child
+                >
                     <Link :href="laporanHref"><BarChart3 class="mr-2 size-4" />Laporan dan log kehadiran</Link>
                 </Button>
             </CardContent>
@@ -49,10 +54,10 @@ defineEmits<{
 
         <Card :class="['rounded-2xl border-border/60', cardShadow]">
             <CardHeader class="pb-3">
-                <CardTitle class="text-[13px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Data</CardTitle>
+                <CardTitle class="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Data</CardTitle>
             </CardHeader>
             <CardContent class="flex flex-col gap-2 pt-0">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
                     <Tooltip>
                         <TooltipTrigger as-child>
                             <Button variant="outline" size="sm" class="rounded-xl" as-child>
@@ -76,7 +81,7 @@ defineEmits<{
         <Card :class="['rounded-2xl border-border/60', cardShadow]">
             <CardHeader class="pb-3">
                 <div class="flex items-center justify-between">
-                    <CardTitle class="text-[13px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Forms</CardTitle>
+                    <CardTitle class="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Forms</CardTitle>
                     <span class="text-[11px] font-medium tabular-nums text-muted-foreground">{{ forms.length }}</span>
                 </div>
             </CardHeader>
@@ -100,7 +105,7 @@ defineEmits<{
 
         <Card :class="['rounded-2xl border-border/60', cardShadow]">
             <CardHeader class="pb-3">
-                <CardTitle class="text-[13px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Lifecycle</CardTitle>
+                <CardTitle class="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Lifecycle</CardTitle>
             </CardHeader>
             <CardContent class="flex flex-col gap-2 pt-0">
                 <Button

@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, reactive } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { useForm, usePage } from '@inertiajs/vue3'
 import { normalizeBannerSrc, pickFormBannerField } from '@/components/modules/builder/formBanner'
 import { getFormFieldOptionRows } from '@/lib/formFieldOptions'
 import { readFieldMetadata, readFieldRules, readMetaBoolean } from '@/lib/formFieldMetadata'
@@ -22,6 +22,9 @@ export function useFormFillPage(props: {
     memberSlots: number
     registrationMode: string
 }) {
+    const fields = props.fields ?? []
+    const page = usePage()
+
     function metadata(field: IFormField): FormFieldMetadataBag {
         return readFieldMetadata(field)
     }
@@ -42,7 +45,7 @@ export function useFormFillPage(props: {
         return ['heading', 'paragraph', 'divider', 'banner'].includes(bt)
     }
 
-    const formBannerField = computed(() => pickFormBannerField(props.fields))
+    const formBannerField = computed(() => pickFormBannerField(props.fields ?? []))
 
     const formBannerImageSrc = computed(() => {
         const fb = formBannerField.value
@@ -94,7 +97,7 @@ export function useFormFillPage(props: {
     })
 
     const initialValues: Record<string, FormFillAnswerValue | string[]> = {}
-    for (const field of props.fields) {
+    for (const field of fields) {
         if (isDisplayOnly(field)) continue
         if (field.type === 'checkbox' || (field.type === 'select' && readMetaBoolean(metadata(field), 'is_multiple'))) {
             initialValues[field.name] = []
@@ -110,7 +113,7 @@ export function useFormFillPage(props: {
     }
 
     if (props.registrationMode === 'bundle' && props.memberSlots > 0) {
-        for (const field of props.fields) {
+        for (const field of fields) {
             if (isDisplayOnly(field)) continue
             if (metadata(field).duplicatable !== true) continue
             for (let i = 0; i < props.memberSlots; i++) {
@@ -204,9 +207,31 @@ export function useFormFillPage(props: {
         return field.type === 'checkbox' || bt === 'checkbox' || isMultipleSelect(field)
     }
 
+    /** Batas karakter untuk teks pendek / panjang (metadata.rules + maxLength). */
+    function maxLengthForField(field: IFormField): number | undefined {
+        const bt = builderType(field)
+        if (bt !== 'short_text' && bt !== 'long_text') return undefined
+        const r = rules(field)
+        const rm = r.max
+        if (typeof rm === 'number' && rm > 0) return rm
+        if (typeof rm === 'string' && rm !== '') {
+            const n = parseInt(rm, 10)
+            if (Number.isFinite(n) && n > 0) return n
+        }
+        const meta = metadata(field)
+        const ml = meta.maxLength as unknown
+        if (typeof ml === 'number' && ml > 0) return ml
+        if (typeof ml === 'string' && ml.trim() !== '') {
+            const n = parseInt(ml, 10)
+            if (Number.isFinite(n) && n > 0) return n
+        }
+        return undefined
+    }
+
     function fileHint(field: IFormField): string {
         const parts: string[] = []
         const fieldRules = rules(field)
+        if (builderType(field) === 'image_upload') parts.push('Recommended: 1200 x 900 px (4:3)')
         if (fieldRules.mimes) parts.push(`Allowed: ${String(fieldRules.mimes)}`)
         if (fieldRules.max_size) parts.push(`Max size: ${String(fieldRules.max_size)} KB`)
         return parts.join(' · ')
@@ -246,6 +271,20 @@ export function useFormFillPage(props: {
 
     function submit() {
         if (isBlocked.value) return
+
+        const myEmail = (page.props as Props).auth?.user?.email?.trim().toLowerCase()
+        if (myEmail && props.memberSlots > 0) {
+            const emails = (answerForm.team_member_emails as string[] | undefined) ?? []
+            const clash = emails.some((e) => (e?.trim().toLowerCase() ?? '') === myEmail)
+            if (clash) {
+                answerForm.setError(
+                    'team_member_emails',
+                    'Email anggota tidak boleh sama dengan email akun Anda. Gunakan email peserta lain.',
+                )
+                return
+            }
+        }
+
         answerForm.post(props.submitUrl, {
             forceFormData: true,
         })
@@ -279,6 +318,7 @@ export function useFormFillPage(props: {
         isMultipleSelect,
         isRadioLike,
         isCheckboxLike,
+        maxLengthForField,
         fileHint,
         acceptValue,
         onCheckboxToggle,

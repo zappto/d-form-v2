@@ -32,6 +32,64 @@ onMounted(() => {
 </script>
 
 <template>
+    <div
+        v-if="!canTeleport"
+        class="mb-4 rounded-2xl border border-border/70 bg-card/95 p-3 shadow-sm sm:mb-5 sm:p-4"
+    >
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
+                <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 rounded-xl sm:mt-0" as-child>
+                    <Link :href="backHref" aria-label="Kembali ke daftar form">
+                        <ArrowLeft class="size-4" />
+                    </Link>
+                </Button>
+                <div class="min-w-0 flex-1">
+                    <p class="text-muted-foreground text-[11px] font-medium tracking-wide uppercase sm:text-xs">
+                        <span class="line-clamp-2 break-words lg:truncate">
+                            {{ toolbarSubtitle }}
+                        </span>
+                    </p>
+                    <h1 class="text-foreground mt-0.5 line-clamp-2 break-words text-base font-semibold tracking-tight sm:text-lg lg:truncate">
+                        {{ headingTitle || 'Form tanpa judul' }}
+                    </h1>
+                </div>
+            </div>
+            <div
+                class="
+                    flex w-full flex-wrap items-center justify-start gap-2
+                    sm:w-auto sm:justify-end sm:gap-2.5
+                "
+            >
+                <slot name="toolbar-extra" />
+                <Button
+                    variant="outline"
+                    size="sm"
+                    class="
+                        hidden rounded-full border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
+                        sm:inline-flex
+                    "
+                    :disabled="isEmpty"
+                    aria-label="Pratinjau formulir"
+                    @click="$emit('preview')"
+                >
+                    <Eye class="size-4 shrink-0 sm:hidden" aria-hidden="true" />
+                    <span>Pratinjau</span>
+                </Button>
+                <Button
+                    size="sm"
+                    class="
+                        hidden rounded-full px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
+                    "
+                    :disabled="processing"
+                    @click="$emit('save')"
+                >
+                    <span class="sm:hidden">Simpan</span>
+                    <span class="hidden sm:inline">{{ saveLabel }}</span>
+                </Button>
+            </div>
+        </div>
+    </div>
+
     <Teleport v-if="canTeleport" to="#dashboard-fb-nav-left">
         <div class="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
             <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 rounded-xl sm:mt-0" as-child>
@@ -53,39 +111,19 @@ onMounted(() => {
     </Teleport>
 
     <Teleport v-if="canTeleport" to="#dashboard-fb-nav-right">
-        <!-- Mobile: grid 2 kolom selebar baris; sm+: baris fleksibel seperti biasa -->
         <div
             class="
-                flex w-full flex-wrap items-center justify-end gap-2
-                max-sm:grid max-sm:grid-cols-2 max-sm:gap-2 max-sm:[&>*]:w-full
-                sm:w-auto sm:flex sm:gap-2.5
+                flex w-full flex-wrap items-center justify-start gap-2
+                sm:w-auto sm:justify-end sm:gap-2.5
             "
         >
             <slot name="toolbar-extra" />
-            <span
-                class="
-                    inline-flex max-w-full items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold uppercase
-                    max-sm:w-full max-sm:justify-center
-                    sm:px-2.5 sm:text-[11px]
-                "
-                :class="
-                    isReadyToSave
-                        ? 'border-success/25 bg-success/10 text-success'
-                        : 'border-warning/25 bg-warning/10 text-warning'
-                "
-                :title="isReadyToSave ? 'Semua validasi terpenuhi' : `${validationIssueCount} hal belum lengkap`"
-            >
-                <span class="size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
-                <span class="min-w-0 truncate">
-                    {{ isReadyToSave ? 'Siap' : `${validationIssueCount} isu` }}
-                </span>
-            </span>
             <Button
                 variant="outline"
                 size="sm"
                 class="
-                    rounded-full border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
-                    max-sm:h-11 max-sm:w-full max-sm:rounded-xl
+                    hidden rounded-full border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
+                    sm:inline-flex
                 "
                 :disabled="isEmpty"
                 aria-label="Pratinjau formulir"
@@ -97,8 +135,7 @@ onMounted(() => {
             <Button
                 size="sm"
                 class="
-                    rounded-full px-3 text-sm font-medium shadow-sm sm:px-4
-                    max-sm:h-11 max-sm:w-full max-sm:rounded-xl
+                    hidden rounded-full px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
                 "
                 :disabled="processing"
                 @click="$emit('save')"

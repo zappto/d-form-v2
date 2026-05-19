@@ -1,9 +1,19 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
+import { Button } from '@/components/ui/button'
 import { getFormFieldOptionRows, formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions'
 import { readFieldMetadata } from '@/lib/formFieldMetadata'
-import { Download, FileText, Maximize2, Image as ImageIcon } from 'lucide-vue-next'
+import { cn } from '@/lib/utils'
+import {
+    Download,
+    FileText,
+    FileImage,
+    ExternalLink,
+    Maximize2,
+    Image as ImageIcon,
+    X,
+} from 'lucide-vue-next'
 
 const props = defineProps<{
     /** When null, file detection uses a light heuristic (e.g. form-uploads paths). */
@@ -70,6 +80,11 @@ function isImageHref(href: string): boolean {
     return /\.(jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(path)
 }
 
+function isPdfHref(href: string): boolean {
+    const path = (href.split('?')[0] ?? '').toLowerCase()
+    return path.endsWith('.pdf')
+}
+
 function basenameFromHref(href: string | null): string {
     if (!href) {
         return 'berkas'
@@ -118,6 +133,27 @@ const preferImagePreview = computed((): boolean => {
     }
     return isImageHref(publicFileUrl.value)
 })
+
+const isPdfPreview = computed((): boolean => {
+    if (!publicFileUrl.value) {
+        return false
+    }
+    return isPdfHref(publicFileUrl.value)
+})
+
+const attachmentCardClass = cn(
+    'overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm',
+    'ring-1 ring-black/[0.04] dark:ring-white/[0.06]',
+)
+
+const attachmentToolbarClass = cn(
+    'flex flex-col gap-3 border-b border-border/40 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5',
+    'bg-gradient-to-b from-muted/[0.35] to-card/80',
+)
+
+function openFileInNewTab(url: string): void {
+    window.open(url, '_blank', 'noopener,noreferrer')
+}
 
 const isMultipleChoice = computed((): boolean => {
     if (!props.field) {
@@ -190,62 +226,163 @@ async function downloadStoredFile(url: string, suggestedName: string): Promise<v
         a.remove()
     }
 }
+
+/** Label singkat jenis lampiran untuk toolbar */
+const attachmentKindLabel = computed((): string => {
+    if (!publicFileUrl.value) return 'Berkas'
+    if (preferImagePreview.value) return 'Gambar'
+    if (isPdfPreview.value) return 'PDF'
+    return 'Berkas'
+})
 </script>
 
 <template>
     <div class="space-y-3">
         <template v-if="treatsAsFile && publicFileUrl">
-            <!-- Gambar: pratinjau + lightbox -->
-            <div v-if="preferImagePreview" class="space-y-3">
+            <!-- Gambar: toolbar + area pratinjau terpisah, tanpa footer tebal -->
+            <div v-if="preferImagePreview" :class="attachmentCardClass">
+                <div :class="attachmentToolbarClass">
+                    <div class="flex min-w-0 items-center gap-3">
+                        <div
+                            class="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-500/[0.12] text-emerald-700 dark:text-emerald-400"
+                            aria-hidden="true"
+                        >
+                            <FileImage class="size-5" stroke-width="2" />
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                                {{ attachmentKindLabel }}
+                            </p>
+                            <p class="truncate text-sm font-semibold text-foreground" :title="storedFileLabel">
+                                {{ storedFileLabel }}
+                            </p>
+                        </div>
+                    </div>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        class="h-9 shrink-0 gap-1.5 rounded-lg px-3 text-[13px] font-medium"
+                        @click="openLightbox(publicFileUrl)"
+                    >
+                        <Maximize2 class="size-3.5 opacity-80" aria-hidden="true" />
+                        Layar penuh
+                    </Button>
+                </div>
                 <button
                     type="button"
-                    class="group relative w-full overflow-hidden rounded-xl border border-border/80 bg-muted/20 text-left ring-offset-background transition hover:border-primary/35 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    class="group relative w-full bg-muted/20 p-4 text-left transition-colors hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     @click="openLightbox(publicFileUrl)"
                 >
-                    <div class="flex items-center justify-center px-2 py-3 sm:py-4">
-                        <img
-                            :src="publicFileUrl"
-                            alt="Pratinjau lampiran"
-                            class="max-h-[min(14rem,40vh)] max-w-full rounded-lg object-contain shadow-sm transition group-hover:opacity-[0.97]"
-                            loading="lazy"
-                        />
-                    </div>
-                    <div
-                        class="flex items-center justify-center gap-2 border-t border-border/60 bg-card/40 px-3 py-2.5 text-[0.8125rem] font-medium text-muted-foreground group-hover:text-foreground"
-                    >
-                        <Maximize2 class="size-3.5 shrink-0 opacity-70" aria-hidden="true" />
-                        <span>Buka ukuran penuh</span>
-                    </div>
+                    <img
+                        :src="publicFileUrl"
+                        alt=""
+                        class="mx-auto max-h-[min(15rem,44vh)] max-w-full rounded-lg object-contain shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:opacity-[0.98] dark:ring-white/10"
+                        loading="lazy"
+                    />
                 </button>
-                <p class="text-[0.75rem] leading-relaxed text-muted-foreground">
-                    Tampilan memenuhi layar. Tutup dengan tombol silang, klik area gelap, atau tombol
-                    <kbd class="rounded border border-border bg-muted px-1 py-px text-[0.65rem]">Esc</kbd>.
-                </p>
             </div>
 
-            <!-- Berkas non-gambar: nama file + unduh -->
-            <button
-                v-else
-                type="button"
-                class="flex w-full max-w-full items-center gap-3 rounded-xl border border-border/80 bg-card/40 px-3.5 py-3 text-left transition hover:border-primary/30 hover:bg-muted/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                @click="downloadStoredFile(publicFileUrl, storedFileLabel)"
-            >
-                <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <FileText class="size-5" aria-hidden="true" />
-                </span>
-                <span class="min-w-0 flex-1">
-                    <span class="block text-[0.6875rem] font-medium text-muted-foreground"> Nama berkas </span>
-                    <span class="mt-0.5 block truncate text-[0.875rem] font-semibold text-foreground" :title="storedFileLabel">
-                        {{ storedFileLabel }}
-                    </span>
-                </span>
-                <span
-                    class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border/70 bg-background px-2.5 py-1.5 text-[0.75rem] font-medium text-primary"
+            <!-- PDF: toolbar + viewport iframe -->
+            <div v-else-if="isPdfPreview" :class="attachmentCardClass">
+                <div :class="attachmentToolbarClass">
+                    <div class="flex min-w-0 items-center gap-3">
+                        <div
+                            class="grid size-10 shrink-0 place-items-center rounded-xl bg-rose-500/[0.11] text-rose-700 dark:text-rose-300"
+                            aria-hidden="true"
+                        >
+                            <FileText class="size-5" stroke-width="2" />
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                                {{ attachmentKindLabel }}
+                            </p>
+                            <p class="truncate text-sm font-semibold text-foreground" :title="storedFileLabel">
+                                {{ storedFileLabel }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            class="h-9 gap-1.5 rounded-lg px-3 text-[13px]"
+                            @click="openFileInNewTab(publicFileUrl)"
+                        >
+                            <ExternalLink class="size-3.5" aria-hidden="true" />
+                            Tab baru
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            class="h-9 gap-1.5 rounded-lg px-3 text-[13px] text-foreground"
+                            @click="downloadStoredFile(publicFileUrl, storedFileLabel)"
+                        >
+                            <Download class="size-3.5 opacity-80" aria-hidden="true" />
+                            Unduh
+                        </Button>
+                    </div>
+                </div>
+                <div class="bg-muted/20 p-3 sm:p-4">
+                    <div
+                        class="overflow-hidden rounded-xl bg-background shadow-inner ring-1 ring-border/50 dark:bg-background/80"
+                    >
+                        <iframe
+                            :src="publicFileUrl"
+                            title="Pratinjau PDF"
+                            class="h-[min(22rem,50vh)] w-full border-0"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Berkas lain: kartu kompak satu baris aksi -->
+            <div v-else :class="attachmentCardClass">
+                <div
+                    class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-5"
                 >
-                    <Download class="size-3.5" aria-hidden="true" />
-                    Unduh
-                </span>
-            </button>
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <div
+                            class="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"
+                            aria-hidden="true"
+                        >
+                            <FileText class="size-5" stroke-width="2" />
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                                {{ attachmentKindLabel }}
+                            </p>
+                            <p class="truncate text-sm font-semibold text-foreground" :title="storedFileLabel">
+                                {{ storedFileLabel }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto sm:justify-end">
+                        <Button
+                            type="button"
+                            variant="default"
+                            size="sm"
+                            class="h-9 flex-1 gap-1.5 rounded-lg px-4 text-[13px] sm:flex-initial"
+                            @click="openFileInNewTab(publicFileUrl)"
+                        >
+                            <ExternalLink class="size-3.5" aria-hidden="true" />
+                            Buka
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            class="h-9 flex-1 gap-1.5 rounded-lg px-4 text-[13px] sm:flex-initial"
+                            @click="downloadStoredFile(publicFileUrl, storedFileLabel)"
+                        >
+                            <Download class="size-3.5" aria-hidden="true" />
+                            Unduh
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </template>
 
         <ul v-else-if="showChoiceMedia && matchedOptionRows.length > 0" class="flex flex-col gap-2.5">
@@ -275,24 +412,32 @@ async function downloadStoredFile(url: string, suggestedName: string): Promise<v
         <Teleport to="body">
             <div
                 v-if="lightboxUrl"
-                class="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-black/88 p-4 backdrop-blur-[2px]"
+                class="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
                 role="dialog"
                 aria-modal="true"
-                aria-label="Pratinjau gambar ukuran penuh"
+                aria-label="Pratinjau gambar"
                 @click.self="closeLightbox"
             >
-                <button
-                    type="button"
-                    class="absolute top-3 right-3 z-10 flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg font-light text-white backdrop-blur-sm transition hover:bg-white/20"
-                    aria-label="Tutup"
-                    @click="closeLightbox"
-                >
-                    ×
-                </button>
+                <div class="absolute top-0 right-0 left-0 z-10 flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
+                    <p class="min-w-0 flex-1 truncate text-xs font-medium text-white/80">
+                        <span class="hidden sm:inline">Pratinjau lampiran · ketuk luar gambar atau tutup</span>
+                        <span class="sm:hidden">Pratinjau</span>
+                    </p>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon-sm"
+                        class="shrink-0 rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/20"
+                        aria-label="Tutup pratinjau"
+                        @click="closeLightbox"
+                    >
+                        <X class="size-4" aria-hidden="true" />
+                    </Button>
+                </div>
                 <img
                     :src="lightboxUrl"
-                    alt="Lampiran gambar"
-                    class="max-h-[min(92dvh,900px)] max-w-full rounded-lg object-contain shadow-2xl"
+                    alt=""
+                    class="max-h-[min(88dvh,920px)] max-w-full rounded-xl object-contain shadow-2xl ring-1 ring-white/10"
                     @click.stop
                 />
             </div>

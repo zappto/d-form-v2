@@ -74,7 +74,7 @@ function isImageFileUrl(value: string): boolean {
         </div>
 
         <div class="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-            <div class="relative h-44 w-full sm:h-52">
+            <div class="relative aspect-video w-full sm:aspect-[3/1]">
                 <EventBannerImage :src="props.event.banner_url" :alt="props.event.title" />
             </div>
             <div class="border-t border-border px-4 py-4 sm:px-6">

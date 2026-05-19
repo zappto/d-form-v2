@@ -21,6 +21,7 @@ defineProps<{
         <PageHeader
             title="Buat acara"
             subtitle="Lengkapi informasi berikut. Simpan dulu sebagai draf atau langsung terbitkan jika sudah siap."
+            back-href="/admin/dashboard/events"
         />
 
         <EventDashboardForm variant="create" :options="options" />

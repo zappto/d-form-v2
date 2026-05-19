@@ -39,25 +39,39 @@ const emit = defineEmits<{
 }>()
 
 const TYPE_CONFIG = {
-    short_text: { icon: Type, label: 'Short Text', accent: '#2563eb' },
-    long_text: { icon: AlignLeft, label: 'Long Text', accent: '#4f46e5' },
+    short_text: { icon: Type, label: 'Teks pendek', accent: '#2563eb' },
+    long_text: { icon: AlignLeft, label: 'Teks panjang', accent: '#4f46e5' },
     email: { icon: Mail, label: 'Email', accent: '#0891b2' },
-    phone: { icon: Phone, label: 'Phone', accent: '#059669' },
-    number: { icon: Hash, label: 'Number', accent: '#d97706' },
+    phone: { icon: Phone, label: 'Telepon', accent: '#059669' },
+    number: { icon: Hash, label: 'Angka', accent: '#d97706' },
     dropdown: { icon: ChevronDown, label: 'Dropdown', accent: '#7c3aed' },
-    checkbox: { icon: SquareCheck, label: 'Checkbox', accent: '#db2777' },
-    radio: { icon: CircleDot, label: 'Radio', accent: '#e11d48' },
-    image_upload: { icon: ImagePlus, label: 'Image', accent: '#0d9488' },
+    checkbox: { icon: SquareCheck, label: 'Centang', accent: '#db2777' },
+    radio: { icon: CircleDot, label: 'Pilihan tunggal', accent: '#e11d48' },
+    image_upload: { icon: ImagePlus, label: 'Gambar', accent: '#0d9488' },
     file_upload: { icon: Upload, label: 'File', accent: '#475569' },
-    date: { icon: Calendar, label: 'Date', accent: '#7c3aed' },
-    time: { icon: Clock, label: 'Time', accent: '#059669' },
+    date: { icon: Calendar, label: 'Tanggal', accent: '#7c3aed' },
+    time: { icon: Clock, label: 'Waktu', accent: '#059669' },
     rating: { icon: Star, label: 'Rating', accent: '#f59e0b' },
-    heading: { icon: HeadingIcon, label: 'Heading', accent: '#1a1a2e' },
-    paragraph: { icon: TextCursorInput, label: 'Paragraph', accent: '#6b7280' },
-    divider: { icon: Minus, label: 'Divider', accent: '#9ca3af' },
+    heading: { icon: HeadingIcon, label: 'Judul', accent: '#1a1a2e' },
+    paragraph: { icon: TextCursorInput, label: 'Paragraf', accent: '#6b7280' },
+    divider: { icon: Minus, label: 'Pemisah', accent: '#9ca3af' },
 }
 
 const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text)
+
+/** Petunjuk di kanvas bila admin belum mengisi placeholder — hanya tampilan, bukan nilai tersimpan. */
+function canvasPlaceholder(f: BuilderField): string {
+    const custom = String(f.placeholder ?? '').trim()
+    if (custom) return custom
+    const byType: Record<string, string> = {
+        short_text: 'Ketik jawaban singkat…',
+        long_text: 'Tulis jawaban di sini…',
+        email: 'nama@email.com',
+        phone: 'Nomor WhatsApp / telepon',
+        number: 'Masukkan angka',
+    }
+    return byType[f.type] ?? 'Ketik di sini…'
+}
 
 const filledStars = computed(() => props.field.metadata?.maxStars ?? 5)
 
@@ -99,14 +113,14 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
             <div class="flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                 <button
                     class="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
-                    title="Duplicate"
+                    title="Gandakan"
                     @click.stop="emit('duplicate')"
                 >
                     <Copy class="size-3.5" />
                 </button>
                 <button
                     class="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-destructive/10 hover:text-destructive"
-                    title="Delete"
+                    title="Hapus"
                     @click.stop="emit('delete')"
                 >
                     <Trash2 class="size-3.5" />
@@ -130,21 +144,39 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                 <!-- Short text / Email / Phone / Number -->
                 <div
                     v-if="['short_text', 'email', 'phone', 'number'].includes(field.type)"
-                    class="rounded-xl border border-border bg-muted/25 px-4 py-3"
+                    class="rounded-xl border border-border bg-muted/25 p-2"
                 >
-                    <span class="text-sm text-muted-foreground/75">
-                        {{ field.placeholder || `Masukkan ${config.label.toLowerCase()}…` }}
-                    </span>
+                    <input
+                        :type="
+                            field.type === 'email'
+                                ? 'email'
+                                : field.type === 'phone'
+                                  ? 'tel'
+                                  : field.type === 'number'
+                                    ? 'text'
+                                    : 'text'
+                        "
+                        readonly
+                        tabindex="-1"
+                        value=""
+                        :inputmode="field.type === 'number' ? 'decimal' : undefined"
+                        :placeholder="canvasPlaceholder(field)"
+                        class="pointer-events-none h-11 w-full rounded-full border border-border/80 bg-background px-4 text-sm text-foreground shadow-xs placeholder:text-muted-foreground/70"
+                    />
                 </div>
 
                 <!-- Long text -->
                 <div
                     v-else-if="field.type === 'long_text'"
-                    class="rounded-xl border border-border bg-muted/25 px-4 py-3"
+                    class="rounded-xl border border-border bg-muted/25 p-2"
                 >
-                    <span class="text-sm text-muted-foreground/75">
-                        {{ field.placeholder || 'Jawaban panjang…' }}
-                    </span>
+                    <textarea
+                        readonly
+                        tabindex="-1"
+                        rows="3"
+                        :placeholder="canvasPlaceholder(field)"
+                        class="pointer-events-none min-h-[4.75rem] w-full resize-none rounded-xl border border-border/80 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70"
+                    ></textarea>
                     <div class="mt-4 space-y-2 border-t border-dashed border-border/70 pt-3">
                         <div class="h-2 w-2/3 rounded-full bg-muted/70"></div>
                         <div class="h-2 w-1/2 rounded-full bg-muted/50"></div>
@@ -156,7 +188,9 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     <div
                         class="flex items-center justify-between rounded-xl border border-border bg-muted/25 px-4 py-3"
                     >
-                        <span class="text-sm text-muted-foreground/75">Pilih opsi…</span>
+                        <span class="text-sm text-muted-foreground/75">{{
+                            String(field.placeholder ?? '').trim() || 'Pilih salah satu…'
+                        }}</span>
                         <ChevronDown class="size-4 text-muted-foreground/50" />
                     </div>
                     <div class="space-y-1.5 rounded-xl border border-border/70 bg-card p-2.5">
@@ -232,8 +266,14 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     >
                         <ImagePlus class="size-5" />
                     </div>
-                    <p class="text-xs font-semibold text-muted-foreground">Click or drag to upload</p>
-                    <p class="mt-0.5 text-[10px] text-muted-foreground/60">PNG, JPG up to 5MB</p>
+                    <p class="text-xs font-semibold text-muted-foreground">Ketuk atau jatuhkan gambar di sini</p>
+                    <p class="mt-0.5 text-[10px] text-muted-foreground/60">PNG, JPG hingga 5 MB</p>
+                    <div class="mt-2 flex flex-wrap justify-center gap-1">
+                        <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">4:3</span>
+                        <span class="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
+                            >tengah</span
+                        >
+                    </div>
                 </div>
 
                 <!-- File upload -->
@@ -246,49 +286,64 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     >
                         <Upload class="size-5" />
                     </div>
-                    <p class="text-xs font-semibold text-muted-foreground">Upload a file</p>
-                    <p class="mt-0.5 text-[10px] text-muted-foreground/60">PDF, DOC, XLS up to 10MB</p>
+                    <p class="text-xs font-semibold text-muted-foreground">Unggah file di sini</p>
+                    <p class="mt-0.5 text-[10px] text-muted-foreground/60">PDF, DOC, XLS hingga 10 MB</p>
                 </div>
 
                 <!-- File upload -->
                 <div
                     v-else-if="field.type === 'date'"
-                    class="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
+                    class="rounded-xl border border-border bg-muted/25 p-2"
                 >
-                    <Calendar class="size-4 shrink-0 text-muted-foreground/50" />
-                    <span class="text-xs text-muted-foreground/60">dd/mm/yyyy</span>
+                    <input
+                        type="text"
+                        readonly
+                        tabindex="-1"
+                        value=""
+                        :placeholder="String(field.placeholder ?? '').trim() || 'Pilih tanggal'"
+                        class="pointer-events-none h-11 w-full rounded-full border border-border/80 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/70"
+                    />
                 </div>
 
                 <!-- Time -->
                 <div
                     v-else-if="field.type === 'time'"
-                    class="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5"
+                    class="rounded-xl border border-border bg-muted/25 p-2"
                 >
-                    <Clock class="size-4 shrink-0 text-muted-foreground/50" />
-                    <span class="text-xs text-muted-foreground/60">--:-- AM</span>
+                    <input
+                        type="text"
+                        readonly
+                        tabindex="-1"
+                        value=""
+                        :placeholder="String(field.placeholder ?? '').trim() || 'Pilih jam (contoh: 09:30)'"
+                        class="pointer-events-none h-11 w-full rounded-full border border-border/80 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/70"
+                    />
                 </div>
 
                 <!-- Rating -->
-                <div v-else-if="field.type === 'rating'" class="flex gap-1.5">
-                    <Star
-                        v-for="i in filledStars"
-                        :key="i"
-                        class="size-6 text-amber-400"
-                        :fill="i <= 3 ? '#fbbf24' : 'none'"
-                    />
+                <div v-else-if="field.type === 'rating'" class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                        <Star
+                            v-for="i in filledStars"
+                            :key="i"
+                            class="size-6 text-amber-400"
+                            :fill="i <= 3 ? '#fbbf24' : 'none'"
+                        />
+                    </div>
+                    <p class="text-[10px] text-muted-foreground/80">Tap bintang untuk nilai</p>
                 </div>
 
                 <!-- Heading -->
                 <div v-else-if="field.type === 'heading'">
                     <h3 class="font-display text-lg font-bold text-foreground">
-                        {{ field.metadata?.content || 'Section Heading' }}
+                        {{ field.metadata?.content || 'Judul bagian' }}
                     </h3>
                 </div>
 
                 <!-- Paragraph -->
                 <div v-else-if="field.type === 'paragraph'">
                     <p class="text-sm leading-relaxed text-muted-foreground">
-                        {{ field.metadata?.content || 'Add descriptive text to guide users through your form.' }}
+                        {{ field.metadata?.content || 'Teks penjelasan untuk pengisi form.' }}
                     </p>
                 </div>
 

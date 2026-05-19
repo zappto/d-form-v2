@@ -23,17 +23,12 @@ defineProps<{
 
 <template>
     <section
-        :class="[
-            'overflow-hidden rounded-3xl border border-border/60 bg-card ring-1 ring-black/5',
-            cardShadow,
-        ]"
+        :class="['overflow-hidden rounded-2xl border border-border/60 bg-card ring-1 ring-black/5 sm:rounded-3xl', cardShadow]"
     >
         <!-- Banner dan konten terpisah (tanpa margin negatif / scale) agar gambar tidak menumpuk teks -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 lg:items-stretch">
-            <div class="relative isolate w-full overflow-hidden bg-muted lg:col-span-5">
-                <div
-                    class="aspect-[5/3] w-full max-h-[220px] sm:aspect-[16/9] sm:max-h-[260px] lg:aspect-auto lg:h-full lg:min-h-[292px] lg:max-h-none"
-                >
+        <div class="grid min-w-0 grid-cols-1 lg:grid-cols-12 lg:items-stretch">
+            <div class="relative isolate w-full min-w-0 overflow-hidden bg-muted lg:col-span-5">
+                <div class="aspect-video w-full sm:aspect-[3/1] lg:aspect-auto lg:h-full lg:min-h-[292px]">
                     <EventBannerImage
                         :src="event.banner_url ?? event.banner"
                         :alt="event.title"
@@ -42,7 +37,7 @@ defineProps<{
                 </div>
             </div>
 
-            <div class="flex flex-col gap-6 px-5 py-6 sm:px-7 sm:py-7 lg:col-span-7 lg:justify-between lg:px-8 lg:py-8">
+            <div class="flex min-w-0 flex-col gap-5 px-4 py-5 sm:gap-6 sm:px-7 sm:py-7 lg:col-span-7 lg:justify-between lg:px-8 lg:py-8">
                 <div class="flex min-w-0 flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
                         <span
@@ -68,19 +63,19 @@ defineProps<{
                     <div>
                         
                         <h1
-                            class="text-balance text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl lg:text-[1.85rem] lg:leading-snug"
+                            class="text-balance break-words text-[1.45rem] font-semibold leading-[1.12] tracking-tight text-foreground sm:text-3xl lg:text-[1.85rem] lg:leading-snug"
                         >
                             {{ event.title }}
                         </h1>
-                        <p class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
+                        <p class="mt-3 flex flex-col gap-1.5 text-[0.9375rem] leading-relaxed text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3">
                             <span class="inline-flex min-w-0 items-center gap-1.5">
                                 <CalendarDays class="size-3.5 shrink-0 text-primary/80" aria-hidden="true" />
                                 {{ formatDate(event.start_date) }}
                             </span>
-                            <span class="text-border" aria-hidden="true">·</span>
+                            <span class="hidden text-border sm:inline" aria-hidden="true">·</span>
                             <span class="inline-flex min-w-0 items-center gap-1.5">
                                 <MapPin class="size-3.5 shrink-0 text-primary/80" aria-hidden="true" />
-                                <span class="truncate">{{ event.location }}</span>
+                                <span class="break-words sm:truncate">{{ event.location }}</span>
                             </span>
                         </p>
                     </div>
@@ -88,12 +83,12 @@ defineProps<{
                     
                 </div>
 
-                <div class="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
+                <div class="grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3">
                     <div
                         v-for="m in metaBlocks"
                         :key="m.title"
                         :class="[
-                            'flex min-h-[4.25rem] items-center gap-3 rounded-2xl border border-border/60 bg-muted/25 p-3 sm:p-3.5',
+                            'flex min-h-[4.25rem] min-w-0 items-center gap-3 rounded-2xl border border-border/60 bg-muted/25 p-3 sm:p-3.5',
                             'transition-colors hover:border-primary/25 hover:bg-muted/40',
                             cardShadow,
                         ]"
@@ -108,7 +103,7 @@ defineProps<{
                                 {{ m.title }}
                             </p>
                             <p
-                                class="mt-0.5 line-clamp-2 text-[13px] font-medium leading-snug text-foreground sm:line-clamp-none sm:truncate"
+                                class="mt-0.5 line-clamp-2 break-words text-[13px] font-medium leading-snug text-foreground lg:line-clamp-none lg:truncate"
                             >
                                 {{ m.value }}
                             </p>

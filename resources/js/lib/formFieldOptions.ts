@@ -151,7 +151,7 @@ function parseOptionChoicesRows(value: unknown, builderType: string): FormFillOp
     if (source.length === 0) return []
 
     const rows: FormFillOptionRow[] = []
-    for (const [i, item] of source.entries()) {
+    for (const item of source) {
         if (typeof item === 'string') {
             const label = asNonEmptyString(item)
             if (!label) continue
@@ -166,7 +166,7 @@ function parseOptionChoicesRows(value: unknown, builderType: string): FormFillOp
             asNonEmptyString(typedItem.value) ??
             asNonEmptyString(typedItem.text) ??
             asNonEmptyString(typedItem.name) ??
-            `Option ${i + 1}`
+            ''
 
         const rawType = asNonEmptyString(typedItem.type)
         const isImageType = rawType === 'image'
@@ -202,8 +202,8 @@ export function getFormFieldOptionRows(field: IFormField): FormFillOptionRow[] {
     if (parsedFieldOptionsRows.length > 0) {
         return parsedFieldOptionsRows
     }
-    return fallbackOptionLabels(field).map((label, i) => ({
+    return fallbackOptionLabels(field).map((label) => ({
         type: 'text' as const,
-        label: label || `Option ${i + 1}`,
+        label,
     }))
 }

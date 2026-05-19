@@ -44,7 +44,7 @@ const upcomingEvents = dummyEvents
                         :href="`/user/dashboard/events/${event.slug}`"
                     class="flex items-center gap-4 rounded-lg border p-3 transition-colors hover:bg-muted/30"
                 >
-                    <div class="h-12 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
+                    <div class="aspect-[4/3] w-20 shrink-0 overflow-hidden rounded-md bg-muted">
                         <img :src="event.banner_url ?? ''" :alt="event.title" class="h-full w-full object-cover" />
                     </div>
                     <div class="min-w-0 flex-1">

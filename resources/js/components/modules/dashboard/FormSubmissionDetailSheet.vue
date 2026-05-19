@@ -146,7 +146,7 @@ defineEmits<{
                             </p>
                             <FormFieldAnswerDisplay
                                 :field="fieldForKey(key)"
-                                :value="submission?.answers[key]"
+                                :value="submission?.answers?.[key]"
                             />
                         </div>
                     </div>

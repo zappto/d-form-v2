@@ -134,88 +134,74 @@ useEventListener('keydown', (e) => {
 watch(currentPath, () => {
     accountMenuOpen.value = false;
 });
+
+/** URL logo publik — dibentuk saat runtime agar Vite tidak mem-bundel path file PNG. */
+const sidebarLogoSrc = `/${encodeURIComponent('DForm 1.png')}`;
 </script>
 
 <template>
     <Sidebar collapsible="icon" variant="sidebar" class="border-sidebar-border bg-sidebar border-r">
-        <SidebarHeader class="gap-3 px-3 pt-4 pb-2">
-            <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton
-                        size="lg"
-                        as-child
-                        class="border-sidebar-border/90 bg-card/90 h-auto border shadow-xs"
-                    >
-                        <Link
-                            :href="canManageEvents ? '/admin/dashboard' : '/user/dashboard/overview'"
-                            class="flex items-center justify-center gap-3 py-2.5"
-                            @click="closeMobileIfNeeded"
-                        >
-                            <img src="/public/DForm%201.png" alt="DOSCOM" class="h-9 w-auto shrink-0" />
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            </SidebarMenu>
+        <SidebarHeader class="gap-0 border-b border-sidebar-border/50 p-0">
+            <Link
+                :href="canManageEvents ? '/admin/dashboard' : '/user/dashboard/overview'"
+                class="hover:bg-sidebar-accent/25 flex w-full items-center px-4 py-3.5 transition-colors"
+                @click="closeMobileIfNeeded"
+            >
+                <img
+                    :src="sidebarLogoSrc"
+                    alt="DForm"
+                    class="h-auto w-full max-h-9 object-contain object-center select-none group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:max-h-8 group-data-[collapsible=icon]:object-contain"
+                    width="160"
+                    height="40"
+                />
+            </Link>
         </SidebarHeader>
 
-        <SidebarSeparator class="mx-3 opacity-60" />
+        <SidebarContent class="flex-1 px-2.5 pb-3 pt-3">
+            <SidebarGroup class="p-0">
+                <SidebarGroupLabel
+                    class="text-sidebar-foreground/45 mb-2 px-2 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                >
+                    Menu utama
+                </SidebarGroupLabel>
+                <SidebarGroupContent class="space-y-0.5">
+                    <SidebarMenu class="gap-0.5">
+                        <SidebarMenuItem v-for="item in mainNavItems" :key="item.href">
+                            <SidebarMenuButton as-child :is-active="isActive(item.href)" :tooltip="item.label">
+                                <Link :href="item.href" class="gap-3 rounded-lg" @click="closeMobileIfNeeded">
+                                    <component :is="item.icon" class="size-4 shrink-0 opacity-90" />
+                                    <span class="font-medium">{{ item.label }}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarGroupContent>
+            </SidebarGroup>
 
-        <SidebarContent class="px-3 pb-3">
-            <div
-                class="border-sidebar-border/80 bg-card/40 rounded-2xl border p-2 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] dark:shadow-none"
-            >
-                <SidebarGroup class="space-y-0 p-0">
-                    <SidebarGroupLabel
-                        class="text-sidebar-foreground/55 px-2 pt-1 pb-1.5 text-[10px] font-semibold tracking-[0.12em] uppercase"
-                    >
-                        Menu utama
-                    </SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu class="gap-0.5">
-                            <SidebarMenuItem v-for="item in mainNavItems" :key="item.href">
-                                <SidebarMenuButton as-child :is-active="isActive(item.href)" :tooltip="item.label">
-                                    <Link :href="item.href" class="gap-3" @click="closeMobileIfNeeded">
-                                        <component :is="item.icon" class="size-4 shrink-0" />
-                                        <span>{{ item.label }}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+            <SidebarSeparator class="bg-sidebar-border/60 my-3 opacity-80" />
 
-                <SidebarSeparator class="bg-sidebar-border/70 my-2" />
-
-                <SidebarGroup class="space-y-0 p-0">
-                    <SidebarGroupLabel
-                        class="text-sidebar-foreground/55 px-2 pt-1 pb-1.5 text-[10px] font-semibold tracking-[0.12em] uppercase"
-                    >
-                        Kelola
-                    </SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu class="gap-0.5">
-                            <SidebarMenuItem v-for="item in managementItems" :key="item.href">
-                                <SidebarMenuButton as-child :is-active="isActive(item.href)" :tooltip="item.label">
-                                    <Link :href="item.href" class="gap-3" @click="closeMobileIfNeeded">
-                                        <component :is="item.icon" class="size-4 shrink-0" />
-                                        <span>{{ item.label }}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </div>
+            <SidebarGroup class="p-0">
+                <SidebarGroupLabel
+                    class="text-sidebar-foreground/45 mb-2 px-2 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                >
+                    Kelola
+                </SidebarGroupLabel>
+                <SidebarGroupContent class="space-y-0.5">
+                    <SidebarMenu class="gap-0.5">
+                        <SidebarMenuItem v-for="item in managementItems" :key="item.href">
+                            <SidebarMenuButton as-child :is-active="isActive(item.href)" :tooltip="item.label">
+                                <Link :href="item.href" class="gap-3 rounded-lg" @click="closeMobileIfNeeded">
+                                    <component :is="item.icon" class="size-4 shrink-0 opacity-90" />
+                                    <span class="font-medium">{{ item.label }}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarGroupContent>
+            </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter
-            class="border-sidebar-border/70 bg-sidebar-accent/15 mt-auto border-t px-2 pt-2 pb-4 backdrop-blur-[2px]"
-        >
-            <p
-                class="text-sidebar-foreground/50 mb-1.5 px-1.5 text-[10px] font-medium tracking-wide uppercase group-data-[collapsible=icon]:sr-only"
-            >
-                Akun
-            </p>
+        <SidebarFooter class="border-sidebar-border/60 mt-auto border-t p-2.5">
             <SidebarMenu>
                 <SidebarMenuItem class="relative overflow-visible">
                     <div ref="accountMenuRootRef" class="relative w-full overflow-visible">
@@ -225,30 +211,26 @@ watch(currentPath, () => {
                             :aria-expanded="accountMenuOpen"
                             aria-haspopup="menu"
                             aria-controls="dashboard-account-menu"
-                            class="border-sidebar-border bg-card/90 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-sidebar-ring flex h-12 w-full items-center gap-2 overflow-hidden rounded-xl border p-2 text-left text-sm font-medium shadow-xs transition-[background-color,box-shadow,border-color] outline-none focus-visible:ring-2 active:scale-[0.99] [&>svg]:size-4"
-                            :class="
-                                accountMenuOpen
-                                    ? 'border-primary/25 bg-sidebar-accent ring-primary/15 shadow-sm ring-1'
-                                    : ''
-                            "
+                            class="text-sidebar-foreground hover:bg-sidebar-accent/80 flex h-11 w-full items-center gap-2.5 overflow-hidden rounded-lg px-2 py-1.5 text-left text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+                            :class="accountMenuOpen ? 'bg-sidebar-accent/90 ring-1 ring-primary/20' : ''"
                             @click="toggleAccountMenu"
                         >
                             <UserAvatarFallback
                                 :src="user?.avatar ?? null"
                                 :seed="userAvatarSeed(user)"
-                                avatar-class="size-8 shrink-0 rounded-lg"
-                                fallback-round-class="rounded-lg"
+                                avatar-class="size-8 shrink-0 rounded-md"
+                                fallback-round-class="rounded-md"
                             />
                             <div class="min-w-0 flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                                 <span class="text-sidebar-foreground block truncate text-xs font-semibold">{{
                                     user?.name ?? 'Pengguna'
                                 }}</span>
-                                <span class="text-sidebar-foreground/55 mt-0.5 block truncate text-[10px]">
-                                    {{ roleLabel }} · Menu akun
+                                <span class="text-sidebar-foreground/50 mt-0.5 block truncate text-[10px]">
+                                    {{ roleLabel }}
                                 </span>
                             </div>
                             <ChevronsUpDown
-                                class="text-sidebar-foreground/35 size-4 shrink-0 transition-transform group-data-[collapsible=icon]:hidden"
+                                class="text-sidebar-foreground/40 size-4 shrink-0 transition-transform group-data-[collapsible=icon]:hidden"
                                 :class="accountMenuOpen ? 'rotate-180' : ''"
                             />
                         </button>

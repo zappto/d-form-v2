@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props -- ctx.answerForm is Inertia useForm */
 import { computed, onBeforeUnmount, ref, watch, type UnwrapNestedRefs } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -61,6 +62,9 @@ interface FoundUser {
 const props = defineProps<{
     ctx: UnwrapNestedRefs<FormFillPageContext>
 }>()
+
+const page = usePage()
+const currentUserEmail = computed(() => (page.props as Props).auth?.user?.email?.trim().toLowerCase() ?? '')
 
 const expandedBySlot = ref<Record<number, boolean>>({})
 const statusBySlot = ref<Record<number, CheckStatus>>({})
@@ -154,6 +158,12 @@ async function runEmailCheck(slot: number) {
         return
     }
 
+    const selfEmail = currentUserEmail.value
+    if (selfEmail && raw.toLowerCase() === selfEmail) {
+        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.')
+        return
+    }
+
     const controller = new AbortController()
     abortBySlot.set(slot, controller)
     setCheckState(slot, 'loading')
@@ -215,11 +225,19 @@ function scheduleCheck(slot: number) {
         setCheckState(slot, 'invalid', undefined, 'Enter a valid email address.')
         return
     }
+    const selfEmail = currentUserEmail.value
+    if (selfEmail && raw.toLowerCase() === selfEmail) {
+        abortBySlot.get(slot)?.abort()
+        debouncedEmailCheck.cancel(slot)
+        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.')
+        return
+    }
 
     debouncedEmailCheck.schedule(slot)
 }
 
 function onEmailInput(slot: number, v: string | number) {
+    props.ctx.answerForm.clearErrors('team_member_emails')
     setTeamEmail(slot, String(v))
     scheduleCheck(slot)
 }

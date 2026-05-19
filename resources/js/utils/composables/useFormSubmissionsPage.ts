@@ -4,7 +4,6 @@ import { toast } from 'vue-sonner'
 import {
     answerPreview,
     formatSubmissionDate,
-    formSubmissionReviewIsPending,
     humanizeSubmissionKey,
     submissionFileUrl,
 } from '@/lib/formSubmissionsUi'
@@ -52,7 +51,7 @@ export function useFormSubmissionsPage(props: {
         const keysFromFields = props.fields.map((f) => f.name)
         const keysInSubmissions = new Set<string>()
         for (const submission of props.submissions.data) {
-            Object.keys(submission.answers).forEach((key) => keysInSubmissions.add(key))
+            Object.keys(submission.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
         }
         const allKeys = [...new Set([...keysFromFields, ...keysInSubmissions])]
         return allKeys.slice(0, 4)
@@ -62,20 +61,10 @@ export function useFormSubmissionsPage(props: {
         const keysFromFields = props.fields.map((f) => f.name)
         const keysInSubmissions = new Set<string>()
         for (const submission of props.submissions.data) {
-            Object.keys(submission.answers).forEach((key) => keysInSubmissions.add(key))
+            Object.keys(submission.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
         }
         return [...new Set([...keysFromFields, ...keysInSubmissions])]
     })
-
-    const latestSubmissionDate = computed(() => {
-        if (props.submissions.data.length === 0) return '-'
-        const dates = props.submissions.data.map((s) => new Date(s.submitted_at).getTime())
-        return formatSubmissionDate(new Date(Math.max(...dates)).toISOString())
-    })
-
-    const pendingReviewCount = computed(
-        () => props.submissions.data.filter((s) => formSubmissionReviewIsPending(s)).length,
-    )
 
     function humanizeKey(value: string): string {
         return humanizeSubmissionKey(fieldLabelMap.value, value)
@@ -176,8 +165,6 @@ export function useFormSubmissionsPage(props: {
         fieldLabelMap,
         answerKeys,
         allAnswerKeys,
-        latestSubmissionDate,
-        pendingReviewCount,
         formatDate: formatSubmissionDate,
         humanizeKey,
         answerPreview,

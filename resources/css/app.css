@@ -224,6 +224,7 @@
 
     html {
         text-size-adjust: 100%;
+        font-size: 15px;
     }
 
     body {
@@ -238,6 +239,14 @@
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    @media (min-width: 640px) {
+        html {
+            font-size: 16px;
+        }
     }
 
     ::selection {
@@ -268,6 +277,73 @@
     button,
     a {
         text-rendering: geometricPrecision;
+    }
+}
+
+/* ──────────────────────────────────────────────────
+   RESPONSIVE TYPE GUARDRAILS
+   Keep copy readable on mobile/tablet without changing desktop intent.
+   ────────────────────────────────────────────────── */
+
+@layer utilities {
+    @media (max-width: 639.98px) {
+        .text-2xl {
+            font-size: 1.375rem !important;
+            line-height: 1.22 !important;
+        }
+
+        .text-3xl {
+            font-size: 1.625rem !important;
+            line-height: 1.14 !important;
+        }
+
+        .text-4xl,
+        .text-5xl,
+        .text-6xl,
+        .text-7xl,
+        .text-8xl,
+        .text-9xl {
+            font-size: 2rem !important;
+            line-height: 1.08 !important;
+        }
+
+        .text-xs {
+            font-size: 0.8125rem !important;
+            line-height: 1.45 !important;
+        }
+
+        .text-\[10px\],
+        .text-\[10\.5px\] {
+            font-size: 0.71875rem !important;
+            line-height: 1rem !important;
+        }
+
+        .text-\[11px\] {
+            font-size: 0.75rem !important;
+            line-height: 1.05rem !important;
+        }
+
+        .text-\[13px\] {
+            font-size: 0.875rem !important;
+            line-height: 1.35rem !important;
+        }
+    }
+
+    @media (min-width: 640px) and (max-width: 1023.98px) {
+        .text-4xl,
+        .text-5xl,
+        .text-6xl,
+        .text-7xl,
+        .text-8xl,
+        .text-9xl {
+            font-size: 2.5rem !important;
+            line-height: 1.08 !important;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem !important;
+            line-height: 1.16 !important;
+        }
     }
 }
 

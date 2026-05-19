@@ -6,9 +6,10 @@
 
 .dform-rich-text {
     font-size: 0.9375rem;
-    line-height: 1.72;
+    line-height: 1.78;
     color: var(--foreground);
     font-weight: 400;
+    overflow-wrap: anywhere;
 }
 
 .dform-rich-text > *:first-child {
@@ -64,15 +65,15 @@
 }
 
 .dform-rich-text h1 {
-    font-size: 1.625rem;
+    font-size: clamp(1.375rem, 4vw, 1.625rem);
 }
 
 .dform-rich-text h2 {
-    font-size: 1.3125rem;
+    font-size: clamp(1.1875rem, 3vw, 1.3125rem);
 }
 
 .dform-rich-text h3 {
-    font-size: 1.125rem;
+    font-size: clamp(1.0625rem, 2.4vw, 1.125rem);
     font-weight: 650;
 }
 
@@ -217,6 +218,13 @@
     margin: 1rem 0;
     border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
     box-shadow: 0 4px 24px -8px color-mix(in oklab, var(--foreground) 18%, transparent);
+}
+
+@media (min-width: 640px) {
+    .dform-rich-text {
+        font-size: 1rem;
+        line-height: 1.75;
+    }
 }
 
 /* Highlight / mark (TipTap sering beri style inline background) */

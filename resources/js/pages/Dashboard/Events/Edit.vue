@@ -19,6 +19,7 @@ defineProps<{
         <PageHeader
             title="Ubah acara"
             subtitle="Perbarui detail di bawah. Banner baru bersifat opsional — kosongkan jika tidak diganti."
+            :back-href="`/admin/dashboard/events/${event.id}`"
         />
 
         <EventDashboardForm variant="edit" :event="event" :options="options" />

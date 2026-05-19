@@ -12,7 +12,7 @@ import EventCalendar from '@/components/modules/dashboard/EventCalendar.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, Zap, Users, TrendingUp, Clock, MapPin, ArrowRight, Plus, LayoutList } from 'lucide-vue-next';
+import { CalendarDays, Zap, Users, TrendingUp, Clock, MapPin, ArrowRight } from 'lucide-vue-next';
 import useAuth from '@/utils/composables/useAuth';
 import { formatDate, categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
 import { toCategoryList } from '@/lib/eventCategories';
@@ -73,27 +73,9 @@ const firstName = computed(() => {
         <!-- Admin -->
         <template v-if="isAdmin">
             <PageHeader
-                eyebrow="Beranda pengelola"
                 title="Ringkasan acara"
                 :subtitle="`${greeting}${firstName ? ', ' + firstName : ''}. Pantau pendaftaran, jadwal, dan performa acara dalam satu layar.`"
-            >
-                <template #actions>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <Button as-child size="sm" class="h-9 gap-1.5 rounded-xl shadow-sm">
-                            <Link href="/admin/dashboard/events/create">
-                                <Plus class="size-4" />
-                                Buat acara
-                            </Link>
-                        </Button>
-                        <Button as-child variant="outline" size="sm" class="h-9 rounded-xl">
-                            <Link href="/admin/dashboard/events" class="inline-flex items-center gap-1.5">
-                                <LayoutList class="size-4" />
-                                Semua acara
-                            </Link>
-                        </Button>
-                    </div>
-                </template>
-            </PageHeader>
+            />
 
             <section class="space-y-4">
                 <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
@@ -150,7 +132,6 @@ const firstName = computed(() => {
         <!-- Member -->
         <template v-else>
             <PageHeader
-                eyebrow="Area peserta"
                 title="Dasbor saya"
                 :subtitle="`${greeting}! Kelola partisipasi Anda dan lihat acara yang akan datang.`"
             >
@@ -203,7 +184,7 @@ const firstName = computed(() => {
                             :href="`/user/dashboard/events/${event.slug}`"
                             class="border-border/70 hover:bg-muted/40 flex items-center gap-4 rounded-xl border p-3 transition-colors"
                         >
-                            <div class="bg-muted h-12 w-20 shrink-0 overflow-hidden rounded-lg">
+                            <div class="bg-muted aspect-[4/3] w-20 shrink-0 overflow-hidden rounded-lg">
                                 <img
                                     :src="event.banner_url ?? ''"
                                     :alt="event.title"

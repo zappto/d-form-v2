@@ -47,11 +47,13 @@ const baseHref = computed(() => props.eventBaseHref ?? '/admin/dashboard/events'
                 :href="`${baseHref}/${event.id}`"
                 class="group flex items-start gap-3 rounded-xl border border-transparent p-2.5 transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-border hover:bg-muted/40"
             >
-                <img
-                    :src="event.banner_url ?? ''"
-                    :alt="event.title"
-                    class="size-11 shrink-0 rounded-lg border border-border object-cover"
-                />
+                <div class="aspect-[4/3] w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
+                    <img
+                        :src="event.banner_url ?? ''"
+                        :alt="event.title"
+                        class="size-full object-cover"
+                    />
+                </div>
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-semibold text-foreground transition-colors group-hover:text-primary">{{ event.title }}</p>
                     <div class="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] font-medium text-muted-foreground">

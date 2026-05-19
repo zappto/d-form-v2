@@ -92,10 +92,10 @@ defineEmits<{
                             :key="key"
                             class="max-w-[240px] px-6 py-4 text-xs leading-relaxed"
                         >
-                            <div v-if="fileUrl(submission.answers[key])" class="flex items-center gap-1.5 text-primary">
+                            <div v-if="fileUrl(submission.answers?.[key])" class="flex items-center gap-1.5 text-primary">
                                 <FileText class="size-3.5 shrink-0" />
                                 <a
-                                    :href="fileUrl(submission.answers[key]) ?? undefined"
+                                    :href="fileUrl(submission.answers?.[key]) ?? undefined"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     class="font-medium underline underline-offset-4"
@@ -105,7 +105,7 @@ defineEmits<{
                                 </a>
                             </div>
                             <span v-else class="line-clamp-2 text-foreground/85">
-                                {{ answerPreview(submission.answers[key]) }}
+                                {{ answerPreview(submission.answers?.[key]) }}
                             </span>
                         </TableCell>
                         <TableCell class="whitespace-nowrap px-6 py-4 text-[11px] text-muted-foreground">

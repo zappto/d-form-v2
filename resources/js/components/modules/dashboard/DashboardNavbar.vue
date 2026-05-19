@@ -14,22 +14,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { User as UserIcon, LogOut, Settings, ChevronsUpDown } from 'lucide-vue-next'
+import { User as UserIcon, LogOut, Settings, ChevronsUpDown, ArrowLeft } from 'lucide-vue-next'
 import useAuth from '@/utils/composables/useAuth'
 import logout from '@/actions/App/Http/Controllers/Auth/LogoutController'
-
-defineProps<{
-    breadcrumbs?: { label: string; href?: string }[]
-}>()
 
 const page = usePage()
 const user = useAuth(page.props)
@@ -41,6 +29,22 @@ const greeting = computed(() => {
     return 'Good evening'
 })
 
+const fallbackBackHref = computed(() => {
+    const path = page.url.split('?')[0] ?? ''
+    if (path.startsWith('/admin/dashboard/events') && path !== '/admin/dashboard/events') return '/admin/dashboard/events'
+    if (path.startsWith('/admin/dashboard') && path !== '/admin/dashboard') return '/admin/dashboard'
+    if (path.startsWith('/user/dashboard/events') || path === '/user/dashboard/profile') return '/user/dashboard'
+    if (path.startsWith('/user/dashboard') && path !== '/user/dashboard') return '/user/dashboard'
+    return '/'
+})
+
+function goBack(): void {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+        window.history.back()
+        return
+    }
+    router.visit(fallbackBackHref.value)
+}
 </script>
 
 <template>
@@ -48,19 +52,16 @@ const greeting = computed(() => {
         <SidebarTrigger class="-ml-1" />
         <Separator orientation="vertical" class="mx-1 h-4!" />
 
-        <Breadcrumb v-if="breadcrumbs && breadcrumbs.length > 0" class="hidden sm:flex">
-            <BreadcrumbList>
-                <template v-for="(crumb, idx) in breadcrumbs" :key="idx">
-                    <BreadcrumbItem>
-                        <BreadcrumbLink v-if="crumb.href" :href="crumb.href">
-                            {{ crumb.label }}
-                        </BreadcrumbLink>
-                        <BreadcrumbPage v-else>{{ crumb.label }}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator v-if="idx < breadcrumbs.length - 1" />
-                </template>
-            </BreadcrumbList>
-        </Breadcrumb>
+        <Button
+            variant="ghost"
+            size="sm"
+            class="h-9 gap-2 rounded-lg px-2.5 text-muted-foreground hover:text-foreground"
+            type="button"
+            @click="goBack"
+        >
+            <ArrowLeft class="size-4" aria-hidden="true" />
+            <span class="hidden sm:inline">Kembali</span>
+        </Button>
 
         <div class="ml-auto flex items-center gap-1.5">
             <p class="mr-1.5 hidden text-sm text-muted-foreground lg:block">

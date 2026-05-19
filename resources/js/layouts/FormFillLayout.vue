@@ -1,60 +1,42 @@
 <script setup lang="ts">
 import 'vue-sonner/style.css'
 import { computed } from 'vue'
-import { usePage, Link } from '@inertiajs/vue3'
+import { usePage, Link, router } from '@inertiajs/vue3'
 import { Toaster } from '@/components/ui/sonner'
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-vue-next'
 
 const page = usePage()
 
-const breadcrumbs = computed((): { label: string; href?: string }[] => {
-    // Explicitly check for event data in props or fallback to URL-based
+const fallbackBackHref = computed((): string => {
     const event = (page.props.event as { id: string; slug?: string; title: string } | undefined)
-    const form = (page.props.form as { id: string; title: string } | undefined)
-    
-    const crumbs: { label: string; href?: string }[] = [
-        { label: 'Acara diikuti', href: '/user/dashboard' },
-    ]
-
-    if (event) {
-        crumbs.push({ label: event.title, href: `/user/dashboard/events/${event.slug ?? event.id}` })
-    }
-
-    if (form) {
-        crumbs.push({ label: form.title })
-    } else {
-        crumbs.push({ label: 'Form' })
-    }
-
-    return crumbs
+    if (event) return `/user/dashboard/events/${event.slug ?? event.id}`
+    return '/user/dashboard'
 })
+
+function goBack(): void {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+        window.history.back()
+        return
+    }
+    router.visit(fallbackBackHref.value)
+}
 </script>
 
 <template>
     <div class="relative flex min-h-svh flex-col bg-background font-sans">
-        <!-- Minimal Header with only Breadcrumbs -->
         <header class="sticky top-0 z-30 border-b border-border bg-card/85 px-4 py-3 backdrop-blur-xl lg:px-8">
             <div class="mx-auto flex max-w-3xl items-center justify-between gap-4">
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <template v-for="(crumb, idx) in breadcrumbs" :key="idx">
-                            <BreadcrumbSeparator v-if="idx > 0" />
-                            <BreadcrumbItem>
-                                <BreadcrumbLink v-if="crumb.href" :href="crumb.href" class="font-medium text-muted-foreground transition-colors hover:text-foreground">
-                                    {{ crumb.label }}
-                                </BreadcrumbLink>
-                                <BreadcrumbPage v-else class="font-semibold text-foreground">{{ crumb.label }}</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </template>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-9 gap-2 rounded-lg px-2.5 text-muted-foreground hover:text-foreground"
+                    type="button"
+                    @click="goBack"
+                >
+                    <ArrowLeft class="size-4" aria-hidden="true" />
+                    <span>Kembali</span>
+                </Button>
 
                 <Link href="/" class="hidden sm:block">
                     <span class="font-display text-lg font-bold tracking-[-0.02em]">

@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input'
 import { DateTimePicker } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { ChevronDown } from 'lucide-vue-next'
+import { cn } from '@/lib/utils'
 import type { FormRegistrationMetadata } from '@/types/form'
 
 const formTitle = defineModel<string>('formTitle', { required: true })
@@ -27,10 +29,26 @@ const isTeamStyleRegistration = computed(() => {
     return m === 'team' || m === 'bundle'
 })
 
-function setRegistrationMode(ev: Event): void {
-    const v = (ev.target as HTMLSelectElement).value
+const registrationModeSelectSentinel = '__none__' as const
+
+const registrationModeSelectClass = cn(
+    'h-10 min-h-10 w-full appearance-none rounded-xl border border-input bg-card px-3 py-2 pr-10 text-sm font-medium text-foreground shadow-xs ring-offset-background',
+    'transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
+    'hover:border-primary/30',
+    'focus:border-ring focus:outline-none focus:ring-[3px] focus:ring-ring/30',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+)
+
+function onRegistrationModeChange(ev: Event): void {
+    const raw = (ev.target as HTMLSelectElement).value
+    onRegistrationModeSelect(raw)
+}
+
+function onRegistrationModeSelect(raw: string): void {
     const mode: FormRegistrationMetadata['registration_mode'] =
-        v === '' ? null : (v as FormRegistrationMetadata['registration_mode'])
+        raw === registrationModeSelectSentinel || raw === ''
+            ? null
+            : (raw as FormRegistrationMetadata['registration_mode'])
     const leaveSizes = mode === 'team' || mode === 'bundle'
     formMetadata.value = {
         ...formMetadata.value,
@@ -126,24 +144,29 @@ function vString(v: unknown): string {
         <div class="border-border space-y-4 border-t pt-5">
             <div class="space-y-2">
                 <Label :for="`${idPrefix}-reg-mode`" class="text-sm font-medium">Registration mode</Label>
-                <select
-                    :id="`${idPrefix}-reg-mode`"
-                    class="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-12 w-full rounded-md border px-3 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    :value="formMetadata.registration_mode ?? ''"
-                    @change="setRegistrationMode"
-                >
-                    <option value="">Not set (individual)</option>
-                    <option value="single">Single</option>
-                    <option value="bundle">Bundle</option>
-                    <option value="team">Team</option>
-                </select>
+                <div class="relative w-full">
+                    <select
+                        :id="`${idPrefix}-reg-mode`"
+                        :value="formMetadata.registration_mode ?? registrationModeSelectSentinel"
+                        :class="registrationModeSelectClass"
+                        @change="onRegistrationModeChange"
+                    >
+                        <option :value="registrationModeSelectSentinel">Not set (individual)</option>
+                        <option value="single">Single</option>
+                        <option value="bundle">Bundle</option>
+                        <option value="team">Team</option>
+                    </select>
+                    <ChevronDown
+                        class="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 opacity-50"
+                        aria-hidden="true"
+                    />
+                </div>
             </div>
             <div v-if="isTeamStyleRegistration" class="grid gap-4 sm:grid-cols-2">
                 <div class="space-y-2">
                     <Label :for="`${idPrefix}-max-team`" class="text-sm font-medium">Max team size</Label>
-                    <p class="text-muted-foreground text-xs">
-                        Bundle: maksimum peserta per satu pendaftaran (termasuk ketua). Dipakai jika
-                        <span class="font-medium">Team size</span> kosong.
+                    <p class="text-muted-foreground text-xs leading-snug">
+                        Maks. anggota per tim (≥2). Dipakai jika <span class="font-medium text-foreground/90">Team size</span> kosong.
                     </p>
                     <Input
                         :id="`${idPrefix}-max-team`"
@@ -157,9 +180,8 @@ function vString(v: unknown): string {
                 </div>
                 <div class="space-y-2">
                     <Label :for="`${idPrefix}-team-size`" class="text-sm font-medium">Team size</Label>
-                    <p class="text-muted-foreground text-xs">
-                        Jumlah peserta per tim (≥2). Jika diisi, nilai ini dipakai; jika kosong, dipakai
-                        <span class="font-medium">Max team size</span>.
+                    <p class="text-muted-foreground text-xs leading-snug">
+                        Ukuran tim (≥2). Menggantikan <span class="font-medium text-foreground/90">Max team size</span> bila diisi.
                     </p>
                     <Input
                         :id="`${idPrefix}-team-size`"

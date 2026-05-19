@@ -64,7 +64,7 @@ const statusVariant = (s: string) =>
                     ]"
                     :style="{ transitionDelay: `${100 + i * 80}ms` }"
                 >
-                    <div class="relative h-40 w-full overflow-hidden bg-muted">
+                    <div class="relative aspect-video w-full overflow-hidden bg-muted sm:aspect-[4/3]">
                         <img
                             v-if="ev.banner_url"
                             :src="ev.banner_url"

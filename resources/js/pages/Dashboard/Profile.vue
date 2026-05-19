@@ -25,6 +25,14 @@ defineOptions({ layout: DashboardLayout })
 const page = usePage()
 const user = useAuth(page.props)
 
+const isAdminOrSuperAdmin = computed(() => {
+    const roles = user.value?.roles
+    if (!roles || roles.length === 0) return false
+    return roles.includes('admin') || roles.includes('super-admin')
+})
+
+const profileBackHref = computed(() => (isAdminOrSuperAdmin.value ? '/admin/dashboard' : '/user/dashboard'))
+
 const hasLocalPassword = computed<boolean>(() => user.value?.has_local_password !== false)
 
 const emailUnverified = computed<boolean>(() => !user.value?.email_verified_at)
@@ -157,9 +165,9 @@ function updatePasswordSubmit(): void {
 
     <div class="flex flex-col gap-8 md:gap-10">
         <PageHeader
-            eyebrow="Akun"
             title="Profil"
             subtitle="Ubah foto profil, nama, email, dan kata sandi sesuai yang didukung akun Anda."
+            :back-href="profileBackHref"
         />
 
         <div

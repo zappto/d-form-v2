@@ -2,7 +2,7 @@
 import { ref, reactive } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
-import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
+import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue'
 import { defaultFormBannerState, prependFormBannerToBackendPayload } from '@/components/modules/builder/formBanner'
 import { toBackendFields } from '@/components/modules/builder/fieldMapping'
@@ -15,7 +15,7 @@ type CreateFormClientPayload = Omit<CreateDashboardFormPayload, 'fields'> & {
     fields: object[]
 }
 
-defineOptions({ layout: DashboardFocusLayout })
+defineOptions({ layout: DashboardLayout })
 
 const props = defineProps<{
     event: { id: string; title: string }

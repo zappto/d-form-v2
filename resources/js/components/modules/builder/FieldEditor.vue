@@ -21,22 +21,22 @@ const emit = defineEmits<{
 }>()
 
 const TYPE_CONFIG = {
-    short_text: { icon: Type, label: 'Short Text', accent: '#2563eb' },
-    long_text: { icon: AlignLeft, label: 'Long Text', accent: '#4f46e5' },
+    short_text: { icon: Type, label: 'Teks pendek', accent: '#2563eb' },
+    long_text: { icon: AlignLeft, label: 'Teks panjang', accent: '#4f46e5' },
     email: { icon: Mail, label: 'Email', accent: '#0891b2' },
-    phone: { icon: Phone, label: 'Phone', accent: '#059669' },
-    number: { icon: Hash, label: 'Number', accent: '#d97706' },
+    phone: { icon: Phone, label: 'Telepon', accent: '#059669' },
+    number: { icon: Hash, label: 'Angka', accent: '#d97706' },
     dropdown: { icon: ChevronDown, label: 'Dropdown', accent: '#7c3aed' },
-    checkbox: { icon: SquareCheck, label: 'Checkbox', accent: '#db2777' },
-    radio: { icon: CircleDot, label: 'Radio', accent: '#e11d48' },
-    image_upload: { icon: ImagePlus, label: 'Image Upload', accent: '#0d9488' },
-    file_upload: { icon: Upload, label: 'File Upload', accent: '#475569' },
-    date: { icon: Calendar, label: 'Date', accent: '#7c3aed' },
-    time: { icon: Clock, label: 'Time', accent: '#059669' },
+    checkbox: { icon: SquareCheck, label: 'Centang', accent: '#db2777' },
+    radio: { icon: CircleDot, label: 'Pilihan tunggal', accent: '#e11d48' },
+    image_upload: { icon: ImagePlus, label: 'Unggah gambar', accent: '#0d9488' },
+    file_upload: { icon: Upload, label: 'Unggah file', accent: '#475569' },
+    date: { icon: Calendar, label: 'Tanggal', accent: '#7c3aed' },
+    time: { icon: Clock, label: 'Waktu', accent: '#059669' },
     rating: { icon: Star, label: 'Rating', accent: '#f59e0b' },
-    heading: { icon: HeadingIcon, label: 'Heading', accent: '#1a1a2e' },
-    paragraph: { icon: TextCursorInput, label: 'Paragraph', accent: '#6b7280' },
-    divider: { icon: Minus, label: 'Divider', accent: '#9ca3af' },
+    heading: { icon: HeadingIcon, label: 'Judul', accent: '#1a1a2e' },
+    paragraph: { icon: TextCursorInput, label: 'Paragraf', accent: '#6b7280' },
+    divider: { icon: Minus, label: 'Garis pemisah', accent: '#9ca3af' },
 }
 
 const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text)
@@ -60,11 +60,11 @@ function optionRows(): FieldOptionEntry[] {
     const rows = raw as FieldOptionEntry[]
     // Dropdown is intentionally text-only to avoid unstable image option rendering.
     if (props.field.type === 'dropdown') {
-        return rows.map((row, i) => ({
+        return rows.map((row) => ({
             ...row,
             type: 'text',
             imageUrl: '',
-            label: String(row.label ?? '').trim() || `Option ${i + 1}`,
+            label: String(row.label ?? ''),
         }))
     }
     return rows
@@ -75,8 +75,8 @@ function emitOptions(next: FieldOptionEntry[]) {
 }
 
 function addOption() {
-    const text = newOption.value.trim()
-    emitOptions([...optionRows(), { id: crypto.randomUUID(), type: 'text', label: text || 'New Option', imageUrl: '' }])
+    const text = newOption.value
+    emitOptions([...optionRows(), { id: crypto.randomUUID(), type: 'text', label: text, imageUrl: '' }])
     newOption.value = ''
 }
 
@@ -96,8 +96,7 @@ function toggleOptionType(index: number) {
 
 function setOptionLabel(index: number, label: string) {
     const opts = [...optionRows()]
-    const next = label.trim()
-    opts[index] = { ...opts[index], label: next || `Option ${index + 1}` }
+    opts[index] = { ...opts[index], label: String(label ?? '') }
     emitOptions(opts)
 }
 
@@ -129,6 +128,25 @@ const hasOptions = computed(() =>
 const isContent = computed(() =>
     ['heading', 'paragraph', 'divider'].includes(props.field.type),
 )
+function onMaxLengthInput(v: string) {
+    const t = String(v ?? '').trim()
+    if (t === '') {
+        const meta = { ...(props.field.metadata || {}) }
+        delete meta.maxLength
+        emit('update:field', { ...props.field, metadata: meta })
+        return
+    }
+    const n = parseInt(t, 10)
+    if (!Number.isFinite(n) || n < 1) return
+    updateMeta('maxLength', Math.min(n, 100_000))
+}
+
+function maxLengthInputDisplay(): string {
+    const raw = props.field.metadata?.maxLength
+    if (raw == null || raw === '') return ''
+    const n = Number(raw)
+    return Number.isFinite(n) && n > 0 ? String(Math.floor(n)) : ''
+}
 const hasAdvancedFlags = computed(
     () => !['heading', 'paragraph', 'divider', 'banner'].includes(props.field.type),
 )
@@ -157,11 +175,11 @@ const hasAdvancedFlags = computed(
             <Label class="text-sm font-medium">Label</Label>
             <Input
                 :model-value="field.label"
-                placeholder="e.g. Nama lengkap"
+                placeholder="Misal: Nama lengkap"
                 class="h-11 text-sm"
                 @update:model-value="(v) => update('label', String(v))"
             />
-            <p class="text-xs text-muted-foreground">Teks yang tampil di atas field.</p>
+            <p class="text-xs text-muted-foreground">Judul yang tampil di atas kolom.</p>
         </div>
 
         <!-- Description -->
@@ -169,39 +187,58 @@ const hasAdvancedFlags = computed(
             <Label class="text-sm font-medium">Teks bantu</Label>
             <Textarea
                 :model-value="field.description"
-                placeholder="Instruksi singkat untuk pengguna"
+                placeholder="Opsional — penjelasan singkat untuk pengisi"
                 rows="2"
                 class="min-h-[4.5rem] text-sm"
                 @update:model-value="(v) => update('description', String(v))"
             />
         </div>
 
-        <!-- Placeholder (text fields only) -->
+        <!-- Petunjuk di dalam kolom (hanya teks input) -->
         <div v-if="hasPlaceholder" class="flex flex-col gap-2">
-            <Label class="text-sm font-medium">Placeholder</Label>
+            <Label class="text-sm font-medium">Teks petunjuk (placeholder)</Label>
             <Input
-                :model-value="field.placeholder"
-                placeholder="e.g. Contoh: Jhon Doe"
+                :model-value="field.placeholder ?? ''"
+                placeholder="Contoh di kolom pengisi"
                 class="h-11 text-sm"
-                @update:model-value="(v) => update('placeholder', String(v))"
+                @update:model-value="(v) => update('placeholder', String(v ?? ''))"
             />
+            <p class="text-xs text-muted-foreground">
+                Kosong = tidak ada petunjuk. Teks abu-abu hanya contoh di UI, bukan nilai tersimpan.
+            </p>
+        </div>
+
+        <!-- Maks. karakter (teks pendek / panjang) -->
+        <div v-if="['short_text', 'long_text'].includes(field.type)" class="flex flex-col gap-2">
+            <Label class="text-sm font-medium">Maks. karakter</Label>
+            <Input
+                type="number"
+                min="1"
+                max="100000"
+                step="1"
+                :model-value="maxLengthInputDisplay()"
+                placeholder="Tanpa batas"
+                class="h-11 text-sm"
+                @update:model-value="onMaxLengthInput"
+            />
+            <p class="text-xs text-muted-foreground">Kosongkan jika tidak dibatasi. Pengisi tidak bisa melebihi nilai ini.</p>
         </div>
 
         <!-- Content text (heading / paragraph) -->
         <div v-if="field.type === 'heading'" class="flex flex-col gap-1.5">
-            <Label class="text-xs font-semibold">Heading Text</Label>
+            <Label class="text-xs font-semibold">Isi judul</Label>
             <Input
                 :model-value="String(field.metadata?.content ?? '')"
-                placeholder="Section Heading"
+                placeholder="Judul bagian"
                 class="text-xs"
                 @update:model-value="(v) => updateMeta('content', String(v))"
             />
         </div>
         <div v-if="field.type === 'paragraph'" class="flex flex-col gap-1.5">
-            <Label class="text-xs font-semibold">Paragraph Text</Label>
+            <Label class="text-xs font-semibold">Isi paragraf</Label>
             <Textarea
                 :model-value="String(field.metadata?.content ?? '')"
-                placeholder="Descriptive text..."
+                placeholder="Teks penjelasan…"
                 rows="3"
                 class="text-xs"
                 @update:model-value="(v) => updateMeta('content', String(v))"
@@ -210,7 +247,7 @@ const hasAdvancedFlags = computed(
 
         <!-- Rating max stars -->
         <div v-if="field.type === 'rating'" class="flex flex-col gap-1.5">
-            <Label class="text-xs font-semibold">Max Stars</Label>
+            <Label class="text-xs font-semibold">Jumlah bintang maksimal</Label>
             <Input
                 type="number"
                 :model-value="Number(field.metadata?.maxStars ?? 5)"
@@ -223,24 +260,35 @@ const hasAdvancedFlags = computed(
 
         <!-- File types (image / file / banner) -->
         <div v-if="['image_upload', 'file_upload'].includes(field.type)" class="flex flex-col gap-1.5">
-            <Label class="text-xs font-semibold">Accepted Formats</Label>
+            <Label class="text-xs font-semibold">Ekstensi file yang diizinkan</Label>
             <Input
                 :model-value="String(field.metadata?.accepts ?? '')"
                 :placeholder="field.type === 'banner' ? 'gif, png, jpg' : 'pdf, jpg, png'"
                 class="text-xs"
                 @update:model-value="(v) => updateMeta('accepts', String(v))"
             />
-            <p class="text-[10px] text-muted-foreground">Comma-separated file extensions.</p>
+            <p class="text-[10px] text-muted-foreground">Pisahkan dengan koma (tanpa titik di depan).</p>
+            <div v-if="field.type === 'image_upload'" class="flex flex-wrap gap-1.5">
+                <span class="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                    4:3
+                </span>
+                <span class="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                    1200 x 900
+                </span>
+                <span class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                    area tengah aman
+                </span>
+            </div>
         </div>
 
         <!-- Options editor (dropdown / checkbox / radio) -->
         <div v-if="hasOptions" class="flex flex-col gap-2">
-            <Label class="text-xs font-semibold">Options</Label>
+            <Label class="text-xs font-semibold">Daftar opsi</Label>
             <p class="text-[10px] text-muted-foreground">
                 {{
                     field.type === 'dropdown'
-                        ? 'Define text choices for the dropdown.'
-                        : 'Define the choices available. Each option can be text-only or image-only.'
+                        ? 'Satu baris satu pilihan teks untuk dropdown.'
+                        : 'Tiap opsi bisa teks saja atau gambar saja (pakai tombol ganti).'
                 }}
             </p>
             <div class="flex flex-col gap-2">
@@ -253,7 +301,7 @@ const hasAdvancedFlags = computed(
                         <div class="flex min-w-0 flex-1 flex-col gap-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                    Option {{ i + 1 }} — {{ opt.type }}
+                                    Opsi {{ i + 1 }} — {{ opt.type === 'text' ? 'teks' : 'gambar' }}
                                 </span>
                                 <button
                                     v-if="field.type !== 'dropdown'"
@@ -261,14 +309,14 @@ const hasAdvancedFlags = computed(
                                     @click="toggleOptionType(i)"
                                     class="text-[9px] font-bold text-primary underline-offset-2 hover:underline"
                                 >
-                                    Switch to {{ opt.type === 'text' ? 'Image' : 'Text' }}
+                                    {{ opt.type === 'text' ? 'Pakai gambar' : 'Pakai teks' }}
                                 </button>
                             </div>
 
                             <div v-if="opt.type === 'text'">
                                 <Input
                                     :model-value="opt.label"
-                                    placeholder="Choice label"
+                                    placeholder="Teks opsi"
                                     class="text-xs"
                                     @update:model-value="(v) => setOptionLabel(i, String(v ?? ''))"
                                 />
@@ -286,15 +334,23 @@ const hasAdvancedFlags = computed(
                                 </div>
                                 <Input
                                     :model-value="opt.imageUrl"
-                                    placeholder="Image URL"
+                                    placeholder="URL gambar"
                                     class="text-[11px]"
                                     @update:model-value="(v) => setOptionImageUrl(i, String(v ?? ''))"
                                 />
+                                <div class="flex flex-wrap gap-1.5">
+                                    <span class="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                        1:1
+                                    </span>
+                                    <span class="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                        800 x 800
+                                    </span>
+                                </div>
                                 <div class="hidden">
                                     <!-- Keep label synced for accessibility or fallback -->
                                     <Input
                                         :model-value="opt.label"
-                                        placeholder="Internal label"
+                                        placeholder="Label aksesibilitas"
                                         @update:model-value="(v) => setOptionLabel(i, String(v ?? ''))"
                                     />
                                 </div>
@@ -317,7 +373,7 @@ const hasAdvancedFlags = computed(
                             <button
                                 type="button"
                                 class="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                title="Remove option"
+                                title="Hapus opsi"
                                 @click="removeOption(i)"
                             >
                                 <X class="size-3.5" />
@@ -328,7 +384,7 @@ const hasAdvancedFlags = computed(
             </div>
             <div class="mt-1 flex gap-2">
                 <Button variant="outline" size="sm" class="w-full text-xs font-bold" type="button" @click="addOption">
-                    <Plus class="mr-1 size-3.5" />Add New Option
+                    <Plus class="mr-1 size-3.5" />Tambah opsi
                 </Button>
             </div>
         </div>
@@ -336,11 +392,11 @@ const hasAdvancedFlags = computed(
         <!-- Advanced (team / bundle) -->
         <div v-if="hasAdvancedFlags" class="mt-2 space-y-4">
             <hr class="app-divider" />
-            <p class="text-sm font-semibold text-foreground">Advanced</p>
+            <p class="text-sm font-semibold text-foreground">Lanjutan</p>
             <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
                 <div class="min-w-0">
-                    <Label class="text-sm font-medium">Member can edit (append)</Label>
-                    <p class="text-xs text-muted-foreground">Team flow: invited members may change this field when confirming.</p>
+                    <Label class="text-sm font-medium">Anggota tim bisa ubah (lampiran)</Label>
+                    <p class="text-xs text-muted-foreground">Untuk alur tim: undangan bisa mengubah field ini saat konfirmasi.</p>
                 </div>
                 <Switch
                     :model-value="!!field.is_append"
@@ -349,8 +405,8 @@ const hasAdvancedFlags = computed(
             </div>
             <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
                 <div class="min-w-0">
-                    <Label class="text-sm font-medium">Duplicatable (bundle)</Label>
-                    <p class="text-xs text-muted-foreground">Repeat for each additional participant in bundle registration.</p>
+                    <Label class="text-sm font-medium">Duplikat per peserta (paket / bundle)</Label>
+                    <p class="text-xs text-muted-foreground">Ulang field ini untuk setiap anggota tambahan pada pendaftaran paket.</p>
                 </div>
                 <Switch
                     :model-value="field.metadata?.duplicatable === true"

@@ -1,51 +1,52 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
-import FormPreviewDialog from '@/components/modules/builder/FormPreviewDialog.vue'
-import type { FormBannerState } from '@/components/modules/builder/formBanner'
-import { FORM_VISIBILITY_OPTIONS } from '@/components/modules/builder/formBuilderPalette'
-import type { BuilderField } from '@/types/form-builder'
-import type { FormRegistrationMetadata } from '@/types/form'
-import { useFormBuilderWorkspace } from '@/utils/composables/useFormBuilderWorkspace'
-import FormBuilderToolbar from './FormBuilderToolbar.vue'
-import FormBuilderMobileTabBar from './FormBuilderMobileTabBar.vue'
-import FormBuilderPalettePanel from './FormBuilderPalettePanel.vue'
-import FormBuilderCanvasBuildView from './FormBuilderCanvasBuildView.vue'
-import FormBuilderValidationSummary from './FormBuilderValidationSummary.vue'
-import FormBuilderFormDetailsCard from './FormBuilderFormDetailsCard.vue'
-import FormBuilderBannerBlock from './FormBuilderBannerBlock.vue'
-import FormBuilderInspectorPanel from './FormBuilderInspectorPanel.vue'
-import FormBuilderAddFieldSheet from './FormBuilderAddFieldSheet.vue'
-import FormBuilderEditFieldSheet from './FormBuilderEditFieldSheet.vue'
-import FormBuilderMobileAddFab from './FormBuilderMobileAddFab.vue'
+import { computed, reactive } from 'vue';
+import FormPreviewDialog from '@/components/modules/builder/FormPreviewDialog.vue';
+import { Button } from '@/components/ui/button';
+import type { FormBannerState } from '@/components/modules/builder/formBanner';
+import { FORM_VISIBILITY_OPTIONS } from '@/components/modules/builder/formBuilderPalette';
+import type { BuilderField } from '@/types/form-builder';
+import type { FormRegistrationMetadata } from '@/types/form';
+import { useFormBuilderWorkspace } from '@/utils/composables/useFormBuilderWorkspace';
+import FormBuilderToolbar from './FormBuilderToolbar.vue';
+import FormBuilderMobileTabBar from './FormBuilderMobileTabBar.vue';
+import FormBuilderPalettePanel from './FormBuilderPalettePanel.vue';
+import FormBuilderCanvasBuildView from './FormBuilderCanvasBuildView.vue';
+import FormBuilderValidationSummary from './FormBuilderValidationSummary.vue';
+import FormBuilderFormDetailsCard from './FormBuilderFormDetailsCard.vue';
+import FormBuilderBannerBlock from './FormBuilderBannerBlock.vue';
+import FormBuilderInspectorPanel from './FormBuilderInspectorPanel.vue';
+import FormBuilderAddFieldSheet from './FormBuilderAddFieldSheet.vue';
+import FormBuilderEditFieldSheet from './FormBuilderEditFieldSheet.vue';
+import FormBuilderMobileAddFab from './FormBuilderMobileAddFab.vue';
 
 const props = withDefaults(
     defineProps<{
-        event: { id: string; title: string }
-        toolbarSubtitle: string
-        saveLabel?: string
-        processing?: boolean
-        fieldErrors?: Partial<Record<'title' | 'description' | 'closed_at' | 'visible_for', string>>
-        shell?: 'dashboard' | 'fullscreen'
+        event: { id: string; title: string };
+        toolbarSubtitle: string;
+        saveLabel?: string;
+        processing?: boolean;
+        fieldErrors?: Partial<Record<'title' | 'description' | 'closed_at' | 'visible_for', string>>;
+        shell?: 'dashboard' | 'fullscreen';
     }>(),
     {
         saveLabel: 'Save Form',
         processing: false,
         fieldErrors: () => ({}),
         shell: 'dashboard',
-    },
-)
+    }
+);
 
 const emit = defineEmits<{
-    save: []
-}>()
+    save: [];
+}>();
 
-const formTitle = defineModel<string>('formTitle', { required: true })
-const formDescription = defineModel<string>('formDescription', { required: true })
-const closedAt = defineModel<string>('closedAt', { required: true })
-const visibleFor = defineModel<string[]>('visibleFor', { required: true })
-const banner = defineModel<FormBannerState>('banner', { required: true })
-const formFields = defineModel<BuilderField[]>('formFields', { required: true })
-const formMetadata = defineModel<FormRegistrationMetadata>('formMetadata', { required: true })
+const formTitle = defineModel<string>('formTitle', { required: true });
+const formDescription = defineModel<string>('formDescription', { required: true });
+const closedAt = defineModel<string>('closedAt', { required: true });
+const visibleFor = defineModel<string[]>('visibleFor', { required: true });
+const banner = defineModel<FormBannerState>('banner', { required: true });
+const formFields = defineModel<BuilderField[]>('formFields', { required: true });
+const formMetadata = defineModel<FormRegistrationMetadata>('formMetadata', { required: true });
 
 const wb = reactive(
     useFormBuilderWorkspace(
@@ -57,19 +58,17 @@ const wb = reactive(
             banner,
             formFields,
         },
-        { onSave: () => emit('save') },
-    ),
-)
+        { onSave: () => emit('save') }
+    )
+);
 
-const backHref = computed(() => `/admin/dashboard/events/${props.event.id}/forms`)
-const shellHeightClass = computed(() =>
-    props.shell === 'fullscreen' ? 'h-svh' : 'min-h-0 flex-1',
-)
-const visibilityOptions = FORM_VISIBILITY_OPTIONS
+const backHref = computed(() => `/admin/dashboard/events/${props.event.id}/forms`);
+const shellHeightClass = computed(() => (props.shell === 'fullscreen' ? 'h-svh' : 'min-h-0 lg:h-[calc(100svh-5rem)]'));
+const visibilityOptions = FORM_VISIBILITY_OPTIONS;
 </script>
 
 <template>
-    <div :class="['flex min-h-0 flex-col overflow-hidden', shellHeightClass]">
+    <div :class="['flex min-h-0 flex-col overflow-visible lg:overflow-hidden', shellHeightClass]">
         <FormBuilderToolbar
             :back-href="backHref"
             :toolbar-subtitle="toolbarSubtitle"
@@ -93,14 +92,14 @@ const visibilityOptions = FORM_VISIBILITY_OPTIONS
             :is-ready-to-save="wb.isReadyToSave"
         />
 
-        <div class="flex flex-1 overflow-hidden">
+        <div class="flex flex-1 flex-col overflow-visible lg:flex-row lg:overflow-hidden">
             <FormBuilderPalettePanel
                 v-model:search-query="wb.searchQuery"
                 :categories="wb.filteredCategories"
                 @toggle-category="wb.toggleCategory"
             />
 
-            <main class="bg-background relative min-h-0 flex-1 overflow-y-auto">
+            <main class="bg-background relative min-h-0 flex-1 overflow-visible lg:overflow-y-auto">
                 <FormBuilderCanvasBuildView
                     v-model:form-title="formTitle"
                     v-model:form-description="formDescription"
@@ -150,6 +149,27 @@ const visibilityOptions = FORM_VISIBILITY_OPTIONS
                 </div>
             </main>
 
+            <div class="mx-auto w-full max-w-[480px] px-4 pb-6 sm:hidden">
+                <div class="grid grid-cols-2 gap-2">
+                    <Button
+                        variant="outline"
+                        class="border-border/80 bg-background h-11 rounded-xl text-sm font-medium shadow-sm"
+                        :disabled="wb.isEmpty"
+                        aria-label="Pratinjau formulir"
+                        @click="wb.showPreview = true"
+                    >
+                        Pratinjau
+                    </Button>
+                    <Button
+                        class="h-11 rounded-xl text-sm font-medium shadow-sm"
+                        :disabled="processing"
+                        @click="wb.requestSave"
+                    >
+                        Simpan
+                    </Button>
+                </div>
+            </div>
+
             <FormBuilderInspectorPanel
                 v-model:inspector-mode="wb.inspectorMode"
                 v-model:form-title="formTitle"
@@ -168,10 +188,7 @@ const visibilityOptions = FORM_VISIBILITY_OPTIONS
             />
         </div>
 
-        <FormBuilderMobileAddFab
-            v-if="wb.mobileTab === 'build' && !wb.isEmpty"
-            @click="wb.showAddSheet = true"
-        />
+        <FormBuilderMobileAddFab v-if="wb.mobileTab === 'build' && !wb.isEmpty" @click="wb.showAddSheet = true" />
     </div>
 
     <FormBuilderAddFieldSheet

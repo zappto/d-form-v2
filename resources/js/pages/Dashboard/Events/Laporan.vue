@@ -51,9 +51,9 @@ const props = defineProps<{
 
     <div class="flex flex-col gap-8 md:gap-10">
         <PageHeader
-            eyebrow="Pelaporan"
             title="Laporan"
             subtitle="Unduhan CSV pendaftaran, kehadiran, dan ringkasan untuk acara ini."
+            :back-href="`/admin/dashboard/events/${props.event.id}`"
         />
 
         <div class="grid gap-4 sm:grid-cols-3">

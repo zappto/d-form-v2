@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import LocalLottie from '@/components/core/LocalLottie.vue'
-import { ArrowRight, Zap } from 'lucide-vue-next'
+import { ArrowRight } from 'lucide-vue-next'
 
 const show = ref(false)
 onMounted(() => requestAnimationFrame(() => (show.value = true)))
