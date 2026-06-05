@@ -39,6 +39,7 @@ class DeleteDeclinedInvitationMemberSubmissionJob implements ShouldQueue
             return;
         }
 
+        // Quota was released when the invitee declined; delete only frees the unique slot.
         $submission->delete();
     }
 }

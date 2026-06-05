@@ -13,6 +13,7 @@ use App\Models\FormAnswer;
 use App\Models\FormField;
 use App\Services\Form\RulesBuilder;
 use App\Services\Registration\BundleRegistrationSubmitter;
+use App\Services\Registration\EventRegistrationCounter;
 use App\Services\Registration\TeamRegistrationSubmitter;
 use App\Support\FormFieldTypeMapping;
 use Illuminate\Http\RedirectResponse;
@@ -26,6 +27,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TeamInvitationController extends Controller
 {
+    public function __construct(
+        private EventRegistrationCounter $registrationCounter,
+    ) {
+    }
+
     public function show(Request $request, string $token): Response
     {
         $answer = $this->loadInvitationAnswer($token);
@@ -114,9 +120,11 @@ class TeamInvitationController extends Controller
         ]);
 
         if ($data['invitation_decision'] === 'reject') {
+            $before = $answer->replicate();
             $answer->forceFill([
                 'member_confirmation_status' => MemberConfirmationStatus::Rejected,
             ])->save();
+            $this->registrationCounter->releaseIfStoppedOccupying($before, $answer->fresh());
 
             $answerId = (string) $answer->id;
             $declineReasonForEmail = $data['decline_reason'];
@@ -233,9 +241,11 @@ class TeamInvitationController extends Controller
         }
 
         if ($answer->invitation_expired_at !== null && now()->isAfter($answer->invitation_expired_at)) {
+            $before = $answer->replicate();
             $answer->forceFill([
                 'member_confirmation_status' => MemberConfirmationStatus::Expired,
             ])->save();
+            $this->registrationCounter->releaseIfStoppedOccupying($before, $answer->fresh());
         }
     }
 

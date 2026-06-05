@@ -155,6 +155,7 @@ final class FormAccessGuard
             ->whereHas('form', function ($q) use ($event): void {
                 $q->where('event_id', $event->id);
             })
+            ->excludeRejectedSubmissions()
             ->exists();
     }
 
@@ -163,6 +164,7 @@ final class FormAccessGuard
         $existing = FormAnswer::query()
             ->where('form_id', $form->id)
             ->where('user_id', $user->id)
+            ->excludeRejectedSubmissions()
             ->first();
 
         if ($existing === null) {

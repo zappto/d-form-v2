@@ -14,6 +14,7 @@ use App\Models\Form;
 use App\Models\FormAnswer;
 use App\Models\FormField;
 use App\Models\User;
+use App\Services\Registration\EventRegistrationCounter;
 use App\Mail\RegistrationAcceptedMail;
 use App\Mail\RegistrationConfirmationMail;
 use App\Mail\RegistrationRejectedMail;
@@ -1461,7 +1462,7 @@ class FormRegistrationTest extends TestCase
         Mail::fake();
 
         $admin  = $this->admin();
-        $event  = $this->openEvent();
+        $event  = $this->openEvent(['registered_count' => 1]);
         $form   = $this->openForm($event);
         $member = $this->member();
 
@@ -1490,6 +1491,9 @@ class FormRegistrationTest extends TestCase
 
         $answer->refresh();
         $this->assertNull($answer->registration_code);
+
+        $event->refresh();
+        $this->assertSame(0, $event->registered_count);
     }
 
     public function test_review_is_immutable_and_second_review_returns_409(): void
@@ -1644,15 +1648,44 @@ class FormRegistrationTest extends TestCase
     // DB CONSTRAINT — unique (user_id, form_id)
     // =========================================================================
 
-    public function test_db_unique_constraint_prevents_duplicate_form_answers(): void
+    public function test_submit_blocks_second_active_registration_for_same_form(): void
     {
-        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
+        $member = $this->member();
+        $event  = $this->openEvent();
+        $form   = $this->openForm($event);
+        $this->textField($form);
 
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'First'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'Second'])
+             ->assertRedirect($this->fillPath($event, $form));
+
+        $this->assertDatabaseCount('form_answers', 1);
+    }
+
+    public function test_rejected_submission_does_not_block_second_row_for_same_user_and_form(): void
+    {
         $member = $this->member();
         $form   = $this->openForm($this->openEvent());
 
-        FormAnswer::factory()->create(['form_id' => $form->id, 'user_id' => $member->id, 'answers' => []]);
-        FormAnswer::factory()->create(['form_id' => $form->id, 'user_id' => $member->id, 'answers' => []]);
+        FormAnswer::factory()->create([
+            'form_id' => $form->id,
+            'user_id' => $member->id,
+            'answers' => ['full_name' => 'Rejected'],
+            'review_status' => FormAnswerReviewStatus::Rejected,
+        ]);
+
+        FormAnswer::factory()->create([
+            'form_id' => $form->id,
+            'user_id' => $member->id,
+            'answers' => ['full_name' => 'Retry'],
+            'review_status' => FormAnswerReviewStatus::Pending,
+        ]);
+
+        $this->assertDatabaseCount('form_answers', 2);
     }
 
     // =========================================================================
@@ -1688,5 +1721,415 @@ class FormRegistrationTest extends TestCase
              ->assertRedirect(route('dashboard.events.show', $event));
 
         $this->assertDatabaseHas('form_answers', ['form_id' => $form->id, 'user_id' => $admin->id]);
+    }
+
+    // =========================================================================
+    // RE-REGISTRATION AFTER REJECTION
+    // =========================================================================
+
+    public function test_user_can_resubmit_after_admin_rejection(): void
+    {
+        $admin  = $this->admin();
+        $member = $this->member();
+        $event  = $this->openEvent();
+        $form   = $this->openForm($event);
+        $this->textField($form);
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'First Submission'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $firstSubmission = FormAnswer::query()->where('form_id', $form->id)->where('user_id', $member->id)->first();
+        $this->assertNotNull($firstSubmission);
+        $this->assertSame('First Submission', $firstSubmission->answers['full_name'] ?? null);
+        $this->assertSame(FormAnswerReviewStatus::Pending, $firstSubmission->review_status);
+
+        $this->actingAs($admin)
+             ->patchJson($this->reviewPath($event, $form, $firstSubmission), [
+                 'review_status' => FormAnswerReviewStatus::Rejected->value,
+             ])
+             ->assertOk()
+             ->assertJsonPath('review_status', FormAnswerReviewStatus::Rejected->value);
+
+        $firstSubmission->refresh();
+        $this->assertSame(FormAnswerReviewStatus::Rejected, $firstSubmission->review_status);
+
+        $this->actingAs($member)
+             ->get($this->fillPath($event, $form))
+             ->assertOk()
+             ->assertInertia(
+                 fn ($page) => $page->where('accessStatus', FormAccessStatus::Allowed->value)
+             );
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'Second Submission'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $this->assertDatabaseCount('form_answers', 2);
+
+        $secondSubmission = FormAnswer::query()
+            ->where('form_id', $form->id)
+            ->where('user_id', $member->id)
+            ->where('review_status', FormAnswerReviewStatus::Pending)
+            ->first();
+
+        $this->assertNotNull($secondSubmission);
+        $this->assertSame('Second Submission', $secondSubmission->answers['full_name'] ?? null);
+        $this->assertNotSame((string) $firstSubmission->id, (string) $secondSubmission->id);
+
+        $this->assertDatabaseHas('form_answers', [
+            'id' => $firstSubmission->id,
+            'review_status' => FormAnswerReviewStatus::Rejected->value,
+        ]);
+    }
+
+    public function test_user_can_submit_different_form_after_rejection_on_first_form(): void
+    {
+        $admin  = $this->admin();
+        $member = $this->member();
+        $event  = $this->openEvent();
+        $formA  = $this->openForm($event, ['title' => 'Form A']);
+        $formB  = $this->openForm($event, ['title' => 'Form B']);
+        $this->textField($formA);
+        $this->textField($formB);
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $formA), ['full_name' => 'Submission Form A'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $submissionA = FormAnswer::query()->where('form_id', $formA->id)->where('user_id', $member->id)->first();
+        $this->assertNotNull($submissionA);
+
+        $this->actingAs($member)
+             ->get($this->fillPath($event, $formB))
+             ->assertOk()
+             ->assertInertia(
+                 fn ($page) => $page->where('accessStatus', FormAccessStatus::EventFormAlreadyChosen->value)
+             );
+
+        $this->actingAs($admin)
+             ->patchJson($this->reviewPath($event, $formA, $submissionA), [
+                 'review_status' => FormAnswerReviewStatus::Rejected->value,
+             ])
+             ->assertOk();
+
+        $this->actingAs($member)
+             ->get($this->fillPath($event, $formB))
+             ->assertOk()
+             ->assertInertia(
+                 fn ($page) => $page->where('accessStatus', FormAccessStatus::Allowed->value)
+             );
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $formB), ['full_name' => 'Submission Form B'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $this->assertDatabaseHas('form_answers', [
+            'form_id' => $formA->id,
+            'user_id' => $member->id,
+            'review_status' => FormAnswerReviewStatus::Rejected->value,
+        ]);
+
+        $this->assertDatabaseHas('form_answers', [
+            'form_id' => $formB->id,
+            'user_id' => $member->id,
+            'review_status' => FormAnswerReviewStatus::Pending->value,
+        ]);
+    }
+
+    public function test_new_team_leader_can_invite_member_after_admin_rejection(): void
+    {
+        Mail::fake();
+
+        $admin       = $this->admin();
+        $firstLeader = $this->member();
+        $secondLeader = $this->member();
+        $memberUser  = $this->member();
+        $event       = $this->openEvent();
+        $form        = $this->openForm($event, [
+            'metadata' => [
+                'registration_mode' => 'team',
+                'team_size' => 2,
+            ],
+        ]);
+        $this->textField($form);
+
+        $this->actingAs($firstLeader)
+             ->post($this->submitPath($event, $form), [
+                 'full_name' => 'First Leader',
+                 'team_member_emails' => [$memberUser->email],
+             ])
+             ->assertRedirect($this->submitSuccessRedirect($event, $firstLeader));
+
+        $memberSubmission = FormAnswer::query()
+            ->where('form_id', $form->id)
+            ->where('user_id', $memberUser->id)
+            ->where('registration_role', RegistrationRole::Member)
+            ->firstOrFail();
+
+        $token = $memberSubmission->invitation_token;
+        $this->assertNotNull($token);
+
+        $this->actingAs($memberUser)
+             ->post(route('dashboard.user.team-invitations.update', ['token' => $token], false), [
+                 'invitation_decision' => 'accept',
+             ])
+             ->assertRedirect(route('dashboard.user.events.show', ['event_segment' => $event->slug], false));
+
+        $memberSubmission->refresh();
+        $this->assertSame(MemberConfirmationStatus::Accepted, $memberSubmission->member_confirmation_status);
+
+        $this->actingAs($admin)
+             ->patchJson($this->reviewPath($event, $form, $memberSubmission), [
+                 'review_status' => FormAnswerReviewStatus::Rejected->value,
+             ])
+             ->assertOk();
+
+        $memberSubmission->refresh();
+        $this->assertSame(FormAnswerReviewStatus::Rejected, $memberSubmission->review_status);
+
+        $this->actingAs($secondLeader)
+             ->post($this->submitPath($event, $form), [
+                 'full_name' => 'Second Leader',
+                 'team_member_emails' => [$memberUser->email],
+             ])
+             ->assertRedirect($this->submitSuccessRedirect($event, $secondLeader));
+
+        $this->assertDatabaseCount('form_answers', 4);
+
+        $newMemberSubmission = FormAnswer::query()
+            ->where('form_id', $form->id)
+            ->where('user_id', $memberUser->id)
+            ->where('registration_role', RegistrationRole::Member)
+            ->where('review_status', FormAnswerReviewStatus::Pending)
+            ->first();
+
+        $this->assertNotNull($newMemberSubmission);
+        $this->assertNotSame((string) $memberSubmission->id, (string) $newMemberSubmission->id);
+    }
+
+    public function test_member_can_register_individually_after_declining_invitation(): void
+    {
+        Mail::fake();
+
+        $leader     = $this->member();
+        $memberUser = $this->member();
+        $event      = $this->openEvent();
+        $teamForm   = $this->openForm($event, [
+            'title' => 'Team Form',
+            'metadata' => [
+                'registration_mode' => 'team',
+                'team_size' => 2,
+            ],
+        ]);
+        $singleForm = $this->openForm($event, [
+            'title' => 'Individual Form',
+            'metadata' => [
+                'registration_mode' => 'single',
+            ],
+        ]);
+        $this->textField($teamForm);
+        $this->textField($singleForm);
+
+        $this->actingAs($leader)
+             ->post($this->submitPath($event, $teamForm), [
+                 'full_name' => 'Team Leader',
+                 'team_member_emails' => [$memberUser->email],
+             ])
+             ->assertRedirect($this->submitSuccessRedirect($event, $leader));
+
+        $memberSubmission = FormAnswer::query()
+            ->where('form_id', $teamForm->id)
+            ->where('user_id', $memberUser->id)
+            ->where('registration_role', RegistrationRole::Member)
+            ->first();
+
+        $this->assertNotNull($memberSubmission);
+        $token = $memberSubmission->invitation_token;
+
+        $this->actingAs($memberUser)
+             ->post(route('dashboard.user.team-invitations.update', ['token' => $token], false), [
+                 'invitation_decision' => 'reject',
+                 'decline_reason' => 'I want to register individually',
+             ])
+             ->assertRedirect(route('dashboard.user.events.show', ['event_segment' => $event->slug], false));
+
+        $this->assertDatabaseMissing('form_answers', ['id' => $memberSubmission->id]);
+
+        $this->actingAs($memberUser)
+             ->get($this->fillPath($event, $singleForm))
+             ->assertOk()
+             ->assertInertia(
+                 fn ($page) => $page->where('accessStatus', FormAccessStatus::Allowed->value)
+             );
+
+        $this->actingAs($memberUser)
+             ->post($this->submitPath($event, $singleForm), ['full_name' => 'Individual Registration'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $memberUser));
+
+        $individualSubmission = FormAnswer::query()
+            ->where('form_id', $singleForm->id)
+            ->where('user_id', $memberUser->id)
+            ->whereNull('registration_role')
+            ->first();
+
+        $this->assertNotNull($individualSubmission);
+        $this->assertSame('Individual Registration', $individualSubmission->answers['full_name'] ?? null);
+    }
+
+    public function test_rejected_submissions_remain_in_database_for_audit(): void
+    {
+        $admin  = $this->admin();
+        $member = $this->member();
+        $event  = $this->openEvent();
+        $form   = $this->openForm($event);
+        $this->textField($form);
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'First Try'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $firstSubmission = FormAnswer::query()->where('form_id', $form->id)->where('user_id', $member->id)->first();
+
+        $this->actingAs($admin)
+             ->patchJson($this->reviewPath($event, $form, $firstSubmission), [
+                 'review_status' => FormAnswerReviewStatus::Rejected->value,
+             ])
+             ->assertOk();
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'Second Try'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $this->actingAs($admin)
+             ->get($this->submissionsPath($event, $form))
+             ->assertOk()
+             ->assertInertia(fn ($page) => $page->has('submissions.data', 2));
+
+        $this->assertDatabaseHas('form_answers', [
+            'id' => $firstSubmission->id,
+            'review_status' => FormAnswerReviewStatus::Rejected->value,
+        ]);
+    }
+
+    public function test_quota_counting_with_rejected_submissions(): void
+    {
+        $admin  = $this->admin();
+        $member = $this->member();
+        $event  = $this->openEvent(['quota' => 1, 'registered_count' => 0]);
+        $form   = $this->openForm($event);
+        $this->textField($form);
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'First Submission'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $event->refresh();
+        $this->assertSame(1, $event->registered_count);
+
+        $firstSubmission = FormAnswer::query()->where('form_id', $form->id)->where('user_id', $member->id)->first();
+
+        $this->actingAs($admin)
+             ->patchJson($this->reviewPath($event, $form, $firstSubmission), [
+                 'review_status' => FormAnswerReviewStatus::Rejected->value,
+             ])
+             ->assertOk();
+
+        $event->refresh();
+        $this->assertSame(0, $event->registered_count);
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'Second Submission'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $event->refresh();
+        $this->assertSame(1, $event->registered_count);
+
+        $this->assertDatabaseCount('form_answers', 2);
+        $activeSubmission = FormAnswer::query()
+            ->where('form_id', $form->id)
+            ->where('user_id', $member->id)
+            ->where('review_status', FormAnswerReviewStatus::Pending)
+            ->first();
+        $this->assertNotNull($activeSubmission);
+        $this->assertSame('Second Submission', $activeSubmission->answers['full_name'] ?? null);
+    }
+
+    public function test_registration_counter_reconcile_matches_active_submissions(): void
+    {
+        $admin  = $this->admin();
+        $member = $this->member();
+        $event  = $this->openEvent(['quota' => 10, 'registered_count' => 0]);
+        $form   = $this->openForm($event);
+        $this->textField($form);
+
+        $this->actingAs($member)
+             ->post($this->submitPath($event, $form), ['full_name' => 'Jane'])
+             ->assertRedirect($this->submitSuccessRedirect($event, $member));
+
+        $event->forceFill(['registered_count' => 99])->save();
+
+        $submission = FormAnswer::query()->where('form_id', $form->id)->where('user_id', $member->id)->firstOrFail();
+
+        $counter = app(EventRegistrationCounter::class);
+        $this->assertSame(1, $counter->countOccupyingSlotsForEvent($event));
+        $this->assertSame(1, $counter->reconcile($event->fresh()));
+
+        $event->refresh();
+        $this->assertSame(1, $event->registered_count);
+
+        $this->actingAs($admin)
+             ->patchJson($this->reviewPath($event, $form, $submission), [
+                 'review_status' => FormAnswerReviewStatus::Rejected->value,
+             ])
+             ->assertOk();
+
+        $this->assertSame(0, $counter->countOccupyingSlotsForEvent($event->fresh()));
+        $this->assertSame(0, $counter->reconcile($event->fresh()));
+
+        $event->refresh();
+        $this->assertSame(0, $event->registered_count);
+    }
+
+    public function test_declining_invitation_releases_registered_count(): void
+    {
+        Mail::fake();
+
+        $leader     = $this->member();
+        $memberUser = $this->member();
+        $event      = $this->openEvent(['quota' => 10, 'registered_count' => 0]);
+        $form       = $this->openForm($event, [
+            'metadata' => [
+                'registration_mode' => 'team',
+                'team_size' => 2,
+            ],
+        ]);
+        $this->textField($form);
+
+        $this->actingAs($leader)
+             ->post($this->submitPath($event, $form), [
+                 'full_name' => 'Team Leader',
+                 'team_member_emails' => [$memberUser->email],
+             ])
+             ->assertRedirect($this->submitSuccessRedirect($event, $leader));
+
+        $event->refresh();
+        $this->assertSame(2, $event->registered_count);
+
+        $memberSubmission = FormAnswer::query()
+            ->where('form_id', $form->id)
+            ->where('user_id', $memberUser->id)
+            ->where('registration_role', RegistrationRole::Member)
+            ->firstOrFail();
+
+        $this->actingAs($memberUser)
+             ->post(route('dashboard.user.team-invitations.update', ['token' => $memberSubmission->invitation_token], false), [
+                 'invitation_decision' => 'reject',
+                 'decline_reason' => 'Cannot join this team.',
+             ])
+             ->assertRedirect(route('dashboard.user.events.show', ['event_segment' => $event->slug], false));
+
+        $event->refresh();
+        $this->assertSame(1, $event->registered_count);
     }
 }

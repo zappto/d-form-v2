@@ -14,6 +14,7 @@ use App\Services\Form\FormAccessGuard;
 use App\Services\Form\RulesBuilder;
 use App\Services\Registration\BundleRegistrationSubmitter;
 use App\Services\Registration\BundleSubmissionRules;
+use App\Services\Registration\EventRegistrationCounter;
 use App\Services\Registration\TeamRegistrationSubmitter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class FormSubmissionController extends Controller
     public function __construct(
         private TeamRegistrationSubmitter $teamRegistrationSubmitter,
         private BundleRegistrationSubmitter $bundleRegistrationSubmitter,
+        private EventRegistrationCounter $registrationCounter,
     ) {
     }
 
@@ -111,13 +113,22 @@ class FormSubmissionController extends Controller
         $submission = DB::transaction(function () use ($answers, $form, $user, $event, $isAdmin): FormAnswer {
             $lockedEvent = Event::query()->lockForUpdate()->find($event->id);
 
-            if (! $isAdmin
-                && $lockedEvent->quota !== null
-                && $lockedEvent->quota > 0
-                && $lockedEvent->registered_count >= $lockedEvent->quota
-            ) {
-                throw new \App\Exceptions\QuotaExceededException();
+            if ($lockedEvent === null) {
+                throw new \RuntimeException('Event not found.');
             }
+
+            if (FormAnswer::query()
+                ->where('form_id', $form->id)
+                ->where('user_id', $user->id)
+                ->excludeRejectedSubmissions()
+                ->lockForUpdate()
+                ->exists()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'form' => __('You have already submitted this form.'),
+                ]);
+            }
+
+            $this->registrationCounter->assertCanReserve($lockedEvent, 1, $isAdmin);
 
             $submission = FormAnswer::create([
                 'answers' => $answers,
@@ -125,7 +136,7 @@ class FormSubmissionController extends Controller
                 'user_id' => (string) $user->id,
             ]);
 
-            $lockedEvent->increment('registered_count');
+            $this->registrationCounter->reserveLocked($lockedEvent, 1);
 
             return $submission;
         });

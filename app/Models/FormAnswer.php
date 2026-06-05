@@ -108,6 +108,32 @@ class FormAnswer extends Model
         });
     }
 
+    /**
+     * Exclude rejected submissions from duplicate registration checks.
+     *
+     * Allows users to re-register after:
+     * - Admin rejection (review_status = rejected)
+     * - Invitation decline/expiry (member_confirmation_status = rejected/expired for members)
+     */
+    public function scopeExcludeRejectedSubmissions(Builder $query): Builder
+    {
+        return $query->where(static function (Builder $w): void {
+            $w->where(function (Builder $notRejected): void {
+                $notRejected
+                    ->whereNull('review_status')
+                    ->orWhere('review_status', '!=', FormAnswerReviewStatus::Rejected->value);
+            })->where(function (Builder $notTerminatedInvitation): void {
+                $notTerminatedInvitation->whereNull('registration_role')
+                    ->orWhere('registration_role', '!=', RegistrationRole::Member->value)
+                    ->orWhereNull('member_confirmation_status')
+                    ->orWhereNotIn('member_confirmation_status', [
+                        MemberConfirmationStatus::Rejected->value,
+                        MemberConfirmationStatus::Expired->value,
+                    ]);
+            });
+        });
+    }
+
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class);

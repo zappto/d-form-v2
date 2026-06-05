@@ -10,6 +10,7 @@ use App\Jobs\SendRegistrationRejectedJob;
 use App\Models\Event;
 use App\Models\Form;
 use App\Models\FormAnswer;
+use App\Services\Registration\EventRegistrationCounter;
 use App\Services\Registration\RegistrationCodeIssuer;
 use App\Enums\RegistrationRole;
 use Illuminate\Database\QueryException;
@@ -29,6 +30,7 @@ class FormAnswerReviewController extends Controller
         Form $form,
         FormAnswer $formAnswer,
         RegistrationCodeIssuer $codeIssuer,
+        EventRegistrationCounter $registrationCounter,
     ): JsonResponse {
         $this->authorize('review', $formAnswer);
 
@@ -62,7 +64,7 @@ class FormAnswerReviewController extends Controller
             ], 422);
         }
 
-        $payload = DB::transaction(function () use ($request, $form, $formAnswer, $newStatus, $codeIssuer): array {
+        $payload = DB::transaction(function () use ($request, $form, $formAnswer, $newStatus, $codeIssuer, $registrationCounter): array {
             /** @var FormAnswer|null $locked */
             $locked = FormAnswer::query()
                 ->whereKey($formAnswer->id)
@@ -81,6 +83,8 @@ class FormAnswerReviewController extends Controller
                 ];
             }
 
+            $before = $locked->replicate();
+
             $locked->forceFill([
                 'review_status' => $newStatus,
                 'reviewed_at' => now(),
@@ -91,6 +95,10 @@ class FormAnswerReviewController extends Controller
                 $this->saveAcceptedWithUniqueRegistrationCode($locked, $codeIssuer);
             } else {
                 $locked->save();
+            }
+
+            if ($newStatus === FormAnswerReviewStatus::Rejected) {
+                $registrationCounter->releaseIfStoppedOccupying($before, $locked->fresh());
             }
 
             return [

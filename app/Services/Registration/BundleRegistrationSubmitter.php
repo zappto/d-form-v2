@@ -4,7 +4,6 @@ namespace App\Services\Registration;
 
 use App\Enums\MemberConfirmationStatus;
 use App\Enums\RegistrationRole;
-use App\Exceptions\QuotaExceededException;
 use App\Models\Event;
 use App\Models\Form;
 use App\Models\FormAnswer;
@@ -15,6 +14,11 @@ use Illuminate\Validation\ValidationException;
 
 final class BundleRegistrationSubmitter
 {
+    public function __construct(
+        private EventRegistrationCounter $registrationCounter,
+    ) {
+    }
+
     public static function isBundleForm(Form $form): bool
     {
         $metadata = $form->metadata;
@@ -55,18 +59,6 @@ final class BundleRegistrationSubmitter
             ]);
         }
 
-        $participants = array_merge([$leaderUser], $memberUsers);
-        foreach ($participants as $participant) {
-            if (FormAnswer::query()
-                ->where('form_id', $form->id)
-                ->where('user_id', $participant->id)
-                ->exists()) {
-                throw ValidationException::withMessages([
-                    'team_member_emails' => __('A participant is already registered for this form.'),
-                ]);
-            }
-        }
-
         $memberAnswerRows = array_map(
             fn (array $row) => json_decode(json_encode($row, JSON_THROW_ON_ERROR), true),
             $memberAnswerRows
@@ -87,12 +79,21 @@ final class BundleRegistrationSubmitter
                 throw new \RuntimeException('Event not found.');
             }
 
-            if (! $adminExemptFromQuota
-                && $lockedEvent->quota !== null
-                && $lockedEvent->quota > 0
-                && $lockedEvent->registered_count + $teamSize > $lockedEvent->quota) {
-                throw new QuotaExceededException();
+            $participants = array_merge([$leaderUser], $memberUsers);
+            foreach ($participants as $participant) {
+                if (FormAnswer::query()
+                    ->where('form_id', $form->id)
+                    ->where('user_id', $participant->id)
+                    ->excludeRejectedSubmissions()
+                    ->lockForUpdate()
+                    ->exists()) {
+                    throw ValidationException::withMessages([
+                        'team_member_emails' => __('A participant is already registered for this form.'),
+                    ]);
+                }
             }
+
+            $this->registrationCounter->assertCanReserve($lockedEvent, $teamSize, $adminExemptFromQuota);
 
             $groupToken = $this->generateUniqueGroupToken((string) $form->id);
             $inviteExpiresAt = now()->addDays((int) config('registration.invitation_ttl_days', 7));
@@ -128,7 +129,7 @@ final class BundleRegistrationSubmitter
                 ]);
             }
 
-            $lockedEvent->increment('registered_count', $teamSize);
+            $this->registrationCounter->reserveLocked($lockedEvent, $teamSize);
 
             return [
                 'leader' => $leader->fresh(),
