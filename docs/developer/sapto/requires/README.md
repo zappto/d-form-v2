@@ -7,6 +7,7 @@ Folder ini berisi **dokumentasi PRD-style** yang memetakan apa yang sudah ada di
 | Dokumen | Deskripsi |
 |---------|-----------|
 | [frontend-backend-requirements-prd.md](./frontend-backend-requirements-prd.md) | Dokumen utama: ringkasan eksekutif, matriks gap, kebutuhan per domain (user story, kontrak data proposal, kriteria penerimaan, prioritas), non-fungsional |
+| [admin-bundling-submissions-requirements.md](./admin-bundling-submissions-requirements.md) | Requirement khusus perubahan konsep admin submissions untuk form bertipe bundling: group cards, detail peserta dalam group, dan aturan locked untuk member yang belum approve undangan |
 
 **Versi dokumen utama:** lihat header di `frontend-backend-requirements-prd.md`.
 
