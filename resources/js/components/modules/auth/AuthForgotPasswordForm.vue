@@ -1,27 +1,43 @@
 <script setup lang="ts">
-import { Link, useForm, usePage } from '@inertiajs/vue3'
-import { AuthSubmitButton } from '@/components/core/button'
+import { Link } from '@inertiajs/vue3'
+import axios from 'axios'
+import { ref } from 'vue'
 import { AuthField } from '@/components/core/field'
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController'
-import { store as forgotPassword } from '@/actions/App/Http/Controllers/Auth/ForgotPasswordController'
 import { toast } from 'vue-sonner'
 
-const page = usePage()
+const PASSWORD_RESET_LINK_URL = '/auth/password-reset-link'
 
-const form = useForm({ email: '' })
+const email = ref('')
+const emailError = ref<string | undefined>()
+const processing = ref(false)
 
-function submit(): void {
-    form.submit(forgotPassword(), {
-        onFinish: () => {
-            const t = page.flash.toast
-            if (!t) return
-            if (t.type === 'success') {
-                toast.success(t.message)
-            } else {
-                toast.error(t.message)
-            }
-        },
-    })
+async function submit(): Promise<void> {
+    if (processing.value) {
+        return
+    }
+
+    emailError.value = undefined
+    processing.value = true
+
+    try {
+        const { data } = await axios.post<{ message: string }>(PASSWORD_RESET_LINK_URL, {
+            email: email.value,
+        })
+        toast.success(data.message)
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 422) {
+            const errors = error.response.data?.errors as Record<string, string[]> | undefined
+            emailError.value = errors?.email?.[0]
+            return
+        }
+
+        toast.error('Unable to send reset link. Please try again.')
+    } finally {
+        processing.value = false
+    }
 }
 </script>
 
@@ -37,20 +53,23 @@ function submit(): void {
         <form @submit.prevent="submit" class="space-y-5">
             <AuthField
                 type="email"
-                :error="form.errors.email"
+                :error="emailError"
                 label="Email"
                 id="forgot-email"
-                v-model="form.email"
+                v-model="email"
                 required
                 autocomplete="email"
                 placeholder="you@example.com"
                 :focus="true"
             />
 
-            <AuthSubmitButton :form="form">
-                <template #processing>Sending link</template>
-                Send reset link
-            </AuthSubmitButton>
+            <Button size="lg" class="w-full disabled:cursor-not-allowed" :disabled="processing">
+                <span v-if="processing" class="flex items-center gap-2">
+                    <Spinner />
+                    Sending link
+                </span>
+                <span v-else>Send reset link</span>
+            </Button>
 
             <p class="mt-2 text-center text-sm text-muted-foreground">
                 Remember your password?

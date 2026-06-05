@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\OAuthController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'store'])
         ->middleware('throttle:5,1,auth-password-email')
         ->name('auth.password.email');
+    Route::post('/auth/password-reset-link', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:5,1,auth-password-email')
+        ->name('auth.password.reset-link');
 
     Route::get('/auth/reset-password/{token}', [ResetPasswordController::class, 'index'])->name('password.reset');
     Route::post('/auth/reset-password/{token}', [ResetPasswordController::class, 'store'])

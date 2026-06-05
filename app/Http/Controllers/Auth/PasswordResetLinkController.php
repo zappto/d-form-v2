@@ -5,24 +5,16 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ForgotPasswordStoreRequest;
 use App\Services\Auth\PasswordResetService;
-use Inertia\Inertia;
+use Illuminate\Http\JsonResponse;
 
-class ForgotPasswordController extends Controller
+class PasswordResetLinkController extends Controller
 {
-    public function index()
-    {
-        return inertia('Auth/ForgotPassword');
-    }
-
-    public function store(ForgotPasswordStoreRequest $request, PasswordResetService $passwordReset)
+    public function store(ForgotPasswordStoreRequest $request, PasswordResetService $passwordReset): JsonResponse
     {
         $passwordReset->sendResetLink($request->validated('email'));
 
-        Inertia::flash('toast', [
+        return response()->json([
             'message' => 'If an account exists for that email, we sent a password reset link.',
-            'type' => 'success',
         ]);
-
-        return Inertia::back();
     }
 }

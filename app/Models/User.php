@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -40,6 +41,7 @@ class User extends Authenticatable implements CanResetPasswordContract
         'avatar',
         'google_id',
         'github_id',
+        'email_verified_at',
     ];
 
     /**
@@ -73,5 +75,13 @@ class User extends Authenticatable implements CanResetPasswordContract
     public function attendanceScansRecorded(): HasMany
     {
         return $this->hasMany(EventAttendance::class, 'scanned_by_user_id');
+    }
+
+    /**
+     * Send the password reset notification.
+     */
+    public function sendPasswordResetNotification(#[\SensitiveParameter] mixed $token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
