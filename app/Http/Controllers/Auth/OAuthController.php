@@ -26,6 +26,7 @@ class OAuthController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->user();
+            $emailVerified = (bool) ($googleUser->user['email_verified'] ?? false);
 
             // First check if user exists with this Google ID
             $user = User::where('google_id', $googleUser->getId())->first();
@@ -48,6 +49,8 @@ class OAuthController extends Controller
                     ]);
                 }
 
+                $this->syncEmailVerifiedFromGoogle($user, $emailVerified);
+
                 Auth::login($user);
 
                 return $this->flashSuccessAndRedirectIntended();
@@ -60,7 +63,7 @@ class OAuthController extends Controller
                 'google_id' => $googleUser->getId(),
                 'avatar' => $googleUser->getAvatar(),
                 'password' => null,
-                'email_verified_at' => now(),
+                'email_verified_at' => $emailVerified ? now() : null,
             ]);
 
             $user->assignRole('member');
@@ -163,5 +166,13 @@ class OAuthController extends Controller
             : route('dashboard.user.events', absolute: false);
 
         return redirect()->intended($default);
+    }
+
+    private function syncEmailVerifiedFromGoogle(User $user, bool $emailVerified): void
+    {
+        if ($emailVerified && $user->email_verified_at === null) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
     }
 }
