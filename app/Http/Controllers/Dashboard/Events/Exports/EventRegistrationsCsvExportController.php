@@ -33,16 +33,19 @@ class EventRegistrationsCsvExportController extends Controller
                 'user_email',
                 'registration_code',
                 'review_status',
+                'group_token',
+                'registration_role',
+                'member_confirmation_status',
+                'leader_email',
                 'submitted_at',
                 'answers_summary',
             ]);
 
             FormAnswer::query()
                 ->join('forms', 'form_answers.form_id', '=', 'forms.id')
-                ->with(['user:id,name,email', 'form:id,title'])
+                ->with(['user:id,name,email', 'form:id,title', 'teamLeaderSubmission.user:id,email'])
                 ->whereNull('forms.deleted_at')
                 ->where('forms.event_id', $event->id)
-                ->whereListedForOrganizerParticipantRoster()
                 ->select('form_answers.*')
                 ->orderByDesc('form_answers.created_at')
                 ->chunk(250, function ($answers) use ($out, $summarizer): void {
@@ -50,6 +53,7 @@ class EventRegistrationsCsvExportController extends Controller
                         /** @var FormAnswer $answer */
                         $form = $answer->form;
                         $user = $answer->user;
+                        $leaderEmail = $answer->teamLeaderSubmission?->user?->email ?? '';
 
                         $summaryParts = [];
                         foreach ($summarizer->summarize($answer) as $label => $value) {
@@ -64,6 +68,10 @@ class EventRegistrationsCsvExportController extends Controller
                             $user?->email ?? '',
                             (string) ($answer->registration_code ?? ''),
                             $answer->review_status?->value ?? '',
+                            $answer->group_token ?? '',
+                            $answer->registration_role?->value ?? '',
+                            $answer->member_confirmation_status?->value ?? '',
+                            $leaderEmail,
                             $answer->created_at->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
                             implode(' | ', $summaryParts),
                         ]);

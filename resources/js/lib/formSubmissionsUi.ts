@@ -71,3 +71,87 @@ export function submissionReviewBadge(
         class: 'border-warning/30 bg-warning/10 text-warning',
     }
 }
+
+/** Label untuk status konfirmasi anggota (Bahasa Indonesia). */
+export function memberConfirmationStatusLabel(
+    status: 'pending' | 'accepted' | 'rejected' | 'expired' | null | undefined,
+): string {
+    if (status === 'accepted') return 'Diterima'
+    if (status === 'rejected') return 'Ditolak'
+    if (status === 'expired') return 'Kedaluwarsa'
+    if (status === 'pending') return 'Menunggu'
+    return '—'
+}
+
+/** Badge classes untuk status konfirmasi anggota. */
+export function memberConfirmationStatusBadge(
+    status: 'pending' | 'accepted' | 'rejected' | 'expired' | null | undefined,
+): { label: string; class: string } {
+    if (status === 'accepted') {
+        return {
+            label: 'Diterima',
+            class: 'border-success/30 bg-success/10 text-success',
+        }
+    }
+    if (status === 'rejected') {
+        return {
+            label: 'Ditolak',
+            class: 'border-destructive/25 bg-destructive/10 text-destructive',
+        }
+    }
+    if (status === 'expired') {
+        return {
+            label: 'Kedaluwarsa',
+            class: 'border-muted-foreground/25 bg-muted/20 text-muted-foreground',
+        }
+    }
+    return {
+        label: 'Menunggu',
+        class: 'border-warning/30 bg-warning/10 text-warning',
+    }
+}
+
+/** Label untuk status review group. */
+export function groupReviewStatusLabel(
+    status: 'pending' | 'partial' | 'accepted' | 'rejected',
+): string {
+    if (status === 'accepted') return 'Semua diterima'
+    if (status === 'rejected') return 'Ditolak'
+    if (status === 'partial') return 'Sebagian direview'
+    return 'Menunggu review'
+}
+
+/** Badge classes untuk status review group. */
+export function groupReviewStatusBadge(
+    status: 'pending' | 'partial' | 'accepted' | 'rejected',
+): { label: string; class: string } {
+    if (status === 'accepted') {
+        return {
+            label: 'Semua diterima',
+            class: 'border-success/30 bg-success/10 text-success',
+        }
+    }
+    if (status === 'rejected') {
+        return {
+            label: 'Ditolak',
+            class: 'border-destructive/25 bg-destructive/10 text-destructive',
+        }
+    }
+    if (status === 'partial') {
+        return {
+            label: 'Sebagian direview',
+            class: 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400',
+        }
+    }
+    return {
+        label: 'Menunggu review',
+        class: 'border-warning/30 bg-warning/10 text-warning',
+    }
+}
+
+/** Label untuk role registrasi. */
+export function registrationRoleLabel(role: 'leader' | 'member' | null | undefined): string {
+    if (role === 'leader') return 'Ketua'
+    if (role === 'member') return 'Anggota'
+    return '—'
+}

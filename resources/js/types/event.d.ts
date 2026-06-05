@@ -35,6 +35,7 @@ declare global {
         banner_url: string | null
         banner_caption: string | null
         metadata?: Record<string, unknown>
+        registration_mode?: 'single' | 'bundle'
     }
 
     type FormFieldOptionType = 'text' | 'image'
@@ -110,6 +111,26 @@ declare global {
         value: string | number
         trend: number
         icon: string
+    }
+
+    interface IBundleSubmissionMember extends IFormSubmission {
+        invited_email?: string | null
+        can_open_detail: boolean
+        can_review: boolean
+        locked_reason?: string | null
+    }
+
+    interface IBundleSubmissionGroup {
+        group_token: string
+        leader: IBundleSubmissionMember
+        members: IBundleSubmissionMember[]
+        total_participants: number
+        accepted_count: number
+        pending_count: number
+        rejected_count: number
+        expired_count: number
+        group_review_status: 'pending' | 'partial' | 'accepted' | 'rejected'
+        submitted_at: string
     }
 }
 

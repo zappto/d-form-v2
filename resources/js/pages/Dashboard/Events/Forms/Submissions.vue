@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import PageHeader from '@/components/modules/dashboard/PageHeader.vue';
 import FormSubmissionsEmptyState from '@/components/modules/dashboard/FormSubmissionsEmptyState.vue';
 import FormSubmissionsCardGridView from '@/components/modules/dashboard/FormSubmissionsCardGridView.vue';
+import FormBundleGroupsCardGridView from '@/components/modules/dashboard/FormBundleGroupsCardGridView.vue';
+import FormBundleGroupDetailSheet from '@/components/modules/dashboard/FormBundleGroupDetailSheet.vue';
 import FormSubmissionsPagination from '@/components/modules/dashboard/FormSubmissionsPagination.vue';
 import FormSubmissionDetailSheet from '@/components/modules/dashboard/FormSubmissionDetailSheet.vue';
 import { Download } from 'lucide-vue-next';
@@ -15,10 +17,18 @@ defineOptions({ layout: DashboardFocusLayout });
 
 const props = defineProps<{
     event: { id: string; title: string };
-    form: { id: string; title: string };
+    form: { id: string; title: string; registration_mode?: 'single' | 'bundle' };
     fields: IFormField[];
-    submissions: {
+    submissions?: {
         data: IFormSubmission[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links?: { url: string | null; label: string; active: boolean }[];
+    };
+    bundleGroups?: {
+        data: IBundleSubmissionGroup[];
         current_page: number;
         last_page: number;
         per_page: number;
@@ -55,24 +65,53 @@ function onReview(payload: { action: 'accept' | 'reject'; submission: IFormSubmi
                 </template>
             </PageHeader>
 
-            <FormSubmissionsEmptyState v-if="submissions.data.length === 0" />
+            <template v-if="form.registration_mode === 'bundle' && bundleGroups">
+                <FormSubmissionsEmptyState v-if="bundleGroups.data.length === 0" />
 
-            <template v-else>
-                <FormSubmissionsCardGridView
-                    :submissions="submissions.data"
-                    :format-date="s.formatDate"
-                    @open-detail="s.openDetail"
-                />
+                <template v-else>
+                    <FormBundleGroupsCardGridView
+                        :bundle-groups="bundleGroups.data"
+                        :format-date="s.formatDate"
+                        @open-group="s.openGroupDetail"
+                    />
 
-                <FormSubmissionsPagination
-                    :links="submissions.links"
-                    :current-page="submissions.current_page"
-                    :last-page="submissions.last_page"
-                    :total="submissions.total"
-                />
+                    <FormSubmissionsPagination
+                        :links="bundleGroups.links"
+                        :current-page="bundleGroups.current_page"
+                        :last-page="bundleGroups.last_page"
+                        :total="bundleGroups.total"
+                    />
+                </template>
+            </template>
+
+            <template v-else-if="submissions">
+                <FormSubmissionsEmptyState v-if="submissions.data.length === 0" />
+
+                <template v-else>
+                    <FormSubmissionsCardGridView
+                        :submissions="submissions.data"
+                        :format-date="s.formatDate"
+                        @open-detail="s.openDetail"
+                    />
+
+                    <FormSubmissionsPagination
+                        :links="submissions.links"
+                        :current-page="submissions.current_page"
+                        :last-page="submissions.last_page"
+                        :total="submissions.total"
+                    />
+                </template>
             </template>
         </div>
     </div>
+
+    <FormBundleGroupDetailSheet
+        v-if="form.registration_mode === 'bundle'"
+        v-model:open="s.isGroupDetailOpen"
+        :group="s.selectedGroup"
+        :format-date="s.formatDate"
+        @open-detail="s.openDetail"
+    />
 
     <FormSubmissionDetailSheet
         v-model:open="s.isDetailOpen"

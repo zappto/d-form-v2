@@ -24,6 +24,15 @@ interface SubmissionPaginator {
     links?: PaginationLink[]
 }
 
+interface BundleGroupPaginator {
+    data: IBundleSubmissionGroup[]
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+    links?: PaginationLink[]
+}
+
 function readXsrfToken(): string | null {
     const m = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/)
     return m?.[1] ? decodeURIComponent(m[1]) : null
@@ -31,12 +40,15 @@ function readXsrfToken(): string | null {
 
 export function useFormSubmissionsPage(props: {
     event: { id: string; title: string }
-    form: { id: string; title: string }
+    form: { id: string; title: string; registration_mode?: 'single' | 'bundle' }
     fields: IFormField[]
-    submissions: SubmissionPaginator
+    submissions?: SubmissionPaginator
+    bundleGroups?: BundleGroupPaginator
 }) {
     const selectedSubmission = ref<IFormSubmission | null>(null)
     const isDetailOpen = ref(false)
+    const selectedGroup = ref<IBundleSubmissionGroup | null>(null)
+    const isGroupDetailOpen = ref(false)
     const reviewingIds = ref<Set<string>>(new Set())
 
     const fieldLabelMap = computed(() => {
@@ -50,9 +62,22 @@ export function useFormSubmissionsPage(props: {
     const answerKeys = computed(() => {
         const keysFromFields = props.fields.map((f) => f.name)
         const keysInSubmissions = new Set<string>()
-        for (const submission of props.submissions.data) {
-            Object.keys(submission.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+        
+        if (props.submissions) {
+            for (const submission of props.submissions.data) {
+                Object.keys(submission.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+            }
         }
+        
+        if (props.bundleGroups) {
+            for (const group of props.bundleGroups.data) {
+                Object.keys(group.leader.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+                for (const member of group.members) {
+                    Object.keys(member.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+                }
+            }
+        }
+        
         const allKeys = [...new Set([...keysFromFields, ...keysInSubmissions])]
         return allKeys.slice(0, 4)
     })
@@ -60,9 +85,22 @@ export function useFormSubmissionsPage(props: {
     const allAnswerKeys = computed(() => {
         const keysFromFields = props.fields.map((f) => f.name)
         const keysInSubmissions = new Set<string>()
-        for (const submission of props.submissions.data) {
-            Object.keys(submission.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+        
+        if (props.submissions) {
+            for (const submission of props.submissions.data) {
+                Object.keys(submission.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+            }
         }
+        
+        if (props.bundleGroups) {
+            for (const group of props.bundleGroups.data) {
+                Object.keys(group.leader.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+                for (const member of group.members) {
+                    Object.keys(member.answers ?? {}).forEach((key) => keysInSubmissions.add(key))
+                }
+            }
+        }
+        
         return [...new Set([...keysFromFields, ...keysInSubmissions])]
     })
 
@@ -74,16 +112,35 @@ export function useFormSubmissionsPage(props: {
         return submissionFileUrl(value)
     }
 
-    function openDetail(submission: IFormSubmission) {
+    function openDetail(submission: IFormSubmission | IBundleSubmissionMember) {
+        // Check can_open_detail for bundle members
+        if ('can_open_detail' in submission && !submission.can_open_detail) {
+            return
+        }
+        
         selectedSubmission.value = submission
         isDetailOpen.value = true
+    }
+
+    function openGroupDetail(group: IBundleSubmissionGroup) {
+        selectedGroup.value = group
+        isGroupDetailOpen.value = true
+    }
+
+    function closeGroupDetail() {
+        isGroupDetailOpen.value = false
     }
 
     function isSubmissionReviewing(submissionId: string): boolean {
         return reviewingIds.value.has(submissionId)
     }
 
-    function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSubmission) {
+    function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSubmission | IBundleSubmissionMember) {
+        // Check can_review for bundle members
+        if ('can_review' in submission && !submission.can_review) {
+            return
+        }
+        
         const review_status = action === 'accept' ? 'accepted' : 'rejected'
         const id = submission.id
         const nextReviewing = new Set(reviewingIds.value)
@@ -142,11 +199,35 @@ export function useFormSubmissionsPage(props: {
 
                 toast.success(action === 'accept' ? 'Submission diterima.' : 'Submission ditolak.')
 
+                const reloadKeys = props.form.registration_mode === 'bundle' 
+                    ? ['bundleGroups'] 
+                    : ['submissions']
+
                 router.reload({
-                    only: ['submissions'],
+                    only: reloadKeys,
                     onSuccess: () => {
                         if (selectedSubmission.value?.id === id) {
-                            const next = props.submissions.data.find((s) => s.id === id)
+                            // Try to find updated submission in either submissions or bundleGroups
+                            let next: IFormSubmission | IBundleSubmissionMember | null = null
+                            
+                            if (props.submissions) {
+                                next = props.submissions.data.find((s) => s.id === id) ?? null
+                            }
+                            
+                            if (!next && props.bundleGroups) {
+                                for (const group of props.bundleGroups.data) {
+                                    if (group.leader.id === id) {
+                                        next = group.leader
+                                        break
+                                    }
+                                    const member = group.members.find((m) => m.id === id)
+                                    if (member) {
+                                        next = member
+                                        break
+                                    }
+                                }
+                            }
+                            
                             if (next) selectedSubmission.value = next
                         }
                     },
@@ -162,6 +243,8 @@ export function useFormSubmissionsPage(props: {
     return {
         selectedSubmission,
         isDetailOpen,
+        selectedGroup,
+        isGroupDetailOpen,
         fieldLabelMap,
         answerKeys,
         allAnswerKeys,
@@ -170,6 +253,8 @@ export function useFormSubmissionsPage(props: {
         answerPreview,
         fileUrl,
         openDetail,
+        openGroupDetail,
+        closeGroupDetail,
         submitSubmissionReview,
         isSubmissionReviewing,
     }

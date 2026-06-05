@@ -11,7 +11,7 @@ import FormFieldAnswerDisplay from '@/components/modules/dashboard/FormFieldAnsw
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue'
 
 const props = defineProps<{
-    submission: IFormSubmission | null
+    submission: IFormSubmission | IBundleSubmissionMember | null
     allAnswerKeys: string[]
     fields: IFormField[]
     formatDate: (v: string) => string
@@ -48,9 +48,21 @@ const orderedAnswerKeys = computed(() => {
 
 const open = defineModel<boolean>('open', { required: true })
 
-defineEmits<{
-    review: [payload: { action: 'accept' | 'reject'; submission: IFormSubmission }]
+const emit = defineEmits<{
+    review: [payload: { action: 'accept' | 'reject'; submission: IFormSubmission | IBundleSubmissionMember }]
 }>()
+
+const canReview = computed(() => {
+    if (!props.submission) return false
+    
+    // Check if this is a bundle member with can_review flag
+    if ('can_review' in props.submission) {
+        return props.submission.can_review
+    }
+    
+    // Default: can review if not blocked
+    return !submissionAdminAcceptBlocked(props.submission)
+})
 </script>
 
 <template>
@@ -162,6 +174,28 @@ defineEmits<{
 
                     <template v-if="formSubmissionReviewIsPending(submission)">
                         <div
+                            v-if="!canReview && 'locked_reason' in submission && submission.locked_reason"
+                            class="overflow-hidden rounded-2xl border border-border/70 bg-card/45 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
+                        >
+                            <div class="space-y-5 p-4 md:p-6">
+                                <div class="flex gap-3 rounded-xl border border-dashed border-border/80 bg-muted/30 px-3.5 py-3">
+                                    <Info
+                                        class="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                                        aria-hidden="true"
+                                    />
+                                    <div class="space-y-1.5">
+                                        <p class="text-[0.8125rem] font-medium leading-relaxed text-foreground">
+                                            Tidak dapat direview
+                                        </p>
+                                        <p class="text-[0.8125rem] leading-relaxed text-muted-foreground">
+                                            {{ submission.locked_reason }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            v-else
                             class="overflow-hidden rounded-2xl border border-border/70 bg-card/45 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
                         >
                             <div
@@ -191,8 +225,8 @@ defineEmits<{
                                         type="button"
                                         class="h-11 min-h-11 flex-1 gap-2 rounded-xl border-success/35 text-[0.8125rem] font-medium text-success hover:bg-success/10"
                                         variant="outline"
-                                        :disabled="isSubmissionReviewing(submission.id) || submissionAdminAcceptBlocked(submission)"
-                                        @click="$emit('review', { action: 'accept', submission })"
+                                        :disabled="isSubmissionReviewing(submission.id) || !canReview"
+                                        @click="emit('review', { action: 'accept', submission })"
                                     >
                                         <CheckCircle2 class="size-4 shrink-0" />
                                         Terima pengajuan
@@ -201,15 +235,15 @@ defineEmits<{
                                         type="button"
                                         class="h-11 min-h-11 flex-1 gap-2 rounded-xl border-destructive/35 text-[0.8125rem] font-medium text-destructive hover:bg-destructive/10"
                                         variant="outline"
-                                        :disabled="isSubmissionReviewing(submission.id)"
-                                        @click="$emit('review', { action: 'reject', submission })"
+                                        :disabled="isSubmissionReviewing(submission.id) || !canReview"
+                                        @click="emit('review', { action: 'reject', submission })"
                                     >
                                         <XCircle class="size-4 shrink-0" />
                                         Tolak pengajuan
                                     </Button>
                                 </div>
                                 <div
-                                    v-if="submissionAdminAcceptBlocked(submission)"
+                                    v-if="submissionAdminAcceptBlocked(submission) && canReview"
                                     class="flex gap-3 rounded-xl border border-dashed border-border/80 bg-muted/30 px-3.5 py-3"
                                 >
                                     <Info
