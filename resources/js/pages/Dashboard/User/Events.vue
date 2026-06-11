@@ -6,10 +6,12 @@ import PageHeader from '@/components/modules/dashboard/PageHeader.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SimpleSelect } from '@/components/ui/simple-select';
 import { Progress } from '@/components/ui/progress';
-import { Search, MapPin, CalendarDays, Users } from 'lucide-vue-next';
-import { formatDate, categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
+import { Search, MapPin, CalendarDays, Users, FilterX } from 'lucide-vue-next';
+import { formatDate, categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummyData';
 import { toCategoryList } from '@/lib/eventCategories';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 import { eventCardBannerContainerClass } from '@/lib/eventBannerAspect';
@@ -27,8 +29,53 @@ const props = withDefaults(
 
 const searchQuery = ref('');
 const filterCategory = ref('all');
+const filterSession = ref('all');
 
 const isBrowse = computed(() => props.listMode === 'browse');
+
+const categoryOptions = computed(() =>
+    Object.entries(categoryLabelMap).map(([value, label]) => ({ value, label }))
+);
+
+const categoryFilterOptions = computed(() => [
+    { value: 'all', label: 'Semua kategori' },
+    ...categoryOptions.value,
+]);
+
+const sessionOptions = computed(() => {
+    const tokens = new Set<string>();
+    for (const event of props.events) {
+        for (const session of eventTokenList(event.session)) tokens.add(session);
+    }
+    return [...tokens]
+        .sort((a, b) => (sessionLabelMap[a] ?? a).localeCompare(sessionLabelMap[b] ?? b))
+        .map((value) => ({ value, label: sessionLabelMap[value] ?? value }));
+});
+
+const sessionFilterOptions = computed(() => [
+    { value: 'all', label: 'Semua sesi' },
+    ...sessionOptions.value,
+]);
+
+function eventTokenList(v: unknown): string[] {
+    if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
+    if (typeof v === 'string')
+        return v
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+    return [];
+}
+
+const hasActiveFilters = computed(
+    () => searchQuery.value.trim() !== '' || filterCategory.value !== 'all' || filterSession.value !== 'all'
+);
+
+function clearFilters() {
+    searchQuery.value = '';
+    filterCategory.value = 'all';
+    filterSession.value = 'all';
+}
 
 const pageTitle = computed(() => (isBrowse.value ? 'Jelajah acara' : 'Acara diikuti'));
 const pageSubtitle = computed(() =>
@@ -48,6 +95,8 @@ const filteredEvents = computed(() => {
     }
     if (filterCategory.value !== 'all')
         list = list.filter((e) => toCategoryList(e.category).includes(filterCategory.value));
+    if (filterSession.value !== 'all')
+        list = list.filter((e) => eventTokenList(e.session).includes(filterSession.value));
     return list;
 });
 
@@ -65,12 +114,57 @@ const emptyDescription = computed(() =>
     <div class="flex flex-col gap-6">
         <PageHeader :title="pageTitle" :subtitle="pageSubtitle" />
 
-        <div class="border-border/60 bg-muted/30 flex flex-wrap items-center gap-3 rounded-xl border p-3 shadow-xs">
-            <div class="relative w-full max-w-xs">
-                <Search class="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                <Input v-model="searchQuery" placeholder="Cari acara…" class="pl-9" />
+        <section
+            class="app-surface border-border/70 overflow-hidden rounded-2xl border shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]"
+        >
+            <div class="flex flex-col gap-4 px-4 py-4 sm:px-6 sm:py-5">
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
+                    <div class="grid min-w-0 flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
+                        <div class="relative sm:col-span-2 lg:col-span-5">
+                            <Search
+                                class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                                aria-hidden="true"
+                            />
+                            <Input
+                                v-model="searchQuery"
+                                type="search"
+                                placeholder="Cari acara…"
+                                class="border-border/80 bg-background/80 h-10 w-full rounded-xl pl-9 shadow-inner"
+                                autocomplete="off"
+                                aria-label="Cari acara"
+                            />
+                        </div>
+                        <div class="lg:col-span-3">
+                            <SimpleSelect
+                                v-model="filterCategory"
+                                :options="categoryFilterOptions"
+                                class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
+                                aria-label="Filter kategori"
+                            />
+                        </div>
+                        <div class="lg:col-span-4">
+                            <SimpleSelect
+                                v-model="filterSession"
+                                :options="sessionFilterOptions"
+                                class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
+                                aria-label="Filter sesi"
+                            />
+                        </div>
+                    </div>
+                    <Button
+                        v-if="hasActiveFilters"
+                        variant="outline"
+                        size="sm"
+                        class="h-10 w-full shrink-0 gap-2 rounded-xl border-dashed sm:w-auto lg:self-end"
+                        type="button"
+                        @click="clearFilters"
+                    >
+                        <FilterX class="size-3.5" />
+                        Reset
+                    </Button>
+                </div>
             </div>
-        </div>
+        </section>
 
         <div v-if="filteredEvents.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Link

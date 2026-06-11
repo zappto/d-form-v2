@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SimpleSelect } from '@/components/ui/simple-select';
 import { Progress } from '@/components/ui/progress';
 import {
     Plus,
@@ -69,6 +69,16 @@ let suppressFilterApply = false;
 
 const categoryOptions = computed(() => props.filterOptions.categories);
 const sessionOptions = computed(() => props.filterOptions.sessions);
+
+const categoryFilterOptions = computed(() => [
+    { value: 'all', label: 'Semua kategori' },
+    ...categoryOptions.value,
+]);
+
+const sessionFilterOptions = computed(() => [
+    { value: 'all', label: 'Semua sesi' },
+    ...sessionOptions.value,
+]);
 
 function readQueryFromProps() {
     suppressFilterApply = true;
@@ -245,34 +255,20 @@ function statusLabel(status: string) {
                             />
                         </div>
                         <div class="lg:col-span-3">
-                            <Select v-model="filterCategory">
-                                <SelectTrigger
-                                    class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
-                                >
-                                    <SelectValue placeholder="Kategori" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Semua kategori</SelectItem>
-                                    <SelectItem v-for="opt in categoryOptions" :key="opt.value" :value="opt.value">
-                                        {{ opt.label }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <SimpleSelect
+                                v-model="filterCategory"
+                                :options="categoryFilterOptions"
+                                class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
+                                aria-label="Filter kategori"
+                            />
                         </div>
                         <div class="lg:col-span-4">
-                            <Select v-model="filterSession">
-                                <SelectTrigger
-                                    class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
-                                >
-                                    <SelectValue placeholder="Sesi" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Semua sesi</SelectItem>
-                                    <SelectItem v-for="opt in sessionOptions" :key="opt.value" :value="opt.value">
-                                        {{ opt.label }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <SimpleSelect
+                                v-model="filterSession"
+                                :options="sessionFilterOptions"
+                                class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
+                                aria-label="Filter sesi"
+                            />
                         </div>
                     </div>
                     <Button
