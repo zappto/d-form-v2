@@ -1,4 +1,6 @@
+@if(!empty($showRegistrationAction))
 @include('mail.partials.primary-action', [
-    'url' => $registrationDetailsUrl,
-    'label' => __('View registration details'),
+    'url' => $registrationActionUrl,
+    'label' => $registrationActionLabel,
 ])
+@endif

@@ -12,7 +12,7 @@
     <tr>
         <td style="padding:24px 32px 0;">
             <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#374151;">
-                <strong style="color:#111827;">{{ __('Hello') }} {{ $user->name }},</strong>
+                <strong style="color:#111827;">{{ __('Hello') }} {{ $recipientName }},</strong>
             </p>
             <p style="margin:0;padding:16px 18px;font-size:16px;line-height:1.65;color:#14532d;background-color:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
                 {{ __('Your attendance has been recorded.') }}

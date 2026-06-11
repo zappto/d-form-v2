@@ -3,7 +3,7 @@
 namespace App\Mail;
 
 use App\Models\FormAnswer;
-use App\Support\RegistrationPortalLinks;
+use App\Services\Registration\RegistrationNotificationMailData;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -32,17 +32,15 @@ class RegistrationAcceptedMail extends Mailable
 
     public function content(): Content
     {
+        $mailData = app(RegistrationNotificationMailData::class)
+            ->shared($this->submission);
+
         return new Content(
             html: 'mail.registration-accepted',
             text: 'mail.registration-accepted-text',
-            with: [
-                'submission' => $this->submission,
-                'event' => $this->submission->form->event,
-                'form' => $this->submission->form,
-                'user' => $this->submission->user,
+            with: array_merge($mailData, [
                 'registrationCode' => $this->registrationCode,
-                'registrationDetailsUrl' => RegistrationPortalLinks::registrationDetailsUrl($this->submission->form->event),
-            ],
+            ]),
         );
     }
 

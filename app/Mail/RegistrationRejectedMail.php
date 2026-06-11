@@ -4,7 +4,7 @@ namespace App\Mail;
 
 use App\Models\FormAnswer;
 use App\Models\User;
-use App\Support\RegistrationPortalLinks;
+use App\Services\Registration\RegistrationNotificationMailData;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -42,22 +42,17 @@ class RegistrationRejectedMail extends Mailable
 
     public function content(): Content
     {
-        $greetingUser = $this->greetingUser ?? $this->submission->user;
+        $mailData = app(RegistrationNotificationMailData::class)
+            ->shared($this->submission, $this->greetingUser);
 
         return new Content(
             html: 'mail.registration-rejected',
             text: 'mail.registration-rejected-text',
-            with: [
-                'submission' => $this->submission,
-                'event' => $this->submission->form->event,
-                'form' => $this->submission->form,
-                'user' => $greetingUser,
-                'teammateUser' => $this->submission->user,
+            with: array_merge($mailData, [
                 'forInvitationSelfDeclined' => $this->forInvitationSelfDeclined,
                 'forTeammateDeclinedLeaderNotice' => $this->forTeammateDeclinedLeaderNotice,
                 'declineReason' => $this->declineReason,
-                'registrationDetailsUrl' => RegistrationPortalLinks::registrationDetailsUrl($this->submission->form->event),
-            ],
+            ]),
         );
     }
 }

@@ -18,11 +18,11 @@
     <tr>
         <td style="padding:24px 32px 0;">
             <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#374151;">
-                <strong style="color:#111827;">{{ __('Hello') }} {{ $user->name }},</strong>
+                <strong style="color:#111827;">{{ __('Hello') }} {{ $recipientName }},</strong>
             </p>
             @if(!empty($isTeammateConfirmedLeaderNotice))
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#374151;">
-                    {{ __(':name has confirmed their participation in your team registration for this event. A summary of their submission is included below.', ['name' => $teammateUser->name ?? __('Your teammate')]) }}
+                    {{ __(':name has confirmed their participation in your team registration for this event. A summary of their submission is included below.', ['name' => $teammateDisplayName]) }}
                 </p>
                 <p style="margin:0;padding:14px 16px;font-size:15px;line-height:1.6;color:#1e40af;background-color:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;">
                     {{ __('Administrators still need to review and approve registrations before final check-in codes are issued to participants.') }}
@@ -34,6 +34,11 @@
                 @if(!$showAttendanceQr)
                     <p style="margin:0;padding:14px 16px;font-size:15px;line-height:1.6;color:#1e40af;background-color:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;">
                         {{ __('This email does not include an attendance QR code. Once an administrator has approved your registration, you will receive another email with your QR code for event check-in.') }}
+                    </p>
+                @endif
+                @if(!empty($isGuestRecipient))
+                    <p style="margin:18px 0 0;padding:14px 16px;font-size:15px;line-height:1.6;color:#374151;background-color:#f9fafb;border-radius:10px;border:1px solid #e5e7eb;">
+                        {{ __('Keep this email safe. Your check-in QR code and registration code will be sent to this address after approval.') }}
                     </p>
                 @endif
             @endif
@@ -82,18 +87,22 @@
                             <p style="margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#6b7280;">{{ __('Attendance QR code') }}</p>
                             <p style="margin:0 0 18px;font-size:14px;line-height:1.55;color:#6b7280;">{{ __('This QR is tied to your submission. Present it for check-in at the event.') }}</p>
                             <img src="cid:qr-code.png" alt="{{ __('Attendance QR code') }}" width="240" height="240" style="display:block;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;background-color:#ffffff;">
-                            <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;">{{ __('Submission ID') }}: {{ $submission->id }}</p>
+                            @if(!empty($showSubmissionId))
+                                <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;">{{ __('Submission ID') }}: {{ $submission->id }}</p>
+                            @endif
                         </td>
                     </tr>
                 </table>
             </td>
         </tr>
     @else
-        <tr>
-            <td style="padding:0 32px 12px;">
-                <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;"><strong>{{ __('Submission ID') }}:</strong> {{ $submission->id }}</p>
-            </td>
-        </tr>
+        @if(!empty($showSubmissionId))
+            <tr>
+                <td style="padding:0 32px 12px;">
+                    <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.55;"><strong>{{ __('Submission ID') }}:</strong> {{ $submission->id }}</p>
+                </td>
+            </tr>
+        @endif
     @endif
     @include('mail.partials.registration-details-button')
     @include('mail.partials.card-footer-by-app')

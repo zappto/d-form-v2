@@ -10,6 +10,7 @@ use App\Mail\AttendanceConfirmedMail;
 use App\Models\EmailLog;
 use App\Models\EventAttendance;
 use App\Models\FormAnswer;
+use App\Services\Registration\FormAnswerRecipientResolver;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -30,7 +31,7 @@ class RecordAttendanceJob implements ShouldQueue
     ) {
     }
 
-    public function handle(): void
+    public function handle(FormAnswerRecipientResolver $recipientResolver): void
     {
         $submission = FormAnswer::query()
             ->with(['form.event', 'user'])
@@ -45,7 +46,7 @@ class RecordAttendanceJob implements ShouldQueue
             return;
         }
 
-        if ($submission->review_status !== FormAnswerReviewStatus::Accepted || $submission->user === null) {
+        if ($submission->review_status !== FormAnswerReviewStatus::Accepted) {
             Log::warning('[RecordAttendanceJob] Submission no longer eligible.', [
                 'form_answer_id' => $submission->id,
             ]);
@@ -68,18 +69,18 @@ class RecordAttendanceJob implements ShouldQueue
             throw $e;
         }
 
-        $user = $submission->user;
         $event = $submission->form->event;
+        $recipientEmail = $recipientResolver->email($submission);
 
-        if ($user->email === '') {
+        if ($recipientEmail === null || $recipientEmail === '') {
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
                 'event_id' => $event->id,
-                'user_id' => $user->id,
+                'user_id' => $recipientResolver->userIdForLog($submission),
                 'recipient_email' => '',
                 'status' => EmailLogStatus::Failed,
                 'notification_type' => EmailNotificationType::AttendanceConfirmed,
-                'error_message' => 'User has no email address configured.',
+                'error_message' => 'No recipient email address configured.',
                 'sent_at' => null,
             ]);
 
@@ -93,13 +94,13 @@ class RecordAttendanceJob implements ShouldQueue
         try {
             $this->applyOutgoingEmailJitter();
 
-            Mail::to($user->email)->send(new AttendanceConfirmedMail($submission, $attendance));
+            Mail::to($recipientEmail)->send(new AttendanceConfirmedMail($submission, $attendance));
 
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
                 'event_id' => $event->id,
-                'user_id' => $user->id,
-                'recipient_email' => $user->email,
+                'user_id' => $recipientResolver->userIdForLog($submission),
+                'recipient_email' => $recipientEmail,
                 'status' => EmailLogStatus::Sent,
                 'notification_type' => EmailNotificationType::AttendanceConfirmed,
                 'error_message' => null,
@@ -109,8 +110,8 @@ class RecordAttendanceJob implements ShouldQueue
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
                 'event_id' => $event->id,
-                'user_id' => $user->id,
-                'recipient_email' => $user->email,
+                'user_id' => $recipientResolver->userIdForLog($submission),
+                'recipient_email' => $recipientEmail,
                 'status' => EmailLogStatus::Failed,
                 'notification_type' => EmailNotificationType::AttendanceConfirmed,
                 'error_message' => $e->getMessage(),
@@ -121,7 +122,7 @@ class RecordAttendanceJob implements ShouldQueue
                 'notification_type' => EmailNotificationType::AttendanceConfirmed->value,
                 'form_answer_id' => $submission->id,
                 'event_id' => $event->id,
-                'recipient_email' => $user->email,
+                'recipient_email' => $recipientEmail,
                 'exception_class' => $e::class,
                 'exception_message' => $e->getMessage(),
                 'exception' => $e,

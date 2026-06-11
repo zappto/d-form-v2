@@ -12,11 +12,16 @@
     <tr>
         <td style="padding:24px 32px 0;">
             <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#374151;">
-                <strong style="color:#111827;">{{ __('Hello') }} {{ $user->name }},</strong>
+                <strong style="color:#111827;">{{ __('Hello') }} {{ $recipientName }},</strong>
             </p>
-            <p style="margin:0;font-size:16px;line-height:1.65;color:#374151;">
+            <p style="margin:0 0 18px;font-size:16px;line-height:1.65;color:#374151;">
                 {{ __('Great news — your registration has been accepted. Use the QR code or manual code below for check-in at the event.') }}
             </p>
+            @if(!empty($isGuestRecipient))
+                <p style="margin:0;padding:14px 16px;font-size:15px;line-height:1.6;color:#92400e;background-color:#fffbeb;border-radius:10px;border:1px solid #fcd34d;">
+                    {{ __('This email contains your personal check-in credentials. Do not forward or share it with others.') }}
+                </p>
+            @endif
         </td>
     </tr>
     <tr>
@@ -45,7 +50,9 @@
                         <p style="margin:24px 0 8px;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#6b7280;">{{ __('Manual registration code') }}</p>
                         <p style="margin:0 0 10px;font-size:14px;color:#6b7280;line-height:1.55;">{{ __('If scanning fails, tell staff this code:') }}</p>
                         <p style="margin:0;padding:14px 18px;font-size:22px;font-weight:700;letter-spacing:0.06em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#111827;background-color:#ffffff;border-radius:10px;border:1px dashed #e5e7eb;">{{ $registrationCode }}</p>
-                        <p style="margin:18px 0 0;font-size:12px;color:#9ca3af;">{{ __('Submission ID') }}: {{ $submission->id }}</p>
+                        @if(!empty($showSubmissionId))
+                            <p style="margin:18px 0 0;font-size:12px;color:#9ca3af;">{{ __('Submission ID') }}: {{ $submission->id }}</p>
+                        @endif
                     </td>
                 </tr>
             </table>

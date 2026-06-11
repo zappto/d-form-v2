@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\EventAttendance;
 use App\Models\FormAnswer;
+use App\Services\Registration\RegistrationNotificationMailData;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -30,16 +31,15 @@ class AttendanceConfirmedMail extends Mailable
 
     public function content(): Content
     {
+        $mailData = app(RegistrationNotificationMailData::class)
+            ->shared($this->submission);
+
         return new Content(
             html: 'mail.attendance-confirmed',
             text: 'mail.attendance-confirmed-text',
-            with: [
-                'submission' => $this->submission,
-                'event' => $this->submission->form->event,
-                'form' => $this->submission->form,
-                'user' => $this->submission->user,
+            with: array_merge($mailData, [
                 'attendance' => $this->attendance,
-            ],
+            ]),
         );
     }
 }

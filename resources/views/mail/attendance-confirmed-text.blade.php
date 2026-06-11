@@ -1,6 +1,6 @@
 {{ __('Attendance confirmed') }} — {{ $event->title }}
 
-{{ __('Hello') }} {{ $user->name }},
+{{ __('Hello') }} {{ $recipientName }},
 
 {{ __('Your attendance has been recorded.') }}
 

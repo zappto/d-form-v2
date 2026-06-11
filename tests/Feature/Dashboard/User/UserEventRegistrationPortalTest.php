@@ -15,6 +15,7 @@ use App\Models\Form;
 use App\Models\FormAnswer;
 use App\Models\User;
 use App\Services\Registration\RegistrationQrPngGenerator;
+use App\Services\Registration\FormAnswerRecipientResolver;
 use App\Support\RegistrationPortalLinks;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -298,12 +299,69 @@ class UserEventRegistrationPortalTest extends TestCase
         $confirmation = new RegistrationConfirmationMail($answer, [], $qrPng);
         $html = $confirmation->render();
         $this->assertStringContainsString($expectedUrl, $html);
-        $this->assertStringContainsString('data:image/png;base64,', $html);
+        $this->assertStringContainsString('cid:qr-code.png', $html);
+        $this->assertStringContainsString($member->name, $html);
 
         $rejected = new RegistrationRejectedMail($answer);
         $this->assertStringContainsString($expectedUrl, $rejected->render());
 
         $accepted = new RegistrationAcceptedMail($answer, 'fake-png', 'CODE');
         $this->assertStringContainsString($expectedUrl, $accepted->render());
+    }
+
+    public function test_recipient_resolver_normalizes_and_rejects_invalid_emails(): void
+    {
+        $resolver = app(FormAnswerRecipientResolver::class);
+
+        $validGuest = FormAnswer::factory()->make([
+            'user_id' => null,
+            'invited_email' => '  Guest-Mail@Example.COM ',
+        ]);
+        $this->assertSame('guest-mail@example.com', $resolver->email($validGuest));
+        $this->assertTrue($resolver->isGuest($validGuest));
+
+        $invalidGuest = FormAnswer::factory()->make([
+            'user_id' => null,
+            'invited_email' => 'not-an-email',
+        ]);
+        $this->assertNull($resolver->email($invalidGuest));
+    }
+
+    public function test_guest_registration_mailables_use_public_event_url_and_recipient_name(): void
+    {
+        $event = $this->publishedEvent(['slug' => 'guest-mail-event']);
+        $form = $this->primaryForm($event);
+
+        $guestAnswer = FormAnswer::factory()->create([
+            'form_id' => $form->id,
+            'user_id' => null,
+            'invited_email' => 'bundle-guest-mail@example.com',
+            'answers' => ['full_name' => 'Guest Participant'],
+        ]);
+
+        $guestAnswer->loadMissing('form.event', 'user');
+
+        $publicUrl = RegistrationPortalLinks::publicEventUrl($event);
+        $portalUrl = RegistrationPortalLinks::registrationDetailsUrl($event);
+
+        $confirmation = new RegistrationConfirmationMail($guestAnswer, ['Name' => 'Guest Participant']);
+        $confirmationHtml = $confirmation->render();
+        $this->assertStringContainsString('Guest Participant', $confirmationHtml);
+        $this->assertStringContainsString($publicUrl, $confirmationHtml);
+        $this->assertStringNotContainsString($portalUrl, $confirmationHtml);
+        $this->assertStringNotContainsString((string) $guestAnswer->id, $confirmationHtml);
+
+        $accepted = new RegistrationAcceptedMail($guestAnswer, 'fake-png', 'GUEST-CODE');
+        $acceptedHtml = $accepted->render();
+        $this->assertStringContainsString('Guest Participant', $acceptedHtml);
+        $this->assertStringContainsString('GUEST-CODE', $acceptedHtml);
+        $this->assertStringContainsString($publicUrl, $acceptedHtml);
+        $this->assertStringNotContainsString($portalUrl, $acceptedHtml);
+
+        $rejected = new RegistrationRejectedMail($guestAnswer);
+        $rejectedHtml = $rejected->render();
+        $this->assertStringContainsString('Guest Participant', $rejectedHtml);
+        $this->assertStringContainsString($publicUrl, $rejectedHtml);
+        $this->assertStringNotContainsString($portalUrl, $rejectedHtml);
     }
 }

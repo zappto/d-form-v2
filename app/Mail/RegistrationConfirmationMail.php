@@ -4,7 +4,7 @@ namespace App\Mail;
 
 use App\Models\FormAnswer;
 use App\Models\User;
-use App\Support\RegistrationPortalLinks;
+use App\Services\Registration\RegistrationNotificationMailData;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -47,22 +47,17 @@ class RegistrationConfirmationMail extends Mailable
             && $this->qrPngBinary !== null
             && $this->qrPngBinary !== '';
 
-        $greetingUser = $this->greetingUser ?? $this->submission->user;
+        $mailData = app(RegistrationNotificationMailData::class)
+            ->shared($this->submission, $this->greetingUser);
 
         return new Content(
             html: 'mail.registration-confirmation',
             text: 'mail.registration-confirmation-text',
-            with: [
-                'submission' => $this->submission,
-                'event' => $this->submission->form->event,
-                'form' => $this->submission->form,
-                'user' => $greetingUser,
+            with: array_merge($mailData, [
                 'answersSummary' => $this->answersSummary,
                 'showAttendanceQr' => $showAttendanceQr,
-                'registrationDetailsUrl' => RegistrationPortalLinks::registrationDetailsUrl($this->submission->form->event),
                 'isTeammateConfirmedLeaderNotice' => $this->isTeammateConfirmedLeaderNotice,
-                'teammateUser' => $this->submission->user,
-            ],
+            ]),
         );
     }
 

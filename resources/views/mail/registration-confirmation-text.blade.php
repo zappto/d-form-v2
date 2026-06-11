@@ -2,10 +2,10 @@
 
 {{ __('Form') }}: {{ $form->title }}
 
-{{ __('Hello') }} {{ $user->name }},
+{{ __('Hello') }} {{ $recipientName }},
 
 @if(!empty($isTeammateConfirmedLeaderNotice))
-{{ __(':name has confirmed their participation in your team registration for this event. A summary of their submission is included below.', ['name' => $teammateUser->name ?? __('Your teammate')]) }}
+{{ __(':name has confirmed their participation in your team registration for this event. A summary of their submission is included below.', ['name' => $teammateDisplayName]) }}
 
 {{ __('Administrators still need to review and approve registrations before final check-in codes are issued to participants.') }}
 @else
@@ -13,6 +13,9 @@
 
 @if(!$showAttendanceQr)
 {{ __('This email does not include an attendance QR code. Once an administrator has approved your registration, you will receive another email with your QR code for event check-in.') }}
+@endif
+@if(!empty($isGuestRecipient))
+{{ __('Keep this email safe. Your check-in QR code and registration code will be sent to this address after approval.') }}
 @endif
 @endif
 
@@ -36,11 +39,15 @@
 {{ __('Attendance QR code') }} — {{ __('The attendance QR image is included in the HTML version of this email.') }}
 @endif
 
+@if(!empty($showSubmissionId))
 {{ __('Submission ID') }}: {{ $submission->id }}
+@endif
 
+@if(!empty($showRegistrationAction))
 ────────────────────────
-{{ __('View registration details') }}:
-{{ $registrationDetailsUrl }}
+{{ $registrationActionLabel }}:
+{{ $registrationActionUrl }}
+@endif
 
 ────────────────────────
 {{ __('This message was sent by :app.', ['app' => config('app.name')]) }}
