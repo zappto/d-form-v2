@@ -23,6 +23,10 @@ RUN apk add --no-cache nodejs npm git netcat-openbsd
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Pre-install Node deps so the node_modules volume gets Alpine/musl native bindings
+COPY package.json package-lock.json ./
+RUN npm ci
+
 # Set entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

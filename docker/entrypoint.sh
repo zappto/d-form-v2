@@ -25,13 +25,18 @@ if [ ! -f "vendor/autoload.php" ]; then
     composer install --no-interaction --prefer-dist --optimize-autoloader
 fi
 
-# Ensure node_modules/vite is actually working
-if [ "$APP_ENV" = "local" ]; then
-    if [ ! -d "node_modules" ] || [ ! -x "node_modules/.bin/vite" ]; then
-        echo "Node modules not found or Vite not executable. Running npm install..."
-        npm install
+# Ensure node_modules match the container platform (Alpine/musl native bindings)
+ensure_node_modules() {
+    if [ -d "node_modules" ] && [ -x "node_modules/.bin/vite" ] \
+        && node -e "require('lightningcss')" >/dev/null 2>&1; then
+        return 0
     fi
-fi
+
+    echo "Node modules missing or native bindings incompatible. Running npm install..."
+    npm install
+}
+
+ensure_node_modules
 
 # Ensure permissions - www-data is the user for frankenphp/caddy
 echo "Setting permissions..."
