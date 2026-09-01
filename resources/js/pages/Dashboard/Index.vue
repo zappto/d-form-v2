@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { computed, onMounted } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
-import PageHeader from '@/components/modules/dashboard/PageHeader.vue';
 import KpiCard from '@/components/modules/dashboard/KpiCard.vue';
 import RecentEventsCard from '@/components/modules/dashboard/RecentEventsCard.vue';
 import MiniCalendar from '@/components/modules/dashboard/MiniCalendar.vue';
@@ -10,7 +9,7 @@ import RegistrationChart from '@/components/modules/dashboard/RegistrationChart.
 import CategoryChart from '@/components/modules/dashboard/CategoryChart.vue';
 import EventCalendar from '@/components/modules/dashboard/EventCalendar.vue';
 import { CalendarDays, Zap, Users, TrendingUp } from 'lucide-vue-next';
-import useAuth from '@/utils/composables/useAuth';
+import { setTopbar } from '@/utils/composables/useDashboardTopbar';
 import { routes } from '@/lib/routes';
 
 defineOptions({ layout: DashboardLayout });
@@ -29,9 +28,6 @@ const props = defineProps<{
     } | null;
 }>();
 
-const page = usePage();
-const user = useAuth(page.props);
-
 const events = computed(() => props.recentEvents);
 
 const totalEvents = computed(() => props.stats.totalEvents);
@@ -39,18 +35,8 @@ const activeEvents = computed(() => props.stats.activeEvents);
 const totalRegistrants = computed(() => props.stats.totalRegistrants);
 const completionRate = computed(() => props.stats.completionRate);
 
-const greeting = computed(() => {
-    const h = new Date().getHours();
-    if (h < 11) return 'Selamat pagi';
-    if (h < 15) return 'Selamat siang';
-    if (h < 19) return 'Selamat sore';
-    return 'Selamat malam';
-});
-
-const firstName = computed(() => {
-    const n = user.value?.name?.trim();
-    if (!n) return '';
-    return n.split(/\s+/)[0] ?? n;
+onMounted(() => {
+    setTopbar({ title: 'Ringkasan acara', subtitle: 'Pantau pendaftaran, jadwal, dan performa acara' });
 });
 </script>
 
@@ -58,11 +44,6 @@ const firstName = computed(() => {
     <Head title="Beranda" />
 
     <div class="flex flex-col gap-10 md:gap-12">
-        <PageHeader
-            title="Ringkasan acara"
-            :subtitle="`${greeting}${firstName ? ', ' + firstName : ''}. Pantau pendaftaran, jadwal, dan performa acara dalam satu layar.`"
-        />
-
         <section class="space-y-4">
             <h2 class="font-display text-base font-bold tracking-tight text-foreground">Metrik utama</h2>
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
