@@ -72,7 +72,7 @@ resources/js/
 │       ├── Applicants.vue           # daftar applicant
 │       ├── ApplicantDetail.vue      # detail + screening action
 │       └── CorrectionRequests.vue   # daftar correction request (staff)
-└── components/modules/recruitment/
+└── components/modules/recruitment/     ← scope module (feature-specific); konsisten dgn modules/{auth,builder,dashboard,landing,user}
     ├── RecruitLandingHero.vue
     ├── RecruitTimelineSection.vue
     ├── RecruitDivisionCard.vue
@@ -82,6 +82,8 @@ resources/js/
     ├── RecruitApplicantTable.vue
     └── RecruitScreeningPanel.vue
 ```
+
+> **Catatan rule §2 vs kode:** `docs/rules/front-end.md` §2 menulis `components/module` (tunggal), tetapi codebase aktual memakai **`components/modules`** (jamak; sudah berisi `auth`, `builder`, `dashboard`, `landing`, `user`). Arahan user "ikuti struktur yang sudah ada" → kami mengikuti **konvensi kode aktual** (`components/modules/recruitment/`). Bila tim ingin menyelaraskan rule tertulis, itu PR terpisah.
 
 ### 4.2 Routes (baru, mengikuti `routes/web/*.php` auto-require)
 
@@ -308,14 +310,33 @@ Frontend-only mockup → verifikasi dengan:
   - Revision → applicant edit & re-submit → kembali ke screening.
   - Correction request → approve/reject.
 
-## 11. Out of scope (eksplisit)
+## 11. Front-end rules compliance (docs/rules/front-end.md)
+
+Implementasi wajib mengikuti rules proyek:
+
+| Rule | Penerapan |
+|---|---|
+| §1 Basic Convention | camelCase untuk .js/.ts; PascalCase untuk .vue; kebab-case hanya untuk CSS class kustom; **wajib `<script setup lang="ts">`** (dilarang Options API) |
+| §3 Penamaan file | Page folder PascalCase (`Dashboard/Recruitment/`); Vue PascalCase; TS camelCase |
+| §4 Components | Semua komponen OpRec di `components/modules/recruitment/` (feature-specific); **jangan** mengubah `components/ui/*` (shadcn) — pakai wrapper `core` bila perlu |
+| §4.1 Reaktivitas | `ref()` primitif, `reactive()` objek/array kompleks |
+| §4.2 Props | `defineProps<{...}>()` generic TS (type-safe) |
+| §4.3 Emits | `defineEmits([...])` eksplisit |
+| §4.4 Styling | Prioritaskan Tailwind utility; `<style scoped>` hanya utk override library |
+| §5.1 Layout | Staff → `DashboardLayout` via `defineOptions({ layout: DashboardLayout })` (pola `Dashboard/Recruitment/Index.vue` existing); publik → `LandingLayout` (pola `Event.vue`) |
+| §5.2 Data fetching | Semua data via **Inertia props dari controller**; **dilarang** `axios.get` di `onMounted` |
+| §5.3 SEO | `<Head>` dari `@inertiajs/vue3` di setiap Page (title/meta) |
+| §6 Utils/Composables | Logika rumit di `resources/js/utils/composables/use*`; helper repetitif di `lib/` |
+| §7 TypeScript | **No `any`** → pakai `unknown`/interface; Interface/Type PascalCase; prop safety via generic |
+
+## 12. Out of scope (eksplisit)
 
 - Backend real (migrasi/model/service), storage, email sungguhan.
 - Milestone 4+ (interview, attendance, queue, evaluation, final selection).
 - RBAC internal nyata (Staff/Interviewer/Admin terpisah).
 - Feedback, reporting, audit trail, multi-period real.
 
-## 12. Catatan transisi ke backend (nanti)
+## 13. Catatan transisi ke backend (nanti)
 
 - Store dummy → controller/service + migrasi `recruitments` domain.
 - Props controller tinggal mengganti isi (shape tipe sudah sesuai).
