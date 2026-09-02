@@ -26,7 +26,7 @@ const contentWidthPx = ref<number | null>(null)
 
 const triggerClass = computed(() =>
     cn(
-        'flex h-10 min-h-10 w-full min-w-0 shrink-0 items-center justify-between gap-2 whitespace-nowrap rounded-xl border border-input bg-card px-3 py-2 text-sm font-medium text-foreground shadow-xs ring-offset-background',
+        'flex h-10 min-h-10 w-full rounded-lg min-w-0 shrink-0 items-center justify-between gap-2 whitespace-nowrap border border-input bg-card px-3 py-2 text-sm font-medium text-foreground shadow-xs ring-offset-background',
         'transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
         'hover:border-primary/30',
         'focus:outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/30',

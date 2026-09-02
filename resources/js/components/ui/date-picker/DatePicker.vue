@@ -53,12 +53,12 @@ const label = (): string => formatIdDateLabel(props.modelValue)
                 variant="outline"
                 :disabled="disabled"
                 :class="
-                    cn(
-                        'h-9 w-full justify-start gap-2 rounded-full px-3 text-left text-xs font-normal shadow-none',
-                        !modelValue && 'text-muted-foreground',
-                        props.class,
-                    )
-                "
+ cn(
+ 'h-9 w-full justify-start gap-2 px-3 text-left text-xs font-normal shadow-none',
+ !modelValue && 'text-muted-foreground',
+ props.class,
+ )
+ "
             >
                 <CalendarIcon class="size-4 shrink-0 opacity-60" aria-hidden="true" />
                 <span class="truncate">{{ label() || placeholder }}</span>

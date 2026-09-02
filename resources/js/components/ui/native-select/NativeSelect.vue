@@ -33,7 +33,7 @@ const delegatedProps = reactiveOmit(props, "class")
       v-model="modelValue"
       data-slot="native-select"
       :class="cn(
-        'h-10 min-h-10 w-full min-w-0 cursor-pointer appearance-none rounded-xl border border-input bg-card px-3 py-2 pr-9 text-left text-sm font-medium text-foreground shadow-xs ring-offset-background',
+        'h-10 min-h-10 w-full min-w-0 cursor-pointer appearance-none rounded-lg border border-input bg-card px-3 py-2 pr-9 text-left text-sm font-medium text-foreground shadow-xs ring-offset-background',
         'transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
         'placeholder:text-muted-foreground',
         'hover:border-primary/30',
