@@ -940,7 +940,7 @@ class FormRegistrationTest extends TestCase
                 fn ($page) => $page
                     ->where('accessStatus', 'pending_team_confirmation')
                     ->where('accessMessage', FormAccessStatus::PendingTeamConfirmation->message())
-                    ->where('pendingInvitationUrl', '/events/joined/team-invitations/'.$token)
+                    ->where('pendingInvitationUrl', '/joined/team-invitations/'.$token)
             );
     }
 

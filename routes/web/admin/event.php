@@ -12,21 +12,21 @@ use App\Http\Controllers\Dashboard\Events\Forms\FormSubmitSuccessController;
 use App\Http\Controllers\Dashboard\Events\Forms\FormSubmissionsController;
 use App\Http\Controllers\Dashboard\User\UserValidationController;
 
-Route::name('dashboard.')->prefix('/events/joined')->middleware('auth')->group(function () {
-    Route::get('/events/{event}/forms/{form}/fill', FormFillController::class)
+Route::name('dashboard.')->prefix('/joined')->middleware('auth')->group(function () {
+    Route::get('/{event}/forms/{form}/fill', FormFillController::class)
         ->name('events.forms.fill');
 
-    Route::post('/events/{event}/forms/{form}/submit', FormSubmissionController::class)
+    Route::post('/{event}/forms/{form}/submit', FormSubmissionController::class)
         ->name('forms.submission');
 
-    Route::get('/events/{event}/forms/{form}/submitted', FormSubmitSuccessController::class)
+    Route::get('/{event}/forms/{form}/submitted', FormSubmitSuccessController::class)
         ->name('events.forms.submitted');
 
     Route::get('/users/check-email', [UserValidationController::class, 'checkEmail'])
         ->name('users.check-email');
 });
 
-Route::name('dashboard.')->prefix('/admin/dashboard')->middleware(['auth', 'organizer'])->group(function () {
+Route::name('dashboard.')->prefix('/admin')->middleware(['auth', 'organizer'])->group(function () {
     Route::get('/events/{event}/registration-status', [EventController::class, 'registrationStatus'])
         ->name('events.registration-status');
 

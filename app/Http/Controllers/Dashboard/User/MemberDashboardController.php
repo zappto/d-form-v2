@@ -85,7 +85,7 @@ class MemberDashboardController extends Controller
                 'start_date' => $event->start_date,
                 'end_date' => $event->end_date,
                 'category' => $event->category,
-                'href' => "/events/joined/events/{$event->slug}",
+                'href' => route('dashboard.user.events.show', ['event_segment' => $event->slug], false),
             ];
         })->values()->all();
 

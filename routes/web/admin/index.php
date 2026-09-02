@@ -36,44 +36,20 @@ Route::middleware('auth')->get('/dashboard', function () {
     return app(MemberDashboardController::class)(request());
 })->name('dashboard');
 
-Route::permanentRedirect('/dashboard/user/events', '/events/joined');
-Route::permanentRedirect('/user/dashboard', '/events/joined');
-Route::permanentRedirect('/user/dashboard/overview', '/dashboard');
-Route::permanentRedirect('/user/dashboard/profile', '/dashboard/profile');
-Route::permanentRedirect('/user/dashboard/events/browse', '/browse/events');
-Route::permanentRedirect('/events/joined/events/browse', '/browse/events');
-Route::permanentRedirect('/user/dashboard/users/check-email', '/events/joined/users/check-email');
-Route::get(
-    '/user/dashboard/events/{event_segment}/register',
-    fn (string $event_segment) => redirect()->route('dashboard.user.events.register', ['event_segment' => $event_segment], 301)
-);
-Route::get(
-    '/user/dashboard/events/{event_segment}/registration',
-    fn (string $event_segment) => redirect()->route('dashboard.user.events.registration', ['event_segment' => $event_segment], 301)
-);
-Route::get(
-    '/user/dashboard/team-invitations/{token}',
-    fn (string $token) => redirect()->route('dashboard.user.team-invitations.show', ['token' => $token], 301)
-);
-Route::get(
-    '/user/dashboard/events/{event_segment}',
-    fn (string $event_segment) => redirect()->route('dashboard.user.events.show', ['event_segment' => $event_segment], 301)
-);
-
-Route::middleware('auth')->get('/dashboard/profile', fn () => inertia('Dashboard/Profile'))->name('dashboard.profile');
-Route::middleware(['auth', 'throttle:10,1'])->patch('/dashboard/profile', [ProfileController::class, 'update'])->name('dashboard.profile.update');
-Route::middleware(['auth', 'throttle:10,1'])->post('/dashboard/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('dashboard.profile.avatar.update');
-Route::middleware(['auth', 'throttle:10,1'])->delete('/dashboard/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('dashboard.profile.avatar.destroy');
-Route::middleware(['auth', 'throttle:10,1'])->put('/dashboard/profile/password', [ProfileController::class, 'updatePassword'])->name('dashboard.profile.password.update');
-Route::middleware(['auth', 'organizer'])->prefix('/admin/dashboard')->group(function () {
-    Route::get('/', fn () => redirect()->route('dashboard'))->name('dashboard.home');
+Route::middleware('auth')->get('/profile', fn () => inertia('Dashboard/Profile'))->name('dashboard.profile');
+Route::middleware(['auth', 'throttle:10,1'])->patch('/profile', [ProfileController::class, 'update'])->name('dashboard.profile.update');
+Route::middleware(['auth', 'throttle:10,1'])->post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('dashboard.profile.avatar.update');
+Route::middleware(['auth', 'throttle:10,1'])->delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('dashboard.profile.avatar.destroy');
+Route::middleware(['auth', 'throttle:10,1'])->put('/profile/password', [ProfileController::class, 'updatePassword'])->name('dashboard.profile.password.update');
+Route::middleware('auth')->get('/admin/dashboard', fn () => redirect()->route('dashboard'))->name('dashboard.home');
+Route::middleware(['auth', 'organizer'])->prefix('/admin')->group(function () {
     Route::get('/reports', fn () => redirect()->route('dashboard.events.index'))->name('dashboard.reports.index');
     Route::get('/recruitment', fn () => inertia('Dashboard/Recruitment/Index'))->name('dashboard.recruitment.index');
 });
 
-Route::middleware('auth')->get('/events/joined/profile', fn () => redirect()->route('dashboard.profile'))->name('dashboard.user.profile');
+Route::middleware('auth')->get('/joined/profile', fn () => redirect()->route('dashboard.profile'))->name('dashboard.user.profile');
 
-Route::middleware(['auth', 'member_portal'])->prefix('/events/joined')->name('dashboard.user.')->group(function () {
+Route::middleware(['auth', 'member_portal'])->prefix('/joined')->name('dashboard.user.')->group(function () {
     Route::get('/', function (EventService $eventService) {
         $userId = auth()->id();
         $events = Event::query()
@@ -119,7 +95,7 @@ Route::middleware(['auth', 'member_portal'])->prefix('/events/joined')->name('da
         ]);
     })->name('events');
 
-    Route::get('/events/{event_segment}/registration', UserEventRegistrationController::class)
+    Route::get('/{event_segment}/registration', UserEventRegistrationController::class)
         ->name('events.registration');
 
     Route::get('/team-invitations/{token}', [TeamInvitationController::class, 'show'])
@@ -127,10 +103,10 @@ Route::middleware(['auth', 'member_portal'])->prefix('/events/joined')->name('da
     Route::post('/team-invitations/{token}', [TeamInvitationController::class, 'update'])
         ->name('team-invitations.update');
 
-    Route::get('/events/{event_segment}/register', UserEventRegistrationFormPickerController::class)
+    Route::get('/{event_segment}/register', UserEventRegistrationFormPickerController::class)
         ->name('events.register');
 
-    Route::get('/events/{event_segment}', function (
+    Route::get('/{event_segment}', function (
         string $event_segment,
         EventService $eventService,
         RegistrationQrPngGenerator $qrGenerator,
@@ -232,7 +208,7 @@ Route::middleware(['auth', 'member_portal'])->prefix('/events/joined')->name('da
     })->name('events.show');
 });
 
-Route::middleware(['auth', 'member_portal'])->get('/browse/events', function (EventService $eventService) {
+Route::middleware(['auth', 'member_portal'])->get('/browse', function (EventService $eventService) {
     $events = Event::query()
         ->where('status', EventStatus::Published)
         ->orderByDesc('start_date')
@@ -247,7 +223,7 @@ Route::middleware(['auth', 'member_portal'])->get('/browse/events', function (Ev
     ]);
 })->name('dashboard.user.events.browse');
 
-Route::middleware(['auth', 'organizer'])->prefix('/admin/dashboard/events/{event}')->name('dashboard.events.')->group(function () {
+Route::middleware(['auth', 'organizer'])->prefix('/admin/events/{event}')->name('dashboard.events.')->group(function () {
     Route::get('/exports/registrations.csv', EventRegistrationsCsvExportController::class)->name('exports.registrations-csv');
     Route::get('/exports/attendance.csv', EventAttendanceCsvExportController::class)->name('exports.attendance-csv');
     Route::get('/scan', [AttendanceScanController::class, 'show'])->name('scan');

@@ -438,7 +438,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                                 Profil Pengguna
                             </h2>
                             <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
-                                Di halaman profil (<code>/dashboard/profile</code>), Anda bisa:
+                                Di halaman profil (<code>/profile</code>), Anda bisa:
                             </p>
                             <ul class="mt-3 space-y-1.5 text-sm text-muted-foreground">
                                 <li class="flex gap-2"><ChevronRight class="mt-0.5 size-4 shrink-0 text-primary" /> Mengunggah atau menghapus foto profil (avatar)</li>
@@ -486,7 +486,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                                 <div>
                                     <h4 class="text-sm font-semibold text-foreground">Membuat Acara</h4>
                                     <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-                                        Navigasi ke <code>/admin/dashboard/events/create</code>. Field yang wajib diisi:
+                                        Navigasi ke <code>/admin/events/create</code>. Field yang wajib diisi:
                                         judul, deskripsi, tanggal mulai dan selesai, lokasi, kuota peserta, dan banner.
                                         Slug URL otomatis digenerate dari judul. Anda bisa memilih untuk mempublikasikan acara langsung atau menyimpan sebagai draft.
                                     </p>
@@ -728,7 +728,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                                 <div>
                                     <h4 class="text-sm font-semibold text-foreground">Untuk Penyelenggara</h4>
                                     <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
-                                        Buka halaman Scan (<code>/admin/dashboard/events/{event}/scan</code>). Arahkan kamera ke QR peserta, atau masukkan kode registrasi secara manual. Sistem akan memverifikasi dan mencatat kehadiran. Setiap peserta hanya bisa di-scan sekali per acara.
+                                        Buka halaman Scan (<code>/admin/events/{event}/scan</code>). Arahkan kamera ke QR peserta, atau masukkan kode registrasi secara manual. Sistem akan memverifikasi dan mencatat kehadiran. Setiap peserta hanya bisa di-scan sekali per acara.
                                     </p>
                                 </div>
                             </div>
@@ -776,7 +776,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                                 Laporan Acara
                             </h2>
                             <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
-                                Halaman Laporan (<code>/admin/dashboard/events/{event}/laporan</code>) menyediakan ringkasan komprehensif per acara:
+                                Halaman Laporan (<code>/admin/events/{event}/laporan</code>) menyediakan ringkasan komprehensif per acara:
                             </p>
                             <ul class="mt-3 space-y-1.5 text-sm text-muted-foreground">
                                 <li class="flex gap-2"><ChevronRight class="mt-0.5 size-4 shrink-0 text-primary" /> KPI ringkasan (total pendaftar, accepted, attendance rate)</li>

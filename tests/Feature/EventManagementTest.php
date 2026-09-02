@@ -55,7 +55,7 @@ class EventManagementTest extends TestCase
     public function test_events_joined_url_resolves_to_member_portal_route(): void
     {
         $route = app('router')->getRoutes()->match(
-            \Illuminate\Http\Request::create('/events/joined', 'GET')
+            \Illuminate\Http\Request::create('/joined', 'GET')
         );
 
         $this->assertSame('dashboard.user.events', $route->getName());

@@ -3,8 +3,8 @@
  * Gunakan builder di sini; hindari string path hardcoded di komponen.
  */
 
-const ADMIN_DASHBOARD = '/admin/dashboard';
-const MEMBER_JOINED = '/events/joined';
+const ADMIN_BASE = '/admin';
+const MEMBER_JOINED = '/joined';
 
 export const routes = {
     home: '/',
@@ -32,53 +32,53 @@ export const routes = {
 
     dashboard: {
         index: '/dashboard',
-        profile: '/dashboard/profile',
-        profileAvatar: '/dashboard/profile/avatar',
-        profilePassword: '/dashboard/profile/password',
+        profile: '/profile',
+        profileAvatar: '/profile/avatar',
+        profilePassword: '/profile/password',
     },
 
     admin: {
-        index: ADMIN_DASHBOARD,
-        recruitment: `${ADMIN_DASHBOARD}/recruitment`,
+        index: ADMIN_BASE,
+        recruitment: `${ADMIN_BASE}/recruitment`,
         events: {
-            index: `${ADMIN_DASHBOARD}/events`,
-            create: `${ADMIN_DASHBOARD}/events/create`,
-            show: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}`,
-            edit: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/edit`,
-            scan: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/scan`,
-            registrants: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/registrants`,
-            laporan: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/laporan`,
+            index: `${ADMIN_BASE}/events`,
+            create: `${ADMIN_BASE}/events/create`,
+            show: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}`,
+            edit: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/edit`,
+            scan: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/scan`,
+            registrants: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/registrants`,
+            laporan: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/laporan`,
             exports: {
                 registrations: (eventId: string | number) =>
-                    `${ADMIN_DASHBOARD}/events/${eventId}/exports/registrations.csv`,
-                attendance: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/exports/attendance.csv`,
+                    `${ADMIN_BASE}/events/${eventId}/exports/registrations.csv`,
+                attendance: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/exports/attendance.csv`,
             },
             forms: {
-                index: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/forms`,
-                create: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/forms/create`,
+                index: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/forms`,
+                create: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/forms/create`,
                 show: (eventId: string | number, formId: string | number) =>
-                    `${ADMIN_DASHBOARD}/events/${eventId}/forms/${formId}`,
-                store: (eventId: string | number) => `${ADMIN_DASHBOARD}/events/${eventId}/forms`,
+                    `${ADMIN_BASE}/events/${eventId}/forms/${formId}`,
+                store: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/forms`,
                 destroy: (eventId: string | number, formId: string | number) =>
-                    `${ADMIN_DASHBOARD}/events/${eventId}/forms/${formId}`,
+                    `${ADMIN_BASE}/events/${eventId}/forms/${formId}`,
                 submissions: (eventId: string | number, formId: string | number) =>
-                    `${ADMIN_DASHBOARD}/events/${eventId}/forms/${formId}/submissions`,
+                    `${ADMIN_BASE}/events/${eventId}/forms/${formId}/submissions`,
             },
         },
     },
 
     member: {
         joined: MEMBER_JOINED,
-        browse: '/browse/events',
+        browse: '/browse',
         checkEmail: `${MEMBER_JOINED}/users/check-email`,
         event: {
-            show: (segment: string | number) => `${MEMBER_JOINED}/events/${segment}`,
-            register: (segment: string | number) => `${MEMBER_JOINED}/events/${segment}/register`,
-            registration: (segment: string | number) => `${MEMBER_JOINED}/events/${segment}/registration`,
+            show: (segment: string | number) => `${MEMBER_JOINED}/${segment}`,
+            register: (segment: string | number) => `${MEMBER_JOINED}/${segment}/register`,
+            registration: (segment: string | number) => `${MEMBER_JOINED}/${segment}/registration`,
             formFill: (eventId: string | number, formId: string | number) =>
-                `${MEMBER_JOINED}/events/${eventId}/forms/${formId}/fill`,
+                `${MEMBER_JOINED}/${eventId}/forms/${formId}/fill`,
             formSubmitted: (eventId: string | number, formId: string | number) =>
-                `${MEMBER_JOINED}/events/${eventId}/forms/${formId}/submitted`,
+                `${MEMBER_JOINED}/${eventId}/forms/${formId}/submitted`,
         },
         teamInvitation: (token: string) => `${MEMBER_JOINED}/team-invitations/${token}`,
     },
@@ -125,9 +125,6 @@ export function resolveNavbarFallbackBackHref(currentUrl: string): string {
         return routes.dashboard.index;
     }
     if (path === routes.member.browse) {
-        return routes.member.joined;
-    }
-    if (path.startsWith(`${routes.member.joined}/events`)) {
         return routes.member.joined;
     }
     if (path.startsWith(routes.member.joined) && path !== routes.member.joined) {
