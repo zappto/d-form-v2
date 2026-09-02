@@ -18,8 +18,8 @@ const forwardedProps = useForwardProps(delegatedProps)
   <CalendarNext
     data-slot="calendar-next-button"
     :class="cn(
-      buttonVariants({ variant: 'outline' }),
-      'size-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+      buttonVariants({ variant: 'ghost', radius: 'full', size: 'icon-sm' }),
+      'bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground',
       props.class,
     )"
     v-bind="forwardedProps"

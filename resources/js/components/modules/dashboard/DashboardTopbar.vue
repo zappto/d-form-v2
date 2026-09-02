@@ -72,13 +72,20 @@ const pageTitle = computed(() => topbar.title.value ?? fallbackTitle.value);
 /** Breadcrumb dibangun dari lib terpisah (pure function). */
 const breadcrumbItems = computed(() => buildBreadcrumbs(page.url, pageTitle.value));
 
-/**
- * Tampilkan back button hanya pada halaman detail yang punya slug/params
- * (min. 4 segmen path). Base page (dashboard, events, recruitment) tidak.
- */
+/** Base pages (halaman utama) — back button disembunyikan di sini. */
+const BASE_PAGE_PATHS = new Set([
+    routes.dashboard.index,
+    routes.admin.index,
+    routes.admin.events.index,
+    routes.admin.recruitment,
+    routes.member.joined,
+    routes.member.browse,
+]);
+
+/** Tampilkan back button di semua halaman KECUALI base page. */
 const showBackButton = computed(() => {
-    const segments = pathWithoutQuery(page.url).split('/').filter(Boolean);
-    return segments.length >= 4;
+    const path = pathWithoutQuery(page.url);
+    return !BASE_PAGE_PATHS.has(path);
 });
 
 function goBack(): void {

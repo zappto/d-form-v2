@@ -6,9 +6,9 @@ import { getLocalTimeZone, today } from "@internationalized/date"
 import { createReusableTemplate, reactiveOmit, useVModel } from "@vueuse/core"
 import { CalendarRoot, useDateFormatter, useForwardPropsEmits } from "reka-ui"
 import { createYear, createYearRange, toDate } from "reka-ui/date"
-import { computed, toRaw } from "vue"
+import { ChevronDown } from "lucide-vue-next"
+import { computed, ref, toRaw } from "vue"
 import { cn } from "@/lib/utils"
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarNextButton, CalendarPrevButton } from "."
 
 const props = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes["class"], layout?: LayoutTypes, yearRange?: DateValue[] }>(), {
@@ -40,51 +40,74 @@ const [DefineMonthTemplate, ReuseMonthTemplate] = createReusableTemplate<{ date:
 const [DefineYearTemplate, ReuseYearTemplate] = createReusableTemplate<{ date: DateValue }>()
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
+
+// ── Dropdown bulan/tahun modern (menggantikan native select transparan) ──
+const openDropdown = ref<'month' | 'year' | null>(null)
+
+function monthShort(date: DateValue): string {
+  return formatter.custom(toDate(date), { month: 'short' })
+}
+function monthLong(date: DateValue): string {
+  return formatter.custom(toDate(date), { month: 'long' })
+}
+function yearNum(date: DateValue): string {
+  return formatter.custom(toDate(date), { year: 'numeric' })
+}
 </script>
 
 <template>
   <DefineMonthTemplate v-slot="{ date }">
-    <div class="**:data-[slot=native-select-icon]:right-1">
-      <div class="relative">
-        <div class="absolute inset-0 flex h-full items-center text-sm pl-2 pointer-events-none">
-          {{ formatter.custom(toDate(date), { month: 'short' }) }}
-        </div>
-        <NativeSelect
-          class="text-xs h-8 pr-6 pl-2 text-transparent relative"
-          :model-value="date.month"
-          @change="(e: Event) => {
-            placeholder = placeholder.set({
-              month: Number((e?.target as any)?.value),
-            })
-          }"
+    <div class="relative">
+      <button
+        type="button"
+        class="flex h-8 min-w-[4.5rem] items-center justify-center gap-1 rounded-lg px-2 text-sm font-semibold text-foreground transition-colors duration-150 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none"
+        @click="openDropdown = openDropdown === 'month' ? null : 'month'"
+      >
+        {{ monthLong(date) }}
+        <ChevronDown class="size-3.5 text-muted-foreground" aria-hidden="true" />
+      </button>
+      <div
+        v-if="openDropdown === 'month'"
+        class="absolute left-0 top-full z-50 mt-1 max-h-56 w-36 overflow-y-auto rounded-lg border border-border bg-popover p-1 shadow-sm"
+      >
+        <button
+          v-for="m in createYear({ dateObj: date })"
+          :key="m.toString()"
+          type="button"
+          class="flex w-full items-center rounded-md px-2 py-1.5 text-left text-sm transition-colors duration-100 hover:bg-accent"
+          :class="m.month === date.month ? 'bg-accent font-semibold text-foreground' : 'text-muted-foreground'"
+          @click="placeholder = placeholder.set({ month: m.month }); openDropdown = null"
         >
-          <NativeSelectOption v-for="(month) in createYear({ dateObj: date })" :key="month.toString()" :value="month.month" :selected="date.month === month.month">
-            {{ formatter.custom(toDate(month), { month: 'short' }) }}
-          </NativeSelectOption>
-        </NativeSelect>
+          {{ monthShort(m) }}
+        </button>
       </div>
     </div>
   </DefineMonthTemplate>
 
   <DefineYearTemplate v-slot="{ date }">
-    <div class="**:data-[slot=native-select-icon]:right-1">
-      <div class="relative">
-        <div class="absolute inset-0 flex h-full items-center text-sm pl-2 pointer-events-none">
-          {{ formatter.custom(toDate(date), { year: 'numeric' }) }}
-        </div>
-        <NativeSelect
-          class="text-xs h-8 pr-6 pl-2 text-transparent relative"
-          :model-value="date.year"
-          @change="(e: Event) => {
-            placeholder = placeholder.set({
-              year: Number((e?.target as any)?.value),
-            })
-          }"
+    <div class="relative">
+      <button
+        type="button"
+        class="flex h-8 items-center justify-center gap-1 rounded-lg px-2 text-sm font-semibold text-foreground transition-colors duration-150 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:outline-none"
+        @click="openDropdown = openDropdown === 'year' ? null : 'year'"
+      >
+        {{ yearNum(date) }}
+        <ChevronDown class="size-3.5 text-muted-foreground" aria-hidden="true" />
+      </button>
+      <div
+        v-if="openDropdown === 'year'"
+        class="absolute right-0 top-full z-50 mt-1 max-h-56 w-24 overflow-y-auto rounded-lg border border-border bg-popover p-1 shadow-sm"
+      >
+        <button
+          v-for="y in yearRange"
+          :key="y.toString()"
+          type="button"
+          class="flex w-full items-center rounded-md px-2 py-1.5 text-left text-sm transition-colors duration-100 hover:bg-accent"
+          :class="y.year === date.year ? 'bg-accent font-semibold text-foreground' : 'text-muted-foreground'"
+          @click="placeholder = placeholder.set({ year: y.year }); openDropdown = null"
         >
-          <NativeSelectOption v-for="(year) in yearRange" :key="year.toString()" :value="year.year" :selected="date.year === year.year">
-            {{ formatter.custom(toDate(year), { year: 'numeric' }) }}
-          </NativeSelectOption>
-        </NativeSelect>
+          {{ yearNum(y) }}
+        </button>
       </div>
     </div>
   </DefineYearTemplate>
@@ -97,7 +120,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     :class="cn('p-3', props.class)"
   >
     <CalendarHeader class="pt-0">
-      <nav class="flex items-center gap-1 absolute top-0 inset-x-0 justify-between">
+      <nav class="absolute inset-x-0 top-0 flex items-center justify-between">
         <CalendarPrevButton>
           <slot name="calendar-prev-icon" />
         </CalendarPrevButton>
@@ -116,12 +139,12 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         <template v-else-if="layout === 'month-only'">
           <div class="flex items-center justify-center gap-1">
             <ReuseMonthTemplate :date="date" />
-            {{ formatter.custom(toDate(date), { year: 'numeric' }) }}
+            {{ yearNum(date) }}
           </div>
         </template>
         <template v-else-if="layout === 'year-only'">
           <div class="flex items-center justify-center gap-1">
-            {{ formatter.custom(toDate(date), { month: 'short' }) }}
+            {{ monthShort(date) }}
             <ReuseYearTemplate :date="date" />
           </div>
         </template>
@@ -131,7 +154,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       </slot>
     </CalendarHeader>
 
-    <div class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
+    <div class="mt-4 flex flex-col gap-y-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
       <CalendarGrid v-for="month in grid" :key="month.value.toString()">
         <CalendarGridHead>
           <CalendarGridRow>

@@ -1,35 +1,52 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useForm } from '@inertiajs/vue3'
-import { toast } from 'vue-sonner'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { DatePicker, DateTimePicker } from '@/components/ui/date-picker'
-import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue'
-import EventMultiValuePicker from '@/components/modules/dashboard/events/EventMultiValuePicker.vue'
-import { Upload, X, Save, Send } from 'lucide-vue-next'
-import { store as storeEvent, update as updateEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController'
-import { getFieldError, handleInertiaFormErrors } from '@/lib/error-message'
-import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect'
+import { computed, ref, watch } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { DatePicker } from '@/components/ui/date-picker';
+import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue';
+import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
+import EventMultiValuePicker from '@/components/modules/dashboard/events/EventMultiValuePicker.vue';
+import {
+    FileText,
+    ImageUp,
+    MapPin,
+    MapPinned,
+    PanelsTopLeft,
+    X,
+    Save,
+    Send,
+    CalendarRange,
+    CalendarClock,
+    Ticket,
+    Tags,
+} from 'lucide-vue-next';
+import {
+    store as storeEvent,
+    update as updateEvent,
+} from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
+import { getFieldError } from '@/lib/error-message';
+import { cn } from '@/lib/utils';
 import {
     formatIntegerId,
     formatPriceId,
+    formatPriceTyping,
     parsePriceInput,
     parseQuotaInput,
     sanitizeQuotaTyping,
-} from '@/lib/indonesianNumericInput'
+} from '@/lib/indonesianNumericInput';
 
-export type EventDashboardFormVariant = 'create' | 'edit'
+export type EventDashboardFormVariant = 'create' | 'edit';
 
 const props = defineProps<{
-    variant: EventDashboardFormVariant
+    variant: EventDashboardFormVariant;
     /** Edit: wajib. Create: tidak dipakai. */
-    event?: IEvent
+    event?: IEvent;
     /** Create: opsional (fallback default). Edit: wajib dari halaman. */
-    options?: { categories: { value: string; label: string }[]; sessions: { value: string; label: string }[] }
-}>()
+    options?: { categories: { value: string; label: string }[]; sessions: { value: string; label: string }[] };
+}>();
 
 const defaultSessions = [
     { value: 'general', label: 'General' },
@@ -37,64 +54,66 @@ const defaultSessions = [
     { value: 'network', label: 'Networking' },
     { value: 'media_creative', label: 'Media Creative' },
     { value: 'data', label: 'Data' },
-]
+];
 
 const defaultCategories = [
     { value: 'rkt', label: 'RKT' },
     { value: 'non-rkt', label: 'NON RKT' },
     { value: 'recruitment', label: 'Recruitment' },
     { value: 'etc', label: 'Etc' },
-]
+];
 
 const sessions = computed(() =>
-    props.variant === 'edit' && props.options
-        ? props.options.sessions
-        : (props.options?.sessions ?? defaultSessions),
-)
+    props.variant === 'edit' && props.options ? props.options.sessions : (props.options?.sessions ?? defaultSessions)
+);
 
 const categories = computed(() =>
     props.variant === 'edit' && props.options
         ? props.options.categories
-        : (props.options?.categories ?? defaultCategories),
-)
+        : (props.options?.categories ?? defaultCategories)
+);
 
 function toTokenList(v: unknown): string[] {
-    if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean)
-    if (typeof v === 'string') return v.split(',').map((s) => s.trim()).filter(Boolean)
-    return []
+    if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
+    if (typeof v === 'string')
+        return v
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+    return [];
 }
 
 function buildFormPayload():
     | {
-          title: string
-          description: string
-          location: string
-          start_date: string
-          end_date: string
-          registration_start: string
-          registration_end: string
-          quota: number
-          price: number
-          session: string
-          category: string
-          banner: File | null
-          publish: boolean
+          title: string;
+          description: string;
+          location: string;
+          start_date: string;
+          end_date: string;
+          registration_start: string;
+          registration_end: string;
+          quota: number;
+          price: number;
+          session: string;
+          category: string;
+          banner: File | null;
+          publish: boolean;
       }
     | {
-          _method: 'PUT'
-          title: string
-          description: string
-          location: string
-          start_date: string
-          end_date: string
-          registration_start: string
-          registration_end: string
-          quota: number
-          price: number
-          session: string
-          category: string
-          banner: File | null
-          publish: boolean
+          _method: 'PUT';
+          title: string;
+          description: string;
+          location: string;
+          start_date: string;
+          end_date: string;
+          registration_start: string;
+          registration_end: string;
+          quota: number;
+          price: number;
+          session: string;
+          category: string;
+          banner: File | null;
+          publish: boolean;
       } {
     if (props.variant === 'create') {
         return {
@@ -111,12 +130,12 @@ function buildFormPayload():
             category: '',
             banner: null,
             publish: false,
-        }
+        };
     }
 
-    const e = props.event!
-    const initialCategories = toTokenList(e.category)
-    const initialSessions = toTokenList(e.session)
+    const e = props.event!;
+    const initialCategories = toTokenList(e.category);
+    const initialSessions = toTokenList(e.session);
 
     return {
         _method: 'PUT' as const,
@@ -133,121 +152,177 @@ function buildFormPayload():
         category: initialCategories.join(','),
         banner: null,
         publish: e.status === 'published',
-    }
+    };
 }
 
-const form = useForm(buildFormPayload())
-
-const bannerHelpPrimary = computed(() =>
-    props.variant === 'create' ? 'Upload banner acara' : 'Ganti banner acara',
-)
+const form = useForm(buildFormPayload());
 
 const bannerEmptyTitle = computed(() =>
-    props.variant === 'create' ? 'Unggah atau seret gambar ke sini' : 'Unggah banner baru',
-)
+    props.variant === 'create' ? 'Unggah atau seret gambar ke sini' : 'Unggah banner baru'
+);
 
 const bannerEmptyHint = computed(() =>
-    props.variant === 'create' ? 'PNG, JPG, WebP - maks. 10MB' : 'PNG, JPG, WebP - maks. 10MB',
-)
-
-const bannerFootnote = computed(() =>
-    props.variant === 'create' ? 'Area aman di tengah' : 'Area aman di tengah - simpan untuk menerapkan',
-)
+    props.variant === 'create' ? 'PNG, JPG, WebP - maks. 10MB' : 'PNG, JPG, WebP - maks. 10MB'
+);
 
 const classificationDescription = computed(() =>
     props.variant === 'create'
         ? 'Sesi (divisi) dan kategori dipakai untuk filter di dashboard. Bisa lebih dari satu.'
-        : 'Sesi dan kategori untuk filter internal. Kombinasikan beberapa nilai bila perlu.',
-)
+        : 'Sesi dan kategori untuk filter internal. Kombinasikan beberapa nilai bila perlu.'
+);
 
-const sessionPickerId = computed(() => (props.variant === 'create' ? 'field-session' : 'edit-field-session'))
+/** Batas karakter frontend (counter) — backend tetap memvalidasi. */
+const TITLE_MAX = 200;
+const DESCRIPTION_MAX = 5000;
 
-const categoryPickerId = computed(() => (props.variant === 'create' ? 'field-category' : 'edit-field-category'))
+const titleLength = computed(() => form.title.length);
+
+/** Hitung panjang teks deskripsi (strip tag HTML dari TipTap). */
+const descriptionLength = computed(() => {
+    const html = String(form.description ?? '');
+    const plain = html
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .trim();
+    return plain.length;
+});
+
+function onTitleInput(v: string | number): void {
+    const s = String(v).slice(0, TITLE_MAX);
+    form.title = s;
+}
+
+const sessionPickerId = computed(() => (props.variant === 'create' ? 'field-session' : 'edit-field-session'));
+
+const categoryPickerId = computed(() => (props.variant === 'create' ? 'field-category' : 'edit-field-category'));
 
 /** Sesi & kategori: perilaku input sama (multi, daftar + ketik). */
-const multiValueFieldHint = 'Pilih dari daftar atau ketik; boleh lebih dari satu.'
+const multiValueFieldHint = 'Pilih dari daftar atau ketik; boleh lebih dari satu.';
 
-const primaryActionLabel = computed(() => (props.variant === 'create' ? 'Terbitkan' : 'Simpan & terbitkan'))
+const primaryActionLabel = computed(() => (props.variant === 'create' ? 'Terbitkan' : 'Simpan & terbitkan'));
 
-const secondaryActionLabel = computed(() => (props.variant === 'create' ? 'Simpan draf' : 'Simpan perubahan'))
+const secondaryActionLabel = computed(() => (props.variant === 'create' ? 'Simpan draf' : 'Simpan perubahan'));
+
+const pageTitle = computed(() => (props.variant === 'create' ? 'Buat event baru' : 'Edit event'));
+
+const pageSubtitle = computed(() =>
+    props.variant === 'create'
+        ? 'Lengkapi informasi event kamu — judul, jadwal, dan detail pendaftaran.'
+        : 'Perbarui detail event kamu — simpan perubahan atau terbitkan kembali.'
+);
 
 const bannerPreview = ref<string | null>(
-    props.variant === 'edit' && props.event?.banner_url ? props.event.banner_url : null,
-)
+    props.variant === 'edit' && props.event?.banner_url ? props.event.banner_url : null
+);
 
-const isDragging = ref(false)
+const isDragging = ref(false);
 
-const quotaDisplay = ref(
-    form.quota > 0 ? formatIntegerId(form.quota) : '',
-)
+const quotaDisplay = ref(form.quota > 0 ? formatIntegerId(form.quota) : '');
 
-const priceDisplay = ref(Number(form.price) > 0 ? formatPriceId(Number(form.price)) : '')
+const priceDisplay = ref(Number(form.price) > 0 ? formatPriceId(Number(form.price)) : '');
+
+/** Field yang sedang bergoyang (shake) karena error validasi, per input field. */
+const shakingFields = ref(new Set<string>());
+const shakeTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function shakeFields(keys: string[]): void {
+    if (keys.length === 0) return;
+    const next = new Set(shakingFields.value);
+    for (const key of keys) {
+        if (shakeTimers.has(key)) clearTimeout(shakeTimers.get(key)!);
+        next.add(key);
+        shakeTimers.set(
+            key,
+            setTimeout(() => {
+                const after = new Set(shakingFields.value);
+                after.delete(key);
+                shakingFields.value = after;
+                shakeTimers.delete(key);
+            }, 450)
+        );
+    }
+    shakingFields.value = next;
+}
+
+function isFieldShaking(key: string): boolean {
+    return shakingFields.value.has(key);
+}
+
+/** Class error untuk input sederhana (Input, DatePicker, TimeAmPmInput, Combobox). */
+function errorClass(key: string): string {
+    return fieldError(key)
+        ? 'border-destructive/70 bg-red-50 dark:bg-red-500/10 focus-visible:border-destructive focus-visible:ring-destructive/20'
+        : '';
+}
 
 function onQuotaInput(v: string | number): void {
-    const s = sanitizeQuotaTyping(String(v))
-    quotaDisplay.value = s
-    form.quota = parseQuotaInput(s)
+    const s = sanitizeQuotaTyping(String(v));
+    quotaDisplay.value = s;
+    form.quota = parseQuotaInput(s);
 }
 
 function onQuotaBlur(): void {
-    const q = parseQuotaInput(quotaDisplay.value)
-    form.quota = q
-    quotaDisplay.value = q > 0 ? formatIntegerId(q) : ''
+    const q = parseQuotaInput(quotaDisplay.value);
+    form.quota = q;
+    quotaDisplay.value = q > 0 ? formatIntegerId(q) : '';
 }
 
 function onPriceInput(v: string | number): void {
-    const s = String(v).replace(/[^\d.,]/g, '')
-    priceDisplay.value = s
-    form.price = parsePriceInput(s)
+    priceDisplay.value = formatPriceTyping(String(v));
+    form.price = parsePriceInput(priceDisplay.value);
 }
 
 function onPriceBlur(): void {
-    const p = parsePriceInput(priceDisplay.value)
-    form.price = p
-    priceDisplay.value = p > 0 ? formatPriceId(p) : ''
+    const p = parsePriceInput(priceDisplay.value);
+    form.price = p;
+    priceDisplay.value = p > 0 ? formatPriceId(p) : '';
 }
 
 function commitQuotaPriceFromFields(): void {
-    form.quota = parseQuotaInput(quotaDisplay.value)
-    form.price = parsePriceInput(priceDisplay.value)
+    form.quota = parseQuotaInput(quotaDisplay.value);
+    form.price = parsePriceInput(priceDisplay.value);
 }
 
 function handleBannerChange(e: Event): void {
-    const input = e.target as HTMLInputElement
+    const input = e.target as HTMLInputElement;
     if (input.files?.[0]) {
-        form.banner = input.files[0]
-        bannerPreview.value = URL.createObjectURL(input.files[0])
+        form.banner = input.files[0];
+        bannerPreview.value = URL.createObjectURL(input.files[0]);
     }
 }
 
 function handleDrop(e: DragEvent): void {
-    isDragging.value = false
-    const file = e.dataTransfer?.files[0]
+    isDragging.value = false;
+    const file = e.dataTransfer?.files[0];
     if (file && file.type.startsWith('image/')) {
-        form.banner = file
-        bannerPreview.value = URL.createObjectURL(file)
+        form.banner = file;
+        bannerPreview.value = URL.createObjectURL(file);
     }
 }
 
 function removeBanner(): void {
-    form.banner = null
-    bannerPreview.value = null
+    form.banner = null;
+    bannerPreview.value = null;
 }
 
 function submitForm(publish: boolean): void {
-    form.publish = publish
-    commitQuotaPriceFromFields()
-    if (typeof form.start_date === 'string') form.start_date = form.start_date.trim()
-    if (typeof form.end_date === 'string') form.end_date = form.end_date.trim()
-    if (typeof form.registration_start === 'string') form.registration_start = form.registration_start.trim()
-    if (typeof form.registration_end === 'string') form.registration_end = form.registration_end.trim()
+    form.publish = publish;
+    commitQuotaPriceFromFields();
+    if (typeof form.start_date === 'string') form.start_date = form.start_date.trim();
+    if (typeof form.end_date === 'string') form.end_date = form.end_date.trim();
+    if (typeof form.registration_start === 'string') form.registration_start = form.registration_start.trim();
+    if (typeof form.registration_end === 'string') form.registration_end = form.registration_end.trim();
     form.transform((data) => ({
         ...data,
         category: toTokenList(data.category),
         session: toTokenList(data.session),
-    }))
+    }));
 
-    const url = props.variant === 'create' ? storeEvent().url : updateEvent(props.event!.id).url
+    const url = props.variant === 'create' ? storeEvent().url : updateEvent(props.event!.id).url;
 
     form.post(url, {
         forceFormData: true,
@@ -256,288 +331,527 @@ function submitForm(publish: boolean): void {
                 toast.success(
                     props.variant === 'create'
                         ? 'Acara berhasil dipublikasikan.'
-                        : 'Acara diperbarui dan dipublikasikan.',
-                )
+                        : 'Acara diperbarui dan dipublikasikan.'
+                );
             } else {
-                toast.success(props.variant === 'create' ? 'Disimpan sebagai draf.' : 'Perubahan disimpan.')
+                toast.success(props.variant === 'create' ? 'Disimpan sebagai draf.' : 'Perubahan disimpan.');
             }
         },
-        onError: (errors) => handleInertiaFormErrors(errors, { title: 'Gagal menyimpan acara' }),
-    })
+        onError: (errors) => {
+            shakeFields(Object.keys(errors));
+        },
+    });
 }
 
 function fieldError(key: string): string | undefined {
-    return getFieldError(form.errors, key)
+    return getFieldError(form.errors, key);
 }
+
+// ── Pendaftaran: tanggal & jam terpisah (payload tetap `YYYY-MM-DDTHH:mm`) ──
+
+function splitDateTimeParts(value: string | undefined): { date: string; time: string } {
+    if (!value) return { date: '', time: '' };
+    const [d, t = ''] = value.split('T');
+    return { date: d.length >= 10 ? d.slice(0, 10) : '', time: t.length >= 5 ? t.slice(0, 5) : '' };
+}
+
+const regOpen = ref(splitDateTimeParts(form.registration_start as string));
+const regClose = ref(splitDateTimeParts(form.registration_end as string));
+
+function combineDateTime(date: string, time: string): string {
+    if (!date) return '';
+    const t = time && time.length >= 5 ? time.slice(0, 5) : '00:00';
+    return `${date}T${t}`;
+}
+
+function syncRegistrationOpen(): void {
+    form.registration_start = combineDateTime(regOpen.value.date, regOpen.value.time);
+}
+
+function syncRegistrationClose(): void {
+    form.registration_end = combineDateTime(regClose.value.date, regClose.value.time);
+}
+
+watch(regOpen, syncRegistrationOpen, { deep: true });
+watch(regClose, syncRegistrationClose, { deep: true });
 </script>
 
-<template>
-    <div class="grid gap-6 lg:grid-cols-12 lg:items-start">
-        <div class="flex flex-col gap-6 lg:col-span-7">
-            <Card class="rounded-xl border shadow-xs">
-                <CardHeader class="pb-4">
-                    <CardTitle class="text-base">Informasi utama</CardTitle>
-                    <CardDescription>Judul, deskripsi, banner, dan lokasi yang terlihat peserta.</CardDescription>
-                </CardHeader>
-                <CardContent class="flex flex-col gap-6">
-                    <div class="flex flex-col gap-2">
-                        <Label for="title" class="text-sm font-medium">Judul acara</Label>
-                        <Input id="title" v-model="form.title" placeholder="Contoh: Bootcamp Web 2026" />
-                        <p v-if="fieldError('title')" class="text-destructive text-xs">{{ fieldError('title') }}</p>
-                    </div>
+<style scoped>
+/* Area editor TipTap ber-latar kartu; ketika error, tint merah sampai ke area ketik. */
+.event-form-description-error {
+    box-shadow: 0 0 0 1px var(--destructive);
+}
+.event-form-description-error :deep(.dform-rich-text) {
+    background-color: color-mix(in srgb, var(--destructive) 5%, white);
+}
+[data-theme='dark'] .event-form-description-error :deep(.dform-rich-text) {
+    background-color: color-mix(in srgb, var(--destructive) 12%, transparent);
+}
+</style>
 
-                    <div class="flex flex-col gap-2">
-                        <Label class="text-sm font-medium">Deskripsi</Label>
-                        <TipTapEditor v-model="form.description" />
-                        <p v-if="fieldError('description')" class="text-destructive text-xs">
-                            {{ fieldError('description') }}
+<template>
+    <div class="flex flex-col gap-5">
+        <!-- Header halaman: judul + subtitle kiri, aksi kanan -->
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="min-w-0">
+                <h1 class="font-display text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
+                    {{ pageTitle }}
+                </h1>
+                <p class="text-muted-foreground mt-1.5 text-base">{{ pageSubtitle }}</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <Button type="button" variant="outline" :disabled="form.processing" @click="submitForm(false)">
+                    <Save class="size-4 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                    {{ secondaryActionLabel }}
+                </Button>
+                <Button type="button" :disabled="form.processing" @click="submitForm(true)">
+                    <Send class="size-4 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                    {{ primaryActionLabel }}
+                </Button>
+            </div>
+        </div>
+
+        <div class="grid mb-5 gap-5 lg:grid-cols-12 lg:items-stretch">
+        <div class="flex flex-col gap-6 lg:col-span-7">
+            <!-- Section: Informasi utama -->
+            <div class="border-border/60 bg-card flex h-full flex-col rounded-xl border p-5 shadow-xs sm:p-6">
+                <div class="mb-5 flex items-center gap-2.5">
+                    <FileText class="text-foreground/80 size-5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                    <div>
+                        <p class="text-foreground text-base font-semibold tracking-tight">Informasi utama</p>
+                        <p class="text-muted-foreground mt-0.5 text-xs">
+                            Judul, deskripsi, banner, dan lokasi yang terlihat peserta.
                         </p>
                     </div>
+                </div>
 
-                    <div class="flex flex-col gap-2">
-                        <Label class="text-sm font-medium">Banner</Label>
-                        <div class="flex flex-wrap gap-1.5">
-                            <span class="rounded-full border border-primary/20 bg-primary/8 px-2.5 py-1 text-[10px] font-semibold text-primary">
-                                Target 3:1
-                            </span>
-                            <span class="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">
-                                1920 x 640 px
-                            </span>
-                            <span class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
-                                Safe center
-                            </span>
+                <div class="flex flex-col gap-6">
+                    <!-- Sub A: Judul + Deskripsi -->
+                    <div class="flex flex-col gap-5">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center justify-between gap-3">
+                                <Label for="title" class="text-sm font-medium">
+                                    Judul acara <span class="text-destructive">*</span>
+                                </Label>
+                                <span
+                                    class="text-muted-foreground text-xs tabular-nums"
+                                    :class="titleLength > TITLE_MAX ? 'text-destructive font-medium' : ''"
+                                >
+                                    {{ titleLength }}/{{ TITLE_MAX }}
+                                </span>
+                            </div>
+                            <Input
+                                id="title"
+                                :model-value="form.title"
+                                placeholder="Contoh: Bootcamp Web 2026"
+                                :aria-invalid="!!fieldError('title')"
+                                :class="[
+                                    'bg-white',
+                                    errorClass('title'),
+                                    isFieldShaking('title') ? 'animate-shake' : '',
+                                ]"
+                                @update:model-value="onTitleInput"
+                            />
+                            <p v-if="fieldError('title')" class="text-destructive text-xs">
+                                {{ fieldError('title') }}
+                            </p>
                         </div>
-                        <div class="overflow-hidden rounded-xl border-2 border-border bg-muted/25 shadow-sm">
-                            <div :class="eventHeroBannerContainerClass()">
+
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center justify-between gap-3">
+                                <Label class="text-sm font-medium">
+                                    Deskripsi event <span class="text-destructive">*</span>
+                                </Label>
+                            </div>
+                            <div
+                                :class="[
+                                    fieldError('description') ? 'event-form-description-error rounded-xl' : '',
+                                    isFieldShaking('description') ? 'animate-shake' : '',
+                                ]"
+                            >
+                                <TipTapEditor v-model="form.description" />
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                                <p v-if="fieldError('description')" class="text-destructive text-xs">
+                                    {{ fieldError('description') }}
+                                </p>
+                                <p v-else class="text-xs" aria-hidden="true"></p>
+                                <span
+                                    class="text-muted-foreground text-xs tabular-nums"
+                                    :class="descriptionLength > DESCRIPTION_MAX ? 'text-destructive font-medium' : ''"
+                                >
+                                    {{ descriptionLength }}/{{ DESCRIPTION_MAX }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pembatas sub-bagian -->
+                    <div class="border-border/60 border-t" />
+
+                    <!-- Sub B: Banner / poster -->
+                    <div class="flex flex-col gap-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <Label class="flex items-center gap-1.5 text-sm font-medium">
+                                    <PanelsTopLeft
+                                        class="text-foreground/80 size-4.5 shrink-0 stroke-[1.75]"
+                                        aria-hidden="true"
+                                    />
+                                    Banner / poster
+                                    <span v-if="props.variant === 'create'" class="text-destructive">*</span>
+                                </Label>
+                                <p class="text-muted-foreground mt-1 text-xs">
+                                    Rasio 16:7 — PNG, JPG, atau WebP maks. 10MB.
+                                </p>
+                            </div>
+                            <div v-if="bannerPreview" class="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    class="h-9 text-xs"
+                                    type="button"
+                                    @click="($refs.bannerInput as HTMLInputElement)?.click()"
+                                >
+                                    Ganti
+                                </Button>
+                                <Button
+                                    radius="icon"
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    class="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                    type="button"
+                                    aria-label="Hapus banner"
+                                    @click="removeBanner"
+                                >
+                                    <X class="size-4" />
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div
+                            :class="[
+                                'border-border bg-muted/25 overflow-hidden rounded-xl border-2 transition-colors',
+                                isDragging ? 'border-primary/60 bg-primary/5' : '',
+                                fieldError('banner') ? 'border-destructive/70 bg-red-50 dark:bg-red-500/10' : '',
+                                isFieldShaking('banner') ? 'animate-shake' : '',
+                            ]"
+                        >
+                            <div class="relative aspect-[16/7] w-full">
                                 <template v-if="bannerPreview">
                                     <img
                                         :src="bannerPreview"
                                         alt="Pratinjau banner"
                                         class="absolute inset-0 size-full object-cover"
                                     />
-                                    <div
-                                        class="pointer-events-none absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-black/40 to-transparent"
-                                    />
-                                    <span
-                                        class="absolute top-3 left-3 rounded-md bg-background/92 px-2 py-1 text-[10px] font-semibold tracking-wide text-foreground uppercase shadow-sm backdrop-blur-md"
-                                    >
-                                        {{ bannerHelpPrimary }}
-                                    </span>
-                                    <div
-                                        class="pointer-events-none absolute inset-y-[18%] left-[18%] right-[18%] rounded-xl border border-white/80 shadow-[0_0_0_999px_rgba(0,0,0,0.18)]"
-                                        aria-hidden="true"
-                                    />
-                                    <div class="absolute top-3 right-3 flex gap-2">
-                                        <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            class="h-9 text-xs shadow-md"
-                                            type="button"
-                                            @click="($refs.bannerInput as HTMLInputElement)?.click()"
-                                        >
-                                            Ganti
-                                        </Button>
-                                        <Button radius="icon"
-                                            variant="destructive"
-                                            size="icon"
-                                            class="size-9 shadow-md"
-                                            type="button"
-                                            @click="removeBanner"
-                                        >
-                                            <X class="size-4" />
-                                        </Button>
-                                    </div>
                                 </template>
                                 <div
                                     v-else
-                                    :class="[
- 'absolute inset-0 flex cursor-pointer flex-col items-center justify-center px-5 py-8 text-center transition-colors',
- isDragging ? 'border-primary bg-primary/8' : 'hover:bg-muted/40',
- ]"
+                                    class="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-2.5 px-6 text-center transition-colors"
                                     @dragover.prevent="isDragging = true"
                                     @dragleave="isDragging = false"
                                     @drop.prevent="handleDrop"
                                     @click="($refs.bannerInput as HTMLInputElement)?.click()"
                                 >
-                                    <div class="bg-muted flex size-12 items-center justify-center rounded-full shadow-inner">
-                                        <Upload class="text-muted-foreground size-5" />
+                                    <span
+                                        class="bg-muted text-muted-foreground grid size-12 place-items-center rounded-full"
+                                    >
+                                        <ImageUp class="size-5.5 stroke-[1.75]" aria-hidden="true" />
+                                    </span>
+                                    <div>
+                                        <p class="text-sm font-medium">{{ bannerEmptyTitle }}</p>
+                                        <p class="text-muted-foreground mt-0.5 text-xs">{{ bannerEmptyHint }}</p>
                                     </div>
-                                    <p class="mt-3 text-sm font-medium">{{ bannerEmptyTitle }}</p>
-                                    <p class="text-muted-foreground mt-1 max-w-xs text-xs">
-                                        {{ bannerEmptyHint }}
+                                    <p class="text-muted-foreground text-[11px]">
+                                        Klik untuk memilih, atau seret gambar ke sini
                                     </p>
-                                    <div class="mt-4 w-full max-w-[260px] rounded-lg border border-border bg-background/70 p-2">
-                                        <div class="relative aspect-[3/1] overflow-hidden rounded-md border border-dashed border-primary/45 bg-primary/8">
-                                            <div class="absolute inset-y-[18%] left-[18%] right-[18%] rounded border border-primary/70 bg-primary/10" />
-                                        </div>
-                                        <div class="mt-1.5 flex items-center justify-between text-[10px] font-medium text-muted-foreground">
-                                            <span>3:1 banner</span>
-                                            <span>safe center</span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
-                            <input
-                                ref="bannerInput"
-                                type="file"
-                                accept="image/*"
-                                class="hidden"
-                                @change="handleBannerChange"
-                            />
-                            <p class="border-t border-border bg-muted/20 px-3 py-2 text-xs font-medium text-muted-foreground">
-                                {{ bannerFootnote }}
+                        </div>
+                        <p v-if="fieldError('banner')" class="text-destructive text-xs">
+                            {{ fieldError('banner') }}
+                        </p>
+                        <input
+                            ref="bannerInput"
+                            type="file"
+                            accept="image/*"
+                            class="hidden"
+                            @change="handleBannerChange"
+                        />
+                    </div>
+
+                    <!-- Pembatas sub-bagian -->
+                    <div class="border-border/60 border-t" />
+
+                    <!-- Sub C: Lokasi event -->
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center gap-2.5">
+                            <MapPinned class="text-foreground/80 size-5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                            <div>
+                                <p class="text-foreground text-sm font-semibold tracking-tight">Lokasi event</p>
+                                <p class="text-muted-foreground mt-0.5 text-xs">
+                                    Tempat acara berlangsung — online atau fisik.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <div class="relative">
+                                <MapPin
+                                    class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 stroke-[1.75]"
+                                    aria-hidden="true"
+                                />
+                                <Input
+                                    id="location"
+                                    v-model="form.location"
+                                    placeholder="Mis. Online — Zoom, atau Semarang — Auditorium A"
+                                    :aria-invalid="!!fieldError('location')"
+                                    :class="[
+                                        'bg-white pl-9',
+                                        errorClass('location'),
+                                        isFieldShaking('location') ? 'animate-shake' : '',
+                                    ]"
+                                />
+                            </div>
+                            <p v-if="fieldError('location')" class="text-destructive text-xs">
+                                {{ fieldError('location') }}
                             </p>
                         </div>
-                        <p v-if="fieldError('banner')" class="text-destructive text-xs">{{ fieldError('banner') }}</p>
                     </div>
-
-                    <div class="flex flex-col gap-2">
-                        <Label for="location" class="text-sm font-medium">Lokasi</Label>
-                        <Input
-                            id="location"
-                            v-model="form.location"
-                            placeholder="Mis. Online — Zoom, atau Semarang — Auditorium A"
-                        />
-                        <p v-if="fieldError('location')" class="text-destructive text-xs">{{ fieldError('location') }}</p>
-                    </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
 
-        <div class="flex flex-col gap-6 lg:col-span-5">
-            <Card class="rounded-xl border shadow-xs">
-                <CardHeader class="pb-4">
-                    <CardTitle class="text-base font-semibold tracking-tight">Jadwal acara & kapasitas</CardTitle>
-                </CardHeader>
-                <CardContent class="flex flex-col gap-5">
-                    <div class="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
-                        <p class="text-xs font-semibold leading-snug tracking-tight text-foreground">
-                            Tanggal pelaksanaan acara
-                        </p>
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <div class="flex flex-col gap-1.5">
-                                <Label for="start_date" class="text-xs font-medium text-foreground">Mulai acara</Label>
-                                <DatePicker id="start_date" v-model="form.start_date" />
-                                <p v-if="fieldError('start_date')" class="text-destructive text-xs">
-                                    {{ fieldError('start_date') }}
-                                </p>
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <Label for="end_date" class="text-xs font-medium text-foreground">Selesai acara</Label>
-                                <DatePicker id="end_date" v-model="form.end_date" />
-                                <p v-if="fieldError('end_date')" class="text-destructive text-xs">
-                                    {{ fieldError('end_date') }}
-                                </p>
-                            </div>
-                        </div>
+        <div class="flex flex-col gap-8 lg:col-span-5">
+            <!-- 1. Jadwal acara -->
+            <div class="border-border/60 bg-card rounded-xl border p-5 shadow-xs sm:p-6">
+                <div class="mb-5 flex items-center gap-2.5">
+                    <CalendarRange class="text-foreground/80 size-5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                    <div>
+                        <p class="text-foreground text-base font-semibold tracking-tight">Jadwal acara</p>
+                        <p class="text-muted-foreground mt-0.5 text-xs">Kapan acara berlangsung.</p>
                     </div>
-
-                    <div class="space-y-3 rounded-xl border border-border/80 bg-muted/20 p-4">
-                        <p class="text-xs font-semibold leading-snug tracking-tight text-foreground">
-                            Buka & tutup pendaftaran
+                </div>
+                <div class="flex flex-col gap-5">
+                    <div class="flex flex-col gap-2">
+                        <Label for="start_date" class="text-foreground text-sm font-medium"
+                            >Tanggal mulai <span class="text-destructive">*</span></Label
+                        >
+                        <DatePicker
+                            id="start_date"
+                            v-model="form.start_date"
+                            :aria-invalid="!!fieldError('start_date')"
+                            :class="
+                                cn(
+                                    'bg-white',
+                                    errorClass('start_date'),
+                                    isFieldShaking('start_date') && 'animate-shake'
+                                )
+                            "
+                        />
+                        <p v-if="fieldError('start_date')" class="text-destructive text-xs">
+                            {{ fieldError('start_date') }}
                         </p>
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <div class="flex flex-col gap-1.5">
-                                <Label for="registration_start" class="text-xs font-medium text-foreground">
-                                    Pendaftaran dibuka
-                                </Label>
-                                <DateTimePicker id="registration_start" v-model="form.registration_start" />
-                                <p v-if="fieldError('registration_start')" class="text-destructive text-xs">
-                                    {{ fieldError('registration_start') }}
-                                </p>
-                            </div>
-                            <div class="flex flex-col gap-1.5">
-                                <Label for="registration_end" class="text-xs font-medium text-foreground">
-                                    Pendaftaran ditutup
-                                </Label>
-                                <DateTimePicker id="registration_end" v-model="form.registration_end" />
-                                <p v-if="fieldError('registration_end')" class="text-destructive text-xs">
-                                    {{ fieldError('registration_end') }}
-                                </p>
-                            </div>
-                        </div>
                     </div>
+                    <div class="flex flex-col gap-2">
+                        <Label for="end_date" class="text-foreground text-sm font-medium"
+                            >Tanggal selesai <span class="text-destructive">*</span></Label
+                        >
+                        <DatePicker
+                            id="end_date"
+                            v-model="form.end_date"
+                            :aria-invalid="!!fieldError('end_date')"
+                            :class="
+                                cn('bg-white', errorClass('end_date'), isFieldShaking('end_date') && 'animate-shake')
+                            "
+                        />
+                        <p v-if="fieldError('end_date')" class="text-destructive text-xs">
+                            {{ fieldError('end_date') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="flex flex-col gap-1.5">
-                            <Label for="quota" class="text-xs font-medium">Kuota</Label>
+            <!-- 2. Pendaftaran -->
+            <div class="border-border/60 bg-card rounded-xl border p-5 shadow-xs sm:p-6">
+                <div class="mb-5 flex items-center gap-2.5">
+                    <CalendarClock class="text-foreground/80 size-5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                    <div>
+                        <p class="text-foreground text-base font-semibold tracking-tight">Pendaftaran</p>
+                        <p class="text-muted-foreground mt-0.5 text-xs">Periode peserta dapat mendaftar.</p>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-5">
+                    <div class="flex flex-col gap-2">
+                        <Label for="reg_open_date" class="text-foreground text-sm font-medium">
+                            Pendaftaran dibuka <span class="text-destructive">*</span>
+                        </Label>
+                        <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                            <DatePicker
+                                id="reg_open_date"
+                                :model-value="regOpen.date"
+                                @update:model-value="regOpen.date = $event"
+                                :aria-invalid="!!fieldError('registration_start')"
+                                :class="
+                                    cn(
+                                        'bg-white',
+                                        errorClass('registration_start'),
+                                        isFieldShaking('registration_start') && 'animate-shake'
+                                    )
+                                "
+                            />
+                            <TimeAmPmInput
+                                id="reg_open_time"
+                                :model-value="regOpen.time"
+                                :aria-invalid="!!fieldError('registration_start')"
+                                :class="isFieldShaking('registration_start') ? 'animate-shake' : ''"
+                                @update:model-value="regOpen.time = String($event)"
+                            />
+                        </div>
+                        <p v-if="fieldError('registration_start')" class="text-destructive text-xs">
+                            {{ fieldError('registration_start') }}
+                        </p>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <Label for="reg_close_date" class="text-foreground text-sm font-medium">
+                            Pendaftaran ditutup <span class="text-destructive">*</span>
+                        </Label>
+                        <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                            <DatePicker
+                                id="reg_close_date"
+                                :model-value="regClose.date"
+                                @update:model-value="regClose.date = $event"
+                                :aria-invalid="!!fieldError('registration_end')"
+                                :class="
+                                    cn(
+                                        'bg-white',
+                                        errorClass('registration_end'),
+                                        isFieldShaking('registration_end') && 'animate-shake'
+                                    )
+                                "
+                            />
+                            <TimeAmPmInput
+                                id="reg_close_time"
+                                :model-value="regClose.time"
+                                :aria-invalid="!!fieldError('registration_end')"
+                                :class="isFieldShaking('registration_end') ? 'animate-shake' : ''"
+                                @update:model-value="regClose.time = String($event)"
+                            />
+                        </div>
+                        <p v-if="fieldError('registration_end')" class="text-destructive text-xs">
+                            {{ fieldError('registration_end') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Kapasitas dan Harga -->
+            <div class="border-border/60 bg-card rounded-xl border p-5 shadow-xs sm:p-6">
+                <div class="mb-5 flex items-center gap-2.5">
+                    <Ticket class="text-foreground/80 size-5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                    <div>
+                        <p class="text-foreground text-base font-semibold tracking-tight">Kapasitas dan Harga</p>
+                        <p class="text-muted-foreground mt-0.5 text-xs">Batas peserta dan biaya pendaftaran.</p>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-5">
+                    <div class="flex flex-col gap-2">
+                        <Label for="quota" class="text-foreground text-sm font-medium"
+                            >Kuota <span class="text-destructive">*</span></Label
+                        >
+                        <div class="relative">
                             <Input
                                 id="quota"
                                 type="text"
                                 inputmode="numeric"
                                 autocomplete="off"
-                                class="h-9 text-xs tabular-nums"
+                                :aria-invalid="!!fieldError('quota')"
+                                :class="[
+                                    'h-10 bg-white pr-14 text-sm tabular-nums',
+                                    errorClass('quota'),
+                                    isFieldShaking('quota') ? 'animate-shake' : '',
+                                ]"
                                 :model-value="quotaDisplay"
                                 placeholder="contoh: 500"
                                 @update:model-value="onQuotaInput"
                                 @blur="onQuotaBlur"
                             />
-                            <p v-if="fieldError('quota')" class="text-destructive text-xs">{{ fieldError('quota') }}</p>
+                            <span
+                                class="text-muted-foreground pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-sm"
+                            >
+                                orang
+                            </span>
                         </div>
-                        <div class="flex flex-col gap-1.5">
-                            <Label for="price" class="text-xs font-medium">Harga (Rp)</Label>
+                        <p v-if="fieldError('quota')" class="text-destructive text-xs">
+                            {{ fieldError('quota') }}
+                        </p>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <Label for="price" class="text-foreground text-sm font-medium"
+                            >Harga (Rp) <span class="text-destructive">*</span></Label
+                        >
+                        <div class="relative">
                             <Input
                                 id="price"
                                 type="text"
                                 inputmode="decimal"
                                 autocomplete="off"
-                                class="h-9 text-xs tabular-nums"
+                                :aria-invalid="!!fieldError('price')"
+                                :class="[
+                                    'h-10 bg-white pl-9 text-sm tabular-nums',
+                                    errorClass('price'),
+                                    isFieldShaking('price') ? 'animate-shake' : '',
+                                ]"
                                 :model-value="priceDisplay"
-                                placeholder="contoh: 1.500.000"
+                                placeholder="0"
                                 @update:model-value="onPriceInput"
                                 @blur="onPriceBlur"
                             />
-                            <p v-if="fieldError('price')" class="text-destructive text-xs">{{ fieldError('price') }}</p>
+                            <span
+                                class="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-sm"
+                            >
+                                Rp
+                            </span>
                         </div>
+                        <p v-if="fieldError('price')" class="text-destructive text-xs">
+                            {{ fieldError('price') }}
+                        </p>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
-            <Card class="rounded-xl border shadow-xs">
-                <CardHeader class="pb-4">
-                    <CardTitle class="text-base">Klasifikasi</CardTitle>
-                    <CardDescription>
-                        {{ classificationDescription }}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent class="flex flex-col gap-6">
-                    <div class="grid gap-6 md:grid-cols-2 md:gap-8">
-                        <EventMultiValuePicker
-                            :id="sessionPickerId"
-                            v-model="form.session"
-                            :options="sessions"
-                            label="Sesi / divisi"
-                            :description="multiValueFieldHint"
-                            :error="fieldError('session')"
-                        />
-                        <EventMultiValuePicker
-                            :id="categoryPickerId"
-                            v-model="form.category"
-                            :options="categories"
-                            label="Kategori"
-                            :description="multiValueFieldHint"
-                            :error="fieldError('category')"
-                        />
+            <!-- 4. Klasifikasi -->
+            <div class="border-border/60 bg-card rounded-xl border p-5 shadow-xs sm:p-6">
+                <div class="mb-5 flex items-center gap-2.5">
+                    <Tags class="text-foreground/80 size-5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                    <div>
+                        <p class="text-foreground text-base font-semibold tracking-tight">Klasifikasi</p>
+                        <p class="text-muted-foreground mt-0.5 text-xs">{{ classificationDescription }}</p>
                     </div>
-                </CardContent>
-            </Card>
-
-            <div class="flex flex-col gap-2 sm:flex-row sm:gap-3">
-                <Button type="button" class="sm:flex-1" :disabled="form.processing" @click="submitForm(true)">
-                    <Send class="mr-2 size-4" />
-                    {{ primaryActionLabel }}
-                </Button>
-                <Button
-                    type="button"
-                    variant="outline"
-                    class="sm:flex-1"
-                    :disabled="form.processing"
-                    @click="submitForm(false)"
-                >
-                    <Save class="mr-2 size-4" />
-                    {{ secondaryActionLabel }}
-                </Button>
+                </div>
+                <div class="flex flex-col gap-5">
+                    <EventMultiValuePicker
+                        :id="sessionPickerId"
+                        v-model="form.session"
+                        :options="sessions"
+                        label="Sesi / divisi"
+                        required
+                        :description="multiValueFieldHint"
+                        :error="fieldError('session')"
+                        :shaking="isFieldShaking('session')"
+                    />
+                    <EventMultiValuePicker
+                        :id="categoryPickerId"
+                        v-model="form.category"
+                        :options="categories"
+                        label="Kategori"
+                        required
+                        :description="multiValueFieldHint"
+                        :error="fieldError('category')"
+                        :shaking="isFieldShaking('category')"
+                    />
+                </div>
             </div>
         </div>
+    </div>
     </div>
 </template>

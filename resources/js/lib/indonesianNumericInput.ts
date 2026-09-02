@@ -39,3 +39,17 @@ export function parsePriceInput(display: string): number {
 export function sanitizeQuotaTyping(raw: string): string {
     return raw.replace(/\D/g, '').slice(0, 6);
 }
+
+/**
+ * Format harga saat mengetik: digit + satu koma desimal, bagian integer diberi
+ * titik ribuan live. Contoh: `1500000` → `1.500.000`; `1500000,5` → `1.500.000,5`.
+ * Desimal dibatasi 2 digit & tidak dikelompokkan.
+ */
+export function formatPriceTyping(raw: string): string {
+    const cleaned = raw.replace(/[^\d,]/g, '').replace(/(,.*?),/g, '$1').slice(0, 20);
+    if (cleaned === '') return '';
+    const [intPart, decPart = ''] = cleaned.split(',');
+    const intDigits = intPart.replace(/\D/g, '');
+    const grouped = intDigits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return decPart ? `${grouped},${decPart.slice(0, 2)}` : grouped;
+}

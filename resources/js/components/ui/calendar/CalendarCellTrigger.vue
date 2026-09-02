@@ -19,17 +19,20 @@ const forwardedProps = useForwardProps(delegatedProps)
   <CalendarCellTrigger
     data-slot="calendar-cell-trigger"
     :class="cn(
-      buttonVariants({ variant: 'ghost' }),
-      'size-8 p-0 font-normal aria-selected:opacity-100 cursor-default',
-      '[&[data-today]:not([data-selected])]:bg-accent [&[data-today]:not([data-selected])]:text-accent-foreground',
-      // Selected
-      'data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:opacity-100 [&[data-selected]:hover]:bg-primary data-[selected]:hover:text-primary-foreground data-[selected]:focus:bg-primary data-[selected]:focus:text-primary-foreground',
+      buttonVariants({ variant: 'ghost', radius: 'full' }),
+      'mx-auto size-8 p-0 font-normal aria-selected:opacity-100 cursor-default transition-colors duration-100',
+      // Today: outline ring halus (tidak bentrok dengan selected)
+      '[&[data-today]:not([data-selected])]:border [&[data-today]:not([data-selected])]:border-primary/40 [&[data-today]:not([data-selected])]:text-primary',
+      // Hover (non-selected)
+      'hover:bg-accent hover:text-accent-foreground data-[selected]:hover:bg-primary data-[selected]:hover:text-primary-foreground',
+      // Selected: primary penuh bulat
+      'data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:opacity-100 data-[selected]:shadow-sm',
       // Disabled
-      'data-[disabled]:text-muted-foreground data-[disabled]:opacity-50',
+      'data-[disabled]:text-muted-foreground data-[disabled]:opacity-40',
       // Unavailable
-      'data-[unavailable]:text-destructive-foreground data-[unavailable]:line-through',
+      'data-[unavailable]:text-destructive data-[unavailable]:line-through',
       // Outside months
-      'data-[outside-view]:text-muted-foreground',
+      'data-[outside-view]:text-muted-foreground data-[outside-view]:opacity-60',
       props.class,
     )"
     v-bind="forwardedProps"

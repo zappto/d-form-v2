@@ -16,6 +16,8 @@ const props = withDefaults(
         placeholder?: string
         disabled?: boolean
         id?: string
+        /** True saat field punya error validasi: border/ring destructive + bg tint. */
+        error?: boolean
     }>(),
     {
         modelValue: '',
@@ -24,6 +26,7 @@ const props = withDefaults(
         allowCustom: true,
         placeholder: 'Cari atau ketik…',
         disabled: false,
+        error: false,
     },
 )
 
@@ -224,8 +227,8 @@ watch(open, val => {
     <div ref="containerRef" class="relative">
         <div
             :class="[
- 'flex min-h-9 items-stretch overflow-hidden rounded-lg border bg-background text-sm transition-colors',
- open ? 'border-ring ring-2 ring-ring/20' : 'border-input hover:border-muted-foreground/25',
+ 'flex min-h-9 items-stretch overflow-hidden rounded-lg border bg-white text-sm transition-colors',
+ open ? 'border-ring ring-2 ring-ring/20' : props.error ? 'border-destructive/70 bg-red-50 dark:bg-red-500/10' : 'border-input hover:border-muted-foreground/25',
  disabled ? 'pointer-events-none opacity-50' : '',
  ]"
         >
