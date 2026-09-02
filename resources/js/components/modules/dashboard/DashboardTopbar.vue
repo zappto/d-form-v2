@@ -3,8 +3,10 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LogOut, Search } from 'lucide-vue-next';
-import { routes } from '@/lib/routes';
+import { LogOut, Search, ChevronLeft } from 'lucide-vue-next';
+import { resolveNavbarFallbackBackHref, pathWithoutQuery, routes } from '@/lib/routes';
+import { buildBreadcrumbs } from '@/lib/breadcrumbs';
+import Breadcrumbs from '@/components/modules/dashboard/Breadcrumbs.vue';
 import logout from '@/actions/App/Http/Controllers/Auth/LogoutController';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
 import { userAvatarSeed } from '@/lib/userAvatarFallback';
@@ -20,22 +22,6 @@ const siteName = computed(() => page.props.appName || 'DForm');
 function escapeRegExp(s: string): string {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-
-/** "super-admin" → "Super Admin". */
-function formatRole(r: string): string {
-    return r
-        .split('-')
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ');
-}
-
-const greetingSubtitle = computed(() => {
-    if (!user.value) return 'Selamat datang';
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Selamat pagi' : hour < 17 ? 'Selamat siang' : 'Selamat malam';
-    const firstName = user.value.name?.split(' ')[0] ?? '';
-    return firstName ? `${greeting}, ${firstName}` : greeting;
-});
 
 /** Ekstrak judul halaman dari <title> ("Judul · DForm" → "Judul"). */
 function titleFromDocument(): string {
@@ -72,23 +58,60 @@ onUnmounted(() => {
     }
 });
 
+/** "super-admin" → "Super Admin". */
+function formatRole(r: string): string {
+    return r
+        .split('-')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+}
+
 /** Judul dari halaman (eksplisit) jika ada; fallback ke parsing document.title. */
 const pageTitle = computed(() => topbar.title.value ?? fallbackTitle.value);
 
-/** Subtitle dari halaman (eksplisit) jika ada; fallback ke greeting. */
-const subtitle = computed(() => topbar.subtitle.value ?? greetingSubtitle.value);
+/** Breadcrumb dibangun dari lib terpisah (pure function). */
+const breadcrumbItems = computed(() => buildBreadcrumbs(page.url, pageTitle.value));
+
+/**
+ * Tampilkan back button hanya pada halaman detail yang punya slug/params
+ * (min. 4 segmen path). Base page (dashboard, events, recruitment) tidak.
+ */
+const showBackButton = computed(() => {
+    const segments = pathWithoutQuery(page.url).split('/').filter(Boolean);
+    return segments.length >= 4;
+});
+
+function goBack(): void {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+        window.history.back();
+        return;
+    }
+    router.visit(resolveNavbarFallbackBackHref(page.url));
+}
 </script>
 
 <template>
     <header
         class="border-sidebar-border/50 bg-background/80 sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b px-4 backdrop-blur-md lg:px-6"
     >
-        <!-- Kiri: judul + subtitle -->
-        <div class="flex min-w-0 flex-col">
-            <h1 class="font-display text-foreground min-w-0 truncate text-lg font-semibold tracking-tight">
-                {{ pageTitle }}
-            </h1>
-            <p class="text-muted-foreground truncate text-sm">{{ subtitle }}</p>
+        <!-- Kiri: back + judul + subtitle -->
+        <div class="flex min-w-0 items-center gap-1.5">
+            <Button
+                v-if="showBackButton"
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Kembali"
+                class="shrink-0 rounded-lg transition-colors duration-150 hover:bg-accent hover:text-foreground"
+                @click="goBack"
+            >
+                <ChevronLeft class="size-4 shrink-0 stroke-[1.75]" />
+            </Button>
+            <div class="flex min-w-0 flex-col">
+                <h1 class="font-display text-foreground min-w-0 truncate text-lg font-semibold tracking-tight">
+                    {{ pageTitle }}
+                </h1>
+                <Breadcrumbs :items="breadcrumbItems" />
+            </div>
         </div>
 
         <!-- Tengah: search bar -->
