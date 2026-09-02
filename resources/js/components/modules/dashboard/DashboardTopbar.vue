@@ -96,7 +96,7 @@ function goBack(): void {
     >
         <!-- Kiri: back + judul + subtitle -->
         <div class="flex min-w-0 items-center gap-1.5">
-            <Button
+            <Button radius="icon"
                 v-if="showBackButton"
                 variant="ghost"
                 size="icon-sm"

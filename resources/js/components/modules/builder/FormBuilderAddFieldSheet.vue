@@ -55,7 +55,7 @@ defineEmits<{
                             @click="$emit('pickField', f)"
                         >
                             <div
-                                class="border-primary/15 bg-primary/8 text-primary group-hover:border-primary/30 group-hover:bg-primary/12 grid size-9 place-items-center rounded-lg border transition-colors"
+                                class="border-primary/15 bg-primary/8 text-primary group-hover:border-primary/30 group-hover:bg-primary/12 grid size-9 place-items-center rounded-full border transition-colors"
                             >
                                 <component :is="f.icon" class="size-4" />
                             </div>

@@ -90,7 +90,7 @@ onMounted(() => {
                     <!-- Text content -->
                     <div :class="['order-1', i % 2 === 0 ? 'lg:order-1' : 'lg:order-2']">
                         <div class="mb-4 flex items-center gap-3">
-                            <div class="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                            <div class="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
                                 <component :is="step.icon" class="size-5" />
                             </div>
                             <span class="text-sm font-bold tracking-wider text-primary/40">LANGKAH {{ step.num }}</span>

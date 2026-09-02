@@ -84,7 +84,7 @@ onMounted(() => {
                     :style="{ transitionDelay: `${120 + i * 100}ms` }"
                 >
                     <!-- Step number -->
-                    <div class="relative z-10 mb-6 flex size-12 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-primary-foreground shadow-sm">
+                    <div class="relative z-10 mb-6 flex size-12 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-sm">
                         <component :is="step.icon" class="size-5" />
                     </div>
 

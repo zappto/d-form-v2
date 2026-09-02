@@ -263,7 +263,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 py-6"
                 >
                     <div
-                        class="mb-2 flex size-10 items-center justify-center rounded-xl bg-primary/8 text-primary"
+                        class="mb-2 flex size-10 items-center justify-center rounded-full bg-primary/8 text-primary"
                     >
                         <ImagePlus class="size-5" />
                     </div>
@@ -283,7 +283,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 py-6"
                 >
                     <div
-                        class="mb-2 flex size-10 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground"
+                        class="mb-2 flex size-10 items-center justify-center rounded-full bg-muted/50 text-muted-foreground"
                     >
                         <Upload class="size-5" />
                     </div>

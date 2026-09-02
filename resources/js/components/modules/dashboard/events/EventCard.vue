@@ -160,7 +160,7 @@ useEventListener('keydown', (e) => {
                 </template>
             </div>
 
-            <Button
+            <Button radius="icon"
                 v-if="canManage"
                 variant="ghost"
                 size="icon-sm"

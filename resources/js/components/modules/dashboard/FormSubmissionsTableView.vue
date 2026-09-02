@@ -114,7 +114,7 @@ defineEmits<{
                         <TableCell class="px-6 py-4 text-center">
                             <div class="flex flex-wrap items-center justify-center gap-1">
                                 <template v-if="formSubmissionReviewIsPending(submission)">
-                                    <Button
+                                    <Button radius="icon"
                                         type="button"
                                         variant="ghost"
                                         size="icon-sm"
@@ -126,7 +126,7 @@ defineEmits<{
                                     >
                                         <CheckCircle2 class="size-4" />
                                     </Button>
-                                    <Button
+                                    <Button radius="icon"
                                         type="button"
                                         variant="ghost"
                                         size="icon-sm"
@@ -139,7 +139,7 @@ defineEmits<{
                                         <XCircle class="size-4" />
                                     </Button>
                                 </template>
-                                <Button
+                                <Button radius="icon"
                                     variant="ghost"
                                     size="icon-sm"
                                     title="Lihat detail lengkap"

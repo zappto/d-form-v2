@@ -212,7 +212,7 @@ const legendEntries = computed(() =>
 
                 <div class="flex flex-wrap items-center gap-2">
                     <div class="border-border/70 bg-background/80 flex items-center rounded-lg border p-0.5 shadow-xs">
-                        <Button
+                        <Button radius="icon"
                             variant="ghost"
                             size="icon-sm"
                             class="size-7 sm:size-8"
@@ -221,7 +221,7 @@ const legendEntries = computed(() =>
                         >
                             <ChevronLeft class="size-4" :stroke-width="2" />
                         </Button>
-                        <Button
+                        <Button radius="icon"
                             variant="ghost"
                             size="icon-sm"
                             class="size-7 sm:size-8"

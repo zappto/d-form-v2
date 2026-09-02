@@ -225,7 +225,7 @@ const showDropChrome = computed(
                                             :class="dragSourceId === field.id ? 'scale-[0.98]' : ''"
                                         >
                                             <div
-                                                class="border-border bg-card text-muted-foreground hover:border-primary/45 hover:bg-primary/8 hover:text-primary ring-border/60 hover:ring-primary/25 grid size-10 cursor-grab place-items-center rounded-xl border-2 border-transparent shadow-sm ring-1 transition-all duration-200 active:cursor-grabbing"
+                                                class="border-border bg-card text-muted-foreground hover:border-primary/45 hover:bg-primary/8 hover:text-primary ring-border/60 hover:ring-primary/25 grid size-10 cursor-grab place-items-center rounded-full border-2 border-transparent shadow-sm ring-1 transition-all duration-200 active:cursor-grabbing"
                                                 draggable="true"
                                                 title="Seret untuk memindahkan urutan — atau pakai tombol naik/turun"
                                                 @dragstart="
@@ -236,7 +236,7 @@ const showDropChrome = computed(
                                                 <GripVertical class="size-4" />
                                             </div>
                                             <div class="flex flex-col gap-0.5">
-                                                <Button
+                                                <Button radius="icon"
                                                     type="button"
                                                     variant="outline"
                                                     size="icon"
@@ -247,7 +247,7 @@ const showDropChrome = computed(
                                                 >
                                                     <ChevronUp class="size-4" />
                                                 </Button>
-                                                <Button
+                                                <Button radius="icon"
                                                     type="button"
                                                     variant="outline"
                                                     size="icon"
@@ -276,7 +276,7 @@ const showDropChrome = computed(
                                         class="border-border bg-muted/30 mt-2 flex items-center justify-between gap-1 rounded-xl border px-2 py-1.5 lg:hidden"
                                     >
                                         <div class="flex items-center gap-0.5">
-                                            <Button
+                                            <Button radius="icon"
                                                 variant="ghost"
                                                 size="icon-sm"
                                                 :disabled="sliceStart + localIdx === 0"
@@ -285,7 +285,7 @@ const showDropChrome = computed(
                                             >
                                                 <ArrowUp class="size-4" />
                                             </Button>
-                                            <Button
+                                            <Button radius="icon"
                                                 variant="ghost"
                                                 size="icon-sm"
                                                 :disabled="sliceStart + localIdx === formFields.length - 1"
@@ -305,7 +305,7 @@ const showDropChrome = computed(
                                                 <Pencil class="size-3.5" />
                                                 Edit
                                             </Button>
-                                            <Button
+                                            <Button radius="icon"
                                                 variant="ghost"
                                                 size="icon-sm"
                                                 class="text-destructive hover:bg-destructive/10 hover:text-destructive"

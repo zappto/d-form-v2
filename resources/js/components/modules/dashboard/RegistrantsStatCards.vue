@@ -46,7 +46,7 @@ const emit = defineEmits<{
                     </div>
                     <div
                         :class="cn(
- 'flex size-12 shrink-0 items-center justify-center rounded-xl border shadow-xs',
+ 'flex size-12 shrink-0 items-center justify-center rounded-full border shadow-xs',
  toneStyles[stat.tone].chip,
  )"
                     >

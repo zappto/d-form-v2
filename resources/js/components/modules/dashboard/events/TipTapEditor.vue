@@ -337,7 +337,7 @@ const toolbarGroups: ToolbarTool[][] = [
                 <div
                     class="flex flex-wrap items-center gap-0.5 rounded-xl bg-background/75 p-0.5 ring-1 ring-border/55 shadow-inner backdrop-blur-sm"
                 >
-                    <Button
+                    <Button radius="icon"
                         v-for="(tool, tIdx) in group"
                         :key="tIdx"
                         type="button"

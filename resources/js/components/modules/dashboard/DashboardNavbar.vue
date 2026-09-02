@@ -66,7 +66,7 @@ function goBack(): void {
 
             <Tooltip>
                 <TooltipTrigger as-child>
-                    <Button variant="ghost" size="icon-sm" as-child aria-label="Profile">
+                    <Button radius="icon" variant="ghost" size="icon-sm" as-child aria-label="Profile">
                         <Link :href="routes.dashboard.profile">
                             <Settings class="size-4" />
                         </Link>
@@ -77,7 +77,7 @@ function goBack(): void {
 
             <Tooltip>
                 <TooltipTrigger as-child>
-                    <Button
+                    <Button radius="icon"
                         variant="ghost"
                         size="icon-sm"
                         aria-label="Log out"

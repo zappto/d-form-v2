@@ -184,7 +184,7 @@ const highlights: string[] = [
 
                             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                                 <div class="flex items-start gap-3 rounded-2xl border border-border/70 bg-muted/20 p-3.5">
-                                    <div class="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                                    <div class="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                                         <CalendarDays class="size-4" />
                                     </div>
                                     <div class="min-w-0">
@@ -197,7 +197,7 @@ const highlights: string[] = [
                                 </div>
 
                                 <div class="flex items-start gap-3 rounded-2xl border border-border/70 bg-muted/20 p-3.5">
-                                    <div class="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                                    <div class="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                                         <MapPin class="size-4" />
                                     </div>
                                     <div class="min-w-0">
@@ -264,7 +264,7 @@ const highlights: string[] = [
                                     :key="item"
                                     class="border-border bg-muted/15 hover:border-primary/30 flex items-center gap-3 rounded-2xl border p-4 transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
                                 >
-                                    <div class="bg-success/10 grid size-7 place-items-center rounded-lg">
+                                    <div class="bg-success/10 grid size-7 place-items-center rounded-full">
                                         <Check class="text-success size-3.5" />
                                     </div>
                                     <span class="text-foreground text-sm font-medium">{{ item }}</span>
@@ -315,7 +315,7 @@ const highlights: string[] = [
                                 </h3>
                                 <div class="flex flex-col gap-4">
                                     <div class="flex items-start gap-3">
-                                        <div class="bg-muted/40 grid size-8 shrink-0 place-items-center rounded-lg">
+                                        <div class="bg-muted/40 grid size-8 shrink-0 place-items-center rounded-full">
                                             <CalendarDays class="text-muted-foreground size-4" />
                                         </div>
                                         <div class="min-w-0">
@@ -337,7 +337,7 @@ const highlights: string[] = [
                                         </div>
                                     </div>
                                     <div class="flex items-start gap-3">
-                                        <div class="bg-muted/40 grid size-8 shrink-0 place-items-center rounded-lg">
+                                        <div class="bg-muted/40 grid size-8 shrink-0 place-items-center rounded-full">
                                             <MapPin class="text-muted-foreground size-4" />
                                         </div>
                                         <div class="min-w-0">
@@ -350,7 +350,7 @@ const highlights: string[] = [
                                         </div>
                                     </div>
                                     <div class="flex items-start gap-3">
-                                        <div class="bg-muted/40 grid size-8 shrink-0 place-items-center rounded-lg">
+                                        <div class="bg-muted/40 grid size-8 shrink-0 place-items-center rounded-full">
                                             <Shield class="text-muted-foreground size-4" />
                                         </div>
                                         <div class="min-w-0">

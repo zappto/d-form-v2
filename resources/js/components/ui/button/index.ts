@@ -14,6 +14,8 @@ export const buttonVariants = cva(
                 lg: 'rounded-lg',
                 xl: 'rounded-xl',
                 '2xl': 'rounded-2xl',
+                icon: 'rounded-full',
+                full: 'rounded-full',
             },
             variant: {
                 default: 'border-primary/10 bg-primary text-primary-foreground hover:bg-primary/92',

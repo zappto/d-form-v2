@@ -209,10 +209,10 @@ function handleDeleteConfirm(): void {
                 acara
             </p>
             <div class="flex flex-wrap items-center justify-center gap-2">
-                <Button
+                <Button radius="icon"
                     variant="outline"
                     size="icon"
-                    class="size-9 "
+                    class="size-9"
                     :disabled="currentPage <= 1"
                     @click="goToPage(1)"
                 >
@@ -236,10 +236,10 @@ function handleDeleteConfirm(): void {
                 >
                     Berikutnya
                 </Button>
-                <Button
+                <Button radius="icon"
                     variant="outline"
                     size="icon"
-                    class="size-9 "
+                    class="size-9"
                     :disabled="currentPage >= lastPage"
                     @click="goToPage(lastPage)"
                 >

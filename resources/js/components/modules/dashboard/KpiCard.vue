@@ -54,7 +54,7 @@ const colorClasses = computed(() => {
                         <span class="text-xs text-muted-foreground">vs last month</span>
                     </div>
                 </div>
-                <div :class="cn('flex size-12 shrink-0 items-center justify-center rounded-xl border shadow-xs', colorClasses)">
+                <div :class="cn('flex size-12 shrink-0 items-center justify-center rounded-full border shadow-xs', colorClasses)">
                     <component :is="icon" class="size-5" />
                 </div>
             </div>

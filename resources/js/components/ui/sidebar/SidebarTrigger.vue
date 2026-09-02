@@ -13,7 +13,7 @@ const { toggleSidebar } = useSidebar()
 </script>
 
 <template>
-  <Button
+  <Button radius="icon"
     data-sidebar="trigger"
     data-slot="sidebar-trigger"
     variant="ghost"

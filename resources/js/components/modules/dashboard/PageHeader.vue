@@ -26,7 +26,7 @@ function goBack(fallbackHref?: string): void {
         class="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card/70 p-4 shadow-sm ring-1 ring-black/[0.03] backdrop-blur-sm sm:p-5 dark:bg-card/80 dark:ring-white/[0.06] md:flex-row md:flex-wrap md:items-start md:justify-between md:gap-6"
     >
         <div class="flex min-w-0 items-start gap-3 md:items-center">
-            <Button
+            <Button radius="icon"
                 v-if="backHref"
                 variant="ghost"
                 size="icon-sm"

@@ -100,10 +100,10 @@ const isViewingCurrentMonth = computed(
                 >
                     Sekarang
                 </Button>
-                <Button variant="ghost" size="icon-sm" class="" aria-label="Bulan sebelumnya" @click="prevMonth">
+                <Button radius="icon" variant="ghost" size="icon-sm" class="" aria-label="Bulan sebelumnya" @click="prevMonth">
                     <ChevronLeft class="size-4" :stroke-width="2" />
                 </Button>
-                <Button variant="ghost" size="icon-sm" class="" aria-label="Bulan berikutnya" @click="nextMonth">
+                <Button radius="icon" variant="ghost" size="icon-sm" class="" aria-label="Bulan berikutnya" @click="nextMonth">
                     <ChevronRight class="size-4" :stroke-width="2" />
                 </Button>
             </div>

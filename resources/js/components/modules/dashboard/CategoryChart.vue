@@ -121,7 +121,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
         <CardHeader class="flex flex-row flex-wrap items-center justify-between gap-4 border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
             <div class="flex min-w-0 items-center gap-3">
                 <div
-                    class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary shadow-inner"
+                    class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary shadow-inner"
                 >
                     <LayoutGrid class="size-5" />
                 </div>

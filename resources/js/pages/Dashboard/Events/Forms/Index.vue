@@ -83,7 +83,7 @@ function submissionsHref(formId: string): string {
                 <CardContent class="flex h-full flex-col p-0">
                     <div class="flex min-w-0 flex-1 items-start gap-3 p-4 sm:p-5">
                         <div
-                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/10"
+                            class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/10"
                         >
                             <FileText class="size-4.5" />
                         </div>

@@ -337,7 +337,7 @@ function fieldError(key: string): string | undefined {
                                         >
                                             Ganti
                                         </Button>
-                                        <Button
+                                        <Button radius="icon"
                                             variant="destructive"
                                             size="icon"
                                             class="size-9 shadow-md"
@@ -359,7 +359,7 @@ function fieldError(key: string): string | undefined {
                                     @drop.prevent="handleDrop"
                                     @click="($refs.bannerInput as HTMLInputElement)?.click()"
                                 >
-                                    <div class="bg-muted flex size-12 items-center justify-center rounded-xl shadow-inner">
+                                    <div class="bg-muted flex size-12 items-center justify-center rounded-full shadow-inner">
                                         <Upload class="text-muted-foreground size-5" />
                                     </div>
                                     <p class="mt-3 text-sm font-medium">{{ bannerEmptyTitle }}</p>

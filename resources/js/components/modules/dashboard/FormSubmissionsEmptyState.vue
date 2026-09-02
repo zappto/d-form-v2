@@ -4,7 +4,7 @@ import { Inbox } from 'lucide-vue-next'
 
 <template>
     <div class="app-surface-soft flex flex-col items-center justify-center rounded-2xl py-24 text-center">
-        <div class="grid size-16 place-items-center rounded-2xl border border-border bg-card shadow-xs">
+        <div class="grid size-16 place-items-center rounded-full border border-border bg-card shadow-xs">
             <Inbox class="size-7 text-muted-foreground" />
         </div>
         <h3 class="font-display mt-6 text-xl font-bold tracking-[-0.02em] text-foreground">Belum ada pengiriman</h3>

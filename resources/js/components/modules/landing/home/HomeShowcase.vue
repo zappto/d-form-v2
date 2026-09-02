@@ -87,7 +87,7 @@ const advantages: Advantage[] = [
                             :key="item.title"
                             class="flex gap-3.5"
                         >
-                            <div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                                 <component :is="item.icon" class="size-4" />
                             </div>
                             <div>

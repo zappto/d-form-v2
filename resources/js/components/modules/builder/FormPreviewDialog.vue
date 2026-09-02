@@ -131,7 +131,7 @@ function ratingStars(field: FormPreviewField): number[] {
                             </p>
                            
                         </div>
-                        <Button
+                        <Button radius="icon"
                             variant="ghost"
                             size="icon"
                             class="size-9 shrink-0 border border-transparent hover:border-border hover:bg-muted/60"

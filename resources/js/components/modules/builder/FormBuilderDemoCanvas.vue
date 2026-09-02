@@ -171,7 +171,7 @@ defineEmits<{
                                         @dragend="$emit('dragEnd')"
                                     >
                                         <div
-                                            class="grid size-7 place-items-center rounded-lg border border-border bg-card text-muted-foreground shadow-xs transition-colors hover:border-primary/30 hover:text-foreground"
+                                            class="grid size-7 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow-xs transition-colors hover:border-primary/30 hover:text-foreground"
                                         >
                                             <GripVertical class="size-4" />
                                         </div>

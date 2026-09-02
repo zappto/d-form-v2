@@ -38,7 +38,7 @@ onMounted(() => {
     >
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div class="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
-                <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 sm:mt-0" as-child>
+                <Button radius="icon" variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 sm:mt-0" as-child>
                     <Link :href="backHref" aria-label="Kembali ke daftar form">
                         <ArrowLeft class="size-4" />
                     </Link>
@@ -92,7 +92,7 @@ onMounted(() => {
 
     <Teleport v-if="canTeleport" to="#dashboard-fb-nav-left">
         <div class="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
-            <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 sm:mt-0" as-child>
+            <Button radius="icon" variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 sm:mt-0" as-child>
                 <Link :href="backHref" aria-label="Kembali ke daftar form">
                     <ArrowLeft class="size-4" />
                 </Link>

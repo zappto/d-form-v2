@@ -95,7 +95,7 @@ defineProps<{
  ]"
                     >
                         <div
-                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15"
+                            class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15"
                         >
                             <component :is="m.icon" class="size-[18px]" aria-hidden="true" />
                         </div>

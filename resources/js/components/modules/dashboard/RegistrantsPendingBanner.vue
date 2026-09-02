@@ -14,7 +14,7 @@ defineProps<{
         role="status"
     >
         <div
-            class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-warning/25 bg-warning/10 text-warning-foreground"
+            class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-warning/25 bg-warning/10 text-warning-foreground"
         >
             <Clock class="size-4" aria-hidden="true" />
         </div>
