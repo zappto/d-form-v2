@@ -69,12 +69,12 @@ const canReview = computed(() => {
     <Dialog v-model:open="open">
         <DialogContent
             :class="
-                cn(
-                    '!flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl',
-                    'max-md:top-0 max-md:right-0 max-md:bottom-0 max-md:left-0 max-md:h-[100dvh] max-md:max-h-[100dvh] max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none max-md:border-0',
-                    'md:top-[50%] md:left-[50%] md:h-auto md:max-h-[min(90vh,56rem)] md:w-full md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-xl md:border',
-                )
-            "
+ cn(
+ '!flex flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl',
+ 'max-md:top-0 max-md:right-0 max-md:bottom-0 max-md:left-0 max-md:h-[100dvh] max-md:max-h-[100dvh] max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none max-md:border-0',
+ 'md:top-[50%] md:left-[50%] md:h-auto md:max-h-[min(90vh,56rem)] md:w-full md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-xl md:border',
+ )
+ "
         >
             <div
                 class="shrink-0 border-b border-border/80 bg-gradient-to-b from-muted/25 via-muted/[0.07] to-background px-5 pb-6 pt-6 pr-14 md:px-7 md:pb-7"
@@ -124,7 +124,7 @@ const canReview = computed(() => {
                         </p>
                     </div>
                     <div
-                        class="grid gap-x-6 gap-y-5 rounded-2xl border border-border/65 bg-muted/[0.08] p-5 md:grid-cols-2  md:p-5"
+                        class="grid gap-x-6 gap-y-5 rounded-2xl border border-border/65 bg-muted/[0.08] p-5 md:grid-cols-2 md:p-5"
                     >
                        
                         <div class="flex min-w-0 flex-col gap-1.5">
@@ -223,7 +223,7 @@ const canReview = computed(() => {
                                 <div class="flex flex-col gap-3 sm:flex-row sm:gap-3">
                                     <Button
                                         type="button"
-                                        class="h-11 min-h-11 flex-1 gap-2 rounded-xl border-success/35 text-[0.8125rem] font-medium text-success hover:bg-success/10"
+                                        class="h-11 min-h-11 flex-1 gap-2 border-success/35 text-[0.8125rem] font-medium text-success hover:bg-success/10"
                                         variant="outline"
                                         :disabled="isSubmissionReviewing(submission.id) || !canReview"
                                         @click="emit('review', { action: 'accept', submission })"
@@ -233,7 +233,7 @@ const canReview = computed(() => {
                                     </Button>
                                     <Button
                                         type="button"
-                                        class="h-11 min-h-11 flex-1 gap-2 rounded-xl border-destructive/35 text-[0.8125rem] font-medium text-destructive hover:bg-destructive/10"
+                                        class="h-11 min-h-11 flex-1 gap-2 border-destructive/35 text-[0.8125rem] font-medium text-destructive hover:bg-destructive/10"
                                         variant="outline"
                                         :disabled="isSubmissionReviewing(submission.id) || !canReview"
                                         @click="emit('review', { action: 'reject', submission })"
@@ -264,10 +264,10 @@ const canReview = computed(() => {
                         v-else
                         class="overflow-hidden rounded-2xl border border-border/70 bg-card/45 shadow-[0_1px_0_rgba(0,0,0,0.03)]"
                         :class="
-                            submission.review_status === 'accepted'
-                                ? 'border-l-[3px] border-l-emerald-600/85'
-                                : 'border-l-[3px] border-l-destructive/85'
-                        "
+ submission.review_status === 'accepted'
+ ? 'border-l-[3px] border-l-emerald-600/85'
+ : 'border-l-[3px] border-l-destructive/85'
+ "
                     >
                         <div class="space-y-5 p-4 md:p-6">
                             <div class="flex flex-wrap items-center justify-between gap-3">

@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <template>
-    <div class="app-surface flex flex-col items-center justify-center px-6 py-14 text-center">
+    <div class="app-surface flex flex-col items-center justify-center rounded-2xl px-6 py-14 text-center">
         <LocalLottie
             v-if="animationUrl || animationName"
             :name="animationUrl ? undefined : (animationName ?? 'emptyData')"

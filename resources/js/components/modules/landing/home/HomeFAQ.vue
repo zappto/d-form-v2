@@ -62,9 +62,9 @@ onMounted(() => {
         <div class="mx-auto max-w-3xl px-6 lg:px-10">
             <div
                 :class="[
-                    'mb-12 text-center transition-all duration-500',
-                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                ]"
+ 'mb-12 text-center transition-all duration-500',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
             >
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">FAQ</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -77,9 +77,9 @@ onMounted(() => {
 
             <div
                 :class="[
-                    'transition-all delay-75 duration-500',
-                    visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
-                ]"
+ 'transition-all delay-75 duration-500',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
+ ]"
             >
                 <Accordion type="single" collapsible class="w-full">
                     <AccordionItem

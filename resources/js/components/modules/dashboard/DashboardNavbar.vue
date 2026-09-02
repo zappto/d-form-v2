@@ -49,7 +49,7 @@ function goBack(): void {
         <Button
             variant="ghost"
             size="sm"
-            class="h-9 gap-2 rounded-lg px-2.5 text-muted-foreground hover:text-foreground"
+            class="h-9 gap-2 px-2.5 text-muted-foreground hover:text-foreground"
             type="button"
             @click="goBack"
         >
@@ -94,7 +94,7 @@ function goBack(): void {
 
             <DropdownMenu>
                 <DropdownMenuTrigger as-child>
-                    <button class="flex items-center gap-2 rounded-lg p-1 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <button class="flex items-center gap-2 p-1 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                         <UserAvatarFallback
                             :src="user?.avatar ?? null"
                             :seed="userAvatarSeed(user)"

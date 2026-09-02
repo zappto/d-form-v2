@@ -65,12 +65,12 @@ function onParticipantKeydown(e: KeyboardEvent, member: IBundleSubmissionMember)
     <Dialog v-model:open="open">
         <DialogContent
             :class="
-                cn(
-                    '!flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg',
-                    'max-md:top-0 max-md:right-0 max-md:bottom-0 max-md:left-0 max-md:h-[100dvh] max-md:max-h-[100dvh] max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none max-md:border-0',
-                    'md:top-[50%] md:left-[50%] md:h-auto md:max-h-[min(90vh,40rem)] md:w-full md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-xl md:border',
-                )
-            "
+ cn(
+ '!flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg',
+ 'max-md:top-0 max-md:right-0 max-md:bottom-0 max-md:left-0 max-md:h-[100dvh] max-md:max-h-[100dvh] max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none max-md:border-0',
+ 'md:top-[50%] md:left-[50%] md:h-auto md:max-h-[min(90vh,40rem)] md:w-full md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-xl md:border',
+ )
+ "
         >
             <div class="shrink-0 border-b border-border/80 px-5 pb-5 pt-6 pr-14 md:px-6">
                 <div class="flex items-start justify-between gap-3">
@@ -108,13 +108,13 @@ function onParticipantKeydown(e: KeyboardEvent, member: IBundleSubmissionMember)
                         type="button"
                         :disabled="'can_open_detail' in member ? !member.can_open_detail : false"
                         :class="
-                            cn(
-                                'flex w-full items-start gap-3 rounded-xl border border-border/70 bg-card px-4 py-3.5 text-left transition-colors',
-                                !('can_open_detail' in member) || member.can_open_detail
-                                    ? 'cursor-pointer hover:border-primary/30 hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-                                    : 'cursor-default opacity-60',
-                            )
-                        "
+ cn(
+ 'flex w-full items-start gap-3 border border-border/70 bg-card px-4 py-3.5 text-left transition-colors',
+ !('can_open_detail' in member) || member.can_open_detail
+ ? 'cursor-pointer hover:border-primary/30 hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+ : 'cursor-default opacity-60',
+ )
+ "
                         @click="openParticipantDetail(member)"
                         @keydown="onParticipantKeydown($event, member)"
                     >

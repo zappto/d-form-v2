@@ -27,7 +27,7 @@ defineProps<{
                         {{ totalRegistrants === 1 ? 'person has' : 'people have' }} signed up so far.
                     </p>
                 </div>
-                <Button variant="ghost" size="sm" class="h-8 gap-1 rounded-full text-xs" as-child>
+                <Button variant="ghost" size="sm" class="h-8 gap-1 text-xs" as-child>
                     <Link :href="routes.admin.events.registrants(eventId)">
                         View all
                         <ArrowUpRight class="size-3.5" />
@@ -57,11 +57,11 @@ defineProps<{
                     <div class="flex shrink-0 items-center gap-3">
                         <span
                             :class="[
-                                'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10.5px] font-medium capitalize',
-                                reg.status === 'accepted' && 'bg-success/10 text-success',
-                                reg.status === 'pending' && 'bg-warning/15 text-warning-foreground',
-                                reg.status === 'rejected' && 'bg-destructive/10 text-destructive',
-                            ]"
+ 'inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10.5px] font-medium capitalize',
+ reg.status === 'accepted' && 'bg-success/10 text-success',
+ reg.status === 'pending' && 'bg-warning/15 text-warning-foreground',
+ reg.status === 'rejected' && 'bg-destructive/10 text-destructive',
+ ]"
                         >
                             <span class="size-1.5 rounded-full bg-current" />
                             {{ reg.status }}

@@ -43,10 +43,10 @@ defineProps<{
                     <div class="flex flex-wrap items-center gap-2">
                         <span
                             :class="[
-                                'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium',
-                                'border-border/70 bg-muted/60 text-foreground',
-                                statusPill.classes,
-                            ]"
+ 'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium',
+ 'border-border/70 bg-muted/60 text-foreground',
+ statusPill.classes,
+ ]"
                         >
                             <span class="size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
                             {{ statusPill.label }}
@@ -54,7 +54,7 @@ defineProps<{
                         <Badge
                             v-for="cat in parseEventCategories(event.category)"
                             :key="cat"
-                            class="rounded-full border-0 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm"
+                            class="rounded-md border-0 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm"
                             :style="{ backgroundColor: categoryColorMap[cat] ?? '#6B7280' }"
                         >
                             {{ categoryLabelMap[cat] ?? cat }}
@@ -89,10 +89,10 @@ defineProps<{
                         v-for="m in metaBlocks"
                         :key="m.title"
                         :class="[
-                            'flex min-h-[4.25rem] min-w-0 items-center gap-3 rounded-2xl border border-border/60 bg-muted/25 p-3 sm:p-3.5',
-                            'transition-colors hover:border-primary/25 hover:bg-muted/40',
-                            cardShadow,
-                        ]"
+ 'flex min-h-[4.25rem] min-w-0 items-center gap-3 rounded-2xl border border-border/60 bg-muted/25 p-3 sm:p-3.5',
+ 'transition-colors hover:border-primary/25 hover:bg-muted/40',
+ cardShadow,
+ ]"
                     >
                         <div
                             class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15"

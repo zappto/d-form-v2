@@ -328,7 +328,7 @@ function saveAllChanges(): void {
                             <div class="mt-3 flex flex-wrap items-center gap-3">
                                 <Button
                                     type="button"
-                                    class="h-10 rounded-xl px-4 shadow-sm"
+                                    class="h-10 px-4 shadow-sm"
                                     :disabled="isProcessing"
                                     @click="openAvatarPicker"
                                 >
@@ -339,7 +339,7 @@ function saveAllChanges(): void {
                                     v-if="avatarHasChanges"
                                     type="button"
                                     variant="outline"
-                                    class="h-10 rounded-xl px-4"
+                                    class="h-10 px-4"
                                     :disabled="isProcessing"
                                     @click="clearPendingAvatar"
                                 >
@@ -349,7 +349,7 @@ function saveAllChanges(): void {
                                     v-else
                                     type="button"
                                     variant="outline"
-                                    class="h-10 rounded-xl px-4"
+                                    class="h-10 px-4"
                                     :disabled="isProcessing || !user?.avatar || pendingAvatarRemoval"
                                     @click="markAvatarForRemoval"
                                 >
@@ -439,7 +439,7 @@ function saveAllChanges(): void {
                                     />
                                     <button
                                         type="button"
-                                        class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-lg transition focus-visible:ring-2 focus-visible:outline-none"
+                                        class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center transition focus-visible:ring-2 focus-visible:outline-none"
                                         :aria-label="
                                             showCurrentPassword ? 'Sembunyikan kata sandi saat ini' : 'Tampilkan kata sandi saat ini'
                                         "
@@ -475,7 +475,7 @@ function saveAllChanges(): void {
                                         />
                                         <button
                                             type="button"
-                                            class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-lg transition focus-visible:ring-2 focus-visible:outline-none"
+                                            class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center transition focus-visible:ring-2 focus-visible:outline-none"
                                             :aria-label="showNewPassword ? 'Sembunyikan kata sandi baru' : 'Tampilkan kata sandi baru'"
                                             @click="showNewPassword = !showNewPassword"
                                         >
@@ -505,7 +505,7 @@ function saveAllChanges(): void {
                                         />
                                         <button
                                             type="button"
-                                            class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-lg transition focus-visible:ring-2 focus-visible:outline-none"
+                                            class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center transition focus-visible:ring-2 focus-visible:outline-none"
                                             :aria-label="
                                                 showConfirmPassword ? 'Sembunyikan konfirmasi kata sandi' : 'Tampilkan konfirmasi kata sandi'
                                             "
@@ -532,7 +532,7 @@ function saveAllChanges(): void {
                         </p>
                         <Button
                             type="button"
-                            class="h-12 rounded-xl px-6"
+                            class="h-12 px-6"
                             :disabled="!hasPendingChanges || isProcessing"
                             @click="saveAllChanges"
                         >

@@ -62,9 +62,9 @@ const formatDate = (d: string) => {
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
-                    'mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between transition-all duration-500',
-                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                ]"
+ 'mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between transition-all duration-500',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
             >
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Semua Acara</p>
@@ -78,7 +78,7 @@ const formatDate = (d: string) => {
                     <Input
                         v-model="query"
                         placeholder="Cari acara..."
-                        class="h-10 rounded-xl pl-9 text-sm"
+                        class="h-10 pl-9 text-sm"
                     />
                 </div>
             </div>
@@ -89,9 +89,9 @@ const formatDate = (d: string) => {
                     :key="ev.id"
                     :href="routes.landing.events.show(ev.slug)"
                     :class="[
-                        'group block rounded-xl border border-border/40 bg-card transition-all duration-400 hover:border-primary/20 hover:shadow-sm',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                    ]"
+ 'group block rounded-xl border border-border/40 bg-card transition-all duration-400 hover:border-primary/20 hover:shadow-sm',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
                     :style="{ transitionDelay: `${60 + i * 30}ms` }"
                 >
                     <div class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
@@ -139,14 +139,14 @@ const formatDate = (d: string) => {
                 <p class="text-sm text-muted-foreground">
                     Tidak ada acara yang cocok dengan "<span class="font-medium text-foreground">{{ query }}</span>".
                 </p>
-                <Button variant="outline" size="sm" class="mt-4 h-9 rounded-lg text-xs" @click="query = ''">
+                <Button variant="outline" size="sm" class="mt-4 h-9 text-xs" @click="query = ''">
                     Reset Pencarian
                 </Button>
             </div>
 
             <div v-else class="rounded-2xl border border-border/40 bg-card p-10 text-center">
                 <p class="text-sm text-muted-foreground">Belum ada acara yang tersedia saat ini.</p>
-                <Button as-child variant="outline" size="sm" class="mt-4 h-9 rounded-lg text-xs">
+                <Button as-child variant="outline" size="sm" class="mt-4 h-9 text-xs">
                     <a :href="routes.home">Kembali ke beranda</a>
                 </Button>
             </div>

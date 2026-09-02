@@ -55,12 +55,12 @@ function formatDt(iso: string) {
 <template>
     <div class="flex flex-col gap-4">
         <div v-if="props.showExportToolbar" class="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" as-child class="rounded-full">
+            <Button variant="outline" size="sm" as-child class="">
                 <a :href="exportUrls.registrations">
                     <Download class="mr-1.5 size-4" />Registrations CSV
                 </a>
             </Button>
-            <Button variant="outline" size="sm" as-child class="rounded-full">
+            <Button variant="outline" size="sm" as-child class="">
                 <a :href="exportUrls.attendance">
                     <Download class="mr-1.5 size-4" />Attendance CSV
                 </a>

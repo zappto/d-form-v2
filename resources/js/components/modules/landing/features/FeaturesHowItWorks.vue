@@ -57,9 +57,9 @@ onMounted(() => {
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
-                    'mx-auto mb-16 max-w-2xl text-center transition-all duration-500',
-                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                ]"
+ 'mx-auto mb-16 max-w-2xl text-center transition-all duration-500',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
             >
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Cara Kerja</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -75,9 +75,9 @@ onMounted(() => {
                     v-for="(step, i) in steps"
                     :key="step.num"
                     :class="[
-                        'grid items-center gap-10 lg:grid-cols-2 lg:gap-16 transition-all duration-600',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
-                    ]"
+ 'grid items-center gap-10 lg:grid-cols-2 lg:gap-16 transition-all duration-600',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+ ]"
                     :style="{ transitionDelay: `${100 + i * 120}ms` }"
                 >
                     <!-- Lottie card — alternates position -->

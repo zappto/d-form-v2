@@ -36,10 +36,10 @@ const onDragEnd = () => {
     <div
         class="group relative flex cursor-grab items-center gap-3 rounded-xl border bg-card px-3 py-2.5 shadow-xs select-none transition-[border-color,background-color,box-shadow,opacity] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:cursor-grabbing"
         :class="
-            isDragging
-                ? 'border-primary/60 bg-primary/10 opacity-80 shadow-md ring-2 ring-primary/25'
-                : 'border-border hover:border-primary/35 hover:bg-accent'
-        "
+ isDragging
+ ? 'border-primary/60 bg-primary/10 opacity-80 shadow-md ring-2 ring-primary/25'
+ : 'border-border hover:border-primary/35 hover:bg-accent'
+ "
         draggable="true"
         @dragstart="onDragStart"
         @dragend="onDragEnd"

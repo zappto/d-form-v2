@@ -79,12 +79,12 @@ onMounted(() => {
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" as-child class="rounded-full">
+                    <Button variant="outline" size="sm" as-child class="">
                         <a :href="exports.registrations">
                             <Download class="mr-1.5 size-4" />Registrations CSV
                         </a>
                     </Button>
-                    <Button variant="outline" size="sm" as-child class="rounded-full">
+                    <Button variant="outline" size="sm" as-child class="">
                         <a :href="exports.attendance">
                             <Download class="mr-1.5 size-4" />Attendance CSV
                         </a>

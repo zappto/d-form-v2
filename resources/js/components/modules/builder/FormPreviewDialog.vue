@@ -134,7 +134,7 @@ function ratingStars(field: FormPreviewField): number[] {
                         <Button
                             variant="ghost"
                             size="icon"
-                            class="size-9 shrink-0 rounded-xl border border-transparent hover:border-border hover:bg-muted/60"
+                            class="size-9 shrink-0 border border-transparent hover:border-border hover:bg-muted/60"
                             type="button"
                             aria-label="Close preview"
                             @click="emit('close')"
@@ -167,7 +167,7 @@ function ratingStars(field: FormPreviewField): number[] {
 
                             <PageHeader :title="titleText" :subtitle="description || undefined" />
 
-                            <div v-if="fieldsSafe.length === 0" class="app-surface-soft py-12 text-center" :class="hasFormDescription ? 'mt-6' : 'mt-3'">
+                            <div v-if="fieldsSafe.length === 0" class="app-surface-soft rounded-2xl py-12 text-center" :class="hasFormDescription ? 'mt-6' : 'mt-3'">
                                 <p class="text-sm font-semibold text-foreground">No questions yet</p>
                                 <p class="mt-1.5 max-w-sm mx-auto text-xs leading-relaxed text-muted-foreground">
                                     Add fields from the canvas — they’ll show up here exactly as respondents will see them.
@@ -331,16 +331,16 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         v-for="star in ratingStars(field)"
                                                         :key="`${field.id}_${star}`"
                                                         type="button"
-                                                        class="rounded-lg p-1 transition"
+                                                        class=" p-1 transition"
                                                         @click.stop="ratingSelection[field.id] = star"
                                                     >
                                                         <Star
                                                             class="size-7"
                                                             :class="
-                                                                (ratingSelection[field.id] ?? 0) >= star
-                                                                    ? 'fill-amber-400 text-amber-400'
-                                                                    : 'text-muted-foreground/40'
-                                                            "
+ (ratingSelection[field.id] ?? 0) >= star
+ ? 'fill-amber-400 text-amber-400'
+ : 'text-muted-foreground/40'
+ "
                                                         />
                                                     </button>
                                                 </div>
@@ -405,7 +405,7 @@ function ratingStars(field: FormPreviewField): number[] {
                             </p>
                             <Button
                                 type="button"
-                                class="shrink-0 rounded-xl border border-border shadow-xs"
+                                class="shrink-0 border border-border shadow-xs"
                                 @click="emit('close')"
                             >
                                 Done

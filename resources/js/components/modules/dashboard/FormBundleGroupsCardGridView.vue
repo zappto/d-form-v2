@@ -134,7 +134,7 @@ function isLeader(member: IBundleSubmissionMember) {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    class="text-foreground h-9 w-full justify-between rounded-xl px-3 text-sm font-medium"
+                    class="text-foreground h-9 w-full justify-between px-3 text-sm font-medium"
                     :aria-expanded="isExpanded(group.group_token)"
                     @click.stop="toggleExpand(group.group_token)"
                 >
@@ -166,13 +166,13 @@ function isLeader(member: IBundleSubmissionMember) {
                             :role="member.can_open_detail ? 'button' : undefined"
                             :tabindex="member.can_open_detail ? 0 : undefined"
                             :class="
-                                cn(
-                                    'border-border/60 bg-card rounded-xl border px-3.5 py-3 transition-colors duration-200',
-                                    member.can_open_detail
-                                        ? 'hover:border-primary/30 hover:bg-muted/20 focus-visible:ring-ring cursor-pointer focus-visible:ring-2 focus-visible:outline-none'
-                                        : 'cursor-default opacity-65'
-                                )
-                            "
+ cn(
+ 'border-border/60 bg-card rounded-xl border px-3.5 py-3 transition-colors duration-200',
+ member.can_open_detail
+ ? 'hover:border-primary/30 hover:bg-muted/20 focus-visible:ring-ring cursor-pointer focus-visible:ring-2 focus-visible:outline-none'
+ : 'cursor-default opacity-65'
+ )
+ "
                             @click="onMemberClick(member)"
                             @keydown="onMemberKeydown($event, member)"
                         >
@@ -189,8 +189,8 @@ function isLeader(member: IBundleSubmissionMember) {
                                         <p
                                             class="truncate text-sm font-semibold"
                                             :class="
-                                                member.can_open_detail ? 'text-foreground' : 'text-muted-foreground'
-                                            "
+ member.can_open_detail ? 'text-foreground' : 'text-muted-foreground'
+ "
                                         >
                                             {{ participantName(member) }}
                                         </p>
@@ -216,8 +216,8 @@ function isLeader(member: IBundleSubmissionMember) {
                                             variant="outline"
                                             class="h-5 rounded-full px-2 text-[0.625rem] font-medium"
                                             :class="
-                                                memberConfirmationStatusBadge(member.member_confirmation_status).class
-                                            "
+ memberConfirmationStatusBadge(member.member_confirmation_status).class
+ "
                                         >
                                             {{ memberConfirmationStatusBadge(member.member_confirmation_status).label }}
                                         </Badge>

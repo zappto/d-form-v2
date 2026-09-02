@@ -87,7 +87,7 @@ function goBack(): void {
                 {{ description }}
             </p>
 
-            <Button type="button" size="lg" class="mt-10 min-w-[11rem] rounded-full" @click="goBack">
+            <Button type="button" size="lg" class="mt-10 min-w-[11rem]" @click="goBack">
                 Kembali
             </Button>
         </div>

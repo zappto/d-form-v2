@@ -103,9 +103,9 @@ onMounted(() => {
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
-                    'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
-                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                ]"
+ 'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
             >
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Keunggulan</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -122,21 +122,21 @@ onMounted(() => {
                     v-for="(feat, i) in features"
                     :key="feat.title"
                     :class="[
-                        'group rounded-2xl border p-6 transition-all duration-400',
-                        feat.highlight
-                            ? 'border-primary/25 bg-primary/[0.04] ring-1 ring-primary/10 hover:bg-primary/[0.06]'
-                            : 'border-border/40 bg-muted/20 hover:border-primary/20 hover:bg-muted/40',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
-                    ]"
+ 'group rounded-2xl border p-6 transition-all duration-400',
+ feat.highlight
+ ? 'border-primary/25 bg-primary/[0.04] ring-1 ring-primary/10 hover:bg-primary/[0.06]'
+ : 'border-border/40 bg-muted/20 hover:border-primary/20 hover:bg-muted/40',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
+ ]"
                     :style="{ transitionDelay: `${60 + i * 40}ms` }"
                 >
                     <div
                         :class="[
-                            'mb-4 flex size-10 items-center justify-center rounded-xl transition-colors duration-200',
-                            feat.highlight
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-primary/10 text-primary group-hover:bg-primary/15',
-                        ]"
+ 'mb-4 flex size-10 items-center justify-center rounded-xl transition-colors duration-200',
+ feat.highlight
+ ? 'bg-primary text-primary-foreground'
+ : 'bg-primary/10 text-primary group-hover:bg-primary/15',
+ ]"
                     >
                         <component :is="feat.icon" class="size-5" />
                     </div>

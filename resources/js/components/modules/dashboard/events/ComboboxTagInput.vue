@@ -224,10 +224,10 @@ watch(open, val => {
     <div ref="containerRef" class="relative">
         <div
             :class="[
-                'flex min-h-9 items-stretch overflow-hidden rounded-lg border bg-background text-sm transition-colors',
-                open ? 'border-ring ring-2 ring-ring/20' : 'border-input hover:border-muted-foreground/25',
-                disabled ? 'pointer-events-none opacity-50' : '',
-            ]"
+ 'flex min-h-9 items-stretch overflow-hidden rounded-lg border bg-background text-sm transition-colors',
+ open ? 'border-ring ring-2 ring-ring/20' : 'border-input hover:border-muted-foreground/25',
+ disabled ? 'pointer-events-none opacity-50' : '',
+ ]"
         >
             <div
                 class="flex min-w-0 flex-1 flex-wrap items-center gap-1 px-2 py-1.5"
@@ -309,9 +309,9 @@ watch(open, val => {
                             type="button"
                             role="option"
                             :class="[
-                                'flex w-full px-3 py-2 text-left text-sm outline-none',
-                                idx === highlightIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted/70',
-                            ]"
+ 'flex w-full px-3 py-2 text-left text-sm outline-none',
+ idx === highlightIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-muted/70',
+ ]"
                             @pointerdown.prevent="addTag(s.value)"
                             @pointerenter="highlightIndex = idx"
                         >
@@ -323,11 +323,11 @@ watch(open, val => {
                             type="button"
                             role="option"
                             :class="[
-                                'flex w-full items-center gap-2 px-3 py-2 text-left text-sm outline-none',
-                                filteredSuggestions.length === highlightIndex
-                                    ? 'bg-accent text-accent-foreground'
-                                    : 'hover:bg-muted/70',
-                            ]"
+ 'flex w-full items-center gap-2 px-3 py-2 text-left text-sm outline-none',
+ filteredSuggestions.length === highlightIndex
+ ? 'bg-accent text-accent-foreground'
+ : 'hover:bg-muted/70',
+ ]"
                             @pointerdown.prevent="addTag(query)"
                             @pointerenter="highlightIndex = filteredSuggestions.length"
                         >

@@ -322,11 +322,11 @@ onBeforeUnmount(() => {
                 v-for="slot in memberSlots"
                 :key="slot"
                 :class="
-                    cn(
-                        'overflow-hidden rounded-xl border shadow-xs transition-[border-color,box-shadow,background-color] duration-200',
-                        rowAccentClass(slot),
-                    )
-                "
+ cn(
+ 'overflow-hidden rounded-xl border shadow-xs transition-[border-color,box-shadow,background-color] duration-200',
+ rowAccentClass(slot),
+ )
+ "
             >
                 <button
                     type="button"
@@ -467,16 +467,16 @@ onBeforeUnmount(() => {
                                 inputmode="email"
                                 placeholder="name@example.com"
                                 :class="
-                                    cn(
-                                        'h-11 min-h-11 rounded-lg pl-10 text-[15px] shadow-none transition-[border-color,box-shadow] duration-200',
-                                        (statusFor(slot) === 'found' || statusFor(slot) === 'valid') &&
-                                            'border-emerald-500/50 focus-visible:border-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-500/20',
-                                        (statusFor(slot) === 'not_found' ||
-                                            statusFor(slot) === 'invalid' ||
-                                            statusFor(slot) === 'error') &&
-                                            'border-destructive/50 focus-visible:border-destructive focus-visible:ring-2 focus-visible:ring-destructive/15',
-                                    )
-                                "
+ cn(
+ 'h-11 min-h-11 rounded-lg pl-10 text-[15px] shadow-none transition-[border-color,box-shadow] duration-200',
+ (statusFor(slot) === 'found' || statusFor(slot) === 'valid') &&
+ 'border-emerald-500/50 focus-visible:border-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-500/20',
+ (statusFor(slot) === 'not_found' ||
+ statusFor(slot) === 'invalid' ||
+ statusFor(slot) === 'error') &&
+ 'border-destructive/50 focus-visible:border-destructive focus-visible:ring-2 focus-visible:ring-destructive/15',
+ )
+ "
                                 :model-value="emailAt(slot)"
                                 :aria-busy="statusFor(slot) === 'loading'"
                                 @update:model-value="(v: string | number) => onEmailInput(slot, v)"

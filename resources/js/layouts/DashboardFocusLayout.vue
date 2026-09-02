@@ -78,7 +78,7 @@ function handleLogout(): void {
                     />
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                            <Button variant="ghost" class="h-10 shrink-0 gap-2 rounded-lg px-2">
+                            <Button variant="ghost" class="h-10 shrink-0 gap-2 px-2">
                                 <UserAvatarFallback
                                     :src="user?.avatar ?? null"
                                     :seed="userAvatarSeed(user)"

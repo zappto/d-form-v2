@@ -63,7 +63,7 @@ function submissionsHref(formId: string): string {
             <p class="text-muted-foreground text-sm">
                 {{ forms.length }} formulir untuk {{ event.title }}
             </p>
-            <Button as-child class="h-10 w-full rounded-xl md:h-9 md:w-auto">
+            <Button as-child class="h-10 w-full md:h-9 md:w-auto">
                 <Link
                     :href="routes.admin.events.forms.create(event.id)"
                     class="inline-flex items-center justify-center gap-2"
@@ -151,7 +151,7 @@ function submissionsHref(formId: string): string {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                class="h-11 w-full rounded-xl border-border/80 bg-background/80 px-3 text-xs font-medium text-primary hover:text-primary sm:h-9 sm:min-w-0"
+                                class="h-11 w-full border-border/80 bg-background/80 px-3 text-xs font-medium text-primary hover:text-primary sm:h-9 sm:min-w-0"
                                 as-child
                             >
                                 <Link
@@ -167,7 +167,7 @@ function submissionsHref(formId: string): string {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                class="h-11 w-full rounded-xl border-border/80 bg-background/80 px-3 text-xs font-medium sm:h-9 sm:min-w-0"
+                                class="h-11 w-full border-border/80 bg-background/80 px-3 text-xs font-medium sm:h-9 sm:min-w-0"
                                 as-child
                             >
                                 <Link
@@ -183,7 +183,7 @@ function submissionsHref(formId: string): string {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                class="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-xl border-destructive/25 bg-background/80 px-3 text-xs font-medium text-destructive hover:border-destructive/35 hover:bg-destructive/10 hover:text-destructive sm:h-9 sm:min-w-0"
+                                class="inline-flex h-11 w-full items-center justify-center gap-1.5 border-destructive/25 bg-background/80 px-3 text-xs font-medium text-destructive hover:border-destructive/35 hover:bg-destructive/10 hover:text-destructive sm:h-9 sm:min-w-0"
                                 @click="startDelete(form)"
                             >
                                 <Trash2 class="size-3.5 shrink-0" aria-hidden="true" />
@@ -201,7 +201,7 @@ function submissionsHref(formId: string): string {
             description="Create your first form for this event."
             animation-name="errorState"
         >
-            <Button as-child class="h-11 w-full rounded-xl sm:w-auto">
+            <Button as-child class="h-11 w-full sm:w-auto">
                 <Link
                     :href="routes.admin.events.forms.create(event.id)"
                     class="inline-flex items-center justify-center gap-2"

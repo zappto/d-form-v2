@@ -38,9 +38,9 @@ onMounted(() => {
         <div class="mx-auto max-w-4xl px-6 lg:px-10">
             <div
                 :class="[
-                    'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
-                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                ]"
+ 'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
             >
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Perbandingan</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -54,9 +54,9 @@ onMounted(() => {
 
             <div
                 :class="[
-                    'overflow-hidden rounded-2xl border border-border/40 bg-card shadow-sm transition-all duration-500',
-                    visible ? 'opacity-100' : 'opacity-0',
-                ]"
+ 'overflow-hidden rounded-2xl border border-border/40 bg-card shadow-sm transition-all duration-500',
+ visible ? 'opacity-100' : 'opacity-0',
+ ]"
             >
                 <!-- Header -->
                 <div class="grid grid-cols-[1fr_100px_100px] items-center border-b border-border/40 bg-muted/30 px-6 py-4 sm:grid-cols-[1fr_120px_120px]">
@@ -70,9 +70,9 @@ onMounted(() => {
                     v-for="(row, i) in rows"
                     :key="row.feature"
                     :class="[
-                        'grid grid-cols-[1fr_100px_100px] items-center px-6 py-4 sm:grid-cols-[1fr_120px_120px]',
-                        i < rows.length - 1 ? 'border-b border-border/20' : '',
-                    ]"
+ 'grid grid-cols-[1fr_100px_100px] items-center px-6 py-4 sm:grid-cols-[1fr_120px_120px]',
+ i < rows.length - 1 ? 'border-b border-border/20' : '',
+ ]"
                 >
                     <div>
                         <p class="text-sm font-medium text-foreground">{{ row.feature }}</p>

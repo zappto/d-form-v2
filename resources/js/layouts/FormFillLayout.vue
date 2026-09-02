@@ -36,7 +36,7 @@ function goBack(): void {
                 <Button
                     variant="ghost"
                     size="sm"
-                    class="h-9 gap-2 rounded-lg px-2.5 text-muted-foreground hover:text-foreground"
+                    class="h-9 gap-2 px-2.5 text-muted-foreground hover:text-foreground"
                     type="button"
                     @click="goBack"
                 >

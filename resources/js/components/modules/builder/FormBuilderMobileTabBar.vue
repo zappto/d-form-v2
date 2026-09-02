@@ -18,12 +18,12 @@ defineProps<{
                 type="button"
                 role="tab"
                 :aria-selected="mobileTab === 'build'"
-                class="flex min-h-12 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-transparent px-3 py-3 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200"
+                class="flex min-h-12 w-full min-w-0 items-center justify-center gap-2 border border-transparent px-3 py-3 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200"
                 :class="
-                    mobileTab === 'build'
-                        ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
-                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                "
+ mobileTab === 'build'
+ ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
+ : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+ "
                 @click="mobileTab = 'build'"
             >
                 <Layers class="size-4 shrink-0" aria-hidden="true" />
@@ -38,12 +38,12 @@ defineProps<{
                 type="button"
                 role="tab"
                 :aria-selected="mobileTab === 'settings'"
-                class="flex min-h-12 w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-transparent px-3 py-3 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200"
+                class="flex min-h-12 w-full min-w-0 items-center justify-center gap-2 border border-transparent px-3 py-3 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200"
                 :class="
-                    mobileTab === 'settings'
-                        ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
-                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                "
+ mobileTab === 'settings'
+ ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
+ : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+ "
                 @click="mobileTab = 'settings'"
             >
                 <SlidersHorizontal class="size-4 shrink-0" aria-hidden="true" />

@@ -114,7 +114,7 @@ onMounted(() => {
                 v-if="hasActiveFilters"
                 variant="outline"
                 size="sm"
-                class="h-10 shrink-0 gap-2 rounded-xl border-dashed"
+                class="h-10 shrink-0 gap-2 border-dashed"
                 type="button"
                 @click="clearFilters"
             >

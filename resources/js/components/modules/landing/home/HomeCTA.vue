@@ -29,9 +29,9 @@ onMounted(() => {
 
         <div
             :class="[
-                'relative mx-auto max-w-2xl px-6 text-center transition-all duration-600 lg:px-10',
-                visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
-            ]"
+ 'relative mx-auto max-w-2xl px-6 text-center transition-all duration-600 lg:px-10',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
+ ]"
         >
             <LocalLottie name="landingCta" :height="80" :width="80" class="mx-auto mb-6" :lazy="false" />
 
@@ -48,7 +48,7 @@ onMounted(() => {
                     as-child
                     size="lg"
                     variant="secondary"
-                    class="h-12 rounded-xl px-8 text-sm font-semibold"
+                    class="h-12 px-8 text-sm font-semibold"
                 >
                     <a :href="routes.auth.register" class="inline-flex items-center gap-2">
                         Mulai Sekarang — Gratis
@@ -59,7 +59,7 @@ onMounted(() => {
                     as-child
                     size="lg"
                     variant="ghost"
-                    class="h-12 rounded-xl px-6 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-primary-foreground"
+                    class="h-12 px-6 text-sm font-medium text-primary-foreground/90 hover:bg-white/10 hover:text-primary-foreground"
                 >
                     <a href="#section-faq">Baca FAQ</a>
                 </Button>

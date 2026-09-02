@@ -159,7 +159,7 @@ const visibilityOptions = FORM_VISIBILITY_OPTIONS;
                 <div class="grid grid-cols-2 gap-2">
                     <Button
                         variant="outline"
-                        class="border-border/80 bg-background h-11 rounded-xl text-sm font-medium shadow-sm"
+                        class="border-border/80 bg-background h-11 text-sm font-medium shadow-sm"
                         :disabled="wb.isEmpty"
                         aria-label="Pratinjau formulir"
                         @click="wb.showPreview = true"
@@ -167,7 +167,7 @@ const visibilityOptions = FORM_VISIBILITY_OPTIONS;
                         Pratinjau
                     </Button>
                     <Button
-                        class="h-11 rounded-xl text-sm font-medium shadow-sm"
+                        class="h-11 text-sm font-medium shadow-sm"
                         :disabled="processing"
                         @click="wb.requestSave"
                     >

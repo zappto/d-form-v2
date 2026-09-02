@@ -124,16 +124,16 @@ function fillReady(): boolean {
                     v-for="rating in Number(ctx.metadata(field).maxStars ?? 5)"
                     :key="rating"
                     type="button"
-                    class="rounded-lg p-1"
+                    class=" p-1"
                     @click="ctx.answerForm[storageKey] = String(rating)"
                 >
                     <Star
                         class="size-7 transition-colors"
                         :class="
-                            Number(ctx.answerForm[storageKey] || 0) >= rating
-                                ? 'fill-amber-400 text-amber-400'
-                                : 'text-muted-foreground/50'
-                        "
+ Number(ctx.answerForm[storageKey] || 0) >= rating
+ ? 'fill-amber-400 text-amber-400'
+ : 'text-muted-foreground/50'
+ "
                     />
                 </button>
             </div>
@@ -249,7 +249,7 @@ function fillReady(): boolean {
                 </button>
                 <button
                     type="button"
-                    class="absolute right-2 top-2 z-20 grid size-9 place-items-center rounded-full border border-border/80 bg-background/95 text-destructive shadow-md backdrop-blur-sm"
+                    class="absolute right-2 top-2 z-20 grid size-9 place-items-center border border-border/80 bg-background/95 text-destructive shadow-md backdrop-blur-sm"
                     :aria-label="`Remove ${(ctx.answerForm[storageKey] as File).name}`"
                     @click.stop="ctx.clearFileUpload(storageKey)"
                 >
@@ -259,7 +259,7 @@ function fillReady(): boolean {
                     class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-1 bg-gradient-to-t from-black/60 via-black/25 to-transparent px-3 pb-3 pt-14 text-center"
                 >
                     <label
-                        class="pointer-events-auto cursor-pointer rounded-full border border-white/20 bg-background/95 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-background"
+                        class="pointer-events-auto cursor-pointer border border-white/20 bg-background/95 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-background"
                     >
                         Choose another file
                         <input

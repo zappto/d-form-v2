@@ -87,7 +87,7 @@ function onReview(payload: { action: 'accept' | 'reject'; submission: IFormSubmi
                     v-if="exportSubmissionsCsvUrl"
                     variant="outline"
                     size="sm"
-                    class="h-9 w-full gap-2 rounded-xl md:w-auto"
+                    class="h-9 w-full gap-2 md:w-auto"
                     as-child
                 >
                     <a :href="exportSubmissionsCsvUrl" class="inline-flex items-center justify-center" download>

@@ -262,7 +262,7 @@ const attachmentKindLabel = computed((): string => {
                         type="button"
                         variant="secondary"
                         size="sm"
-                        class="h-9 shrink-0 gap-1.5 rounded-lg px-3 text-[13px] font-medium"
+                        class="h-9 shrink-0 gap-1.5 px-3 text-[13px] font-medium"
                         @click="openLightbox(publicFileUrl)"
                     >
                         <Maximize2 class="size-3.5 opacity-80" aria-hidden="true" />
@@ -307,7 +307,7 @@ const attachmentKindLabel = computed((): string => {
                             type="button"
                             variant="outline"
                             size="sm"
-                            class="h-9 gap-1.5 rounded-lg px-3 text-[13px]"
+                            class="h-9 gap-1.5 px-3 text-[13px]"
                             @click="openFileInNewTab(publicFileUrl)"
                         >
                             <ExternalLink class="size-3.5" aria-hidden="true" />
@@ -317,7 +317,7 @@ const attachmentKindLabel = computed((): string => {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            class="h-9 gap-1.5 rounded-lg px-3 text-[13px] text-foreground"
+                            class="h-9 gap-1.5 px-3 text-[13px] text-foreground"
                             @click="downloadStoredFile(publicFileUrl, storedFileLabel)"
                         >
                             <Download class="size-3.5 opacity-80" aria-hidden="true" />
@@ -364,7 +364,7 @@ const attachmentKindLabel = computed((): string => {
                             type="button"
                             variant="default"
                             size="sm"
-                            class="h-9 flex-1 gap-1.5 rounded-lg px-4 text-[13px] sm:flex-initial"
+                            class="h-9 flex-1 gap-1.5 px-4 text-[13px] sm:flex-initial"
                             @click="openFileInNewTab(publicFileUrl)"
                         >
                             <ExternalLink class="size-3.5" aria-hidden="true" />
@@ -374,7 +374,7 @@ const attachmentKindLabel = computed((): string => {
                             type="button"
                             variant="outline"
                             size="sm"
-                            class="h-9 flex-1 gap-1.5 rounded-lg px-4 text-[13px] sm:flex-initial"
+                            class="h-9 flex-1 gap-1.5 px-4 text-[13px] sm:flex-initial"
                             @click="downloadStoredFile(publicFileUrl, storedFileLabel)"
                         >
                             <Download class="size-3.5" aria-hidden="true" />
@@ -427,7 +427,7 @@ const attachmentKindLabel = computed((): string => {
                         type="button"
                         variant="secondary"
                         size="icon-sm"
-                        class="shrink-0 rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/20"
+                        class="shrink-0 border border-white/15 bg-white/10 text-white hover:bg-white/20"
                         aria-label="Tutup pratinjau"
                         @click="closeLightbox"
                     >

@@ -39,12 +39,12 @@ defineProps<{
                         {{ t.label }}
                         <span
                             :class="[
-                                'ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums',
-                                t.value === 'pending' && 'bg-warning/20 text-warning-foreground',
-                                t.value === 'accepted' && 'bg-success/15 text-success',
-                                t.value === 'rejected' && 'bg-destructive/12 text-destructive',
-                                t.value === 'all' && 'bg-muted text-muted-foreground',
-                            ]"
+ 'ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums',
+ t.value === 'pending' && 'bg-warning/20 text-warning-foreground',
+ t.value === 'accepted' && 'bg-success/15 text-success',
+ t.value === 'rejected' && 'bg-destructive/12 text-destructive',
+ t.value === 'all' && 'bg-muted text-muted-foreground',
+ ]"
                         >
                             {{ statusCounts[t.value] }}
                         </span>

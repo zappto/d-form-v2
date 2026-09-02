@@ -33,19 +33,19 @@ defineEmits<{
                 <CardTitle class="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Manage event</CardTitle>
             </CardHeader>
             <CardContent class="flex flex-col gap-2 pt-0">
-                <Button class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal" as-child>
+                <Button class="h-auto min-h-10 w-full justify-start py-2 text-left whitespace-normal" as-child>
                     <Link :href="editEvent.url(event.id)"><Pencil class="mr-2 size-4" />Edit details</Link>
                 </Button>
-                <Button variant="outline" class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal" as-child>
+                <Button variant="outline" class="h-auto min-h-10 w-full justify-start py-2 text-left whitespace-normal" as-child>
                     <Link :href="routes.admin.events.scan(event.id)"><QrCode class="mr-2 size-4" />Check-in scanner</Link>
                 </Button>
-                <Button variant="outline" class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal" as-child>
+                <Button variant="outline" class="h-auto min-h-10 w-full justify-start py-2 text-left whitespace-normal" as-child>
                     <Link :href="routes.admin.events.registrants(event.id)"><Users class="mr-2 size-4" />Manage registrants</Link>
                 </Button>
                 <Button
                     v-if="laporanHref"
                     variant="outline"
-                    class="h-auto min-h-10 w-full justify-start rounded-xl py-2 text-left whitespace-normal"
+                    class="h-auto min-h-10 w-full justify-start py-2 text-left whitespace-normal"
                     as-child
                 >
                     <Link :href="laporanHref"><BarChart3 class="mr-2 size-4" />Laporan dan log kehadiran</Link>
@@ -61,7 +61,7 @@ defineEmits<{
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
                     <Tooltip>
                         <TooltipTrigger as-child>
-                            <Button variant="outline" size="sm" class="rounded-xl" as-child>
+                            <Button variant="outline" size="sm" class="" as-child>
                                 <a :href="registrationsCsvHref"><Download class="mr-1.5 size-3.5" />CSV</a>
                             </Button>
                         </TooltipTrigger>
@@ -69,7 +69,7 @@ defineEmits<{
                     </Tooltip>
                     <Tooltip>
                         <TooltipTrigger as-child>
-                            <Button variant="outline" size="sm" class="rounded-xl" as-child>
+                            <Button variant="outline" size="sm" class="" as-child>
                                 <a :href="attendanceCsvHref"><FileSpreadsheet class="mr-1.5 size-3.5" />Attendance</a>
                             </Button>
                         </TooltipTrigger>
@@ -87,7 +87,7 @@ defineEmits<{
                 </div>
             </CardHeader>
             <CardContent class="flex flex-col gap-2 pt-0">
-                <Button variant="outline" size="sm" class="w-full justify-start rounded-xl" as-child>
+                <Button variant="outline" size="sm" class="w-full justify-start" as-child>
                     <Link :href="routes.admin.events.forms.index(event.id)"><FileText class="mr-2 size-4" />Manage forms</Link>
                 </Button>
                 <div v-if="forms.length > 0" class="mt-1 flex flex-col gap-1">
@@ -113,7 +113,7 @@ defineEmits<{
                     v-if="!event.deleted_at"
                     variant="outline"
                     size="sm"
-                    class="w-full justify-start rounded-xl border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
+                    class="w-full justify-start border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
                     @click="$emit('openArchive')"
                 >
                     <Trash2 class="mr-2 size-4" />Archive event
@@ -122,7 +122,7 @@ defineEmits<{
                     v-else
                     variant="outline"
                     size="sm"
-                    class="w-full justify-start rounded-xl"
+                    class="w-full justify-start "
                     @click="$emit('openRestore')"
                 >
                     <RotateCcw class="mr-2 size-4" />Restore event

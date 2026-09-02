@@ -101,7 +101,7 @@ function goBack(): void {
                 variant="ghost"
                 size="icon-sm"
                 aria-label="Kembali"
-                class="shrink-0 rounded-lg transition-colors duration-150 hover:bg-accent hover:text-foreground"
+                class="shrink-0 transition-colors duration-150 hover:bg-accent hover:text-foreground"
                 @click="goBack"
             >
                 <ChevronLeft class="size-4 shrink-0 stroke-[1.75]" />

@@ -44,10 +44,10 @@ function formatInt(n: number): string {
                 variant="outline"
                 size="sm"
                 :class="[
-                    'h-9 min-w-9',
-                    link.active ? 'border-primary bg-primary/10 text-primary' : '',
-                    !link.url ? 'opacity-40' : '',
-                ]"
+ 'h-9 min-w-9',
+ link.active ? 'border-primary bg-primary/10 text-primary' : '',
+ !link.url ? 'opacity-40' : '',
+ ]"
                 :disabled="!link.url"
                 as-child
             >

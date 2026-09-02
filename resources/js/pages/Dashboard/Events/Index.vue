@@ -154,7 +154,7 @@ function handleDeleteConfirm(): void {
                 :category-options="categoryFilterOptions"
                 :session-options="sessionFilterOptions"
             />
-            <Button as-child class="w-full rounded-xl shadow-sm sm:w-auto">
+            <Button as-child class="w-full shadow-sm sm:w-auto">
                 <Link :href="routes.admin.events.create" class="inline-flex items-center gap-2">
                     <Plus class="size-4" />
                     Buat acara
@@ -212,7 +212,7 @@ function handleDeleteConfirm(): void {
                 <Button
                     variant="outline"
                     size="icon"
-                    class="size-9 rounded-xl"
+                    class="size-9 "
                     :disabled="currentPage <= 1"
                     @click="goToPage(1)"
                 >
@@ -221,7 +221,7 @@ function handleDeleteConfirm(): void {
                 <Button
                     variant="outline"
                     size="sm"
-                    class="h-9 rounded-xl px-4"
+                    class="h-9 px-4"
                     :disabled="currentPage <= 1"
                     @click="goToPage(currentPage - 1)"
                 >
@@ -230,7 +230,7 @@ function handleDeleteConfirm(): void {
                 <Button
                     variant="outline"
                     size="sm"
-                    class="h-9 rounded-xl px-4"
+                    class="h-9 px-4"
                     :disabled="currentPage >= lastPage"
                     @click="goToPage(currentPage + 1)"
                 >
@@ -239,7 +239,7 @@ function handleDeleteConfirm(): void {
                 <Button
                     variant="outline"
                     size="icon"
-                    class="size-9 rounded-xl"
+                    class="size-9 "
                     :disabled="currentPage >= lastPage"
                     @click="goToPage(lastPage)"
                 >

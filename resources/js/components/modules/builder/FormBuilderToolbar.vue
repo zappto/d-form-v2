@@ -38,7 +38,7 @@ onMounted(() => {
     >
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div class="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
-                <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 rounded-xl sm:mt-0" as-child>
+                <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 sm:mt-0" as-child>
                     <Link :href="backHref" aria-label="Kembali ke daftar form">
                         <ArrowLeft class="size-4" />
                     </Link>
@@ -56,18 +56,18 @@ onMounted(() => {
             </div>
             <div
                 class="
-                    flex w-full flex-wrap items-center justify-start gap-2
-                    sm:w-auto sm:justify-end sm:gap-2.5
-                "
+ flex w-full flex-wrap items-center justify-start gap-2
+ sm:w-auto sm:justify-end sm:gap-2.5
+ "
             >
                 <slot name="toolbar-extra" />
                 <Button
                     variant="outline"
                     size="sm"
                     class="
-                        hidden rounded-full border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
-                        sm:inline-flex
-                    "
+ hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
+ sm:inline-flex
+ "
                     :disabled="isEmpty"
                     aria-label="Pratinjau formulir"
                     @click="$emit('preview')"
@@ -78,8 +78,8 @@ onMounted(() => {
                 <Button
                     size="sm"
                     class="
-                        hidden rounded-full px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
-                    "
+ hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
+ "
                     :disabled="processing"
                     @click="$emit('save')"
                 >
@@ -92,7 +92,7 @@ onMounted(() => {
 
     <Teleport v-if="canTeleport" to="#dashboard-fb-nav-left">
         <div class="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
-            <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 rounded-xl sm:mt-0" as-child>
+            <Button variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 sm:mt-0" as-child>
                 <Link :href="backHref" aria-label="Kembali ke daftar form">
                     <ArrowLeft class="size-4" />
                 </Link>
@@ -113,18 +113,18 @@ onMounted(() => {
     <Teleport v-if="canTeleport" to="#dashboard-fb-nav-right">
         <div
             class="
-                flex w-full flex-wrap items-center justify-start gap-2
-                sm:w-auto sm:justify-end sm:gap-2.5
-            "
+ flex w-full flex-wrap items-center justify-start gap-2
+ sm:w-auto sm:justify-end sm:gap-2.5
+ "
         >
             <slot name="toolbar-extra" />
             <Button
                 variant="outline"
                 size="sm"
                 class="
-                    hidden rounded-full border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
-                    sm:inline-flex
-                "
+ hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
+ sm:inline-flex
+ "
                 :disabled="isEmpty"
                 aria-label="Pratinjau formulir"
                 @click="$emit('preview')"
@@ -135,8 +135,8 @@ onMounted(() => {
             <Button
                 size="sm"
                 class="
-                    hidden rounded-full px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
-                "
+ hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
+ "
                 :disabled="processing"
                 @click="$emit('save')"
             >

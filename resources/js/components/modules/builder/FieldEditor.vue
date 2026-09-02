@@ -372,7 +372,7 @@ const hasAdvancedFlags = computed(
                             </label>
                             <button
                                 type="button"
-                                class="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                class="flex size-8 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                                 title="Hapus opsi"
                                 @click="removeOption(i)"
                             >

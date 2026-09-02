@@ -96,10 +96,10 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
     <div
         class="group relative cursor-pointer rounded-2xl border transition-[border-color,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         :class="[
-            isSelected
-                ? 'border-primary bg-primary/[0.04] shadow-md ring-2 ring-primary/20'
-                : 'border-border bg-card shadow-sm hover:border-primary/35 hover:shadow-md',
-        ]"
+ isSelected
+ ? 'border-primary bg-primary/[0.04] shadow-md ring-2 ring-primary/20'
+ : 'border-border bg-card shadow-sm hover:border-primary/35 hover:shadow-md',
+ ]"
         @click="emit('select')"
     >
         <!-- Type badge + actions bar -->
@@ -113,14 +113,14 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
             </span>
             <div class="flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                 <button
-                    class="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
+                    class="grid size-8 place-items-center text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground"
                     title="Gandakan"
                     @click.stop="emit('duplicate')"
                 >
                     <Copy class="size-3.5" />
                 </button>
                 <button
-                    class="grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors duration-200 hover:bg-destructive/10 hover:text-destructive"
+                    class="grid size-8 place-items-center text-muted-foreground transition-colors duration-200 hover:bg-destructive/10 hover:text-destructive"
                     title="Hapus"
                     @click.stop="emit('delete')"
                 >

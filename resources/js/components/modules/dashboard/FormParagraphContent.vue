@@ -18,11 +18,11 @@ const html = computed(() => {
 <template>
     <div
         :class="
-            cn(
-                'text-sm leading-relaxed text-muted-foreground [&_a]:break-all',
-                props.class,
-            )
-        "
+ cn(
+ 'text-sm leading-relaxed text-muted-foreground [&_a]:break-all',
+ props.class,
+ )
+ "
         v-html="html"
     />
 </template>

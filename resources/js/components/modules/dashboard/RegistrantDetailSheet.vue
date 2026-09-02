@@ -44,9 +44,9 @@ const emit = defineEmits<{
                     </div>
                     <span
                         :class="[
-                            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium capitalize ring-1',
-                            registrantStatusBadgeClass(registrant.status),
-                        ]"
+ 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium capitalize ring-1',
+ registrantStatusBadgeClass(registrant.status),
+ ]"
                     >
                         <span class="size-1.5 rounded-full bg-current" />
                         {{ registrant.status }}
@@ -94,7 +94,7 @@ const emit = defineEmits<{
 
                 <div v-if="registrant.status === 'pending'" class="flex items-center gap-2 pt-2">
                     <Button
-                        class="flex-1 rounded-xl bg-success text-success-foreground hover:bg-success/90"
+                        class="flex-1 bg-success text-success-foreground hover:bg-success/90"
                         @click="emit('approve')"
                     >
                         <CheckCircle2 class="mr-1.5 size-4" />
@@ -102,7 +102,7 @@ const emit = defineEmits<{
                     </Button>
                     <Button
                         variant="outline"
-                        class="flex-1 rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive"
+                        class="flex-1 border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive"
                         @click="emit('reject')"
                     >
                         <XCircle class="mr-1.5 size-4" />

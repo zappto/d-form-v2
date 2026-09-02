@@ -351,9 +351,9 @@ function fieldError(key: string): string | undefined {
                                 <div
                                     v-else
                                     :class="[
-                                        'absolute inset-0 flex cursor-pointer flex-col items-center justify-center px-5 py-8 text-center transition-colors',
-                                        isDragging ? 'border-primary bg-primary/8' : 'hover:bg-muted/40',
-                                    ]"
+ 'absolute inset-0 flex cursor-pointer flex-col items-center justify-center px-5 py-8 text-center transition-colors',
+ isDragging ? 'border-primary bg-primary/8' : 'hover:bg-muted/40',
+ ]"
                                     @dragover.prevent="isDragging = true"
                                     @dragleave="isDragging = false"
                                     @drop.prevent="handleDrop"

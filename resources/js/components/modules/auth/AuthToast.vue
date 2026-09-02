@@ -19,18 +19,18 @@ const emit = defineEmits<{
             aria-live="polite"
             class="fixed right-4 top-4 z-50 flex items-center gap-3 rounded-2xl border bg-card px-4 py-3 shadow-sm"
             :class="
-                toast.type === 'success'
-                    ? 'border-success/25 text-success'
-                    : 'border-destructive/25 text-destructive'
-            "
+ toast.type === 'success'
+ ? 'border-success/25 text-success'
+ : 'border-destructive/25 text-destructive'
+ "
         >
             <span
                 class="grid size-8 place-items-center rounded-xl"
                 :class="
-                    toast.type === 'success'
-                        ? 'bg-success/10'
-                        : 'bg-destructive/10'
-                "
+ toast.type === 'success'
+ ? 'bg-success/10'
+ : 'bg-destructive/10'
+ "
             >
                 <CheckCircle2 v-if="toast.type === 'success'" class="size-4" :stroke-width="2.5" />
                 <XCircle v-else class="size-4" :stroke-width="2.5" />
@@ -39,7 +39,7 @@ const emit = defineEmits<{
             <button
                 @click="emit('dismiss')"
                 aria-label="Dismiss"
-                class="ml-1 -mr-1 grid size-7 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                class="ml-1 -mr-1 grid size-7 place-items-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
                 <X class="size-3.5" :stroke-width="2.5" />
             </button>

@@ -44,9 +44,9 @@ const statusVariant = (s: string) =>
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
-                    'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
-                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                ]"
+ 'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
             >
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Sorotan</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -62,9 +62,9 @@ const statusVariant = (s: string) =>
                     v-for="(ev, i) in featured"
                     :key="ev.id"
                     :class="[
-                        'group gap-0 overflow-hidden border-border/40 p-0 transition-all duration-500 hover:border-primary/25 hover:shadow-sm',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
-                    ]"
+ 'group gap-0 overflow-hidden border-border/40 p-0 transition-all duration-500 hover:border-primary/25 hover:shadow-sm',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+ ]"
                     :style="{ transitionDelay: `${100 + i * 80}ms` }"
                 >
                     <div :class="eventCardBannerContainerClass()">
@@ -103,7 +103,7 @@ const statusVariant = (s: string) =>
                             as-child
                             variant="outline"
                             size="sm"
-                            class="mt-4 h-9 w-full rounded-lg text-xs font-medium"
+                            class="mt-4 h-9 w-full text-xs font-medium"
                         >
                             <a :href="routes.landing.events.show(ev.slug)" class="inline-flex items-center justify-center gap-1.5">
                                 Lihat Detail

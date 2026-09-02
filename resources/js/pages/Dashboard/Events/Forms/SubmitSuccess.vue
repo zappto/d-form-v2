@@ -66,7 +66,7 @@ const successContent = computed(() => {
             <Button
                 v-if="isRegistrationForm && registrationUrl"
                 as-child
-                class="h-11 rounded-xl font-semibold shadow-sm"
+                class="h-11 font-semibold shadow-sm"
             >
                 <Link :href="registrationUrl">
                     <ClipboardList class="mr-2 size-4" aria-hidden="true" />
@@ -76,7 +76,7 @@ const successContent = computed(() => {
             <Button
                 as-child
                 :variant="isRegistrationForm && registrationUrl ? 'outline' : 'default'"
-                class="h-11 rounded-xl font-semibold"
+                class="h-11 font-semibold"
             >
                 <Link :href="eventUrl">
                     Kembali ke acara

@@ -114,9 +114,9 @@ defineEmits<{
                     <div
                         class="min-h-[400px] px-4 py-4"
                         :class="[
-                            isEmpty && !isDraggingOverCanvas ? 'flex items-center justify-center' : '',
-                            isDraggingOverCanvas && isEmpty ? 'bg-primary/[0.03]' : '',
-                        ]"
+ isEmpty && !isDraggingOverCanvas ? 'flex items-center justify-center' : '',
+ isDraggingOverCanvas && isEmpty ? 'bg-primary/[0.03]' : '',
+ ]"
                         @dragover.prevent="$emit('canvasDragOver', $event)"
                         @dragleave="$emit('canvasDragLeave', $event)"
                         @drop="$emit('canvasDrop', $event)"
@@ -193,10 +193,10 @@ defineEmits<{
                                 <div
                                     class="pointer-events-none h-0.5 rounded-full transition-all duration-200"
                                     :class="
-                                        dropIndicatorIndex === formFields.length
-                                            ? 'bg-primary shadow-sm'
-                                            : 'bg-transparent'
-                                    "
+ dropIndicatorIndex === formFields.length
+ ? 'bg-primary shadow-sm'
+ : 'bg-transparent'
+ "
                                 ></div>
                             </div>
                         </div>

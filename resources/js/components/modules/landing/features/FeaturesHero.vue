@@ -22,9 +22,9 @@ onMounted(() => requestAnimationFrame(() => (show.value = true)))
             <div class="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
                 <div
                     :class="[
-                        'transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                        show ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
-                    ]"
+ 'transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
+ show ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+ ]"
                 >
                     <span
                         class="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.06] px-4 py-1.5 text-xs font-semibold tracking-wide text-primary"
@@ -51,9 +51,9 @@ onMounted(() => requestAnimationFrame(() => (show.value = true)))
 
                 <div
                     :class="[
-                        'transition-all delay-150 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                        show ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
-                    ]"
+ 'transition-all delay-150 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
+ show ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
+ ]"
                 >
                     <div class="overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-b from-card to-muted/20 p-6 shadow-sm sm:p-8">
                         <LocalLottie name="featuresHero" :height="300" width="100%" :lazy="false" :speed="0.85" />

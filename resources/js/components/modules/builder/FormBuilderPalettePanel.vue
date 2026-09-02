@@ -42,7 +42,7 @@ defineEmits<{
             <div v-for="cat in categories" :key="cat.name" class="mb-4 last:mb-0">
                 <button
                     type="button"
-                    class="text-muted-foreground hover:text-foreground mb-2 flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-xs font-semibold uppercase tracking-wide transition-colors"
+                    class="text-muted-foreground hover:text-foreground mb-2 flex w-full items-center gap-2 px-1.5 py-1.5 text-left text-xs font-semibold uppercase tracking-wide transition-colors"
                     @click="$emit('toggleCategory', cat)"
                 >
                     <ChevronRight

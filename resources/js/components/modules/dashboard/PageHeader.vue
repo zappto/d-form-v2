@@ -30,7 +30,7 @@ function goBack(fallbackHref?: string): void {
                 v-if="backHref"
                 variant="ghost"
                 size="icon-sm"
-                class="mt-0.5 shrink-0 rounded-lg md:mt-0"
+                class="mt-0.5 shrink-0 md:mt-0"
                 type="button"
                 @click="goBack(backHref)"
             >

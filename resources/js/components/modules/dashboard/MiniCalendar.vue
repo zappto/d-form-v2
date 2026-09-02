@@ -94,16 +94,16 @@ const isViewingCurrentMonth = computed(
                 <Button
                     variant="outline"
                     size="sm"
-                    class="mr-1 h-8 rounded-lg px-2.5 text-xs"
+                    class="mr-1 h-8 px-2.5 text-xs"
                     :disabled="isViewingCurrentMonth"
                     @click="goThisMonth"
                 >
                     Sekarang
                 </Button>
-                <Button variant="ghost" size="icon-sm" class="rounded-lg" aria-label="Bulan sebelumnya" @click="prevMonth">
+                <Button variant="ghost" size="icon-sm" class="" aria-label="Bulan sebelumnya" @click="prevMonth">
                     <ChevronLeft class="size-4" :stroke-width="2" />
                 </Button>
-                <Button variant="ghost" size="icon-sm" class="rounded-lg" aria-label="Bulan berikutnya" @click="nextMonth">
+                <Button variant="ghost" size="icon-sm" class="" aria-label="Bulan berikutnya" @click="nextMonth">
                     <ChevronRight class="size-4" :stroke-width="2" />
                 </Button>
             </div>
@@ -128,12 +128,12 @@ const isViewingCurrentMonth = computed(
                         <span
                             :title="cell.events.length ? `${cell.events.length} acara` : undefined"
                             :class="[
-                                'flex size-8 items-center justify-center rounded-lg text-xs font-semibold transition-colors',
-                                cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground/30',
-                                cell.isToday
-                                    ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
-                                    : 'hover:bg-muted/70',
-                            ]"
+ 'flex size-8 items-center justify-center rounded-lg text-xs font-semibold transition-colors',
+ cell.isCurrentMonth ? 'text-foreground' : 'text-muted-foreground/30',
+ cell.isToday
+ ? 'bg-primary text-primary-foreground shadow-md ring-2 ring-primary/20'
+ : 'hover:bg-muted/70',
+ ]"
                         >
                             {{ cell.day }}
                         </span>

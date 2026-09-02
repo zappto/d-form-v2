@@ -46,7 +46,7 @@ const registrationModeSelectSentinel = '__none__' as const
 const requiresFormSelectSentinel = '__none__' as const
 
 const registrationModeSelectClass = cn(
-    'h-10 min-h-10 w-full appearance-none rounded-xl border border-input bg-card px-3 py-2 pr-10 text-sm font-medium text-foreground shadow-xs ring-offset-background',
+    'h-10 min-h-10 w-full appearance-none rounded-lg border border-input bg-card px-3 py-2 pr-10 text-sm font-medium text-foreground shadow-xs ring-offset-background',
     'transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
     'hover:border-primary/30',
     'focus:border-ring focus:outline-none focus:ring-[3px] focus:ring-ring/30',
@@ -170,11 +170,11 @@ function vString(v: unknown): string {
                     type="button"
                     @click="$emit('toggleVisibility', opt.value, !visibleFor.includes(opt.value))"
                     :class="[
-                        'rounded-full border px-4 py-2 text-sm font-medium transition-[border-color,background-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                        visibleFor.includes(opt.value)
-                            ? 'border-primary/40 bg-primary/10 text-primary'
-                            : 'border-border bg-background text-muted-foreground hover:border-primary/25 hover:text-foreground',
-                    ]"
+ ' border px-4 py-2 text-sm font-medium transition-[border-color,background-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
+ visibleFor.includes(opt.value)
+ ? 'border-primary/40 bg-primary/10 text-primary'
+ : 'border-border bg-background text-muted-foreground hover:border-primary/25 hover:text-foreground',
+ ]"
                 >
                     {{ opt.label }}
                 </button>

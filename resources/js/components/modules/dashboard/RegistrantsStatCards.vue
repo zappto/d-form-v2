@@ -25,10 +25,10 @@ const emit = defineEmits<{
             role="button"
             tabindex="0"
             :class="cn(
-                'cursor-pointer rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] transition-colors',
-                'hover:bg-muted/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:ring-white/[0.06]',
-                activeStatusTab === stat.key && 'border-primary/30 bg-primary/[0.04] ring-2 ring-primary/25',
-            )"
+ 'cursor-pointer rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] transition-colors',
+ 'hover:bg-muted/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:ring-white/[0.06]',
+ activeStatusTab === stat.key && 'border-primary/30 bg-primary/[0.04] ring-2 ring-primary/25',
+ )"
             @click="emit('selectStat', stat.key)"
             @keydown.enter.prevent="emit('selectStat', stat.key)"
             @keydown.space.prevent="emit('selectStat', stat.key)"
@@ -46,9 +46,9 @@ const emit = defineEmits<{
                     </div>
                     <div
                         :class="cn(
-                            'flex size-12 shrink-0 items-center justify-center rounded-xl border shadow-xs',
-                            toneStyles[stat.tone].chip,
-                        )"
+ 'flex size-12 shrink-0 items-center justify-center rounded-xl border shadow-xs',
+ toneStyles[stat.tone].chip,
+ )"
                     >
                         <component :is="stat.icon" class="size-5" aria-hidden="true" />
                     </div>

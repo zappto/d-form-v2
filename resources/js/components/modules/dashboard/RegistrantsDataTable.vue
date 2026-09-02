@@ -75,9 +75,9 @@ function formatSubmittedDetail(iso: string): string {
                         <td class="px-4 py-4 align-top sm:px-6">
                             <span
                                 :class="[
-                                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
-                                    registrantStatusBadgeClass(reg.status),
-                                ]"
+ 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+ registrantStatusBadgeClass(reg.status),
+ ]"
                             >
                                 <span class="size-1.5 shrink-0 rounded-full bg-current opacity-80" aria-hidden="true" />
                                 {{ registrantStatusLabel(reg.status) }}

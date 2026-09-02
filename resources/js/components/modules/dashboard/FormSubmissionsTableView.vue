@@ -24,7 +24,7 @@ defineEmits<{
 </script>
 
 <template>
-    <div class="app-surface overflow-hidden p-0">
+    <div class="app-surface overflow-hidden rounded-2xl p-0">
         <div class="overflow-x-auto">
             <Table>
                 <TableHeader>

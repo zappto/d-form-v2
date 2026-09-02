@@ -17,7 +17,7 @@ defineProps<{
                 v-model="category"
                 :options="categoryOptions"
                 id="filter-kategori"
-                class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
+                class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
                 aria-label="Filter kategori"
             />
         </div>
@@ -26,7 +26,7 @@ defineProps<{
                 v-model="session"
                 :options="sessionOptions"
                 id="filter-sesi"
-                class="border-border/80 bg-background/80 h-10 w-full rounded-xl text-xs sm:text-sm"
+                class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
                 aria-label="Filter sesi"
             />
         </div>

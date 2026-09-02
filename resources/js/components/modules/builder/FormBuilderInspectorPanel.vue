@@ -48,12 +48,12 @@ const emit = defineEmits<{
                     type="button"
                     role="tab"
                     :aria-selected="inspectorMode === 'settings'"
-                    class="flex min-h-10 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl border border-transparent px-2 py-2.5 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200"
+                    class="flex min-h-10 w-full min-w-0 items-center justify-center gap-1.5 border border-transparent px-2 py-2.5 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200"
                     :class="
-                        inspectorMode === 'settings'
-                            ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
-                            : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                    "
+ inspectorMode === 'settings'
+ ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
+ : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+ "
                     @click="inspectorMode = 'settings'"
                 >
                     <span class="truncate">Pengaturan</span>
@@ -68,12 +68,12 @@ const emit = defineEmits<{
                     type="button"
                     role="tab"
                     :aria-selected="inspectorMode === 'field'"
-                    class="flex min-h-10 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl border border-transparent px-2 py-2.5 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200 disabled:cursor-not-allowed disabled:opacity-45"
+                    class="flex min-h-10 w-full min-w-0 items-center justify-center gap-1.5 border border-transparent px-2 py-2.5 text-sm font-medium transition-[color,background-color,box-shadow,border-color] duration-200 disabled:cursor-not-allowed disabled:opacity-45"
                     :class="
-                        inspectorMode === 'field'
-                            ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
-                            : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                    "
+ inspectorMode === 'field'
+ ? 'border-border/60 bg-card text-foreground shadow-sm ring-1 ring-border/40'
+ : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+ "
                     :disabled="!selectedField"
                     @click="inspectorMode = 'field'"
                 >

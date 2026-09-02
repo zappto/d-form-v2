@@ -61,9 +61,9 @@ onMounted(() => {
                 <!-- Lottie -->
                 <div
                     :class="[
-                        'transition-all duration-600',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
-                    ]"
+ 'transition-all duration-600',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+ ]"
                 >
                     <div class="overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-b from-card to-muted/20 p-6 shadow-sm sm:p-8">
                         <LocalLottie name="featuresIntegrations" :height="300" width="100%" />
@@ -73,9 +73,9 @@ onMounted(() => {
                 <!-- Text content -->
                 <div
                     :class="[
-                        'transition-all delay-75 duration-600',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                    ]"
+ 'transition-all delay-75 duration-600',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
                 >
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Integrasi & Konektivitas</p>
                     <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -91,9 +91,9 @@ onMounted(() => {
                             v-for="(item, i) in integrations"
                             :key="item.title"
                             :class="[
-                                'flex gap-3.5 transition-all duration-400',
-                                visible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0',
-                            ]"
+ 'flex gap-3.5 transition-all duration-400',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0',
+ ]"
                             :style="{ transitionDelay: `${150 + i * 60}ms` }"
                         >
                             <div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

@@ -215,7 +215,7 @@ const legendEntries = computed(() =>
                         <Button
                             variant="ghost"
                             size="icon-sm"
-                            class="size-7 rounded-md sm:size-8"
+                            class="size-7 sm:size-8"
                             :aria-label="viewMode === 'month' ? 'Bulan sebelumnya' : 'Minggu sebelumnya'"
                             @click="viewMode === 'month' ? prevMonth() : prevWeek()"
                         >
@@ -224,14 +224,14 @@ const legendEntries = computed(() =>
                         <Button
                             variant="ghost"
                             size="icon-sm"
-                            class="size-7 rounded-md sm:size-8"
+                            class="size-7 sm:size-8"
                             :aria-label="viewMode === 'month' ? 'Bulan berikutnya' : 'Minggu berikutnya'"
                             @click="viewMode === 'month' ? nextMonth() : nextWeek()"
                         >
                             <ChevronRight class="size-4" :stroke-width="2" />
                         </Button>
                     </div>
-                    <Button variant="outline" size="sm" class="h-7 rounded-lg px-2 text-xs sm:h-8 sm:px-2.5" @click="goToday">
+                    <Button variant="outline" size="sm" class="h-7 px-2 text-xs sm:h-8 sm:px-2.5" @click="goToday">
                         Hari ini
                     </Button>
 
@@ -243,11 +243,11 @@ const legendEntries = computed(() =>
                         <button
                             type="button"
                             :class="[
-                                'rounded-lg px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-3 sm:py-1.5',
-                                viewMode === 'month'
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground',
-                            ]"
+ ' px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-3 sm:py-1.5',
+ viewMode === 'month'
+ ? 'bg-primary text-primary-foreground shadow-sm'
+ : 'text-muted-foreground hover:text-foreground',
+ ]"
                             @click="viewMode = 'month'"
                         >
                             Bulan
@@ -255,11 +255,11 @@ const legendEntries = computed(() =>
                         <button
                             type="button"
                             :class="[
-                                'rounded-lg px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-3 sm:py-1.5',
-                                viewMode === 'week'
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground',
-                            ]"
+ ' px-2.5 py-1 text-xs font-semibold transition-all duration-200 sm:px-3 sm:py-1.5',
+ viewMode === 'week'
+ ? 'bg-primary text-primary-foreground shadow-sm'
+ : 'text-muted-foreground hover:text-foreground',
+ ]"
                             @click="viewMode = 'week'"
                         >
                             Minggu
@@ -293,19 +293,19 @@ const legendEntries = computed(() =>
                                 v-for="(cell, dIdx) in week"
                                 :key="dIdx"
                                 :class="[
-                                    'min-h-12 p-1 transition-colors sm:min-h-24 sm:p-2',
-                                    !cell.isCurrentMonth ? 'bg-muted/25' : 'hover:bg-muted/20',
-                                ]"
+ 'min-h-12 p-1 transition-colors sm:min-h-24 sm:p-2',
+ !cell.isCurrentMonth ? 'bg-muted/25' : 'hover:bg-muted/20',
+ ]"
                             >
                                 <span
                                     :class="[
-                                        'mb-0.5 inline-flex size-6 items-center justify-center rounded-md text-[11px] font-semibold transition-colors sm:mb-1 sm:size-7 sm:rounded-lg sm:text-xs',
-                                        cell.isToday
-                                            ? 'bg-primary text-primary-foreground ring-primary/30 shadow-md ring-2'
-                                            : cell.isCurrentMonth
-                                              ? 'text-foreground'
-                                              : 'text-muted-foreground/40',
-                                    ]"
+ 'mb-0.5 inline-flex size-6 items-center justify-center rounded-md text-[11px] font-semibold transition-colors sm:mb-1 sm:size-7 sm:rounded-lg sm:text-xs',
+ cell.isToday
+ ? 'bg-primary text-primary-foreground ring-primary/30 shadow-md ring-2'
+ : cell.isCurrentMonth
+ ? 'text-foreground'
+ : 'text-muted-foreground/40',
+ ]"
                                 >
                                     {{ cell.day }}
                                 </span>
@@ -326,7 +326,7 @@ const legendEntries = computed(() =>
                                         v-for="ev in cell.events.slice(0, 2)"
                                         :key="ev.id"
                                         type="button"
-                                        class="w-full truncate rounded-md border border-white/10 px-1.5 py-0.5 text-left text-[10px] leading-tight font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+                                        class="w-full truncate border border-white/10 px-1.5 py-0.5 text-left text-[10px] leading-tight font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
                                         :style="{
                                             backgroundColor:
                                                 categoryColorMap[primaryCategory(ev.category)] ??
@@ -364,11 +364,11 @@ const legendEntries = computed(() =>
                                 </div>
                                 <span
                                     :class="[
-                                        'mt-1 inline-flex size-8 items-center justify-center rounded-lg text-sm font-semibold',
-                                        day.isToday
-                                            ? 'bg-primary text-primary-foreground ring-primary/25 shadow-md ring-2'
-                                            : 'text-foreground',
-                                    ]"
+ 'mt-1 inline-flex size-8 items-center justify-center rounded-lg text-sm font-semibold',
+ day.isToday
+ ? 'bg-primary text-primary-foreground ring-primary/25 shadow-md ring-2'
+ : 'text-foreground',
+ ]"
                                 >
                                     {{ day.day }}
                                 </span>
@@ -378,7 +378,7 @@ const legendEntries = computed(() =>
                                     v-for="ev in day.events"
                                     :key="ev.id"
                                     type="button"
-                                    class="w-full truncate rounded-md border border-white/10 px-2 py-1 text-left text-[10px] font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+                                    class="w-full truncate border border-white/10 px-2 py-1 text-left text-[10px] font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
                                     :style="{
                                         backgroundColor:
                                             categoryColorMap[primaryCategory(ev.category)] ?? 'var(--muted-foreground)',
@@ -404,11 +404,11 @@ const legendEntries = computed(() =>
                             </div>
                             <span
                                 :class="[
-                                    'mt-0.5 inline-flex size-8 items-center justify-center rounded-lg text-sm font-semibold',
-                                    day.isToday
-                                        ? 'bg-primary text-primary-foreground ring-primary/25 shadow-md ring-2'
-                                        : 'text-foreground',
-                                ]"
+ 'mt-0.5 inline-flex size-8 items-center justify-center rounded-lg text-sm font-semibold',
+ day.isToday
+ ? 'bg-primary text-primary-foreground ring-primary/25 shadow-md ring-2'
+ : 'text-foreground',
+ ]"
                             >
                                 {{ day.day }}
                             </span>
@@ -418,7 +418,7 @@ const legendEntries = computed(() =>
                                 v-for="ev in day.events"
                                 :key="ev.id"
                                 type="button"
-                                class="w-full truncate rounded-lg border border-white/10 px-2.5 py-1.5 text-left text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+                                class="w-full truncate border border-white/10 px-2.5 py-1.5 text-left text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
                                 :style="{
                                     backgroundColor:
                                         categoryColorMap[primaryCategory(ev.category)] ?? 'var(--muted-foreground)',
@@ -473,7 +473,7 @@ const legendEntries = computed(() =>
                     <MapPin class="text-primary mt-0.5 size-4 shrink-0" />
                     <span>{{ selectedEvent.location }}</span>
                 </div>
-                <Button variant="default" size="sm" class="mt-2 w-full rounded-xl" as-child>
+                <Button variant="default" size="sm" class="mt-2 w-full" as-child>
                     <Link
                         :href="selectedEvent.href"
                         class="inline-flex items-center justify-center gap-2"

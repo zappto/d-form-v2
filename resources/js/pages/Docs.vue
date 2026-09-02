@@ -154,7 +154,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 
                 <!-- Mobile nav toggle -->
                 <button
-                    class="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm lg:hidden"
+                    class="fixed bottom-6 right-6 z-50 flex size-12 items-center justify-center bg-primary text-primary-foreground shadow-sm lg:hidden"
                     @click="mobileNavOpen = !mobileNavOpen"
                 >
                     <Menu v-if="!mobileNavOpen" class="size-5" />
@@ -164,9 +164,9 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                 <!-- Sidebar -->
                 <aside
                     :class="[
-                        'fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-border/30 bg-background px-6 pt-24 pb-10 transition-transform duration-300 lg:sticky lg:top-24 lg:z-auto lg:h-[calc(100vh-6rem)] lg:w-56 lg:shrink-0 lg:translate-x-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0',
-                        mobileNavOpen ? 'translate-x-0' : '-translate-x-full',
-                    ]"
+ 'fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-border/30 bg-background px-6 pt-24 pb-10 transition-transform duration-300 lg:sticky lg:top-24 lg:z-auto lg:h-[calc(100vh-6rem)] lg:w-56 lg:shrink-0 lg:translate-x-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0',
+ mobileNavOpen ? 'translate-x-0' : '-translate-x-full',
+ ]"
                 >
                     <nav class="flex flex-col gap-6">
                         <div v-for="group in navSections" :key="group.group">
@@ -175,11 +175,11 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
                                 <li v-for="item in group.items" :key="item.id">
                                     <button
                                         :class="[
-                                            'flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-[13px] font-medium transition-colors',
-                                            activeSection === item.id
-                                                ? 'bg-primary/10 text-primary'
-                                                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
-                                        ]"
+ 'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[13px] font-medium transition-colors',
+ activeSection === item.id
+ ? 'bg-primary/10 text-primary'
+ : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+ ]"
                                         @click="scrollToSection(item.id)"
                                     >
                                         {{ item.label }}
@@ -1055,7 +1055,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <!-- Scroll to top -->
         <button
             v-if="showScrollTop"
-            class="fixed bottom-6 right-20 z-40 flex size-10 items-center justify-center rounded-full border border-border/50 bg-card text-muted-foreground shadow-sm transition-all hover:text-primary lg:right-6"
+            class="fixed bottom-6 right-20 z-40 flex size-10 items-center justify-center border border-border/50 bg-card text-muted-foreground shadow-sm transition-all hover:text-primary lg:right-6"
             @click="scrollToTop"
         >
             <ArrowUp class="size-4" />

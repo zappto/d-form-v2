@@ -46,7 +46,7 @@ const emit = defineEmits<{
             <div v-for="(category, catIdx) in categories" :key="category.name" class="mb-3 last:mb-0">
                 <button
                     type="button"
-                    class="mb-1.5 flex w-full items-center gap-2 rounded-lg px-1 py-1 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
+                    class="mb-1.5 flex w-full items-center gap-2 px-1 py-1 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
                     @click="emit('toggleCategory', catIdx)"
                 >
                     <ChevronRight

@@ -56,9 +56,9 @@ const advantages: Advantage[] = [
                 <!-- Lottie illustration -->
                 <div
                     :class="[
-                        'order-2 lg:order-1 transition-all duration-600',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
-                    ]"
+ 'order-2 lg:order-1 transition-all duration-600',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+ ]"
                 >
                     <div class="overflow-hidden rounded-2xl border border-border/30 bg-background/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
                         <LocalLottie name="landingShowcase" :height="280" width="100%" />
@@ -68,9 +68,9 @@ const advantages: Advantage[] = [
                 <!-- Text content -->
                 <div
                     :class="[
-                        'order-1 lg:order-2 transition-all delay-75 duration-600',
-                        visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
-                    ]"
+ 'order-1 lg:order-2 transition-all delay-75 duration-600',
+ visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+ ]"
                 >
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Mengapa DForm?</p>
                     <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">

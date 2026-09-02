@@ -104,9 +104,9 @@ const showDropChrome = computed(
 <template>
     <div
         :class="[
-            'flex min-h-0 justify-center px-4 py-5 sm:px-6 sm:py-6 lg:pb-12',
-            hideOnMobileSettings && 'hidden lg:flex',
-        ]"
+ 'flex min-h-0 justify-center px-4 py-5 sm:px-6 sm:py-6 lg:pb-12',
+ hideOnMobileSettings && 'hidden lg:flex',
+ ]"
     >
         <div class="w-full max-w-[480px] sm:max-w-[520px]">
             <div
@@ -145,10 +145,10 @@ const showDropChrome = computed(
                 <div
                     class="min-h-[400px] px-5 py-7 transition-[box-shadow,background-color] duration-300 sm:px-7 sm:py-8"
                     :class="
-                        showDropChrome && !isEmpty
-                            ? 'bg-primary/[0.03] ring-primary/20 rounded-b-xl ring-2 ring-inset'
-                            : ''
-                    "
+ showDropChrome && !isEmpty
+ ? 'bg-primary/[0.03] ring-primary/20 rounded-b-xl ring-2 ring-inset'
+ : ''
+ "
                     @dragover.prevent="$emit('canvasDragOver', $event)"
                     @dragleave="$emit('canvasDragLeave', $event)"
                     @drop="$emit('canvasDrop', $event)"
@@ -195,12 +195,12 @@ const showDropChrome = computed(
                                         <div
                                             class="flex min-h-[1.25rem] w-full items-center justify-center transition-all duration-200"
                                             :class="
-                                                gapActive(sliceStart + localIdx)
-                                                    ? 'py-1'
-                                                    : showDropChrome
-                                                      ? 'py-0.5'
-                                                      : ''
-                                            "
+ gapActive(sliceStart + localIdx)
+ ? 'py-1'
+ : showDropChrome
+ ? 'py-0.5'
+ : ''
+ "
                                         >
                                             <div
                                                 v-if="gapActive(sliceStart + localIdx)"
@@ -240,7 +240,7 @@ const showDropChrome = computed(
                                                     type="button"
                                                     variant="outline"
                                                     size="icon"
-                                                    class="border-border/80 hover:border-primary/40 hover:bg-primary/5 size-8 rounded-lg shadow-sm transition-all duration-200"
+                                                    class="border-border/80 hover:border-primary/40 hover:bg-primary/5 size-8 shadow-sm transition-all duration-200"
                                                     :disabled="sliceStart + localIdx === 0"
                                                     title="Pindah ke atas"
                                                     @click="$emit('moveField', field.id, -1)"
@@ -251,7 +251,7 @@ const showDropChrome = computed(
                                                     type="button"
                                                     variant="outline"
                                                     size="icon"
-                                                    class="border-border/80 hover:border-primary/40 hover:bg-primary/5 size-8 rounded-lg shadow-sm transition-all duration-200"
+                                                    class="border-border/80 hover:border-primary/40 hover:bg-primary/5 size-8 shadow-sm transition-all duration-200"
                                                     :disabled="sliceStart + localIdx === formFields.length - 1"
                                                     title="Pindah ke bawah"
                                                     @click="$emit('moveField', field.id, 1)"
@@ -356,7 +356,7 @@ const showDropChrome = computed(
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    class="h-9 gap-1 rounded-full px-3"
+                                    class="h-9 gap-1 px-3"
                                     :disabled="currentPage <= 1"
                                     @click="goPrev"
                                 >
@@ -369,7 +369,7 @@ const showDropChrome = computed(
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    class="h-9 gap-1 rounded-full px-3"
+                                    class="h-9 gap-1 px-3"
                                     :disabled="currentPage >= totalPages"
                                     @click="goNext"
                                 >

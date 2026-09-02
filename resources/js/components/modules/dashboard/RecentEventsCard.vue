@@ -35,7 +35,7 @@ const baseHref = computed(() => props.eventBaseHref ?? routes.admin.events.index
                 <CardTitle class="font-display text-lg font-bold tracking-[-0.02em]">Acara terbaru</CardTitle>
                 <p class="text-muted-foreground mt-1 text-xs leading-snug">Aktivitas terakhir di workspace Anda</p>
             </div>
-            <Button variant="outline" size="sm" class="h-8 shrink-0 gap-1 rounded-lg text-xs" as-child>
+            <Button variant="outline" size="sm" class="h-8 shrink-0 gap-1 text-xs" as-child>
                 <Link :href="allHref">
                     Lihat semua
                     <ArrowRight class="size-3" :stroke-width="2.4" />

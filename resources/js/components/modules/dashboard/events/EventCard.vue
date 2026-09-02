@@ -165,7 +165,7 @@ useEventListener('keydown', (e) => {
                 variant="ghost"
                 size="icon-sm"
                 aria-label="Menu acara"
-                class="border-border/60 relative size-8 shrink-0 cursor-pointer rounded-lg border bg-white/90 shadow-sm backdrop-blur-sm transition-colors duration-150 hover:bg-white"
+                class="border-border/60 relative size-8 shrink-0 cursor-pointer border bg-white/90 shadow-sm backdrop-blur-sm transition-colors duration-150 hover:bg-white"
                 :ref="(el) => { triggerRef = el as HTMLElement | null }"
                 @click.stop="toggleMenu"
             >
@@ -187,28 +187,28 @@ useEventListener('keydown', (e) => {
                 >
                     <button
                         type="button"
-                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
+                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none"
                         @click="menuAction(openEdit)"
                     >
                         <SquarePen class="mr-2 size-4 shrink-0 stroke-[1.75]" />Edit acara
                     </button>
                     <button
                         type="button"
-                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
+                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none"
                         @click="menuAction(openExport)"
                     >
                         <Download class="mr-2 size-4 shrink-0 stroke-[1.75]" />Export data
                     </button>
                     <button
                         type="button"
-                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
+                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none"
                         @click="menuAction(openForms)"
                     >
                         <FileStack class="mr-2 size-4 shrink-0 stroke-[1.75]" />Kelola formulir
                     </button>
                     <button
                         type="button"
-                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none"
+                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none"
                         @click="menuAction(openScan)"
                     >
                         <QrCode class="mr-2 size-4 shrink-0 stroke-[1.75]" />Check in
@@ -216,7 +216,7 @@ useEventListener('keydown', (e) => {
                     <div class="bg-border my-1 h-px" />
                     <button
                         type="button"
-                        class="text-destructive hover:bg-destructive/10 focus:text-destructive focus:bg-destructive/15 relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm font-medium transition-colors outline-none"
+                        class="text-destructive hover:bg-destructive/10 focus:text-destructive focus:bg-destructive/15 relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm font-medium transition-colors outline-none"
                         @click="menuAction(requestDelete)"
                     >
                         <Trash2 class="mr-2 size-4 shrink-0 stroke-[1.75]" />Hapus acara
@@ -247,9 +247,9 @@ useEventListener('keydown', (e) => {
                     <Badge
                         variant="outline"
                         :class="[
-                            'shrink-0 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap',
-                            registrationUi(event).badgeClass,
-                        ]"
+ 'shrink-0 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap',
+ registrationUi(event).badgeClass,
+ ]"
                     >
                         {{ registrationUi(event).label }}
                     </Badge>

@@ -25,9 +25,9 @@ onMounted(() => requestAnimationFrame(() => (show.value = true)))
                 <!-- Left: Text content -->
                 <div
                     :class="[
-                        'transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                        show ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
-                    ]"
+ 'transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
+ show ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+ ]"
                 >
 
                     <h1
@@ -45,7 +45,7 @@ onMounted(() => requestAnimationFrame(() => (show.value = true)))
                     </p>
 
                     <div class="mt-10 flex flex-wrap gap-3.5">
-                        <Button as-child size="lg" class="h-12 rounded-xl px-8 text-sm font-semibold shadow-sm">
+                        <Button as-child size="lg" class="h-12 px-8 text-sm font-semibold shadow-sm">
                             <a :href="routes.auth.register" class="inline-flex items-center gap-2">
                                 Coba Gratis
                                 <ArrowRight class="size-4" />
@@ -55,7 +55,7 @@ onMounted(() => requestAnimationFrame(() => (show.value = true)))
                             as-child
                             variant="outline"
                             size="lg"
-                            class="h-12 rounded-xl border-border/60 px-7 text-sm font-medium"
+                            class="h-12 border-border/60 px-7 text-sm font-medium"
                         >
                             <a href="#section-steps">Pelajari Lebih Lanjut</a>
                         </Button>
@@ -76,9 +76,9 @@ onMounted(() => requestAnimationFrame(() => (show.value = true)))
                 <!-- Right: Lottie animation -->
                 <div
                     :class="[
-                        'transition-all delay-150 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                        show ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
-                    ]"
+ 'transition-all delay-150 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
+ show ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
+ ]"
                 >
                     <div class="relative">
                         <div class="overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-b from-card to-muted/20 p-6 shadow-sm sm:p-8">
@@ -99,10 +99,10 @@ onMounted(() => requestAnimationFrame(() => (show.value = true)))
             <!-- Stats strip -->
             <div
                 :class="[
-                    'mt-20 grid grid-cols-2 gap-6 border-t border-border/30 pt-10 sm:grid-cols-4',
-                    'transition-all delay-300 duration-600 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                    show ? 'opacity-100' : 'opacity-0',
-                ]"
+ 'mt-20 grid grid-cols-2 gap-6 border-t border-border/30 pt-10 sm:grid-cols-4',
+ 'transition-all delay-300 duration-600 ease-[cubic-bezier(0.22,1,0.36,1)]',
+ show ? 'opacity-100' : 'opacity-0',
+ ]"
             >
                 <div
                     v-for="stat in [
