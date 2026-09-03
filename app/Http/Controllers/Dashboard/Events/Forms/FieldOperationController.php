@@ -59,9 +59,18 @@ class FieldOperationController extends Controller
                 'message' => 'Fields have been saved',
             ]);
 
+            // Autosave wizard (background, tanpa navigasi) → JSON.
+            if ($request->expectsJson()) {
+                return response()->json(['ok' => true]);
+            }
+
             return to_route('dashboard.events.forms.show', ['event' => $event, 'form' => $form]);
         } catch (\Exception $e) {
             Log::error('[FieldOperationController, __invoke]: ' . $e->getMessage());
+
+            if ($request->expectsJson()) {
+                return response()->json(['ok' => false, 'message' => 'Fields cannot be saved'], 422);
+            }
 
             return Inertia::flash('toast', [
                 'type' => 'error',

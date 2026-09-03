@@ -46,7 +46,11 @@ const props = defineProps<{
     event?: IEvent;
     /** Create: opsional (fallback default). Edit: wajib dari halaman. */
     options?: { categories: { value: string; label: string }[]; sessions: { value: string; label: string }[] };
+    /** Mode wizard (Create → forms): POST via Inertia (X-Inertia) → BE render ulang
+     *  Create 200 dgn draftEvent; halaman induk mendeteksi & pindah step. */
+    wizardMode?: boolean;
 }>();
+
 
 const defaultSessions = [
     { value: 'general', label: 'General' },
@@ -200,12 +204,42 @@ const sessionPickerId = computed(() => (props.variant === 'create' ? 'field-sess
 
 const categoryPickerId = computed(() => (props.variant === 'create' ? 'field-category' : 'edit-field-category'));
 
+/**
+ * Field yang wajib diisi, selaras dengan StoreEventRequest.
+ * Kuota & harga opsional. Banner wajib hanya saat create (saat edit banner lama dipakai).
+ */
+const REQUIRED_FIELDS: ReadonlySet<string> = new Set([
+    'title',
+    'description',
+    'location',
+    'start_date',
+    'end_date',
+    'registration_start',
+    'registration_end',
+    'session',
+    'category',
+    'banner',
+]);
+
+/** Penanda wajib (*) softcoded: cukup edit REQUIRED_FIELDS, tanpa menyentuh template. */
+function isRequired(fieldName: string): boolean {
+    if (!REQUIRED_FIELDS.has(fieldName)) return false;
+    if (fieldName === 'banner') return props.variant === 'create';
+    return true;
+}
+
 /** Sesi & kategori: perilaku input sama (multi, daftar + ketik). */
 const multiValueFieldHint = 'Pilih dari daftar atau ketik; boleh lebih dari satu.';
 
-const primaryActionLabel = computed(() => (props.variant === 'create' ? 'Terbitkan' : 'Simpan & terbitkan'));
+const primaryActionLabel = computed(() => {
+    if (props.wizardMode && props.variant === 'create') return 'Simpan & lanjutkan';
+    return props.variant === 'create' ? 'Terbitkan' : 'Simpan & terbitkan';
+});
 
-const secondaryActionLabel = computed(() => (props.variant === 'create' ? 'Simpan draf' : 'Simpan perubahan'));
+const secondaryActionLabel = computed(() => {
+    if (props.wizardMode && props.variant === 'create') return 'Simpan draf';
+    return props.variant === 'create' ? 'Simpan draf' : 'Simpan perubahan';
+});
 
 const pageTitle = computed(() => (props.variant === 'create' ? 'Buat event baru' : 'Edit event'));
 
@@ -324,9 +358,16 @@ function submitForm(publish: boolean): void {
 
     const url = props.variant === 'create' ? storeEvent().url : updateEvent(props.event!.id).url;
 
+    const isWizard = props.wizardMode === true && props.variant === 'create';
+
     form.post(url, {
         forceFormData: true,
         onSuccess: () => {
+            if (isWizard) {
+                // Backend merender ulang Create (200, draftEvent prop) → halaman
+                // otomatis pindah ke step forms via watcher di Create.vue.
+                return;
+            }
             if (publish) {
                 toast.success(
                     props.variant === 'create'
@@ -391,20 +432,27 @@ watch(regClose, syncRegistrationClose, { deep: true });
 
 <template>
     <div class="flex flex-col gap-5">
-        <!-- Header halaman: judul + subtitle kiri, aksi kanan -->
+        <!-- Header halaman: judul + subtitle kiri (atau slot wizard), aksi kanan -->
         <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="min-w-0">
+            <div class="flex min-w-0 items-center gap-4">
+                <slot name="header-leading" />
+                <div v-if="!(props.wizardMode && props.variant === 'create')" class="min-w-0">
                 <h1 class="font-display text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
                     {{ pageTitle }}
                 </h1>
                 <p class="text-muted-foreground mt-1.5 text-base">{{ pageSubtitle }}</p>
             </div>
-            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            </div>
+            <div class="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
                 <Button type="button" variant="outline" :disabled="form.processing" @click="submitForm(false)">
                     <Save class="size-4 shrink-0 stroke-[1.75]" aria-hidden="true" />
                     {{ secondaryActionLabel }}
                 </Button>
-                <Button type="button" :disabled="form.processing" @click="submitForm(true)">
+                <Button
+                    type="button"
+                    :disabled="form.processing"
+                    @click="submitForm(props.wizardMode && props.variant === 'create' ? false : true)"
+                >
                     <Send class="size-4 shrink-0 stroke-[1.75]" aria-hidden="true" />
                     {{ primaryActionLabel }}
                 </Button>
@@ -431,7 +479,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center justify-between gap-3">
                                 <Label for="title" class="text-sm font-medium">
-                                    Judul acara <span class="text-destructive">*</span>
+                                    Judul acara
+                                    <span v-if="isRequired('title')" class="text-destructive">*</span>
                                 </Label>
                                 <span
                                     class="text-muted-foreground text-xs tabular-nums"
@@ -460,7 +509,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center justify-between gap-3">
                                 <Label class="text-sm font-medium">
-                                    Deskripsi event <span class="text-destructive">*</span>
+                                    Deskripsi event
+                                    <span v-if="isRequired('description')" class="text-destructive">*</span>
                                 </Label>
                             </div>
                             <div
@@ -499,7 +549,7 @@ watch(regClose, syncRegistrationClose, { deep: true });
                                         aria-hidden="true"
                                     />
                                     Banner / poster
-                                    <span v-if="props.variant === 'create'" class="text-destructive">*</span>
+                                    <span v-if="isRequired('banner')" class="text-destructive">*</span>
                                 </Label>
                                 <p class="text-muted-foreground mt-1 text-xs">
                                     Rasio 16:7 — PNG, JPG, atau WebP maks. 10MB.
@@ -588,7 +638,10 @@ watch(regClose, syncRegistrationClose, { deep: true });
                         <div class="flex items-center gap-2.5">
                             <MapPinned class="text-foreground/80 size-5 shrink-0 stroke-[1.75]" aria-hidden="true" />
                             <div>
-                                <p class="text-foreground text-sm font-semibold tracking-tight">Lokasi event</p>
+                                <p class="text-foreground text-sm font-semibold tracking-tight">
+                                    Lokasi event
+                                    <span v-if="isRequired('location')" class="text-destructive">*</span>
+                                </p>
                                 <p class="text-muted-foreground mt-0.5 text-xs">
                                     Tempat acara berlangsung — online atau fisik.
                                 </p>
@@ -634,7 +687,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                 <div class="flex flex-col gap-5">
                     <div class="flex flex-col gap-2">
                         <Label for="start_date" class="text-foreground text-sm font-medium"
-                            >Tanggal mulai <span class="text-destructive">*</span></Label
+                            >Tanggal mulai
+                            <span v-if="isRequired('start_date')" class="text-destructive">*</span></Label
                         >
                         <DatePicker
                             id="start_date"
@@ -654,7 +708,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                     </div>
                     <div class="flex flex-col gap-2">
                         <Label for="end_date" class="text-foreground text-sm font-medium"
-                            >Tanggal selesai <span class="text-destructive">*</span></Label
+                            >Tanggal selesai
+                            <span v-if="isRequired('end_date')" class="text-destructive">*</span></Label
                         >
                         <DatePicker
                             id="end_date"
@@ -683,7 +738,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                 <div class="flex flex-col gap-5">
                     <div class="flex flex-col gap-2">
                         <Label for="reg_open_date" class="text-foreground text-sm font-medium">
-                            Pendaftaran dibuka <span class="text-destructive">*</span>
+                            Pendaftaran dibuka
+                            <span v-if="isRequired('registration_start')" class="text-destructive">*</span>
                         </Label>
                         <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
                             <DatePicker
@@ -713,7 +769,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                     </div>
                     <div class="flex flex-col gap-2">
                         <Label for="reg_close_date" class="text-foreground text-sm font-medium">
-                            Pendaftaran ditutup <span class="text-destructive">*</span>
+                            Pendaftaran ditutup
+                            <span v-if="isRequired('registration_end')" class="text-destructive">*</span>
                         </Label>
                         <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
                             <DatePicker
@@ -756,7 +813,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                 <div class="flex flex-col gap-5">
                     <div class="flex flex-col gap-2">
                         <Label for="quota" class="text-foreground text-sm font-medium"
-                            >Kuota <span class="text-destructive">*</span></Label
+                            >Kuota
+                            <span v-if="isRequired('quota')" class="text-destructive">*</span></Label
                         >
                         <div class="relative">
                             <Input
@@ -787,7 +845,8 @@ watch(regClose, syncRegistrationClose, { deep: true });
                     </div>
                     <div class="flex flex-col gap-2">
                         <Label for="price" class="text-foreground text-sm font-medium"
-                            >Harga (Rp) <span class="text-destructive">*</span></Label
+                            >Harga (Rp)
+                            <span v-if="isRequired('price')" class="text-destructive">*</span></Label
                         >
                         <div class="relative">
                             <Input
@@ -834,7 +893,7 @@ watch(regClose, syncRegistrationClose, { deep: true });
                         v-model="form.session"
                         :options="sessions"
                         label="Sesi / divisi"
-                        required
+                        :required="isRequired('session')"
                         :description="multiValueFieldHint"
                         :error="fieldError('session')"
                         :shaking="isFieldShaking('session')"
@@ -844,7 +903,7 @@ watch(regClose, syncRegistrationClose, { deep: true });
                         v-model="form.category"
                         :options="categories"
                         label="Kategori"
-                        required
+                        :required="isRequired('category')"
                         :description="multiValueFieldHint"
                         :error="fieldError('category')"
                         :shaking="isFieldShaking('category')"

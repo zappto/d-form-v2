@@ -105,7 +105,7 @@ function submissionsHref(formId: string): string {
                             <div class="mt-3 flex flex-wrap gap-1.5">
                                 <Badge
                                     variant="outline"
-                                    class="rounded-full px-2 text-[10px] font-medium"
+                                    class="px-2 text-[10px] font-medium"
                                 >
                                     {{
                                         form.purpose === 'other' || form.metadata?.purpose === 'other'
@@ -117,7 +117,7 @@ function submissionsHref(formId: string): string {
                                     v-for="vis in form.visible_for ?? []"
                                     :key="vis"
                                     variant="secondary"
-                                    class="rounded-full px-2 text-[10px] font-medium capitalize"
+                                    class="px-2 text-[10px] font-medium capitalize"
                                 >
                                     {{ vis }}
                                 </Badge>

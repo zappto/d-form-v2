@@ -101,7 +101,7 @@ const canReview = computed(() => {
                             <Badge
                                 v-if="submission"
                                 variant="outline"
-                                class="shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold leading-none md:text-xs"
+                                class="shrink-0 border px-3 py-1 text-[11px] font-semibold leading-none md:text-xs"
                                 :class="submissionReviewBadge(submission.review_status).class"
                             >
                                 {{ submissionReviewBadge(submission.review_status).label }}
@@ -274,7 +274,7 @@ const canReview = computed(() => {
                                 <p class="text-[11px] font-medium text-muted-foreground">Status akhir</p>
                                 <Badge
                                     variant="outline"
-                                    class="rounded-full px-3 py-1 text-[11px] font-semibold"
+                                    class="px-3 py-1 text-[11px] font-semibold"
                                     :class="submissionReviewBadge(submission.review_status).class"
                                 >
                                     {{ submissionReviewBadge(submission.review_status).label }}

@@ -88,7 +88,7 @@ function onParticipantKeydown(e: KeyboardEvent, member: IBundleSubmissionMember)
                     <Badge
                         v-if="group"
                         variant="outline"
-                        class="shrink-0 rounded-full px-2.5 py-0.5 text-[0.6875rem] font-medium"
+                        class="shrink-0 px-2.5 py-0.5 text-[0.6875rem] font-medium"
                         :class="groupReviewStatusBadge(group.group_review_status).class"
                     >
                         {{ groupReviewStatusBadge(group.group_review_status).label }}
@@ -140,7 +140,7 @@ function onParticipantKeydown(e: KeyboardEvent, member: IBundleSubmissionMember)
                             <div class="flex flex-wrap gap-1.5">
                                 <Badge
                                     variant="outline"
-                                    class="h-5 rounded-full px-2 text-[0.625rem] font-medium"
+                                    class="h-5 px-2 text-[0.625rem] font-medium"
                                     :class="submissionReviewBadge(member.review_status).class"
                                 >
                                     {{ submissionReviewBadge(member.review_status).label }}
@@ -148,7 +148,7 @@ function onParticipantKeydown(e: KeyboardEvent, member: IBundleSubmissionMember)
                                 <Badge
                                     v-if="member.registration_role !== 'leader'"
                                     variant="outline"
-                                    class="h-5 rounded-full px-2 text-[0.625rem] font-medium"
+                                    class="h-5 px-2 text-[0.625rem] font-medium"
                                     :class="memberConfirmationStatusBadge(member.member_confirmation_status).class"
                                 >
                                     {{ memberConfirmationStatusBadge(member.member_confirmation_status).label }}

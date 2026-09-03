@@ -54,7 +54,7 @@ function onCardKeydown(e: KeyboardEvent, submission: IFormSubmission) {
                 </div>
                 <Badge
                     variant="outline"
-                    class="shrink-0 rounded-full px-2.5 py-0.5 text-[0.6875rem] font-medium"
+                    class="shrink-0 px-2.5 py-0.5 text-[0.6875rem] font-medium"
                     :class="submissionReviewBadge(submission.review_status).class"
                 >
                     {{ submissionReviewBadge(submission.review_status).label }}

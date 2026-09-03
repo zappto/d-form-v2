@@ -133,7 +133,7 @@ useEventListener('keydown', (e) => {
                 <Badge
                     v-if="alertBadge"
                     variant="secondary"
-                    class="rounded-md border border-amber-500/40 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:text-amber-100"
+                    class="border border-amber-500/40 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:text-amber-100"
                 >
                     {{ alertBadge }}
                 </Badge>
@@ -141,7 +141,7 @@ useEventListener('keydown', (e) => {
                     <Badge
                         v-for="cat in categoryTokens.slice(0, 1)"
                         :key="`${event.id}-cat-${cat}`"
-                        class="rounded-md border px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm"
+                        class="border px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm"
                         :style="{
                             backgroundColor: `color-mix(in oklab, ${categoryColorMap[cat] ?? '#6B7280'} 12%, white)`,
                             borderColor: `color-mix(in oklab, ${categoryColorMap[cat] ?? '#6B7280'} 30%, transparent)`,
@@ -153,7 +153,7 @@ useEventListener('keydown', (e) => {
                     <Badge
                         v-if="categoryTokens.length > 1"
                         variant="secondary"
-                        class="dark:bg-background/90 rounded-md border-0 bg-white/90 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm"
+                        class="dark:bg-background/90 border-0 bg-white/90 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm"
                     >
                         +{{ categoryTokens.length - 1 }}
                     </Badge>
@@ -247,7 +247,7 @@ useEventListener('keydown', (e) => {
                     <Badge
                         variant="outline"
                         :class="[
- 'shrink-0 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap',
+                            'shrink-0 px-2.5 py-1 text-xs font-medium whitespace-nowrap',
  registrationUi(event).badgeClass,
  ]"
                     >

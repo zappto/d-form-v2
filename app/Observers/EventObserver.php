@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Event;
+use App\Models\Form;
 use Illuminate\Support\Facades\Cache;
 
 class EventObserver
@@ -32,10 +33,31 @@ class EventObserver
     }
 
     /**
+     * Cascade soft-delete to child forms (and their fields) so an event draft
+     * removal (wizard Cancel) does not leave orphaned forms behind.
+     */
+    public function deleting(Event $event): void
+    {
+        $event->forms()->withTrashed()->get()->each(function (Form $form): void {
+            $form->formFields()->withTrashed()->get()->each(function ($field): void {
+                $field->delete();
+            });
+            $form->delete();
+        });
+    }
+
+    /**
      * Handle the Event "restored" event.
      */
     public function restored(Event $event): void
     {
+        $event->forms()->withTrashed()->get()->each(function (Form $form): void {
+            $form->formFields()->withTrashed()->get()->each(function ($field): void {
+                $field->restore();
+            });
+            $form->restore();
+        });
+
         $this->invalidateEventListCache();
     }
 

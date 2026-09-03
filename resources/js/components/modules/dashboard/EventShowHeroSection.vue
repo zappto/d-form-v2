@@ -54,7 +54,7 @@ defineProps<{
                         <Badge
                             v-for="cat in parseEventCategories(event.category)"
                             :key="cat"
-                            class="rounded-md border-0 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm"
+                            class="border-0 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm"
                             :style="{ backgroundColor: categoryColorMap[cat] ?? '#6B7280' }"
                         >
                             {{ categoryLabelMap[cat] ?? cat }}
