@@ -53,3 +53,4 @@ frankenphp
 frankenphp-worker.php
 graphify-out/
 docs/superpowers/
+.playwright-mcp/

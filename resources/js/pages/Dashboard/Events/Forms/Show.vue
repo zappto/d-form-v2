@@ -255,42 +255,32 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value);
                         </Badge>
                     </TabsTrigger>
                 </TabsList>
+
+                <div class="flex shrink-0 items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        class="border-border/80 bg-background/90 hidden px-3 text-sm font-medium shadow-sm sm:inline-flex"
+                        :disabled="builderEmpty"
+                        aria-label="Pratinjau formulir"
+                        @click="requestPreview"
+                    >
+                        <Eye class="size-4 shrink-0 sm:hidden" aria-hidden="true" />
+                        <span>Pratinjau</span>
+                    </Button>
+                    <Button
+                        size="sm"
+                        class="hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4"
+                        :disabled="settingsForm.processing"
+                        @click="requestSaveAll"
+                    >
+                        <span class="sm:hidden">Simpan</span>
+                        <span class="hidden sm:inline">Save All</span>
+                    </Button>
+                </div>
             </div>
 
             <TabsContent value="editor" class="mt-0">
-                <div class="mb-3 flex items-center justify-between gap-3 sm:mb-4">
-                    <div class="min-w-0">
-                        <h2 class="text-foreground truncate text-sm font-semibold tracking-[-0.01em] sm:text-base">
-                            Editor
-                        </h2>
-                        <p class="text-muted-foreground text-xs">
-                            Susun dan ubah pertanyaan formulir.
-                        </p>
-                    </div>
-                    <div class="flex shrink-0 items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            class="hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm sm:inline-flex"
-                            :disabled="builderEmpty"
-                            aria-label="Pratinjau formulir"
-                            @click="requestPreview"
-                        >
-                            <Eye class="size-4 shrink-0 sm:hidden" aria-hidden="true" />
-                            <span>Pratinjau</span>
-                        </Button>
-                        <Button
-                            size="sm"
-                            class="hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4"
-                            :disabled="settingsForm.processing"
-                            @click="requestSaveAll"
-                        >
-                            <span class="sm:hidden">Simpan</span>
-                            <span class="hidden sm:inline">Save All</span>
-                        </Button>
-                    </div>
-                </div>
-
                 <FormBuilderWorkspace
                     ref="workspaceRef"
                     v-model:form-title="formTitle"
@@ -313,38 +303,6 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value);
             </TabsContent>
 
             <TabsContent value="jawaban" class="mt-0">
-                <div class="mb-3 flex items-center justify-between gap-3 sm:mb-4">
-                    <div class="min-w-0">
-                        <h2 class="text-foreground truncate text-sm font-semibold tracking-[-0.01em] sm:text-base">
-                            Jawaban
-                        </h2>
-                        <p class="text-muted-foreground text-xs">
-                            Lihat jawaban yang masuk ke formulir ini.
-                        </p>
-                    </div>
-                    <div class="flex shrink-0 items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            class="hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm sm:inline-flex"
-                            :disabled="builderEmpty"
-                            aria-label="Pratinjau formulir"
-                            @click="requestPreview"
-                        >
-                            <Eye class="size-4 shrink-0 sm:hidden" aria-hidden="true" />
-                            <span>Pratinjau</span>
-                        </Button>
-                        <Button
-                            size="sm"
-                            class="hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4"
-                            :disabled="settingsForm.processing"
-                            @click="requestSaveAll"
-                        >
-                            <span class="sm:hidden">Simpan</span>
-                            <span class="hidden sm:inline">Save All</span>
-                        </Button>
-                    </div>
-                </div>
                 <div
                     v-if="submissionRows.length === 0"
                     class="border-border/70 bg-muted/10 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-6 py-20 text-center"

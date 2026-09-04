@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DatePicker } from '@/components/ui/date-picker';
-import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue';
+import { SplitDateTimeField } from '@/components/ui/date-picker';
 import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
 import EventMultiValuePicker from '@/components/modules/dashboard/events/EventMultiValuePicker.vue';
 import {
@@ -388,33 +387,40 @@ function fieldError(key: string): string | undefined {
     return getFieldError(form.errors, key);
 }
 
-// ── Pendaftaran: tanggal & jam terpisah (payload tetap `YYYY-MM-DDTHH:mm`) ──
-
-function splitDateTimeParts(value: string | undefined): { date: string; time: string } {
-    if (!value) return { date: '', time: '' };
-    const [d, t = ''] = value.split('T');
-    return { date: d.length >= 10 ? d.slice(0, 10) : '', time: t.length >= 5 ? t.slice(0, 5) : '' };
+function validateRequired(): boolean {
+    const missing: string[] = []
+    for (const key of REQUIRED_FIELDS) {
+        if (key === 'banner' && props.variant !== 'create') continue
+        const raw = (form as unknown as Record<string, unknown>)[key]
+        const val = Array.isArray(raw) ? raw.join('').trim() : String(raw ?? '').trim()
+        // banner is File | null, check file existence separately
+        if (key === 'banner') {
+            if (!form.banner) missing.push(key)
+            continue
+        }
+        if (val === '') missing.push(key)
+    }
+    // also check description plain length for TipTap (already covered but ensure)
+    if (missing.length) {
+        shakeFields(missing)
+        // also trigger form errors visually via errorClass/fieldError is server-driven,
+        // but shake + red border via errorClass fallback when fieldError empty yet missing
+        // force a dummy error to show red border by setting form errors temporarily
+        // instead we rely on shake + missing check will make errorClass via fieldError? So set manual shake enough
+        // Populate form.errors for red border via errorClass check (fieldError)
+        // We set a temporary error message to ensure red border shows even without server roundtrip
+        for (const k of missing) {
+            if (!form.errors[k as keyof typeof form.errors]) {
+                // @ts-expect-error manual set for UI
+                form.errors[k] = 'Wajib diisi.'
+            }
+        }
+        return false
+    }
+    return true
 }
 
-const regOpen = ref(splitDateTimeParts(form.registration_start as string));
-const regClose = ref(splitDateTimeParts(form.registration_end as string));
-
-function combineDateTime(date: string, time: string): string {
-    if (!date) return '';
-    const t = time && time.length >= 5 ? time.slice(0, 5) : '00:00';
-    return `${date}T${t}`;
-}
-
-function syncRegistrationOpen(): void {
-    form.registration_start = combineDateTime(regOpen.value.date, regOpen.value.time);
-}
-
-function syncRegistrationClose(): void {
-    form.registration_end = combineDateTime(regClose.value.date, regClose.value.time);
-}
-
-watch(regOpen, syncRegistrationOpen, { deep: true });
-watch(regClose, syncRegistrationClose, { deep: true });
+defineExpose({ submitForm, validateRequired, form })
 </script>
 
 <style scoped>
@@ -434,16 +440,16 @@ watch(regClose, syncRegistrationClose, { deep: true });
     <div class="flex flex-col gap-5">
         <!-- Header halaman: judul + subtitle kiri (atau slot wizard), aksi kanan -->
         <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex min-w-0 items-center gap-4">
+            <div :class="['flex min-w-0 items-center gap-4', props.wizardMode ? 'min-w-0 flex-1' : '']">
                 <slot name="header-leading" />
-                <div v-if="!(props.wizardMode && props.variant === 'create')" class="min-w-0">
+                <div v-if="!props.wizardMode" class="min-w-0">
                 <h1 class="font-display text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
                     {{ pageTitle }}
                 </h1>
                 <p class="text-muted-foreground mt-1.5 text-base">{{ pageSubtitle }}</p>
             </div>
             </div>
-            <div class="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
+            <div v-if="!props.wizardMode" class="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
                 <Button type="button" variant="outline" :disabled="form.processing" @click="submitForm(false)">
                     <Save class="size-4 shrink-0 stroke-[1.75]" aria-hidden="true" />
                     {{ secondaryActionLabel }}
@@ -736,68 +742,26 @@ watch(regClose, syncRegistrationClose, { deep: true });
                     </div>
                 </div>
                 <div class="flex flex-col gap-5">
-                    <div class="flex flex-col gap-2">
-                        <Label for="reg_open_date" class="text-foreground text-sm font-medium">
-                            Pendaftaran dibuka
-                            <span v-if="isRequired('registration_start')" class="text-destructive">*</span>
-                        </Label>
-                        <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
-                            <DatePicker
-                                id="reg_open_date"
-                                :model-value="regOpen.date"
-                                @update:model-value="regOpen.date = $event"
-                                :aria-invalid="!!fieldError('registration_start')"
-                                :class="
-                                    cn(
-                                        'bg-white',
-                                        errorClass('registration_start'),
-                                        isFieldShaking('registration_start') && 'animate-shake'
-                                    )
-                                "
-                            />
-                            <TimeAmPmInput
-                                id="reg_open_time"
-                                :model-value="regOpen.time"
-                                :aria-invalid="!!fieldError('registration_start')"
-                                :class="isFieldShaking('registration_start') ? 'animate-shake' : ''"
-                                @update:model-value="regOpen.time = String($event)"
-                            />
-                        </div>
-                        <p v-if="fieldError('registration_start')" class="text-destructive text-xs">
-                            {{ fieldError('registration_start') }}
-                        </p>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <Label for="reg_close_date" class="text-foreground text-sm font-medium">
-                            Pendaftaran ditutup
-                            <span v-if="isRequired('registration_end')" class="text-destructive">*</span>
-                        </Label>
-                        <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
-                            <DatePicker
-                                id="reg_close_date"
-                                :model-value="regClose.date"
-                                @update:model-value="regClose.date = $event"
-                                :aria-invalid="!!fieldError('registration_end')"
-                                :class="
-                                    cn(
-                                        'bg-white',
-                                        errorClass('registration_end'),
-                                        isFieldShaking('registration_end') && 'animate-shake'
-                                    )
-                                "
-                            />
-                            <TimeAmPmInput
-                                id="reg_close_time"
-                                :model-value="regClose.time"
-                                :aria-invalid="!!fieldError('registration_end')"
-                                :class="isFieldShaking('registration_end') ? 'animate-shake' : ''"
-                                @update:model-value="regClose.time = String($event)"
-                            />
-                        </div>
-                        <p v-if="fieldError('registration_end')" class="text-destructive text-xs">
-                            {{ fieldError('registration_end') }}
-                        </p>
-                    </div>
+                    <SplitDateTimeField
+                        :id-prefix="`reg_open`"
+                        v-model="form.registration_start"
+                        label="Pendaftaran dibuka"
+                        picker-class="bg-white"
+                        :required="isRequired('registration_start')"
+                        :invalid="!!fieldError('registration_start')"
+                        :error="fieldError('registration_start')"
+                        :shaking="isFieldShaking('registration_start')"
+                    />
+                    <SplitDateTimeField
+                        :id-prefix="`reg_close`"
+                        v-model="form.registration_end"
+                        label="Pendaftaran ditutup"
+                        picker-class="bg-white"
+                        :required="isRequired('registration_end')"
+                        :invalid="!!fieldError('registration_end')"
+                        :error="fieldError('registration_end')"
+                        :shaking="isFieldShaking('registration_end')"
+                    />
                 </div>
             </div>
 

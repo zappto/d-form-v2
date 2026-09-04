@@ -54,6 +54,7 @@ export const routes = {
                 attendance: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/exports/attendance.csv`,
             },
             forms: {
+                /** @deprecated primary UI now inline di Event Detail, keep untuk redirect/bookmark */
                 index: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/forms`,
                 create: (eventId: string | number) => `${ADMIN_BASE}/events/${eventId}/forms/create`,
                 show: (eventId: string | number, formId: string | number) =>

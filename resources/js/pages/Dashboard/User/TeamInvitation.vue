@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata'
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
@@ -45,6 +45,10 @@ function metadata(field: IFormField): Record<string, unknown> {
 
 function builderType(field: IFormField): string {
     return formFieldBuilderType(field)
+}
+
+function dropdownOptions(field: IFormField): SimpleSelectOption[] {
+    return getFormFieldOptionRows(field).map((row) => ({ value: row.label, label: row.label }))
 }
 
 const appendableFields = computed(() => props.fields.filter((f) => f.is_append))
@@ -291,23 +295,15 @@ function submitDeclineFromDialog() {
                                     {{ row.label }}
                                 </label>
                             </div>
-                            <Select v-else-if="field.type === 'select'" v-model="confirmForm[field.name] as string">
-                                <SelectTrigger><SelectValue :placeholder="'Select'" /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem v-for="row in getFormFieldOptionRows(field)" :key="row.label" :value="row.label">
-                                        <span class="flex items-center gap-2">
-                                            <img
-                                                v-if="row.imageSrc"
-                                                :src="row.imageSrc"
-                                                alt=""
-                                                class="size-7 rounded border border-border object-cover"
-                                                loading="lazy"
-                                            />
-                                            {{ row.label }}
-                                        </span>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <SimpleSelect
+                                v-else-if="field.type === 'select'"
+                                v-model="confirmForm[field.name] as string"
+                                :options="dropdownOptions(field)"
+                                :id="`invite-select-${field.name}`"
+                                placeholder="Select"
+                                class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
+                                aria-label="Select"
+                            />
                             <div v-else-if="field.type === 'fileUpload'" class="space-y-3 rounded-xl border border-dashed border-border p-4">
                                 <p v-if="typeof answers[field.name] === 'string' && answers[field.name]" class="text-xs font-medium text-muted-foreground">
                                     Berkas saat ini (dari pendaftar utama)

@@ -86,7 +86,7 @@ class EventController extends Controller
             // default agar step forms (autosave fields) punya form id untuk POST fields.
             if ($event->forms()->count() === 0) {
                 $event->forms()->create([
-                    'title' => __('Formulir Pendaftaran'),
+                    'title' => '',
                     'description' => '',
                     'success_content' => null,
                     'closed_at' => null,

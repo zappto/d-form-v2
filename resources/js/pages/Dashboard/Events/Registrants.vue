@@ -116,7 +116,7 @@ onMounted(() => {
                 :size="200"
             >
                 <Button as-child class="mt-1">
-                    <Link :href="routes.admin.events.forms.index(props.event.id)">Buka halaman formulir</Link>
+                    <Link :href="routes.admin.events.show(props.event.id)">Buka detail event</Link>
                 </Button>
             </EmptyState>
 

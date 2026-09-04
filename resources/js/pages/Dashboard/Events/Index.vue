@@ -19,7 +19,7 @@ import useAuth from '@/utils/composables/useAuth';
 
 defineOptions({ layout: DashboardLayout });
 
-const page = usePage();
+const page = usePage<IProps>();
 const user = useAuth(page.props);
 const canManageEvents = computed(() => user.value?.can_manage_events === true);
 
@@ -185,7 +185,11 @@ function handleDeleteConfirm(): void {
             variant="destructive"
             @confirm="handleDeleteConfirm"
             @cancel="deleteTarget = null"
-            @update:open="(v) => { if (!v) deleteTarget = null }"
+            @update:open="
+                (v) => {
+                    if (!v) deleteTarget = null;
+                }
+            "
         />
 
         <EmptyState
@@ -209,7 +213,8 @@ function handleDeleteConfirm(): void {
                 acara
             </p>
             <div class="flex flex-wrap items-center justify-center gap-2">
-                <Button radius="icon"
+                <Button
+                    radius="icon"
                     variant="outline"
                     size="icon"
                     class="size-9"
@@ -236,7 +241,8 @@ function handleDeleteConfirm(): void {
                 >
                     Berikutnya
                 </Button>
-                <Button radius="icon"
+                <Button
+                    radius="icon"
                     variant="outline"
                     size="icon"
                     class="size-9"

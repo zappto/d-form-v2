@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { Camera, QrCode, ScanLine, ShieldAlert } from 'lucide-vue-next'
 
-defineProps<{
+const props = defineProps<{
     scannerContainerId: string
     eventLabel: string
     cameras: Array<{ id: string; label: string }>
@@ -19,6 +20,10 @@ defineProps<{
     duplicateScansCount: number
     invalidScansCount: number
 }>()
+
+const cameraOptions = computed<SimpleSelectOption[]>(() =>
+    props.cameras.map((camera) => ({ value: camera.id, label: camera.label })),
+)
 
 const manualQrInput = defineModel<string>('manualQrInput', { required: true })
 const registrationCodeInput = defineModel<string>('registrationCodeInput', { required: true })
@@ -41,16 +46,15 @@ defineEmits<{
                 </Badge>
             </div>
             <div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
-                <Select :model-value="selectedCameraId" @update:model-value="$emit('switchCamera', $event)">
-                    <SelectTrigger class="w-full">
-                        <SelectValue placeholder="Pilih kamera" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem v-for="camera in cameras" :key="camera.id" :value="camera.id">
-                            {{ camera.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                <SimpleSelect
+                    :model-value="selectedCameraId"
+                    :options="cameraOptions"
+                    id="scanner-camera-select"
+                    placeholder="Pilih kamera"
+                    class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
+                    aria-label="Pilih kamera"
+                    @update:model-value="$emit('switchCamera', $event)"
+                />
 
                 <Button class="md:min-w-36" :disabled="isStartingCamera || isCameraReady || !selectedCameraId" @click="$emit('startCamera')">
                     <Camera data-icon="inline-start" />

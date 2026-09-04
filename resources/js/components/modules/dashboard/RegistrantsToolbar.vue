@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { Search } from 'lucide-vue-next'
 import { REGISTRANTS_TAB_ITEMS } from '@/lib/registrantsUi'
 
@@ -13,10 +14,15 @@ const activeStatusTab = defineModel<'all' | 'pending' | 'accepted' | 'rejected'>
 })
 const activeFormFilter = defineModel<string>('activeFormFilter', { required: true })
 
-defineProps<{
+const props = defineProps<{
     statusCounts: Record<'all' | 'pending' | 'accepted' | 'rejected', number>
     forms: { id: string; title: string }[]
 }>()
+
+const formFilterOptions = computed<SimpleSelectOption[]>(() => [
+    { value: 'all', label: 'Semua formulir' },
+    ...props.forms.map((f) => ({ value: f.id, label: f.title })),
+])
 </script>
 
 <template>
@@ -57,25 +63,13 @@ defineProps<{
                     <Label for="registrants-form-filter" class="text-xs font-semibold text-muted-foreground">
                         Formulir
                     </Label>
-                    <Select v-model="activeFormFilter">
-                        <SelectTrigger
-                            id="registrants-form-filter"
-                            class="mt-1.5 h-10 w-full rounded-xl"
-                        >
-                            <SelectValue placeholder="Semua formulir" />
-                        </SelectTrigger>
-                        <SelectContent class="rounded-xl">
-                            <SelectItem value="all" class="rounded-lg">Semua formulir</SelectItem>
-                            <SelectItem
-                                v-for="f in forms"
-                                :key="f.id"
-                                :value="f.id"
-                                class="rounded-lg"
-                            >
-                                {{ f.title }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <SimpleSelect
+                        v-model="activeFormFilter"
+                        :options="formFilterOptions"
+                        id="registrants-form-filter"
+                        class="border-border/80 bg-background/80 mt-1.5 h-10 w-full text-xs sm:text-sm"
+                        aria-label="Formulir"
+                    />
                 </div>
 
                 <div class="relative min-w-0 flex-1">

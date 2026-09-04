@@ -97,7 +97,7 @@ function openExport(): void {
 }
 
 function openForms(): void {
-    router.visit(routes.admin.events.forms.index(props.event.id));
+    router.visit(routes.admin.events.show(props.event.id));
 }
 
 function openScan(): void {

@@ -69,7 +69,7 @@ const wb = reactive(
     )
 );
 
-const backHref = computed(() => routes.admin.events.forms.index(props.event.id));
+const backHref = computed(() => routes.admin.events.show(props.event.id));
 const shellHeightClass = computed(() => (props.shell === 'fullscreen' ? 'h-svh' : 'min-h-0 lg:h-[calc(100svh-5rem)]'));
 const visibilityOptions = FORM_VISIBILITY_OPTIONS;
 /** Accordion "Pengaturan form" di panel kiri (bawaan tertutup). */

@@ -5,18 +5,15 @@ import axios from 'axios';
 import { handleInertiaFormErrors } from '@/lib/error-message';
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
 import EventDashboardForm from '@/components/modules/dashboard/events/EventDashboardForm.vue';
+import EventWizardStepper from '@/components/modules/dashboard/events/EventWizardStepper.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Loader2 } from 'lucide-vue-next';
+import { Loader2 } from 'lucide-vue-next';
 import { setTopbar } from '@/utils/composables/useDashboardTopbar';
 import { destroy as destroyEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { __invoke as postFields } from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FieldOperationController';
-import {
-    fromBackendField,
-    toBackendFields,
-    type BackendField,
-} from '@/components/modules/builder/fieldMapping';
+import { fromBackendField, toBackendFields, type BackendField } from '@/components/modules/builder/fieldMapping';
 import {
     defaultFormBannerState,
     prependFormBannerToBackendPayload,
@@ -59,26 +56,28 @@ const queryStep = computed(() => new URLSearchParams(page.url.split('?')[1] ?? '
 const queryDraftId = computed(() => new URLSearchParams(page.url.split('?')[1] ?? '').get('draftId') ?? '');
 
 const step = ref<'event' | 'forms'>(
-    queryStep.value === 'forms' && queryDraftId.value && props.draftEvent ? 'forms' : 'event',
+    queryStep.value === 'forms' && queryDraftId.value && props.draftEvent ? 'forms' : 'event'
 );
 
 const draftEvent = computed<WizardDraftEvent | null>(() => props.draftEvent ?? null);
 const draftForm = computed<WizardDraftForm | null>(() => draftEvent.value?.forms?.[0] ?? null);
+const eventFormRef = ref<InstanceType<typeof EventDashboardForm> | null>(null);
 
 onMounted(() => {
     setTopbar({ title: 'Buat acara', subtitle: 'Detail acara & formulir pendaftaran' });
 });
 
 // ── Step event → forms: setelah POST wizard, Inertia render ulang dgn draftEvent ──
+// Guard: hanya auto-pindah saat draft baru dibuat (oldId falsy), bukan saat
+// user sengaja kembali ke step event via goBackToEvent (?step=event&draftId=...).
 watch(
     () => props.draftEvent?.id,
-    (id) => {
-        if (id && step.value === 'event') {
+    (id, oldId) => {
+        if (id && !oldId && step.value === 'event') {
             const params: Record<string, string> = { step: 'forms', draftId: String(id) };
             router.get(routes.admin.events.create, params, { preserveState: false });
         }
-    },
-    { immediate: true },
+    }
 );
 
 // ── Step forms: builder state (hydrate dari draftForm) ──────────
@@ -117,7 +116,7 @@ watch(
     () => {
         if (step.value === 'forms') hydrateBuilder();
     },
-    { immediate: true },
+    { immediate: true }
 );
 
 // ── Autosave fields (debounce 800ms) ────────────────────────────
@@ -139,9 +138,13 @@ function flushFields(): Promise<void> {
     const backend = toBackendFields(merged) as unknown as Record<string, unknown>[];
 
     return axios
-        .post(postFields({ event: eventId, form: formId }).url, { fields: backend }, {
-            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        })
+        .post(
+            postFields({ event: eventId, form: formId }).url,
+            { fields: backend },
+            {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            }
+        )
         .then(() => {
             if (seq === saveSeq) saveState.value = 'saved';
         })
@@ -158,7 +161,7 @@ watch(
         debounceTimer = setTimeout(() => {
             void flushFields();
         }, 800);
-    },
+    }
 );
 
 /** Tunggu debounce tertunda selesai (dipakai sebelum navigasi Selesai). */
@@ -179,6 +182,19 @@ function goBackToEvent(): void {
 }
 
 function goToForms(): void {
+    const api = eventFormRef.value as unknown as {
+        validateRequired?: () => boolean;
+        submitForm?: (publish: boolean) => void;
+    } | null;
+
+    if (!draftEvent.value) {
+        if (api?.validateRequired && !api.validateRequired()) return;
+        api?.submitForm?.(false);
+        return;
+    }
+
+    if (api?.validateRequired && !api.validateRequired()) return;
+
     const eventId = draftEvent.value?.id;
     if (!eventId) return;
     router.get(routes.admin.events.create, { step: 'forms', draftId: String(eventId) }, { preserveState: false });
@@ -252,7 +268,7 @@ const steps = [
 const currentIndex = computed(() => (step.value === 'forms' ? 1 : 0));
 
 const saveStatusLabel = computed(() =>
-    saveState.value === 'saving' ? 'Menyimpan…' : saveState.value === 'saved' ? 'Tersimpan' : '',
+    saveState.value === 'saving' ? 'Menyimpan…' : saveState.value === 'saved' ? 'Tersimpan' : ''
 );
 </script>
 
@@ -263,40 +279,26 @@ const saveStatusLabel = computed(() =>
         <!-- Step 1: detail event (stepper inline dgn tombol aksi via slot) -->
         <EventDashboardForm
             v-if="step === 'event'"
+            ref="eventFormRef"
             :variant="draftEvent ? 'edit' : 'create'"
             :event="draftEvent ?? undefined"
             :options="options"
-            :wizard-mode="!draftEvent"
+            :wizard-mode="true"
         >
             <template #header-leading>
-                <div class="flex min-w-0 flex-wrap items-center gap-2">
-                    <template v-for="(s, i) in steps" :key="s.key">
-                        <div class="flex items-center gap-1.5">
-                            <span
-                                class="grid size-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold"
-                                :class="
-                                    i < currentIndex
-                                        ? 'bg-success/15 text-success'
-                                        : i === currentIndex
-                                          ? 'bg-primary text-primary-foreground'
-                                          : 'bg-muted text-muted-foreground'
-                                "
-                            >
-                                <CheckCircle2 v-if="i < currentIndex" class="size-3.5 stroke-[1.75]" />
-                                <template v-else>{{ i + 1 }}</template>
-                            </span>
-                            <span
-                                class="text-xs font-medium"
-                                :class="i === currentIndex ? 'text-foreground' : 'text-muted-foreground'"
-                            >
-                                {{ s.label }}
-                            </span>
-                        </div>
-                        <span v-if="i < steps.length - 1" class="text-muted-foreground/40">›</span>
-                    </template>
-                    <Button v-if="draftEvent" size="sm" class="ml-1" @click="goToForms">
-                        Lanjutkan ke formulir
-                    </Button>
+                <div class="flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
+                    <EventWizardStepper :steps="steps" :active-index="currentIndex" />
+                    <div class="flex shrink-0 items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="border-destructive/30 text-destructive hover:bg-destructive/10"
+                            @click="showCancelModal = true"
+                        >
+                            Batalkan
+                        </Button>
+                        <Button size="sm" class="shrink-0" @click="goToForms"> Lanjutkan </Button>
+                    </div>
                 </div>
             </template>
         </EventDashboardForm>
@@ -304,35 +306,12 @@ const saveStatusLabel = computed(() =>
         <!-- Step 2: formulir pendaftaran -->
         <template v-else-if="step === 'forms' && draftEvent">
             <!-- Satu baris: stepper kiri, aksi kanan -->
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                    <template v-for="(s, i) in steps" :key="s.key">
-                        <div class="flex items-center gap-1.5">
-                            <span
-                                class="grid size-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold"
-                                :class="
-                                    i < currentIndex
-                                        ? 'bg-success/15 text-success'
-                                        : i === currentIndex
-                                          ? 'bg-primary text-primary-foreground'
-                                          : 'bg-muted text-muted-foreground'
-                                "
-                            >
-                                <CheckCircle2 v-if="i < currentIndex" class="size-3.5 stroke-[1.75]" />
-                                <template v-else>{{ i + 1 }}</template>
-                            </span>
-                            <span
-                                class="text-xs font-medium"
-                                :class="i === currentIndex ? 'text-foreground' : 'text-muted-foreground'"
-                            >
-                                {{ s.label }}
-                            </span>
-                        </div>
-                        <span v-if="i < steps.length - 1" class="text-muted-foreground/40">›</span>
-                    </template>
+            <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+                <div class="flex min-w-0 items-center gap-4">
+                    <EventWizardStepper :steps="steps" :active-index="currentIndex" />
                     <span
                         v-if="saveStatusLabel"
-                        class="text-muted-foreground flex items-center gap-1.5 text-xs"
+                        class="text-muted-foreground flex shrink-0 items-center gap-1.5 text-xs"
                     >
                         <Loader2 v-if="saveState === 'saving'" class="size-3 animate-spin" aria-hidden="true" />
                         <span v-else class="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
@@ -340,10 +319,8 @@ const saveStatusLabel = computed(() =>
                     </span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <Button variant="ghost" class="text-muted-foreground" @click="goBackToEvent">Kembali</Button>
-                    <Button variant="ghost" class="text-muted-foreground" @click="skipWizard">
-                        Lewati — buat nanti
-                    </Button>
+                    <Button variant="outline" @click="goBackToEvent">Kembali ke event</Button>
+                    <Button variant="outline" @click="skipWizard">Lewati</Button>
                     <Button
                         variant="outline"
                         class="border-destructive/30 text-destructive hover:bg-destructive/10"
@@ -371,6 +348,7 @@ const saveStatusLabel = computed(() =>
                 :toolbar-subtitle="`Formulir pendaftaran · ${draftEvent.title}`"
                 save-label="Selesai"
                 :processing="finishing"
+                :hide-toolbar-titles="true"
                 @save="finishWizard"
             />
         </template>
@@ -386,6 +364,10 @@ const saveStatusLabel = computed(() =>
         :loading="cancelBusy"
         @confirm="confirmCancel"
         @cancel="showCancelModal = false"
-        @update:open="(v) => { if (!v) showCancelModal = false }"
+        @update:open="
+            (v) => {
+                if (!v) showCancelModal = false;
+            }
+        "
     />
 </template>
