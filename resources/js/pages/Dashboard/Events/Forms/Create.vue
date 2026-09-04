@@ -89,6 +89,7 @@ function onSave(): void {
         :toolbar-subtitle="`New form for ${event.title}`"
         save-label="Save Form"
         :processing="isSaving"
+        :hide-toolbar-titles="true"
         @save="onSave"
     />
 </template>

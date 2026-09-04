@@ -1,70 +1,71 @@
 <script setup lang="ts">
-import { ref, reactive, watch, computed } from 'vue'
-import { Head, router, useForm, usePage } from '@inertiajs/vue3'
-import { toast } from 'vue-sonner'
-import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { PenLine, Inbox, FileText } from 'lucide-vue-next'
+import { ref, reactive, watch, computed } from 'vue';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
+import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { PenLine, Inbox, FileText, Eye } from 'lucide-vue-next';
 import {
     fromBackendField,
     toBackendFields,
     type BackendField,
     type BuilderField,
-} from '@/components/modules/builder/fieldMapping'
+} from '@/components/modules/builder/fieldMapping';
 import {
     defaultFormBannerState,
     prependFormBannerToBackendPayload,
     extractFormBannerFromBuilderFields,
-} from '@/components/modules/builder/formBanner'
-import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form'
-import type { FormSiblingOption } from '@/types/form'
+} from '@/components/modules/builder/formBanner';
+import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
+import type { FormSiblingOption } from '@/types/form';
 import {
     answerPreview,
     formatSubmissionDate,
     humanizeSubmissionKey,
     submissionFileUrl,
     submissionReviewBadge,
-} from '@/lib/formSubmissionsUi'
-import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue'
-import { userAvatarSeed } from '@/lib/userAvatarFallback'
+} from '@/lib/formSubmissionsUi';
+import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
+import { userAvatarSeed } from '@/lib/userAvatarFallback';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
-type ShowTab = 'editor' | 'jawaban'
+type ShowTab = 'editor' | 'jawaban';
 const props = defineProps<{
-    event: { id: string; title: string }
-    form: IForm
-    fields: BackendField[]
-    siblingForms?: FormSiblingOption[]
-    saveFieldsUrl: string
-    updateFormUrl: string
-    submissions?: IFormSubmission[]
-    submissionsCount?: number
-}>()
+    event: { id: string; title: string };
+    form: IForm;
+    fields: BackendField[];
+    siblingForms?: FormSiblingOption[];
+    saveFieldsUrl: string;
+    updateFormUrl: string;
+    submissions?: IFormSubmission[];
+    submissionsCount?: number;
+}>();
 
-const page = usePage()
+const page = usePage();
 
 /** Baca tab dari query string agar deep-link ?tab=jawaban bekerja saat refresh/back. */
 function tabFromQuery(): ShowTab {
-    const raw = new URLSearchParams(page.url.split('?')[1] ?? '').get('tab')
-    return raw === 'jawaban' ? 'jawaban' : 'editor'
+    const raw = new URLSearchParams(page.url.split('?')[1] ?? '').get('tab');
+    return raw === 'jawaban' ? 'jawaban' : 'editor';
 }
-const activeTab = ref<ShowTab>(tabFromQuery())
+const activeTab = ref<ShowTab>(tabFromQuery());
 
 /** Sinkronkan tab ke query string (?tab=jawaban) agar deep-link tetap bertahan saat refresh. */
 watch(activeTab, (tab) => {
-    const url = new URL(page.url, window.location.origin)
-    url.searchParams.set('tab', tab)
+    const url = new URL(page.url, window.location.origin);
+    url.searchParams.set('tab', tab);
     router.visit(`${url.pathname}${url.search}`, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-    })
-})
+    });
+});
 
 const settingsForm = useForm({
     _method: 'put',
@@ -75,91 +76,105 @@ const settingsForm = useForm({
     visible_for: [...props.form.visible_for],
     banner_url: props.form.banner_url ?? '',
     banner_caption: props.form.banner_caption ?? '',
-})
+});
 
-const bannerState = reactive(defaultFormBannerState())
-const formFields = ref<BuilderField[]>([])
-const formMetadata = ref(emptyFormRegistrationMetadata())
+const bannerState = reactive(defaultFormBannerState());
+const formFields = ref<BuilderField[]>([]);
+const formMetadata = ref(emptyFormRegistrationMetadata());
+
+/** Ref ke FormBuilderWorkspace untuk memicu preview/save dari bar aksi inline (toolbar disembunyikan). */
+const workspaceRef = ref<InstanceType<typeof FormBuilderWorkspace> | null>(null);
+
+/** Sama dengan wb.isEmpty di workspace: kanvas belum punya field. */
+const builderEmpty = computed(() => formFields.value.length === 0);
+
+function requestPreview(): void {
+    workspaceRef.value?.showPreview();
+}
+
+function requestSaveAll(): void {
+    workspaceRef.value?.requestSave();
+}
 
 const formTitle = computed({
     get: () => settingsForm.title,
     set: (v: string) => {
-        settingsForm.title = v
+        settingsForm.title = v;
     },
-})
+});
 const formDescription = computed({
     get: () => settingsForm.description,
     set: (v: string) => {
-        settingsForm.description = v
+        settingsForm.description = v;
     },
-})
+});
 const successContent = computed({
     get: () => settingsForm.success_content ?? '',
     set: (v: string) => {
-        settingsForm.success_content = v
+        settingsForm.success_content = v;
     },
-})
+});
 const closedAt = computed({
     get: () => settingsForm.closed_at ?? '',
     set: (v: string) => {
-        settingsForm.closed_at = v
+        settingsForm.closed_at = v;
     },
-})
+});
 const visibleFor = computed({
     get: () => [...settingsForm.visible_for],
     set: (v: string[]) => {
-        settingsForm.visible_for = v
+        settingsForm.visible_for = v;
     },
-})
+});
 
 const fieldErrors = computed(() => ({
     title: getFieldError(settingsForm.errors, 'title'),
     description: getFieldError(settingsForm.errors, 'description'),
     closed_at: getFieldError(settingsForm.errors, 'closed_at'),
     visible_for: getFieldError(settingsForm.errors, 'visible_for'),
-}))
+}));
 
 function syncFieldsFromProps(): void {
-    const raw: BackendField[] = JSON.parse(JSON.stringify(props.fields || []))
-    raw.sort((a, b) => a.order - b.order)
-    const mapped = raw.map((f) => fromBackendField(f))
-    const { banner: syntheticBanner, canvasFields } = extractFormBannerFromBuilderFields(mapped)
+    const raw: BackendField[] = JSON.parse(JSON.stringify(props.fields || []));
+    raw.sort((a, b) => a.order - b.order);
+    const mapped = raw.map((f) => fromBackendField(f));
+    const { banner: syntheticBanner, canvasFields } = extractFormBannerFromBuilderFields(mapped);
 
-    bannerState.id = syntheticBanner.id
-    bannerState.bannerUrl = props.form.banner_url ?? syntheticBanner.bannerUrl
-    bannerState.caption = props.form.banner_caption ?? syntheticBanner.caption
-    bannerState.bannerFileName = syntheticBanner.bannerFileName
+    bannerState.id = syntheticBanner.id;
+    bannerState.bannerUrl = props.form.banner_url ?? syntheticBanner.bannerUrl;
+    bannerState.caption = props.form.banner_caption ?? syntheticBanner.caption;
+    bannerState.bannerFileName = syntheticBanner.bannerFileName;
 
-    formFields.value = canvasFields
+    formFields.value = canvasFields;
 }
 
 watch(
     () => props.fields,
     () => syncFieldsFromProps(),
-    { immediate: true, deep: true },
-)
+    { immediate: true, deep: true }
+);
 watch(
     () => props.form,
     (f) => {
-        if (!f) return
-        settingsForm.title = f.title
-        settingsForm.description = f.description
-        settingsForm.success_content = f.success_content ?? ''
-        settingsForm.closed_at = f.closed_at ?? ''
-        settingsForm.visible_for = [...f.visible_for]
-        settingsForm.banner_url = f.banner_url ?? ''
-        settingsForm.banner_caption = f.banner_caption ?? ''
-        formMetadata.value = parseFormRegistrationMetadata(f.metadata)
+        if (!f) return;
+        settingsForm.title = f.title;
+        settingsForm.description = f.description;
+        settingsForm.success_content = f.success_content ?? '';
+        settingsForm.closed_at = f.closed_at ?? '';
+        settingsForm.visible_for = [...f.visible_for];
+        settingsForm.banner_url = f.banner_url ?? '';
+        settingsForm.banner_caption = f.banner_caption ?? '';
+        formMetadata.value = parseFormRegistrationMetadata(f.metadata);
     },
-    { deep: true, immediate: true },
-)
+    { deep: true, immediate: true }
+);
 
 function onSave(): void {
-    settingsForm.banner_url = bannerState.bannerUrl
-    settingsForm.banner_caption = bannerState.caption
+    settingsForm.banner_url = bannerState.bannerUrl;
+    settingsForm.banner_caption = bannerState.caption;
 
-    const merged = prependFormBannerToBackendPayload(formFields.value, bannerState)
-    const backendFields = toBackendFields(merged)
+    const merged = prependFormBannerToBackendPayload(formFields.value, bannerState);
+    const backendFields = toBackendFields(merged);
 
     settingsForm
         .transform((data) => ({
@@ -171,68 +186,63 @@ function onSave(): void {
             preserveScroll: true,
             onSuccess: () => toast.success(humanizeErrorMessage('Form and fields saved successfully.')),
             onError: (errors) => {
-                handleInertiaFormErrors(errors, { title: 'Gagal menyimpan form' })
+                handleInertiaFormErrors(errors, { title: 'Gagal menyimpan form' });
             },
-        })
+        });
 }
 
 /** Jawaban terurut mengikuti urutan field di builder; sisa key (legacy) di akhir. */
 const answerKeys = computed(() => {
-    const orderMap = new Map<string, number>()
-    props.fields.forEach((f) => orderMap.set(f.name, f.order))
+    const orderMap = new Map<string, number>();
+    props.fields.forEach((f) => orderMap.set(f.name, f.order));
 
-    const keys = new Set<string>()
-    props.fields.forEach((f) => keys.add(f.name))
+    const keys = new Set<string>();
+    props.fields.forEach((f) => keys.add(f.name));
     for (const submission of props.submissions ?? []) {
-        Object.keys(submission.answers ?? {}).forEach((key) => keys.add(key))
+        Object.keys(submission.answers ?? {}).forEach((key) => keys.add(key));
     }
 
     return [...keys].sort((a, b) => {
-        const hasA = orderMap.has(a)
-        const hasB = orderMap.has(b)
-        if (hasA && hasB) return (orderMap.get(a) ?? 0) - (orderMap.get(b) ?? 0)
-        if (hasA) return -1
-        if (hasB) return 1
-        return a.localeCompare(b)
-    })
-})
+        const hasA = orderMap.has(a);
+        const hasB = orderMap.has(b);
+        if (hasA && hasB) return (orderMap.get(a) ?? 0) - (orderMap.get(b) ?? 0);
+        if (hasA) return -1;
+        if (hasB) return 1;
+        return a.localeCompare(b);
+    });
+});
 
-const submissionRows = computed(() => props.submissions ?? [])
+const submissionRows = computed(() => props.submissions ?? []);
 const submissionLabelMap = computed(() => {
-    const map: Record<string, string> = {}
+    const map: Record<string, string> = {};
     props.fields.forEach((f) => {
-        map[f.name] = f.label
-    })
-    return map
-})
-const humanizeKey = (key: string): string => humanizeSubmissionKey(submissionLabelMap.value, key)
-const formatDate = (value: string): string => formatSubmissionDate(value)
-const submissionFileUrlOf = (value: unknown): string | null => submissionFileUrl(value)
-const answerPreviewOf = (value: unknown): string => answerPreview(value)
+        map[f.name] = f.label;
+    });
+    return map;
+});
+const humanizeKey = (key: string): string => humanizeSubmissionKey(submissionLabelMap.value, key);
+const formatDate = (value: string): string => formatSubmissionDate(value);
+const submissionFileUrlOf = (value: unknown): string | null => submissionFileUrl(value);
+const answerPreviewOf = (value: unknown): string => answerPreview(value);
 </script>
 
 <template>
     <Head :title="`Edit: ${form.title}`" />
 
     <div class="flex min-w-0 flex-col gap-4">
-        <Tabs
-            v-model="activeTab"
-            class="flex w-full flex-col gap-4"
-            :unmount-on-hide="false"
-            aria-label="Konten form"
-        >
-            <div class="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
-                <TabsList class="h-auto min-h-10 flex-wrap gap-1 rounded-xl bg-muted/40 p-1">
+        <Tabs v-model="activeTab" class="flex w-full flex-col gap-4" :unmount-on-hide="false" aria-label="Konten form">
+            <div class="border-border/60 flex items-center justify-between gap-3 border-b pb-3">
+                <TabsList class="bg-muted/40 h-auto min-h-10 flex-wrap gap-1 rounded-xl p-1">
                     <TabsTrigger
                         value="editor"
-                        class="gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm"
+                        class="data-[state=active]:bg-card gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:shadow-sm"
                     >
                         <PenLine class="size-4 shrink-0" aria-hidden="true" />
                         Editor
                     </TabsTrigger>
                     <TabsTrigger
                         value="jawaban"
-                        class="gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm"
+                        class="data-[state=active]:bg-card gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:shadow-sm"
                     >
                         <Inbox class="size-4 shrink-0" aria-hidden="true" />
                         Jawaban
@@ -248,7 +258,41 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
             </div>
 
             <TabsContent value="editor" class="mt-0">
+                <div class="mb-3 flex items-center justify-between gap-3 sm:mb-4">
+                    <div class="min-w-0">
+                        <h2 class="text-foreground truncate text-sm font-semibold tracking-[-0.01em] sm:text-base">
+                            Editor
+                        </h2>
+                        <p class="text-muted-foreground text-xs">
+                            Susun dan ubah pertanyaan formulir.
+                        </p>
+                    </div>
+                    <div class="flex shrink-0 items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm sm:inline-flex"
+                            :disabled="builderEmpty"
+                            aria-label="Pratinjau formulir"
+                            @click="requestPreview"
+                        >
+                            <Eye class="size-4 shrink-0 sm:hidden" aria-hidden="true" />
+                            <span>Pratinjau</span>
+                        </Button>
+                        <Button
+                            size="sm"
+                            class="hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4"
+                            :disabled="settingsForm.processing"
+                            @click="requestSaveAll"
+                        >
+                            <span class="sm:hidden">Simpan</span>
+                            <span class="hidden sm:inline">Save All</span>
+                        </Button>
+                    </div>
+                </div>
+
                 <FormBuilderWorkspace
+                    ref="workspaceRef"
                     v-model:form-title="formTitle"
                     v-model:form-description="formDescription"
                     v-model:success-content="successContent"
@@ -261,6 +305,7 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
                     :sibling-forms="siblingForms ?? []"
                     :toolbar-subtitle="`Edit form · ${event.title}`"
                     save-label="Save All"
+                    hide-toolbar
                     :processing="settingsForm.processing"
                     :field-errors="fieldErrors"
                     @save="onSave"
@@ -268,8 +313,43 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
             </TabsContent>
 
             <TabsContent value="jawaban" class="mt-0">
-                <div v-if="submissionRows.length === 0" class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border/70 bg-muted/10 px-6 py-20 text-center">
-                    <div class="grid size-14 place-items-center rounded-full border border-border bg-card shadow-xs">
+                <div class="mb-3 flex items-center justify-between gap-3 sm:mb-4">
+                    <div class="min-w-0">
+                        <h2 class="text-foreground truncate text-sm font-semibold tracking-[-0.01em] sm:text-base">
+                            Jawaban
+                        </h2>
+                        <p class="text-muted-foreground text-xs">
+                            Lihat jawaban yang masuk ke formulir ini.
+                        </p>
+                    </div>
+                    <div class="flex shrink-0 items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm sm:inline-flex"
+                            :disabled="builderEmpty"
+                            aria-label="Pratinjau formulir"
+                            @click="requestPreview"
+                        >
+                            <Eye class="size-4 shrink-0 sm:hidden" aria-hidden="true" />
+                            <span>Pratinjau</span>
+                        </Button>
+                        <Button
+                            size="sm"
+                            class="hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4"
+                            :disabled="settingsForm.processing"
+                            @click="requestSaveAll"
+                        >
+                            <span class="sm:hidden">Simpan</span>
+                            <span class="hidden sm:inline">Save All</span>
+                        </Button>
+                    </div>
+                </div>
+                <div
+                    v-if="submissionRows.length === 0"
+                    class="border-border/70 bg-muted/10 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-6 py-20 text-center"
+                >
+                    <div class="border-border bg-card grid size-14 place-items-center rounded-full border shadow-xs">
                         <Inbox class="text-muted-foreground size-6" aria-hidden="true" />
                     </div>
                     <h2 class="font-display text-foreground mt-2 text-lg font-bold tracking-[-0.02em]">
@@ -282,7 +362,7 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
                 </div>
 
                 <div v-else class="app-surface overflow-hidden rounded-2xl p-0">
-                    <div class="flex items-center gap-2.5 border-b border-border/60 px-5 py-4">
+                    <div class="border-border/60 flex items-center gap-2.5 border-b px-5 py-4">
                         <div class="bg-primary/10 text-primary grid size-9 place-items-center rounded-full">
                             <Inbox class="size-4" aria-hidden="true" />
                         </div>
@@ -298,20 +378,26 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
                         <Table>
                             <TableHeader>
                                 <TableRow class="hover:bg-transparent">
-                                    <TableHead class="h-11 bg-muted/40 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                    <TableHead
+                                        class="bg-muted/40 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                    >
                                         Pengirim
                                     </TableHead>
-                                    <TableHead class="h-11 bg-muted/30 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                    <TableHead
+                                        class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                    >
                                         Status review
                                     </TableHead>
                                     <TableHead
                                         v-for="key in answerKeys"
                                         :key="key"
-                                        class="h-11 min-w-[160px] bg-muted/30 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                                        class="bg-muted/30 text-muted-foreground h-11 min-w-[160px] px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
                                     >
                                         {{ humanizeKey(key) }}
                                     </TableHead>
-                                    <TableHead class="h-11 bg-muted/30 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                    <TableHead
+                                        class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                    >
                                         Dikirim
                                     </TableHead>
                                 </TableRow>
@@ -320,9 +406,9 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
                                 <TableRow
                                     v-for="submission in submissionRows"
                                     :key="submission.id"
-                                    class="border-b border-border/60 transition-colors hover:bg-muted/30"
+                                    class="border-border/60 hover:bg-muted/30 border-b transition-colors"
                                 >
-                                    <TableCell class="border-r border-border/60 bg-card px-5 py-3.5">
+                                    <TableCell class="border-border/60 bg-card border-r px-5 py-3.5">
                                         <div class="flex items-center gap-3">
                                             <UserAvatarFallback
                                                 :src="submission.user?.avatar ?? null"
@@ -331,7 +417,9 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
                                                 fallback-round-class="rounded-lg"
                                             />
                                             <div class="min-w-0">
-                                                <p class="text-foreground truncate text-sm font-semibold tracking-[-0.005em]">
+                                                <p
+                                                    class="text-foreground truncate text-sm font-semibold tracking-[-0.005em]"
+                                                >
                                                     {{ submission.user?.name ?? 'Tanpa nama' }}
                                                 </p>
                                                 <p class="text-muted-foreground truncate text-[10px]">
@@ -343,7 +431,10 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
                                     <TableCell class="px-5 py-3.5 whitespace-nowrap">
                                         <Badge
                                             variant="outline"
-                                            :class="['font-medium', submissionReviewBadge(submission.review_status).class]"
+                                            :class="[
+                                                'font-medium',
+                                                submissionReviewBadge(submission.review_status).class,
+                                            ]"
                                         >
                                             {{ submissionReviewBadge(submission.review_status).label }}
                                         </Badge>
@@ -353,7 +444,10 @@ const answerPreviewOf = (value: unknown): string => answerPreview(value)
                                         :key="key"
                                         class="text-muted-foreground max-w-[220px] px-5 py-3.5 text-xs leading-relaxed"
                                     >
-                                        <span v-if="submissionFileUrlOf(submission.answers?.[key])" class="flex items-center gap-1.5 text-primary">
+                                        <span
+                                            v-if="submissionFileUrlOf(submission.answers?.[key])"
+                                            class="text-primary flex items-center gap-1.5"
+                                        >
                                             <FileText class="size-3.5 shrink-0" aria-hidden="true" />
                                             <a
                                                 :href="submissionFileUrlOf(submission.answers?.[key]) ?? undefined"

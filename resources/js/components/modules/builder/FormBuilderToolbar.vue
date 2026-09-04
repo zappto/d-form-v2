@@ -4,16 +4,21 @@ import { Button } from '@/components/ui/button'
 import { Link } from '@inertiajs/vue3'
 import { ArrowLeft, Eye } from 'lucide-vue-next'
 
-defineProps<{
-    backHref: string
-    toolbarSubtitle: string
-    headingTitle: string
-    isReadyToSave: boolean
-    validationIssueCount: number
-    isEmpty: boolean
-    processing: boolean
-    saveLabel: string
-}>()
+const props = withDefaults(
+    defineProps<{
+        backHref: string
+        toolbarSubtitle: string
+        headingTitle: string
+        isReadyToSave: boolean
+        validationIssueCount: number
+        isEmpty: boolean
+        processing: boolean
+        saveLabel: string
+        hideTitles?: boolean
+        hideToolbar?: boolean
+    }>(),
+    { hideTitles: false, hideToolbar: false }
+)
 
 defineEmits<{
     preview: []
@@ -33,7 +38,7 @@ onMounted(() => {
 
 <template>
     <div
-        v-if="!canTeleport"
+        v-if="!canTeleport && !props.hideTitles && !props.hideToolbar"
         class="mb-4 rounded-2xl border border-border/70 bg-card/95 p-3 shadow-sm sm:mb-5 sm:p-4"
     >
         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -43,7 +48,7 @@ onMounted(() => {
                         <ArrowLeft class="size-4" />
                     </Link>
                 </Button>
-                <div class="min-w-0 flex-1">
+                <div v-if="!props.hideTitles" class="min-w-0 flex-1">
                     <p class="text-muted-foreground text-[11px] font-medium tracking-wide uppercase sm:text-xs">
                         <span class="line-clamp-2 break-words lg:truncate">
                             {{ toolbarSubtitle }}
@@ -58,7 +63,7 @@ onMounted(() => {
                 class="
  flex w-full flex-wrap items-center justify-start gap-2
  sm:w-auto sm:justify-end sm:gap-2.5
- "
+  "
             >
                 <slot name="toolbar-extra" />
                 <Button
@@ -67,7 +72,7 @@ onMounted(() => {
                     class="
  hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
  sm:inline-flex
- "
+  "
                     :disabled="isEmpty"
                     aria-label="Pratinjau formulir"
                     @click="$emit('preview')"
@@ -79,7 +84,7 @@ onMounted(() => {
                     size="sm"
                     class="
  hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
- "
+  "
                     :disabled="processing"
                     @click="$emit('save')"
                 >
@@ -90,14 +95,14 @@ onMounted(() => {
         </div>
     </div>
 
-    <Teleport v-if="canTeleport" to="#dashboard-fb-nav-left">
+    <Teleport v-if="canTeleport && !props.hideTitles && !props.hideToolbar" to="#dashboard-fb-nav-left">
         <div class="flex min-w-0 items-start gap-2 sm:items-center sm:gap-3">
             <Button radius="icon" variant="ghost" size="icon-sm" class="mt-0.5 shrink-0 sm:mt-0" as-child>
                 <Link :href="backHref" aria-label="Kembali ke daftar form">
                     <ArrowLeft class="size-4" />
                 </Link>
             </Button>
-            <div class="min-w-0 flex-1">
+            <div v-if="!props.hideTitles" class="min-w-0 flex-1">
                 <p class="text-muted-foreground text-[11px] font-medium tracking-wide uppercase sm:text-xs">
                     <span class="max-sm:line-clamp-2 max-sm:break-words sm:truncate">
                         {{ toolbarSubtitle }}
@@ -110,7 +115,7 @@ onMounted(() => {
         </div>
     </Teleport>
 
-    <Teleport v-if="canTeleport" to="#dashboard-fb-nav-right">
+    <Teleport v-if="canTeleport && !props.hideTitles && !props.hideToolbar" to="#dashboard-fb-nav-right">
         <div
             class="
  flex w-full flex-wrap items-center justify-start gap-2

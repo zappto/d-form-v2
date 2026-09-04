@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import FieldRenderer from '@/components/modules/builder/FieldRenderer.vue'
 import { Button } from '@/components/ui/button'
 import LocalLottie from '@/components/core/LocalLottie.vue'
+import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { Eye, Save, Smartphone, Plus, GripVertical } from 'lucide-vue-next'
 import type { FormBuilderPaletteField } from '@/components/modules/builder/formBuilderPalette'
 import type { BuilderField } from '@/types/form-builder'
@@ -10,7 +12,7 @@ const formTitle = defineModel<string>('formTitle', { required: true })
 const formDescription = defineModel<string>('formDescription', { required: true })
 const mobileFieldType = defineModel<string>('mobileFieldPick', { required: true })
 
-defineProps<{
+const props = defineProps<{
     fieldCount: number
     formBannerCaption: string
     bannerPreviewSrc: string
@@ -27,6 +29,11 @@ defineProps<{
 function previewField(f: IFormField): BuilderField {
     return f as unknown as BuilderField
 }
+
+const mobileFieldTypeOptions = computed<SimpleSelectOption[]>(() => [
+    { value: '', label: 'Choose field type' },
+    ...props.allFieldTypes.map((fieldType) => ({ value: fieldType.type, label: fieldType.label })),
+])
 
 defineEmits<{
     addFromPicker: []
@@ -68,16 +75,14 @@ defineEmits<{
                 >Add field on mobile</label
             >
             <div class="flex gap-2">
-                <select
+                <SimpleSelect
                     v-model="mobileFieldType"
-                    class="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-xs transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15"
-                >
-                    <option value="">Choose field type</option>
-                    <option v-for="fieldType in allFieldTypes" :key="fieldType.type" :value="fieldType.type">
-                        {{ fieldType.label }}
-                    </option>
-                </select>
-                <Button size="sm" class="h-9 shrink-0 text-xs" :disabled="addFieldDisabled" @click="$emit('addFromPicker')">
+                    :options="mobileFieldTypeOptions"
+                    id="mobile-field-type-picker"
+                    class="border-border/80 bg-background/80 h-10 min-w-0 flex-1 text-xs sm:text-sm"
+                    aria-label="Add field type"
+                />
+                <Button size="sm" class="h-10 shrink-0 text-xs" :disabled="addFieldDisabled" @click="$emit('addFromPicker')">
                     <Plus class="mr-1 size-3.5" />Add
                 </Button>
             </div>

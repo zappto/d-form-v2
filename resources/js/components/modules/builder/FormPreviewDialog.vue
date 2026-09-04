@@ -11,7 +11,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 
 /** Mirrors canvas builder field shape used by Show/Create with unknown metadata values. */
 export interface FormPreviewField {
@@ -87,6 +87,13 @@ function optionEntries(field: FormPreviewField): FieldOptionEntry[] {
         if (typeof opt === 'object' && opt !== null) return opt as FieldOptionEntry
         return { id: crypto.randomUUID(), type: 'text', label: String(opt) } as FieldOptionEntry
     })
+}
+
+function dropdownOptions(field: FormPreviewField): SimpleSelectOption[] {
+    return optionEntries(field).map((opt, oi) => ({
+        value: String(opt.id || `option-${oi}`),
+        label: optionLabel(opt),
+    }))
 }
 
 function choiceThumb(url: string): string {
@@ -246,20 +253,14 @@ function ratingStars(field: FormPreviewField): number[] {
                                             />
 
                                             <div v-else-if="field.type === 'dropdown'" class="space-y-2">
-                                                <Select :model-value="undefined">
-                                                    <SelectTrigger class="text-sm opacity-90">
-                                                        <SelectValue placeholder="Choose an option" />
-                                                    </SelectTrigger>
-                                                    <SelectContent class="z-[200]">
-                                                        <SelectItem
-                                                            v-for="(opt, oi) in optionEntries(field)"
-                                                            :key="optKey(opt, oi)"
-                                                            :value="String(opt.id || `option-${oi}`)"
-                                                        >
-                                                            <span class="min-h-[1em] py-0.5">{{ optionLabel(opt) }}</span>
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
+                                                <SimpleSelect
+                                                    model-value=""
+                                                    :options="dropdownOptions(field)"
+                                                    placeholder="Choose an option"
+                                                    disabled
+                                                    class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm disabled:opacity-90"
+                                                    aria-label="Choose an option"
+                                                />
                                                 <div class="space-y-1.5 rounded-xl border border-border/70 bg-muted/20 p-2">
                                                     <div
                                                         v-for="(opt, oi) in optionEntries(field)"

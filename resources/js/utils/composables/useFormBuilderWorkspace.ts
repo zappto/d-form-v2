@@ -24,13 +24,18 @@ export interface FormBuilderWorkspaceModels {
     visibleFor: Ref<string[]>
     banner: Ref<FormBannerState>
     formFields: Ref<BuilderField[]>
+    successContent?: Ref<string>
 }
 
+/** Kategori palette terbuka. `null` = semua tertutup (single-expand). */
 export function useFormBuilderWorkspace(
     models: FormBuilderWorkspaceModels,
     options: { onSave: () => void },
 ) {
     const categories = ref<FormBuilderPaletteCategory[]>(cloneFormBuilderPalette())
+
+    /** Single-expand: simpan nama kategori yang terbuka (default semua tertutup). */
+    const openCategoryName = ref<string | null>(null)
 
     const searchQuery = ref<string>('')
     const selectedFieldId = ref<string | null>(null)
@@ -43,9 +48,19 @@ export function useFormBuilderWorkspace(
     const showMobileEditor = ref<boolean>(false)
     const showPreview = ref<boolean>(false)
 
+    /** Toggle "Pesan setelah submit" — state utama ada di sini agar sinkron kiri ↔ kanvas. */
+    const successEnabled = ref(false)
+
+    // Edit form tersimpan: konten sudah ada saat mount → nyalakan toggle.
+    const initialSuccess = models.successContent?.value ?? ''
+    if (initialSuccess.replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim() !== '') {
+        successEnabled.value = true
+    }
+
     const filteredCategories = computed(() => {
         const q = searchQuery.value.toLowerCase().trim()
         if (!q) return categories.value
+        // Mode pencarian: tampilkan semua kategori yang cocok (abaikan single-expand).
         return categories.value
             .map((cat) => ({
                 ...cat,
@@ -150,7 +165,20 @@ export function useFormBuilderWorkspace(
     }
 
     function toggleCategory(cat: FormBuilderPaletteCategory): void {
-        cat.isOpen = !cat.isOpen
+        openCategoryName.value = openCategoryName.value === cat.name ? null : cat.name
+        // Sinkronkan isOpen agar cocok dengan state yang dipakai item kartu.
+        for (const c of categories.value) {
+            c.isOpen = c.name === openCategoryName.value
+        }
+    }
+
+    function toggleSuccessEnabled(): void {
+        const next = !successEnabled.value
+        successEnabled.value = next
+        // OFF → kosongkan konten agar payload bersih & preview tak menampilkan pesan basi.
+        if (!next && models.successContent) {
+            models.successContent.value = ''
+        }
     }
 
     function onGapDragEnter(index: number): void {
@@ -241,6 +269,8 @@ export function useFormBuilderWorkspace(
         categories,
         searchQuery,
         filteredCategories,
+        openCategoryName,
+        successEnabled,
         selectedFieldId,
         selectedField,
         dropIndicatorIndex,
@@ -264,6 +294,7 @@ export function useFormBuilderWorkspace(
         moveField,
         toggleVisibility,
         toggleCategory,
+        toggleSuccessEnabled,
         onGapDragEnter,
         onCanvasDragOver,
         onCanvasDragLeave,
