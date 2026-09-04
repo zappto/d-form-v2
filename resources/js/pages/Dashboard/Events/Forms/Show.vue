@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, router, useForm, usePage } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
 import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { PenLine, Inbox, FileText } from 'lucide-vue-next'
 import {
     fromBackendField,
     toBackendFields,
@@ -18,9 +22,19 @@ import {
 } from '@/components/modules/builder/formBanner'
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form'
 import type { FormSiblingOption } from '@/types/form'
+import {
+    answerPreview,
+    formatSubmissionDate,
+    humanizeSubmissionKey,
+    submissionFileUrl,
+    submissionReviewBadge,
+} from '@/lib/formSubmissionsUi'
+import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue'
+import { userAvatarSeed } from '@/lib/userAvatarFallback'
 
 defineOptions({ layout: DashboardLayout })
 
+type ShowTab = 'editor' | 'jawaban'
 const props = defineProps<{
     event: { id: string; title: string }
     form: IForm
@@ -28,7 +42,29 @@ const props = defineProps<{
     siblingForms?: FormSiblingOption[]
     saveFieldsUrl: string
     updateFormUrl: string
+    submissions?: IFormSubmission[]
+    submissionsCount?: number
 }>()
+
+const page = usePage()
+
+/** Baca tab dari query string agar deep-link ?tab=jawaban bekerja saat refresh/back. */
+function tabFromQuery(): ShowTab {
+    const raw = new URLSearchParams(page.url.split('?')[1] ?? '').get('tab')
+    return raw === 'jawaban' ? 'jawaban' : 'editor'
+}
+const activeTab = ref<ShowTab>(tabFromQuery())
+
+/** Sinkronkan tab ke query string (?tab=jawaban) agar deep-link tetap bertahan saat refresh. */
+watch(activeTab, (tab) => {
+    const url = new URL(page.url, window.location.origin)
+    url.searchParams.set('tab', tab)
+    router.visit(`${url.pathname}${url.search}`, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    })
+})
 
 const settingsForm = useForm({
     _method: 'put',
@@ -139,26 +175,209 @@ function onSave(): void {
             },
         })
 }
+
+/** Jawaban terurut mengikuti urutan field di builder; sisa key (legacy) di akhir. */
+const answerKeys = computed(() => {
+    const orderMap = new Map<string, number>()
+    props.fields.forEach((f) => orderMap.set(f.name, f.order))
+
+    const keys = new Set<string>()
+    props.fields.forEach((f) => keys.add(f.name))
+    for (const submission of props.submissions ?? []) {
+        Object.keys(submission.answers ?? {}).forEach((key) => keys.add(key))
+    }
+
+    return [...keys].sort((a, b) => {
+        const hasA = orderMap.has(a)
+        const hasB = orderMap.has(b)
+        if (hasA && hasB) return (orderMap.get(a) ?? 0) - (orderMap.get(b) ?? 0)
+        if (hasA) return -1
+        if (hasB) return 1
+        return a.localeCompare(b)
+    })
+})
+
+const submissionRows = computed(() => props.submissions ?? [])
+const submissionLabelMap = computed(() => {
+    const map: Record<string, string> = {}
+    props.fields.forEach((f) => {
+        map[f.name] = f.label
+    })
+    return map
+})
+const humanizeKey = (key: string): string => humanizeSubmissionKey(submissionLabelMap.value, key)
+const formatDate = (value: string): string => formatSubmissionDate(value)
+const submissionFileUrlOf = (value: unknown): string | null => submissionFileUrl(value)
+const answerPreviewOf = (value: unknown): string => answerPreview(value)
 </script>
 
 <template>
     <Head :title="`Edit: ${form.title}`" />
 
-    <FormBuilderWorkspace
-        v-model:form-title="formTitle"
-        v-model:form-description="formDescription"
-        v-model:success-content="successContent"
-        v-model:closed-at="closedAt"
-        v-model:visible-for="visibleFor"
-        v-model:banner="bannerState"
-        v-model:form-fields="formFields"
-        v-model:form-metadata="formMetadata"
-        :event="event"
-        :sibling-forms="siblingForms ?? []"
-        :toolbar-subtitle="`Edit form · ${event.title}`"
-        save-label="Save All"
-        :processing="settingsForm.processing"
-        :field-errors="fieldErrors"
-        @save="onSave"
-    />
+    <div class="flex min-w-0 flex-col gap-4">
+        <Tabs
+            v-model="activeTab"
+            class="flex w-full flex-col gap-4"
+            :unmount-on-hide="false"
+            aria-label="Konten form"
+        >
+            <div class="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
+                <TabsList class="h-auto min-h-10 flex-wrap gap-1 rounded-xl bg-muted/40 p-1">
+                    <TabsTrigger
+                        value="editor"
+                        class="gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm"
+                    >
+                        <PenLine class="size-4 shrink-0" aria-hidden="true" />
+                        Editor
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="jawaban"
+                        class="gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm"
+                    >
+                        <Inbox class="size-4 shrink-0" aria-hidden="true" />
+                        Jawaban
+                        <Badge
+                            v-if="submissionsCount && submissionsCount > 0"
+                            variant="secondary"
+                            class="ml-0.5 h-5 min-w-5 px-1.5 text-[10px] font-semibold tabular-nums"
+                        >
+                            {{ submissionsCount }}
+                        </Badge>
+                    </TabsTrigger>
+                </TabsList>
+            </div>
+
+            <TabsContent value="editor" class="mt-0">
+                <FormBuilderWorkspace
+                    v-model:form-title="formTitle"
+                    v-model:form-description="formDescription"
+                    v-model:success-content="successContent"
+                    v-model:closed-at="closedAt"
+                    v-model:visible-for="visibleFor"
+                    v-model:banner="bannerState"
+                    v-model:form-fields="formFields"
+                    v-model:form-metadata="formMetadata"
+                    :event="event"
+                    :sibling-forms="siblingForms ?? []"
+                    :toolbar-subtitle="`Edit form · ${event.title}`"
+                    save-label="Save All"
+                    :processing="settingsForm.processing"
+                    :field-errors="fieldErrors"
+                    @save="onSave"
+                />
+            </TabsContent>
+
+            <TabsContent value="jawaban" class="mt-0">
+                <div v-if="submissionRows.length === 0" class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border/70 bg-muted/10 px-6 py-20 text-center">
+                    <div class="grid size-14 place-items-center rounded-full border border-border bg-card shadow-xs">
+                        <Inbox class="text-muted-foreground size-6" aria-hidden="true" />
+                    </div>
+                    <h2 class="font-display text-foreground mt-2 text-lg font-bold tracking-[-0.02em]">
+                        Belum ada jawaban
+                    </h2>
+                    <p class="text-muted-foreground max-w-md text-sm leading-relaxed">
+                        Saat ada yang mengisi dan mengirim formulir ini, daftar jawaban akan muncul di sini beserta
+                        status review-nya.
+                    </p>
+                </div>
+
+                <div v-else class="app-surface overflow-hidden rounded-2xl p-0">
+                    <div class="flex items-center gap-2.5 border-b border-border/60 px-5 py-4">
+                        <div class="bg-primary/10 text-primary grid size-9 place-items-center rounded-full">
+                            <Inbox class="size-4" aria-hidden="true" />
+                        </div>
+                        <div>
+                            <h2 class="text-foreground text-sm font-semibold">Daftar jawaban</h2>
+                            <p class="text-muted-foreground text-xs">
+                                Total {{ submissionsCount ?? submissionRows.length }} jawaban masuk.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow class="hover:bg-transparent">
+                                    <TableHead class="h-11 bg-muted/40 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                        Pengirim
+                                    </TableHead>
+                                    <TableHead class="h-11 bg-muted/30 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                        Status review
+                                    </TableHead>
+                                    <TableHead
+                                        v-for="key in answerKeys"
+                                        :key="key"
+                                        class="h-11 min-w-[160px] bg-muted/30 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                                    >
+                                        {{ humanizeKey(key) }}
+                                    </TableHead>
+                                    <TableHead class="h-11 bg-muted/30 px-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                                        Dikirim
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow
+                                    v-for="submission in submissionRows"
+                                    :key="submission.id"
+                                    class="border-b border-border/60 transition-colors hover:bg-muted/30"
+                                >
+                                    <TableCell class="border-r border-border/60 bg-card px-5 py-3.5">
+                                        <div class="flex items-center gap-3">
+                                            <UserAvatarFallback
+                                                :src="submission.user?.avatar ?? null"
+                                                :seed="userAvatarSeed(submission.user)"
+                                                avatar-class="size-8 rounded-lg border border-border"
+                                                fallback-round-class="rounded-lg"
+                                            />
+                                            <div class="min-w-0">
+                                                <p class="text-foreground truncate text-sm font-semibold tracking-[-0.005em]">
+                                                    {{ submission.user?.name ?? 'Tanpa nama' }}
+                                                </p>
+                                                <p class="text-muted-foreground truncate text-[10px]">
+                                                    {{ submission.user?.email ?? '—' }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell class="px-5 py-3.5 whitespace-nowrap">
+                                        <Badge
+                                            variant="outline"
+                                            :class="['font-medium', submissionReviewBadge(submission.review_status).class]"
+                                        >
+                                            {{ submissionReviewBadge(submission.review_status).label }}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell
+                                        v-for="key in answerKeys"
+                                        :key="key"
+                                        class="text-muted-foreground max-w-[220px] px-5 py-3.5 text-xs leading-relaxed"
+                                    >
+                                        <span v-if="submissionFileUrlOf(submission.answers?.[key])" class="flex items-center gap-1.5 text-primary">
+                                            <FileText class="size-3.5 shrink-0" aria-hidden="true" />
+                                            <a
+                                                :href="submissionFileUrlOf(submission.answers?.[key]) ?? undefined"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="font-medium underline underline-offset-4"
+                                                @click.stop
+                                            >
+                                                Lampiran
+                                            </a>
+                                        </span>
+                                        <span v-else class="text-foreground/85 line-clamp-2">
+                                            {{ answerPreviewOf(submission.answers?.[key]) }}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell class="text-muted-foreground px-5 py-3.5 text-[11px] whitespace-nowrap">
+                                        {{ formatDate(submission.submitted_at) }}
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            </TabsContent>
+        </Tabs>
+    </div>
 </template>

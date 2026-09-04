@@ -1404,6 +1404,53 @@ class FormRegistrationTest extends TestCase
     }
 
     // =========================================================================
+    // FORM SHOW — submissions injected into the Jawaban tab
+    // =========================================================================
+
+    public function test_form_show_injects_empty_submissions_when_no_answers_yet(): void
+    {
+        $admin = $this->admin();
+        $event = $this->openEvent();
+        $form  = $this->openForm($event);
+
+        $this->actingAs($admin)
+            ->get(route('dashboard.events.forms.show', ['event' => $event, 'form' => $form]))
+            ->assertOk()
+            ->assertInertia(
+                fn ($page) => $page
+                    ->component('Dashboard/Events/Forms/Show')
+                    ->has('submissions', 0)
+                    ->where('submissionsCount', 0)
+            );
+    }
+
+    public function test_form_show_injects_submissions_and_count_into_jawaban_tab(): void
+    {
+        $admin  = $this->admin();
+        $event  = $this->openEvent();
+        $form   = $this->openForm($event);
+        $member = $this->member();
+
+        FormAnswer::factory()->create([
+            'form_id' => $form->id,
+            'user_id' => $member->id,
+            'answers' => ['full_name' => 'Jane Doe'],
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('dashboard.events.forms.show', ['event' => $event, 'form' => $form]))
+            ->assertOk()
+            ->assertInertia(
+                fn ($page) => $page
+                    ->component('Dashboard/Events/Forms/Show')
+                    ->has('submissions', 1)
+                    ->where('submissionsCount', 1)
+                    ->where('submissions.0.user.email', $member->email)
+                    ->where('submissions.0.answers.full_name', 'Jane Doe')
+            );
+    }
+
+    // =========================================================================
     // FORM SUBMISSIONS CONTROLLER (admin list)
     // =========================================================================
 
@@ -1422,14 +1469,25 @@ class FormRegistrationTest extends TestCase
 
         $response = $this->actingAs($admin)->get($this->submissionsPath($event, $form));
 
-        $response->assertOk()
-                 ->assertInertia(
-                     fn ($page) => $page
-                     ->component('Dashboard/Events/Forms/Submissions')
-                     ->has('submissions.data', 1)
-                     ->where('submissions.data.0.user.email', $member->email)
-                     ->where('submissions.data.0.answers.full_name', 'Jane Doe')
-                 );
+        $response->assertRedirect(
+            route('dashboard.events.forms.show', [
+                'event' => $event,
+                'form' => $form,
+                'tab' => 'jawaban',
+            ])
+        );
+
+        $this->actingAs($admin)
+            ->get(route('dashboard.events.forms.show', ['event' => $event, 'form' => $form]))
+            ->assertOk()
+            ->assertInertia(
+                fn ($page) => $page
+                ->component('Dashboard/Events/Forms/Show')
+                ->has('submissions', 1)
+                ->where('submissionsCount', 1)
+                ->where('submissions.0.user.email', $member->email)
+                ->where('submissions.0.answers.full_name', 'Jane Doe')
+            );
     }
 
     public function test_submissions_list_excludes_team_member_until_invitation_accepted(): void
@@ -1460,12 +1518,22 @@ class FormRegistrationTest extends TestCase
         ]);
 
         $this->actingAs($admin)->get($this->submissionsPath($event, $form))
+            ->assertRedirect(
+                route('dashboard.events.forms.show', [
+                    'event' => $event,
+                    'form' => $form,
+                    'tab' => 'jawaban',
+                ])
+            );
+
+        $this->actingAs($admin)
+            ->get(route('dashboard.events.forms.show', ['event' => $event, 'form' => $form]))
             ->assertOk()
             ->assertInertia(
                 fn ($page) => $page
-                    ->component('Dashboard/Events/Forms/Submissions')
-                    ->has('submissions.data', 1)
-                    ->where('submissions.data.0.user.email', $leader->email)
+                    ->component('Dashboard/Events/Forms/Show')
+                    ->has('submissions', 1)
+                    ->where('submissions.0.user.email', $leader->email)
             );
     }
 
@@ -2377,8 +2445,18 @@ class FormRegistrationTest extends TestCase
 
         $this->actingAs($admin)
              ->get($this->submissionsPath($event, $form))
+             ->assertRedirect(
+                 route('dashboard.events.forms.show', [
+                     'event' => $event,
+                     'form' => $form,
+                     'tab' => 'jawaban',
+                 ])
+             );
+
+        $this->actingAs($admin)
+             ->get(route('dashboard.events.forms.show', ['event' => $event, 'form' => $form]))
              ->assertOk()
-             ->assertInertia(fn ($page) => $page->has('submissions.data', 2));
+             ->assertInertia(fn ($page) => $page->has('submissions', 2));
 
         $this->assertDatabaseHas('form_answers', [
             'id' => $firstSubmission->id,
