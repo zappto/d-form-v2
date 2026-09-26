@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Clock3, QrCode } from 'lucide-vue-next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SCAN_STATUS_THEME, type ScanEntry, type ScanResult } from '@/lib/qrScanUi';
+import { padQueueNumber } from '@/lib/format';
 
 const props = withDefaults(
     defineProps<{
@@ -55,14 +56,6 @@ function eventTitleOf(value: ScanResult | ScanEntry): string {
 function hasEventContext(value: ScanResult | ScanEntry): boolean {
     const title = eventTitleOf(value);
     return title !== '' && title !== '-';
-}
-
-function padQueueNumber(value: number | null): string {
-    if (value === null) {
-        return '-';
-    }
-
-    return String(value).padStart(2, '0');
 }
 
 function heroIdentifier(result: ScanResult): string {

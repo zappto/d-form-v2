@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { useRespondentDraft } from '@/utils/composables/useRespondentDraft';
+import { useDraftRestore } from '@/utils/composables/useDraftRestore';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import OpRecFeedbackForm from '@/components/modules/open-recruitment/OpRecFeedbackForm.vue';
 import { Button } from '@/components/ui/button';
@@ -134,18 +134,9 @@ function correctionDraftSnapshot(): string {
     return JSON.stringify({ values: { request_message: correctionForm.request_message } });
 }
 
-const {
-    restore: restoreCorrectionDraft,
-    clear: clearCorrectionDraft,
-    cancel: cancelCorrectionDraft,
-} = useRespondentDraft<{ values?: unknown }>(correctionDraftSnapshot, 'dform:track-correction', {
-    debounceMs: 800,
-});
-
-function applyCorrectionDraft(): void {
-    const parsed = restoreCorrectionDraft();
-    if (!parsed || typeof parsed !== 'object') return;
-    const values = (parsed as { values?: unknown }).values;
+function applyCorrectionDraftValues(draft: unknown): void {
+    if (typeof draft !== 'object' || draft === null) return;
+    const values = (draft as { values?: unknown }).values;
     if (typeof values !== 'object' || values === null) return;
     const message = (values as Record<string, unknown>).request_message;
     if (typeof message === 'string' && message !== '') {
@@ -153,12 +144,10 @@ function applyCorrectionDraft(): void {
     }
 }
 
-onMounted(() => {
-    applyCorrectionDraft();
-});
-
-onBeforeUnmount(() => {
-    cancelCorrectionDraft();
+const { clear: clearCorrectionDraft } = useDraftRestore({
+    snapshot: correctionDraftSnapshot,
+    storageKey: 'dform:track-correction',
+    restoreIntoForm: applyCorrectionDraftValues,
 });
 
 const heroToneClass = computed(() => {

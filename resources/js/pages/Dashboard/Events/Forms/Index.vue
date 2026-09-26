@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Plus, FileText, Pencil, Trash2, Inbox, CalendarClock, Users } from 'lucide-vue-next'
-import { formatDateTime } from '@/lib/dummyData'
+import { formatDisplayDateTime } from '@/lib/format'
 import FormSubmissionsController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormSubmissionsController'
 import { routes } from '@/lib/routes'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
@@ -170,7 +170,7 @@ function submissionsHref(formId: string): string {
                                 <CalendarClock class="size-3.5 shrink-0 text-muted-foreground/70" />
                                 <span class="shrink-0">Tutup</span>
                                 <span class="min-w-0 truncate font-medium text-foreground">
-                                    {{ form.closed_at ? formatDateTime(form.closed_at) : 'Belum diatur' }}
+                                    {{ form.closed_at ? formatDisplayDateTime(form.closed_at) : 'Belum diatur' }}
                                 </span>
                             </div>
                             <div class="flex min-w-0 items-center gap-2">

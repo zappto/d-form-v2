@@ -1,5 +1,7 @@
+import { formatSubmissionDateTime } from './format';
+
 export function formatSubmissionDate(value: string): string {
-    return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+    return formatSubmissionDateTime(value);
 }
 
 export function humanizeSubmissionKey(fieldLabelMap: Record<string, string>, value: string): string {

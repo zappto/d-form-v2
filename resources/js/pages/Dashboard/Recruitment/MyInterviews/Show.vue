@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { handleInertiaFormErrors } from '@/lib/error-message'
+import { formatBytes } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 import useAuth from '@/utils/composables/useAuth'
@@ -252,13 +253,6 @@ const queuePollUrl = computed<string>((): string => {
 
 function isFilled(value: string | null | undefined): value is string {
     return typeof value === 'string' && value.trim() !== ''
-}
-
-function formatBytes(bytes: number | null | undefined): string | null {
-    if (typeof bytes !== 'number' || !Number.isFinite(bytes) || bytes <= 0) return null
-    if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 const cvPreviewUrl = computed<string | null>(() => {

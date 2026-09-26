@@ -18,6 +18,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { applicantAllowsTrackingResend, userAllowsTrackingResend } from '@/lib/recruitmentApplicantCapabilities'
+import { formatBytes, formatSubmissionDateTime } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { showErrorToast, showFlashToast } from '@/lib/error-message'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
@@ -449,12 +450,6 @@ function rejectCorrection(correctionId: string): void {
     })
 }
 
-function formatBytes(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
 const activityActionLabels: Record<string, string> = {
     'screening.pass': 'Lolos screening',
     'screening.revision_required': 'Diminta revisi',
@@ -488,19 +483,13 @@ function activityActionLabel(action: string): string {
     return pretty.charAt(0).toUpperCase() + pretty.slice(1)
 }
 
-const activityDateFormatter = new Intl.DateTimeFormat('id-ID', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'Asia/Jakarta',
-})
-
 function formatActivityTime(value: string | null): string {
     if (!value) return ''
 
     const date = new Date(value)
     if (Number.isNaN(date.getTime())) return ''
 
-    return activityDateFormatter.format(date)
+    return formatSubmissionDateTime(value)
 }
 
 const instagramHandle = computed<string>(() =>

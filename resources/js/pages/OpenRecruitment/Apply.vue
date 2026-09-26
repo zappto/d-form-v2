@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { AutosaveStatus } from '@/components/ui/autosave-status';
 import FormFillFieldSlotRows from '@/components/modules/dashboard/FormFillFieldSlotRows.vue';
 import { useFormFillPage } from '@/utils/composables/useFormFillPage';
-import { snapshotRespondentValues, useRespondentDraft } from '@/utils/composables/useRespondentDraft';
+import { snapshotRespondentValues } from '@/utils/composables/useRespondentDraft';
+import { useDraftRestore } from '@/utils/composables/useDraftRestore';
 import { readFieldRules } from '@/lib/formFieldMetadata';
 import type { FormFillPageEvent, FormFillPageForm } from '@/types/form';
 import { routes } from '@/lib/routes';
@@ -152,15 +153,33 @@ function draftSnapshot(): string {
     return JSON.stringify({ step: currentStep.value, values: snapshotRespondentValues(ctx.answerForm) });
 }
 
+function isDraftShape(value: unknown): value is { step?: unknown; values?: unknown } {
+    return typeof value === 'object' && value !== null;
+}
+
+function restoreApplyDraft(parsed: unknown): void {
+    if (!isDraftShape(parsed)) return;
+    if (typeof parsed.step === 'number' && parsed.step >= 1 && parsed.step <= TOTAL_STEPS) {
+        currentStep.value = parsed.step;
+    }
+    if (typeof parsed.values === 'object' && parsed.values !== null) {
+        for (const [key, value] of Object.entries(parsed.values)) {
+            if (typeof value === 'string' && key in ctx.answerForm) {
+                ctx.answerForm[key] = value;
+            }
+        }
+    }
+}
+
 const {
     status: draftStatus,
-    lastSavedAt,
-    restore: restoreRawDraft,
+    savedTimeLabel: draftSavedTimeLabel,
     clear: clearDraft,
     flush: flushDraft,
-    cancel: cancelDraft,
-} = useRespondentDraft<{ step?: unknown; values?: unknown }>(draftSnapshot, 'oprec-apply-draft-v1', {
-    debounceMs: 800,
+} = useDraftRestore({
+    snapshot: draftSnapshot,
+    storageKey: 'oprec-apply-draft-v1',
+    restoreIntoForm: restoreApplyDraft,
 });
 
 /** Hapus pesan error begitu isian sudah diperbaiki, agar card-nya tidak tetap merah. */
@@ -180,30 +199,10 @@ watch(
 const draftStatusText = computed((): string => {
     if (draftStatus.value === 'saving') return 'Menyimpan…';
     if (draftStatus.value === 'saved') {
-        const time = lastSavedAt.value?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) ?? '';
-        return `Draft tersimpan otomatis · ${time}`;
+        return `Draft tersimpan otomatis · ${draftSavedTimeLabel.value}`;
     }
     return '';
 });
-
-function isDraftShape(value: unknown): value is { step?: unknown; values?: unknown } {
-    return typeof value === 'object' && value !== null;
-}
-
-function restoreDraft(): void {
-    const parsed = restoreRawDraft();
-    if (!parsed || !isDraftShape(parsed)) return;
-    if (typeof parsed.step === 'number' && parsed.step >= 1 && parsed.step <= TOTAL_STEPS) {
-        currentStep.value = parsed.step;
-    }
-    if (typeof parsed.values === 'object' && parsed.values !== null) {
-        for (const [key, value] of Object.entries(parsed.values)) {
-            if (typeof value === 'string' && key in ctx.answerForm) {
-                ctx.answerForm[key] = value;
-            }
-        }
-    }
-}
 
 function firstStepWithErrors(): number {
     for (let step = 1; step <= TOTAL_STEPS; step += 1) {
@@ -276,14 +275,12 @@ const reviewRows = computed((): Array<{ label: string; value: string }> => {
 onMounted(() => {
     const fromUrl = Number(new URL(window.location.href).searchParams.get('step') || '1');
     if (fromUrl >= 1 && fromUrl <= TOTAL_STEPS) currentStep.value = fromUrl;
-    restoreDraft();
     syncStepToUrl(currentStep.value, true);
     window.addEventListener('popstate', onPopState);
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('popstate', onPopState);
-    cancelDraft();
 });
 
 const isBlocked = computed((): boolean => !props.registration.is_open);

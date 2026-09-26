@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ChevronLeft, ChevronRight, MapPin, CalendarDays, ArrowRight } from 'lucide-vue-next';
-import { categoryColorMap, categoryLabelMap, formatDate } from '@/lib/dummyData';
+import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData';
+import { formatDisplayDate } from '@/lib/format';
 import { toCategoryList, primaryCategory } from '@/lib/eventCategories';
 
 interface CalendarEvent {
@@ -467,7 +468,7 @@ const legendEntries = computed(() =>
             <div v-if="selectedEvent" class="flex flex-col gap-3 pt-1">
                 <div class="text-muted-foreground flex items-start gap-2 text-sm">
                     <CalendarDays class="text-primary mt-0.5 size-4 shrink-0" />
-                    <span> {{ formatDate(selectedEvent.start_date) }}<template v-if="selectedEvent.end_date"> — {{ formatDate(selectedEvent.end_date) }}</template> </span>
+                    <span> {{ formatDisplayDate(selectedEvent.start_date) }}<template v-if="selectedEvent.end_date"> — {{ formatDisplayDate(selectedEvent.end_date) }}</template> </span>
                 </div>
                 <div v-if="selectedEvent.location" class="text-muted-foreground flex items-start gap-2 text-sm">
                     <MapPin class="text-primary mt-0.5 size-4 shrink-0" />

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge'
 import { CalendarDays, MapPin } from 'lucide-vue-next'
-import { categoryColorMap, categoryLabelMap, formatDate } from '@/lib/dummyData'
+import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData'
+import { formatDisplayDate } from '@/lib/format'
 import { parseEventCategories } from '@/lib/eventShowUi'
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'
 import { EVENT_HERO_BANNER_ASPECT } from '@/lib/eventBannerAspect'
@@ -71,7 +72,7 @@ defineProps<{
                         <p class="mt-3 flex flex-col gap-1.5 text-[0.9375rem] leading-relaxed text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3">
                             <span class="inline-flex min-w-0 items-center gap-1.5">
                                 <CalendarDays class="size-3.5 shrink-0 text-primary/80" aria-hidden="true" />
-                                {{ formatDate(event.start_date) }}
+                                {{ formatDisplayDate(event.start_date) }}
                             </span>
                             <span class="hidden text-border sm:inline" aria-hidden="true">·</span>
                             <span class="inline-flex min-w-0 items-center gap-1.5">

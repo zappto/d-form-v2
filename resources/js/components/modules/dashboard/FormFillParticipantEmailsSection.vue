@@ -9,6 +9,7 @@ import type { FormFillPageContext } from '@/utils/composables/useFormFillPage'
 import { CheckCircle2, ChevronDown, Loader2, UserRound, XCircle } from 'lucide-vue-next'
 import { routes } from '@/lib/routes'
 import { humanizeErrorMessage } from '@/lib/error-message'
+import { formatDisplayDate } from '@/lib/format'
 
 const CHECK_EMAIL_URL = routes.member.checkEmail
 const DEBOUNCE_MS = 1000
@@ -268,7 +269,7 @@ function statusFor(slot: number): CheckStatus {
 
 function shortDate(iso: string): string {
     try {
-        return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+        return formatDisplayDate(iso)
     } catch {
         return ''
     }

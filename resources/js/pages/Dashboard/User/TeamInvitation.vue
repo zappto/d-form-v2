@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
-import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft'
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/utils/composables/useDraftRestore'
 import FormFillLayout from '@/layouts/FormFillLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -83,22 +83,9 @@ function initialFormState(): Record<string, unknown> {
 
 const confirmForm = useForm(initialFormState())
 
-function inviteDraftSnapshot(): string {
-    return JSON.stringify({ values: snapshotRespondentValues(confirmForm) })
-}
-
-const {
-    restore: restoreInviteDraft,
-    clear: clearInviteDraft,
-    cancel: cancelInviteDraft,
-} = useRespondentDraft<{ values?: unknown }>(inviteDraftSnapshot, `dform:invite:${props.form?.id ?? 'unknown'}`, {
-    debounceMs: 800,
-})
-
-function applyInviteDraft(): void {
-    const parsed = restoreInviteDraft()
-    if (!parsed || typeof parsed !== 'object') return
-    const values = (parsed as { values?: unknown }).values
+function applyInviteDraftValues(draft: unknown): void {
+    if (typeof draft !== 'object' || draft === null) return
+    const values = (draft as { values?: unknown }).values
     if (typeof values !== 'object' || values === null) return
     for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
         if (!(key in confirmForm)) continue
@@ -110,12 +97,10 @@ function applyInviteDraft(): void {
     }
 }
 
-onMounted(() => {
-    applyInviteDraft()
-})
-
-onBeforeUnmount(() => {
-    cancelInviteDraft()
+const { clear: clearInviteDraft } = useDraftRestore({
+    snapshot: () => buildValuesDraftSnapshot(confirmForm),
+    storageKey: `dform:invite:${props.form?.id ?? 'unknown'}`,
+    restoreIntoForm: applyInviteDraftValues,
 })
 
 const declineDialogOpen = ref(false)
