@@ -9,13 +9,12 @@ import { Progress } from '@/components/ui/progress';
 import { MapPin, CalendarDays, Clock, DollarSign, Users, Send, Mail, MailOpen, FileText, ChevronRight, Lock } from 'lucide-vue-next';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-    formatDate,
-    formatDateTime,
     statusColorMap,
     categoryLabelMap,
     categoryColorMap,
     sessionLabelMap,
 } from '@/lib/dummyData';
+import { formatDisplayDate, formatDisplayDateTime, formatRupiahPrice } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 import TiptapRichHtml from '@/components/modules/dashboard/events/TiptapRichHtml.vue';
@@ -104,7 +103,7 @@ function participantStatusLabel(s: FormAccessStatus): string {
 const metaBlocks = computed(() => [
     {
         title: 'Jadwal',
-        value: `${formatDate(event.value.start_date)} — ${formatDate(event.value.end_date)}`,
+        value: `${formatDisplayDate(event.value.start_date)} — ${formatDisplayDate(event.value.end_date)}`,
         icon: CalendarDays,
     },
     { title: 'Lokasi', value: event.value.location || '—', icon: MapPin },
@@ -118,7 +117,7 @@ const metaBlocks = computed(() => [
     },
     {
         title: 'Biaya',
-        value: event.value.price > 0 ? `Rp ${Number(event.value.price).toLocaleString('id-ID')}` : 'Gratis',
+        value: event.value.price > 0 ? `Rp ${formatRupiahPrice(Number(event.value.price))}` : 'Gratis',
         icon: DollarSign,
     },
 ]);
@@ -427,13 +426,13 @@ const quotaPercent = computed(() => {
                             <p class="flex justify-between gap-2">
                                 <span class="text-muted-foreground">Buka</span>
                                 <span class="text-foreground text-right font-medium">{{
-                                    formatDateTime(event.registration_start)
+                                    formatDisplayDateTime(event.registration_start)
                                 }}</span>
                             </p>
                             <p class="flex justify-between gap-2">
                                 <span class="text-muted-foreground">Tutup</span>
                                 <span class="text-foreground text-right font-medium">{{
-                                    formatDateTime(event.registration_end)
+                                    formatDisplayDateTime(event.registration_end)
                                 }}</span>
                             </p>
                         </div>

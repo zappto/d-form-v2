@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft';
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/utils/composables/useDraftRestore';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import { Button } from '@/components/ui/button';
 import { CometSpinner } from '@/components/ui/comet';
@@ -64,22 +64,9 @@ const form = useForm({
     twibbon_url: props.application?.twibbon_url ?? '',
 });
 
-function trackEditSnapshot(): string {
-    return JSON.stringify({ values: snapshotRespondentValues(form) });
-}
-
-const {
-    restore: restoreTrackEditDraft,
-    clear: clearTrackEditDraft,
-    cancel: cancelTrackEditDraft,
-} = useRespondentDraft<{ values?: unknown }>(trackEditSnapshot, 'dform:track-edit', {
-    debounceMs: 800,
-});
-
-function applyTrackEditDraft(): void {
-    const parsed = restoreTrackEditDraft();
-    if (!parsed || typeof parsed !== 'object') return;
-    const values = (parsed as { values?: unknown }).values;
+function applyTrackEditDraftValues(draft: unknown): void {
+    if (typeof draft !== 'object' || draft === null) return;
+    const values = (draft as { values?: unknown }).values;
     if (typeof values !== 'object' || values === null) return;
     for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
         if (!(key in form)) continue;
@@ -89,12 +76,10 @@ function applyTrackEditDraft(): void {
     }
 }
 
-onMounted(() => {
-    applyTrackEditDraft();
-});
-
-onBeforeUnmount(() => {
-    cancelTrackEditDraft();
+const { clear: clearTrackEditDraft } = useDraftRestore({
+    snapshot: () => buildValuesDraftSnapshot(form),
+    storageKey: 'dform:track-edit',
+    restoreIntoForm: applyTrackEditDraftValues,
 });
 
 const semesterOptions: SimpleSelectOption[] = [

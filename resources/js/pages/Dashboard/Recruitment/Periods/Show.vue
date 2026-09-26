@@ -33,6 +33,7 @@ import {
     statusLabel,
 } from '@/lib/recruitmentPeriodPhase'
 import { formatIdDateLabel, formatIdDateTimeLabel } from '@/lib/shadcnDateFormat'
+import { initialsOf } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 import useAuth from '@/utils/composables/useAuth'
@@ -219,15 +220,6 @@ function confirmUnassign(): void {
             unassignDialogOpen.value = false
         },
     })
-}
-
-function initialsOf(name: string): string {
-    const words: string[] = name.trim().split(/\s+/).filter((w) => w.length > 0)
-    if (words.length === 0) return '—'
-    const first: string = words[0]?.charAt(0) ?? ''
-    const second: string = words.length > 1 ? (words[1]?.charAt(0) ?? '') : ''
-    const letters: string = `${first}${second}`.toUpperCase()
-    return letters.length > 0 ? letters : '—'
 }
 
 const assignedPairKeys = computed<Set<string>>(

@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { initialsOf } from '@/lib/format'
 import { Check, ChevronDown, Plus, Search } from 'lucide-vue-next'
 
 defineOptions({ inheritAttrs: false })
@@ -63,19 +64,10 @@ const popoverContentClass = cn(
     'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
 )
 
-function initialsFor(label: string): string {
-    const words: string[] = label.trim().split(/\s+/).filter((w) => w.length > 0)
-    if (words.length === 0) return '—'
-    const first: string = words[0] ?? ''
-    const second: string = words.length > 1 ? (words[1] ?? '') : ''
-    const letters: string = `${first.charAt(0)}${second.charAt(0)}`.toUpperCase()
-    return letters.trim().length > 0 ? letters : '—'
-}
-
 function optionInitials(opt: SearchableSelectOption): string {
     const custom: string | undefined = opt.initials?.trim()
     if (custom && custom.length > 0) return custom.toUpperCase().slice(0, 2)
-    return initialsFor(opt.label)
+    return initialsOf(opt.label)
 }
 
 const normalizedQuery = computed<string>(() => query.value.trim().toLowerCase())

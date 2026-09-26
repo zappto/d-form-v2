@@ -3,6 +3,7 @@ import axios from 'axios'
 import { toast } from 'vue-sonner'
 import { Html5Qrcode } from 'html5-qrcode'
 import { humanizeErrorMessage, parseApiErrorMessage, showErrorToast } from '@/lib/error-message'
+import { padQueueNumber } from '@/lib/format'
 import {
     createScanHistoryEntry,
     extractQrCandidate,
@@ -88,14 +89,6 @@ function resolveDeskId(): string {
     catch {
         return Math.random().toString(16).slice(2, 10)
     }
-}
-
-function padQueueNumber(value: number | null | undefined): string {
-    if (value === null || value === undefined) {
-        return '-'
-    }
-
-    return String(value).padStart(2, '0')
 }
 
 function formatGlobalEventTitle(kind: 'event' | 'oprec', rawTitle: string): string {

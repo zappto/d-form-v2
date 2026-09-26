@@ -9,7 +9,8 @@ import TiptapRichHtml from '@/components/modules/dashboard/events/TiptapRichHtml
 import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect'
 import { CalendarDays, MapPin } from 'lucide-vue-next'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate, formatDateTime, statusColorMap } from '@/lib/dummyData'
+import { statusColorMap } from '@/lib/dummyData'
+import { formatDisplayDate, formatDisplayDateTime } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 
@@ -204,18 +205,18 @@ function isImageFileUrl(value: string): boolean {
                     <div class="text-right text-xs text-muted-foreground">
                         <p>
                             Submitted
-                            <span class="font-medium text-foreground">{{ formatDateTime(props.registration.submitted_at) }}</span>
+                            <span class="font-medium text-foreground">{{ formatDisplayDateTime(props.registration.submitted_at) }}</span>
                         </p>
                         <p v-if="props.registration.reviewed_at" class="mt-1">
                             Updated
-                            <span class="font-medium text-foreground">{{ formatDateTime(props.registration.reviewed_at) }}</span>
+                            <span class="font-medium text-foreground">{{ formatDisplayDateTime(props.registration.reviewed_at) }}</span>
                         </p>
                     </div>
                 </div>
                 <div class="mt-4 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
                     <p class="flex items-center gap-2">
                         <CalendarDays class="size-4 shrink-0 text-primary" />
-                        {{ formatDate(props.event.start_date) }} — {{ formatDate(props.event.end_date) }}
+                        {{ formatDisplayDate(props.event.start_date) }} — {{ formatDisplayDate(props.event.end_date) }}
                     </p>
                     <p class="flex items-center gap-2">
                         <MapPin class="size-4 shrink-0 text-primary" />

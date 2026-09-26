@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ArrowUpRight } from 'lucide-vue-next'
-import { formatDate } from '@/lib/dummyData'
+import { formatDisplayDate } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue'
 import { userAvatarSeed } from '@/lib/userAvatarFallback'
@@ -67,7 +67,7 @@ defineProps<{
                             {{ reg.status }}
                         </span>
                         <span class="hidden text-[11px] tabular-nums text-muted-foreground sm:inline">
-                            {{ formatDate(reg.submitted_at) }}
+                            {{ formatDisplayDate(reg.submitted_at) }}
                         </span>
                     </div>
                 </Link>

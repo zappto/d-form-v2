@@ -6,11 +6,8 @@ import {
     restore as restoreEvent,
     update as updateEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController'
-import {
-    formatDate,
-    formatDateTime,
-    sessionLabelMap,
-} from '@/lib/dummyData'
+import { sessionLabelMap } from '@/lib/dummyData'
+import { formatDisplayDate, formatDisplayDateTime, formatRupiahPrice } from '@/lib/format'
 import { parseEventCategories } from '@/lib/eventShowUi'
 import { Banknote, CalendarDays, Clock, MapPin } from 'lucide-vue-next'
 
@@ -50,7 +47,7 @@ export function useDashboardEventShowPage(
     const metaBlocks = computed(() => [
         {
             title: 'Schedule',
-            value: event.start_date === event.end_date ? formatDate(event.start_date) : `${formatDate(event.start_date)} — ${formatDate(event.end_date)}`,
+            value: event.start_date === event.end_date ? formatDisplayDate(event.start_date) : `${formatDisplayDate(event.start_date)} — ${formatDisplayDate(event.end_date)}`,
             icon: CalendarDays,
         },
         { title: 'Location', value: event.location, icon: MapPin },
@@ -61,7 +58,7 @@ export function useDashboardEventShowPage(
         },
         {
             title: 'Price',
-            value: event.price > 0 ? `Rp ${Number(event.price).toLocaleString('id-ID')}` : 'Free',
+            value: event.price > 0 ? `Rp ${formatRupiahPrice(Number(event.price))}` : 'Free',
             icon: Banknote,
         },
     ])
@@ -134,8 +131,8 @@ export function useDashboardEventShowPage(
         statusPill,
         metaBlocks,
         parseEventCategories,
-        formatDate,
-        formatDateTime,
+        formatDate: formatDisplayDate,
+        formatDateTime: formatDisplayDateTime,
         handleDelete,
         handleRestore,
         handleTogglePublish,

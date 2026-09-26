@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { routes } from '@/lib/routes'
+import { initialsOf } from '@/lib/format'
 import { showErrorToast, showFlashToast } from '@/lib/error-message'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 import useAuth from '@/utils/composables/useAuth'
@@ -104,15 +105,6 @@ function scheduleSelected() {
             scheduleForm.reset()
         },
     })
-}
-
-function initialsOf(name: string): string {
-    const words: string[] = name.trim().split(/\s+/).filter((w) => w.length > 0)
-    if (words.length === 0) return '—'
-    const first: string = words[0]?.charAt(0) ?? ''
-    const second: string = words.length > 1 ? (words[1]?.charAt(0) ?? '') : ''
-    const letters: string = `${first}${second}`.toUpperCase()
-    return letters.length > 0 ? letters : '—'
 }
 
 function reassignOptionsFor(currentInterviewerId: string | null): SearchableSelectOption[] {

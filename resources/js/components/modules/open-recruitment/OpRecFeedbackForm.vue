@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue'
 import { useForm } from '@inertiajs/vue3'
-import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft'
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/utils/composables/useDraftRestore'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { CometSpinner } from '@/components/ui/comet'
@@ -34,22 +33,9 @@ const form = useForm({
     feedback_text: '',
 })
 
-function feedbackDraftSnapshot(): string {
-    return JSON.stringify({ values: snapshotRespondentValues(form) })
-}
-
-const {
-    restore: restoreFeedbackDraft,
-    clear: clearFeedbackDraft,
-    cancel: cancelFeedbackDraft,
-} = useRespondentDraft<{ values?: unknown }>(feedbackDraftSnapshot, 'dform:track-feedback', {
-    debounceMs: 800,
-})
-
-function applyFeedbackDraft(): void {
-    const parsed = restoreFeedbackDraft()
-    if (!parsed || typeof parsed !== 'object') return
-    const values = (parsed as { values?: unknown }).values
+function applyFeedbackDraftValues(draft: unknown): void {
+    if (typeof draft !== 'object' || draft === null) return
+    const values = (draft as { values?: unknown }).values
     if (typeof values !== 'object' || values === null) return
     for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
         if (!(key in form)) continue
@@ -59,12 +45,10 @@ function applyFeedbackDraft(): void {
     }
 }
 
-onMounted(() => {
-    applyFeedbackDraft()
-})
-
-onBeforeUnmount(() => {
-    cancelFeedbackDraft()
+const { clear: clearFeedbackDraft } = useDraftRestore({
+    snapshot: () => buildValuesDraftSnapshot(form),
+    storageKey: 'dform:track-feedback',
+    restoreIntoForm: applyFeedbackDraftValues,
 })
 
 function submit(): void {

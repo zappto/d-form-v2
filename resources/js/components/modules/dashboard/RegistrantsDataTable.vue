@@ -9,6 +9,7 @@ import {
 } from '@/lib/registrantsUi'
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue'
 import { userAvatarSeed } from '@/lib/userAvatarFallback'
+import { formatSubmissionDateTime } from '@/lib/format'
 import { FileText } from 'lucide-vue-next'
 
 defineProps<{
@@ -17,7 +18,7 @@ defineProps<{
 
 function formatSubmittedDetail(iso: string): string {
     try {
-        return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso))
+        return formatSubmissionDateTime(iso)
     } catch {
         return iso
     }

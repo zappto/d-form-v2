@@ -1,6 +1,6 @@
-import { computed, onBeforeUnmount, onMounted, reactive } from 'vue'
+import { computed, onBeforeUnmount, reactive } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
-import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft'
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/utils/composables/useDraftRestore'
 import { normalizeBannerSrc, pickFormBannerField } from '@/components/modules/builder/formBanner'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
 import {
@@ -147,19 +147,9 @@ export function useFormFillPage(props: {
     const answerForm = useForm<FormFillAnswerMap>(initialValues)
 
     /** Draft lokal responden (tanpa server): File dikecualikan seperti pola Apply. */
-    function fillDraftSnapshot(): string {
-        return JSON.stringify({ values: snapshotRespondentValues(answerForm) })
-    }
-
-    const fillDraft = props.draftKey
-        ? useRespondentDraft<{ values?: unknown }>(fillDraftSnapshot, props.draftKey, { debounceMs: 800 })
-        : null
-
-    function restoreFillDraft(): void {
-        if (!fillDraft) return
-        const parsed = fillDraft.restore()
-        if (!parsed || typeof parsed !== 'object') return
-        const values = (parsed as { values?: unknown }).values
+    function restoreFillDraftValues(draft: unknown): void {
+        if (typeof draft !== 'object' || draft === null) return
+        const values = (draft as { values?: unknown }).values
         if (typeof values !== 'object' || values === null) return
         for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
             if (!(key in answerForm)) continue
@@ -171,14 +161,13 @@ export function useFormFillPage(props: {
         }
     }
 
-    if (fillDraft) {
-        onMounted(() => {
-            restoreFillDraft()
-        })
-        onBeforeUnmount(() => {
-            fillDraft.cancel()
-        })
-    }
+    const fillDraft = props.draftKey
+        ? useDraftRestore({
+              snapshot: () => buildValuesDraftSnapshot(answerForm),
+              storageKey: props.draftKey,
+              restoreIntoForm: restoreFillDraftValues,
+          })
+        : null
 
     const errorContext = computed<ErrorMessageContext>(() => ({
         fields,
