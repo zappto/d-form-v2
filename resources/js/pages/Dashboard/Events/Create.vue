@@ -11,11 +11,11 @@ import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import { Button } from '@/components/ui/button';
 import { CometSpinner } from '@/components/ui/comet';
 import { AutosaveStatus } from '@/components/ui/autosave-status';
-import { setTopbar } from '@/utils/composables/useDashboardTopbar';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 import { destroy as destroyEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import FormAutosaveController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAutosaveController';
 import { __invoke as postFields } from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FieldOperationController';
-import { useBuilderAutosave } from '@/utils/composables/useBuilderAutosave';
+import { useBuilderAutosave } from '@/hooks/useBuilderAutosave';
 import { fromBackendField, type BackendField } from '@/components/modules/builder/fieldMapping';
 import {
     defaultFormBannerState,

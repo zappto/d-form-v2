@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { FileText, ChevronRight, Lock, AlertCircle } from 'lucide-vue-next'
 import type { FormAccessStatus } from '@/types/form'
 import { routes } from '@/lib/routes'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
 
 defineOptions({ layout: DashboardLayout })
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
-import { buildValuesDraftSnapshot, useDraftRestore } from '@/utils/composables/useDraftRestore'
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { CometSpinner } from '@/components/ui/comet'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { useDraftRestore } from '@/utils/composables/useDraftRestore';
+import { useDraftRestore } from '@/hooks/useDraftRestore';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import OpRecFeedbackForm from '@/components/modules/open-recruitment/OpRecFeedbackForm.vue';
 import { Button } from '@/components/ui/button';

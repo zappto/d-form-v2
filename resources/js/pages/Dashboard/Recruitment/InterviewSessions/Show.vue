@@ -12,8 +12,8 @@ import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/s
 import { routes } from '@/lib/routes'
 import { initialsOf } from '@/lib/format'
 import { showErrorToast, showFlashToast } from '@/lib/error-message'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
-import useAuth from '@/utils/composables/useAuth'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
+import useAuth from '@/hooks/useAuth'
 import { usePage } from '@inertiajs/vue3'
 import { ListOrdered, Plus } from 'lucide-vue-next'
 

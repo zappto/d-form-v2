@@ -5,7 +5,7 @@ import {
     useRecruitmentQueue,
     type QueueEntryRow,
     type QueueSnapshot,
-} from '@/utils/composables/useRecruitmentQueue'
+} from '@/hooks/useRecruitmentQueue'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const props = defineProps<{

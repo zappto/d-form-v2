@@ -22,7 +22,7 @@ import { formatBytes, formatSubmissionDateTime } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { showErrorToast, showFlashToast } from '@/lib/error-message'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
-import useAuth from '@/utils/composables/useAuth'
+import useAuth from '@/hooks/useAuth'
 import {
     CheckCircle2,
     ClipboardCheck,

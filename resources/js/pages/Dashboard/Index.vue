@@ -10,7 +10,7 @@ import CategoryChart from '@/components/modules/dashboard/CategoryChart.vue';
 import EventCalendar from '@/components/modules/dashboard/EventCalendar.vue';
 import { CalendarDays, Zap, Users, TrendingUp } from 'lucide-vue-next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { setTopbar } from '@/utils/composables/useDashboardTopbar';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 import { routes } from '@/lib/routes';
 
 defineOptions({ layout: DashboardLayout });

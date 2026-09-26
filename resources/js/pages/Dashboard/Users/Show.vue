@@ -17,7 +17,7 @@ import {
 import { showErrorToast } from '@/lib/error-message'
 import { routes } from '@/lib/routes'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
 import {
     ArrowLeft,
     CalendarDays,

@@ -9,8 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { CometSpinner } from '@/components/ui/comet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { routes } from '@/lib/routes'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
-import { useRecruitmentQueue, type QueueSnapshot } from '@/utils/composables/useRecruitmentQueue'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { useRecruitmentQueue, type QueueSnapshot } from '@/hooks/useRecruitmentQueue'
 import { toast } from 'vue-sonner'
 
 defineOptions({ layout: DashboardLayout })

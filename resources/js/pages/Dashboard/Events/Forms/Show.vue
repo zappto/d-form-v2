@@ -2,7 +2,7 @@
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
-import { useBuilderAutosave } from '@/utils/composables/useBuilderAutosave';
+import { useBuilderAutosave } from '@/hooks/useBuilderAutosave';
 import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
 import {
     DESCRIPTION_REQUIRED_MESSAGE,

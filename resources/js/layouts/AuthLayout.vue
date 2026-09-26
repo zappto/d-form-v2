@@ -4,7 +4,7 @@ import AuthIllustration from '@/components/modules/auth/AuthIllustration.vue';
 import AuthOAuthButtons from '@/components/modules/auth/AuthOAuthButtons.vue';
 import { Toaster } from '@/components/ui/sonner';
 import { routes } from '@/lib/routes';
-import { usePageFlashToast } from '@/utils/composables/usePageFlashToast';
+import { usePageFlashToast } from '@/hooks/usePageFlashToast';
 
 usePageFlashToast();
 </script>

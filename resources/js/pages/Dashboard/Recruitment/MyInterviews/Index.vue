@@ -31,8 +31,8 @@ import {
 } from '@/components/ui/pagination'
 import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { routes } from '@/lib/routes'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
-import useAuth from '@/utils/composables/useAuth'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
+import useAuth from '@/hooks/useAuth'
 import {
     ChevronLeft,
     ChevronRight,

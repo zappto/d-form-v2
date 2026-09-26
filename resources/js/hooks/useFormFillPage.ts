@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, reactive } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
-import { buildValuesDraftSnapshot, useDraftRestore } from '@/utils/composables/useDraftRestore'
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore'
 import { normalizeBannerSrc, pickFormBannerField } from '@/components/modules/builder/formBanner'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
 import {

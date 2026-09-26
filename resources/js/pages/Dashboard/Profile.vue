@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
 import { userAvatarSeed } from '@/lib/userAvatarFallback';
-import useAuth from '@/utils/composables/useAuth';
+import useAuth from '@/hooks/useAuth';
 import { Eye, EyeOff, Save, UploadCloud } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
 

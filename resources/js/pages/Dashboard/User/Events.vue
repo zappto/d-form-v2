@@ -11,7 +11,7 @@ import { FilterX } from 'lucide-vue-next';
 import { categoryLabelMap, sessionLabelMap } from '@/lib/dummyData';
 import { toCategoryList } from '@/lib/eventCategories';
 import { routes } from '@/lib/routes';
-import { setTopbar } from '@/utils/composables/useDashboardTopbar';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardLayout });
 

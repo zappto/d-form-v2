@@ -27,8 +27,8 @@ import {
 import { showErrorToast } from '@/lib/error-message'
 import { routes } from '@/lib/routes'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
-import useAuth from '@/utils/composables/useAuth'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
+import useAuth from '@/hooks/useAuth'
 import { ChevronLeft, ChevronRight, Eye, Pencil, Plus, RotateCcw, Search, Trash2 } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardLayout })
