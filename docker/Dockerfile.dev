@@ -31,6 +31,9 @@ RUN npm ci
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Apply project PHP settings (memory/upload limits) — parity with prod image
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-custom.ini
+
 # Ensure storage and bootstrap/cache exist and have correct permissions
 RUN mkdir -p storage bootstrap/cache && \
     chown -R www-data:www-data /app && \
