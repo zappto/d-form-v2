@@ -112,6 +112,7 @@ class FormController extends Controller
             'siblingForms' => $this->siblingFormsPayload($event, $form->id),
             'saveFieldsUrl' => route('dashboard.events.forms.fields', ['event' => $event, 'form' => $form]),
             'updateFormUrl' => route('dashboard.events.forms.update', ['event' => $event, 'form' => $form]),
+            'autosaveFormUrl' => route('dashboard.events.forms.autosave', ['event' => $event, 'form' => $form]),
             'submissions' => $submissions,
             'submissionsCount' => $submissionQuery->count(),
         ]);

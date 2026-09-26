@@ -43,10 +43,42 @@ class FieldModifyRequest extends FormRequest
     {
         return array_merge(
             [
-                'fields' => 'required|array',
+                'fields' => 'nullable|array',
+                'deleted_ids' => 'sometimes|array',
+                'deleted_ids.*' => 'uuid',
+                'banner_file' => 'sometimes|nullable|image|max:10240',
+                'option_images' => 'sometimes|nullable|array',
+                'option_images.*' => 'sometimes|array',
+                'option_images.*.*' => 'sometimes|nullable|image|max:10240',
             ],
             FormFieldsRequestValidation::nestedFieldRules(),
         );
+    }
+
+    protected function prepareForValidation(): void
+    {
+        // Multipart autosave (FormData) mengirim `fields` / `deleted_ids`
+        // sebagai JSON-string part + `banner_file` sebagai file part.
+        // Decode di sini agar validasi nested `fields.*` tetap jalan
+        // native tanpa endpoint baru.
+        $merge = [];
+        foreach (['fields', 'deleted_ids'] as $key) {
+            $value = $this->input($key);
+            if (is_string($value)) {
+                $trimmed = trim($value);
+                if ($trimmed === '') {
+                    continue;
+                }
+                $decoded = json_decode($trimmed, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $merge[$key] = $decoded;
+                }
+            }
+        }
+
+        if ($merge !== []) {
+            $this->merge($merge);
+        }
     }
 
     /**
