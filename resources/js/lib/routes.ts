@@ -98,6 +98,7 @@ export const routes = {
                     reject: (id: string) => `${ADMIN_BASE}/recruitment/applications/${id}/screening/reject`,
                 },
                 verify: (id: string) => `${ADMIN_BASE}/recruitment/applications/${id}/verify`,
+                resendTracking: (id: string) => `${ADMIN_BASE}/recruitment/applications/${id}/resend-tracking`,
                 evaluationOverride: (id: string) => `${ADMIN_BASE}/recruitment/applications/${id}/evaluation`,
                 final: {
                     accept: (id: string) => `${ADMIN_BASE}/recruitment/applications/${id}/final/accept`,
@@ -161,6 +162,15 @@ export const routes = {
             feed: `${ADMIN_BASE}/scan/feed`,
             export: (params: { kind: 'event' | 'oprec'; target: string; format: 'csv' | 'xlsx' }) =>
                 `${ADMIN_BASE}/scan/export?kind=${params.kind}&target=${encodeURIComponent(params.target)}&format=${params.format}`,
+        },
+        users: {
+            index: `${ADMIN_BASE}/users`,
+            create: `${ADMIN_BASE}/users/create`,
+            store: `${ADMIN_BASE}/users`,
+            show: (id: string) => `${ADMIN_BASE}/users/${id}`,
+            edit: (id: string) => `${ADMIN_BASE}/users/${id}/edit`,
+            update: (id: string) => `${ADMIN_BASE}/users/${id}`,
+            destroy: (id: string) => `${ADMIN_BASE}/users/${id}`,
         },
     },
 
