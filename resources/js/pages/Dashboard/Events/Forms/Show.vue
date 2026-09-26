@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, computed, onUnmounted } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { toast } from 'vue-sonner';
-import { useAutosaveSync } from '@/utils/composables/useAutosaveSync';
+import { useBuilderAutosave } from '@/utils/composables/useBuilderAutosave';
 import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
 import {
     DESCRIPTION_REQUIRED_MESSAGE,
     TITLE_REQUIRED_MESSAGE,
     isBlankRequiredValue,
-    mergeSentHeader,
-    stripBlankRequiredKeys,
 } from '@/lib/autosaveHeader';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
@@ -33,28 +30,13 @@ import {
     type BackendField,
     type BuilderField,
 } from '@/components/modules/builder/fieldMapping';
-import { diffBackendFields, snapshotBackendFields } from '@/components/modules/builder/dirtyFields';
 import {
-    applyBannerUploadSuccess,
-    buildBannerFieldsFormData,
     defaultFormBannerState,
-    ensureBannerRowDirty,
     extractFormBannerFromBuilderFields,
     hasPendingBannerFile,
-    pendingBannerSnapshotKey,
     prependFormBannerToBackendPayload,
-    readBannerPathFromResponse,
 } from '@/components/modules/builder/formBanner';
-import {
-    applyOptionImageUploadSuccess,
-    buildOptionImageFieldsFormData,
-    collectPendingOptionImageFiles,
-    discardPendingOptionImageFiles,
-    ensureOptionImageRowsDirty,
-    hasPendingOptionImageFiles,
-    pendingOptionImagesSnapshotKey,
-    readOptionImagePathsFromResponse,
-} from '@/components/modules/builder/optionImage';
+import { hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
 import type { FormSiblingOption } from '@/types/form';
 import {
@@ -130,155 +112,6 @@ const bannerState = ref(defaultFormBannerState());
 const formFields = ref<BuilderField[]>([]);
 const formMetadata = ref(emptyFormRegistrationMetadata());
 
-/** Header autosave yang dinormalisasi persis seperti payload PATCH yang dikirim. */
-interface AutosaveHeaderPayload {
-    title: string;
-    description: string;
-    success_content: string | null;
-    closed_at: string | null;
-    visible_for: string[];
-    banner_url: string | null;
-    banner_caption: string | null;
-    metadata: Record<string, unknown>;
-}
-
-function buildHeaderPayload(): AutosaveHeaderPayload {
-    return {
-        title: settingsForm.title,
-        description: settingsForm.description,
-        success_content: settingsForm.success_content ?? '',
-        closed_at: (settingsForm.closed_at ?? '').trim() !== '' ? (settingsForm.closed_at as string) : null,
-        visible_for: [...settingsForm.visible_for],
-        banner_url: bannerState.value.bannerUrl || null,
-        banner_caption: bannerState.value.caption || null,
-        metadata: toFormMetadataPayload(formMetadata.value),
-    };
-}
-
-/**
- * Snapshot header terakhir yang sukses terkirim. PATCH hanya mengirim key yang
- * berubah (diff per-key) — hemat payload + tidak menulis null ke kolom NOT NULL
- * (mis. description '' → null oleh ConvertEmptyStringsToNull).
- */
-const lastSentHeader = ref<AutosaveHeaderPayload | null>(null);
-
-function diffHeaderPayload(current: AutosaveHeaderPayload): Partial<AutosaveHeaderPayload> {
-    const prev: AutosaveHeaderPayload | null = lastSentHeader.value;
-    if (prev === null) return { ...current };
-    const diff: Partial<AutosaveHeaderPayload> = {};
-    (Object.keys(current) as Array<keyof AutosaveHeaderPayload>).forEach((key: keyof AutosaveHeaderPayload) => {
-        if (JSON.stringify(current[key]) !== JSON.stringify(prev[key])) {
-            (diff as Record<string, unknown>)[key] = current[key];
-        }
-    });
-    return diff;
-}
-
-// ── Autosave global: semua mutasi builder (fields + header/settings) ──
-// Snapshot backend terakhir yang sukses terkirim (per id) untuk dirty-subset.
-const lastSentFields = ref<BackendField[] | null>(null);
-
-function buildShowSnapshot(): string {
-    return JSON.stringify({
-        fields: formFields.value,
-        title: settingsForm.title,
-        description: settingsForm.description,
-        bannerUrl: bannerState.value.bannerUrl,
-        bannerCaption: bannerState.value.caption,
-        bannerFileName: bannerState.value.bannerFileName,
-        bannerPending: pendingBannerSnapshotKey(bannerState.value),
-        optionImagesPending: pendingOptionImagesSnapshotKey(formFields.value),
-        success: settingsForm.success_content ?? '',
-        closedAt: settingsForm.closed_at ?? '',
-        visibleFor: settingsForm.visible_for,
-        metadata: formMetadata.value,
-    });
-}
-
-async function saveShowSnapshot(snapshot?: string): Promise<boolean> {
-    void snapshot;
-    const merged = prependFormBannerToBackendPayload(formFields.value, bannerState.value);
-    const backendFields = toBackendFields(merged);
-    const fieldDiff = diffBackendFields(backendFields, lastSentFields.value);
-    const pendingBannerFile = hasPendingBannerFile(bannerState.value)
-        ? (bannerState.value.bannerFile as File)
-        : null;
-    const pendingOptionFiles = collectPendingOptionImageFiles(formFields.value);
-    // File banner/opsi baru wajib ikut terkirim walau diff per-id bersih.
-    let dirty = fieldDiff.dirty;
-    let hasFieldChanges = fieldDiff.hasChanges;
-    if (pendingBannerFile) {
-        dirty = ensureBannerRowDirty(backendFields, dirty);
-        hasFieldChanges = true;
-    }
-    if (pendingOptionFiles.length > 0) {
-        dirty = ensureOptionImageRowsDirty(backendFields, dirty);
-        hasFieldChanges = true;
-    }
-    // Dirty-subset: POST /fields hanya berisi baris tambah/edit (termasuk yang
-    // order-nya berubah) + deleted_ids eksplisit; tanpa field kotor dan tanpa
-    // deleted → skip POST. Snapshot sukses diperbarui setelah berhasil.
-    if (hasFieldChanges) {
-        if (pendingBannerFile || pendingOptionFiles.length > 0) {
-            // Multipart: fields + deleted_ids sebagai JSON-string part,
-            // banner_file + option_images[fieldId][optionId] sebagai file part
-            // (Laravel parse native + decode). Tanpa file pending berperilaku
-            // seperti sekarang (JSON).
-            const formData =
-                pendingOptionFiles.length === 0 && pendingBannerFile
-                    ? buildBannerFieldsFormData(dirty, fieldDiff.deletedIds, pendingBannerFile)
-                    : buildOptionImageFieldsFormData(
-                          dirty,
-                          fieldDiff.deletedIds,
-                          pendingOptionFiles,
-                          pendingBannerFile,
-                      );
-            const res = await axios.post(props.saveFieldsUrl, formData, {
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-            });
-            const storedPath = readBannerPathFromResponse(res.data);
-            if (storedPath) {
-                // State pegang path string hasil upload, bukan File/base64.
-                applyBannerUploadSuccess(bannerState.value, storedPath, pendingBannerFile?.name);
-            } else if (pendingBannerFile) {
-                bannerState.value.bannerFile = null;
-                bannerState.value.bannerPreviewUrl = '';
-            }
-            const storedOptionMap = readOptionImagePathsFromResponse(res.data);
-            if (storedOptionMap) {
-                // State pegang path string hasil upload, bukan File/base64.
-                applyOptionImageUploadSuccess(formFields.value, storedOptionMap);
-            } else if (pendingOptionFiles.length > 0) {
-                discardPendingOptionImageFiles(formFields.value);
-            }
-        } else {
-            await axios.post(
-                props.saveFieldsUrl,
-                { fields: dirty, deleted_ids: fieldDiff.deletedIds },
-                { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
-            );
-        }
-        lastSentFields.value = snapshotBackendFields(
-            toBackendFields(prependFormBannerToBackendPayload(formFields.value, bannerState.value)),
-        );
-    }
-    // Header parsial via PATCH lenient (tanpa fields): hanya key yang berubah
-    // dibanding snapshot sukses terakhir. Title/description yang kosong/blank
-    // dikecualikan dari payload (bukan ''/null) + ditandai invalid inline —
-    // '' yang terkirim hanya akan dilewati server lalu terlihat "resurrect"
-    // diam-diam saat reload. Clear banner tetap menolkan
-    // kolom banner_url/banner_caption di save yang sama dengan hapus baris field banner.
-    const header: AutosaveHeaderPayload = buildHeaderPayload();
-    const headerDiff: Partial<AutosaveHeaderPayload> = stripBlankRequiredKeys(diffHeaderPayload(header), header);
-    if (Object.keys(headerDiff).length > 0) {
-        await axios.patch(props.autosaveFormUrl, headerDiff, {
-            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        });
-        lastSentHeader.value = mergeSentHeader(lastSentHeader.value, header, headerDiff);
-    }
-    return hasFieldChanges || Object.keys(headerDiff).length > 0;
-}
-
 /** Ref ke FormBuilderWorkspace untuk memicu preview/save dari bar aksi inline (toolbar disembunyikan). */
 const workspaceRef = ref<InstanceType<typeof FormBuilderWorkspace> | null>(null);
 
@@ -335,6 +168,25 @@ const fieldErrors = computed(() => ({
     visible_for: getFieldError(settingsForm.errors, 'visible_for'),
 }));
 
+// ── Autosave global: pemilik pipeline save/guard/beacon; state tetap milik halaman. ──
+const builderAutosave = useBuilderAutosave({
+    getState: () => ({
+        title: settingsForm.title,
+        description: settingsForm.description,
+        successContent: settingsForm.success_content ?? '',
+        closedAt: settingsForm.closed_at ?? '',
+        visibleFor: settingsForm.visible_for,
+        banner: bannerState.value,
+        fields: formFields.value,
+        metadata: formMetadata.value,
+    }),
+    resolveFieldsUrl: () => props.saveFieldsUrl,
+    resolveAutosaveUrl: () => props.autosaveFormUrl,
+    readEnabled: () => true,
+    notifySaveError: () => toast.error('Gagal menyimpan otomatis. Perubahan tetap ada di kanvas.'),
+});
+const showSaveState = builderAutosave.status;
+
 function syncFieldsFromProps(): void {
     const raw: BackendField[] = JSON.parse(JSON.stringify(props.fields || []));
     raw.sort((a, b) => a.order - b.order);
@@ -349,18 +201,37 @@ function syncFieldsFromProps(): void {
     bannerState.value.bannerPreviewUrl = '';
 
     formFields.value = canvasFields;
-    lastSentFields.value = snapshotBackendFields(toBackendFields(prependFormBannerToBackendPayload(canvasFields, bannerState.value)));
 }
 
 watch(
     () => props.fields,
-    () => syncFieldsFromProps(),
+    () => {
+        // Guard anti-timpa (adopsi baru): reload Inertia di tengah editan lokal tak menimpa kanvas.
+        if (
+            builderAutosave.evaluateHydrate(
+                props.form.id,
+                hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value),
+            )
+        ) {
+            return;
+        }
+        syncFieldsFromProps();
+        builderAutosave.registerHydrated(props.form.id);
+    },
     { immediate: true, deep: true }
 );
 watch(
     () => props.form,
     (f) => {
         if (!f) return;
+        if (
+            builderAutosave.evaluateHydrate(
+                f.id,
+                hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value),
+            )
+        ) {
+            return;
+        }
         settingsForm.title = f.title;
         settingsForm.description = f.description;
         settingsForm.success_content = f.success_content ?? '';
@@ -369,21 +240,18 @@ watch(
         settingsForm.banner_url = f.banner_url ?? '';
         settingsForm.banner_caption = f.banner_caption ?? '';
         formMetadata.value = parseFormRegistrationMetadata(f.metadata);
-        lastSentHeader.value = buildHeaderPayload();
+        builderAutosave.registerHydrated(f.id);
     },
     { deep: true, immediate: true }
 );
 
-// ── Autosave global: di-instantiasi SETELAH watcher hydrate di atas, agar snapshot
-// awal menangkap state yang sudah terisi → tidak ada job save-redundan saat mount. ──
-const showAutosave = useAutosaveSync(buildShowSnapshot, saveShowSnapshot, {
-    debounceMs: 800,
-    onError: () => toast.error('Gagal menyimpan otomatis. Perubahan tetap ada di kanvas.'),
+onMounted(() => {
+    window.addEventListener('beforeunload', builderAutosave.flushBeacon);
 });
-const showSaveState = showAutosave.status;
 
 onUnmounted(() => {
-    void showAutosave.flush();
+    window.removeEventListener('beforeunload', builderAutosave.flushBeacon);
+    void builderAutosave.flush();
 });
 
 function onSave(): void {
@@ -412,7 +280,7 @@ function onSave(): void {
     };
 
     if (hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value)) {
-        void showAutosave
+        void builderAutosave
             .flush()
             .catch(() => toast.error('Gagal mengunggah banner. Coba lagi.'))
             .then(() => proceed());
