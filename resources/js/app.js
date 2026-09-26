@@ -19,12 +19,9 @@ router.on('invalid', (event) => {
 });
 
 createInertiaApp({
-    progress: {
-        delay: 180,
-        color: '#FFD84D',
-        includeCSS: true,
-        showSpinner: false,
-    },
+    // Progress bar bawaan Inertia DIMATIKAN total (progress: false):
+    // navigasi memakai skeleton per-halaman + CometSpinner tombol (M1/M2).
+    progress: false,
     resolve: (name) => {
         const pages = import.meta.glob('./pages/**/*.vue', { eager: true });
         return pages[`./pages/${name}.vue`];
