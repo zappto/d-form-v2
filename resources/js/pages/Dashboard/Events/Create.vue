@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
 import { handleInertiaFormErrors } from '@/lib/error-message';
 import { toast } from 'vue-sonner';
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
@@ -16,41 +15,19 @@ import { setTopbar } from '@/utils/composables/useDashboardTopbar';
 import { destroy as destroyEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import FormAutosaveController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAutosaveController';
 import { __invoke as postFields } from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FieldOperationController';
-import { useAutosaveSync } from '@/utils/composables/useAutosaveSync';
-import { fromBackendField, toBackendFields, type BackendField } from '@/components/modules/builder/fieldMapping';
-import { diffBackendFields, snapshotBackendFields } from '@/components/modules/builder/dirtyFields';
+import { useBuilderAutosave } from '@/utils/composables/useBuilderAutosave';
+import { fromBackendField, type BackendField } from '@/components/modules/builder/fieldMapping';
 import {
-    buildUnloadPayload,
-    shouldSkipHydrate,
-} from '@/components/modules/builder/autosaveGuard';
-import {
-    applyBannerUploadSuccess,
-    buildBannerFieldsFormData,
     defaultFormBannerState,
-    ensureBannerRowDirty,
     extractFormBannerFromBuilderFields,
     hasPendingBannerFile,
-    pendingBannerSnapshotKey,
-    prependFormBannerToBackendPayload,
-    readBannerPathFromResponse,
 } from '@/components/modules/builder/formBanner';
-import {
-    applyOptionImageUploadSuccess,
-    buildOptionImageFieldsFormData,
-    collectPendingOptionImageFiles,
-    discardPendingOptionImageFiles,
-    ensureOptionImageRowsDirty,
-    hasPendingOptionImageFiles,
-    pendingOptionImagesSnapshotKey,
-    readOptionImagePathsFromResponse,
-} from '@/components/modules/builder/optionImage';
-import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
+import { hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
+import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata } from '@/types/form';
 import {
     DESCRIPTION_REQUIRED_MESSAGE,
     TITLE_REQUIRED_MESSAGE,
     isBlankRequiredValue,
-    mergeSentHeader,
-    stripBlankRequiredKeys,
 } from '@/lib/autosaveHeader';
 import type { BuilderField } from '@/types/form-builder';
 import { routes } from '@/lib/routes';
@@ -97,7 +74,7 @@ const eventFormRef = ref<InstanceType<typeof EventDashboardForm> | null>(null);
 
 onMounted(() => {
     setTopbar({ title: 'Buat acara', subtitle: 'Detail acara & formulir pendaftaran' });
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('beforeunload', builderAutosave.flushBeacon);
 });
 
 // ── Step event → forms: setelah POST wizard, Inertia render ulang dgn draftEvent ──
@@ -123,61 +100,38 @@ const bannerState = ref(defaultFormBannerState());
 const formFields = ref<BuilderField[]>([]);
 const formMetadata = ref(emptyFormRegistrationMetadata());
 
-/** Header autosave yang dinormalisasi persis seperti payload PATCH yang dikirim. */
-interface AutosaveHeaderPayload {
-    title: string;
-    description: string;
-    success_content: string | null;
-    closed_at: string | null;
-    visible_for: string[];
-    banner_url: string | null;
-    banner_caption: string | null;
-    metadata: Record<string, unknown>;
-}
-
-function buildHeaderPayload(): AutosaveHeaderPayload {
-    return {
+// ── Autosave global (optimistik + debounce 800ms): SEMUA mutasi builder ──
+// Dideklarasikan sebelum hydrateBuilder karena watcher immediate di bawah
+// memanggilnya saat registrasi.
+const builderAutosave = useBuilderAutosave({
+    getState: () => ({
         title: formTitle.value,
         description: formDescription.value,
-        success_content: successContent.value,
-        closed_at: closedAt.value.trim() !== '' ? closedAt.value : null,
-        visible_for: [...visibleFor.value],
-        banner_url: bannerState.value.bannerUrl || null,
-        banner_caption: bannerState.value.caption || null,
-        metadata: toFormMetadataPayload(formMetadata.value),
-    };
-}
-
-/**
- * Snapshot header terakhir yang sukses terkirim. PATCH hanya mengirim key yang
- * berubah (diff per-key) — hemat payload + tidak menulis null ke kolom NOT NULL
- * (mis. description '' → null oleh ConvertEmptyStringsToNull).
- */
-const lastSentHeader = ref<AutosaveHeaderPayload | null>(null);
-
-// Snapshot backend terakhir yang sukses terkirim (per id) untuk dirty-subset.
-// Dideklarasikan sebelum hydrateBuilder karena watcher immediate di bawah
-// memanggil hydrateBuilder saat registrasi.
-const lastSentFields = ref<BackendField[] | null>(null);
-
-// Guard hydrate anti-timpa (Fase 1-B): id draft terakhir yang dihydrate +
-// snapshot bersih terakhir (setelah hydrate/save-sukses). Draft id SAMA +
-// snapshot saat ini berbeda (mutasi lokal belum tersimpan) → lewati hydrate.
-// Mount segar / id berubah → hydrate normal.
-const lastHydratedFormId = ref<string | null>(null);
-const lastCleanSnapshot = ref<string | null>(null);
-
-function diffHeaderPayload(current: AutosaveHeaderPayload): Partial<AutosaveHeaderPayload> {
-    const prev: AutosaveHeaderPayload | null = lastSentHeader.value;
-    if (prev === null) return { ...current };
-    const diff: Partial<AutosaveHeaderPayload> = {};
-    (Object.keys(current) as Array<keyof AutosaveHeaderPayload>).forEach((key: keyof AutosaveHeaderPayload) => {
-        if (JSON.stringify(current[key]) !== JSON.stringify(prev[key])) {
-            (diff as Record<string, unknown>)[key] = current[key];
-        }
-    });
-    return diff;
-}
+        successContent: successContent.value,
+        closedAt: closedAt.value,
+        visibleFor: visibleFor.value,
+        banner: bannerState.value,
+        fields: formFields.value,
+        metadata: formMetadata.value,
+    }),
+    // '' bila draft belum ada; save hook menjadi false tanpa request.
+    resolveFieldsUrl: () => {
+        const formId = draftForm.value?.id;
+        const eventId = draftEvent.value?.id;
+        if (!formId || !eventId) return '';
+        return postFields({ event: eventId, form: formId }).url;
+    },
+    resolveAutosaveUrl: () => {
+        const formId = draftForm.value?.id;
+        const eventId = draftEvent.value?.id;
+        if (!formId || !eventId) return '';
+        return FormAutosaveController.patch({ event: eventId, form: formId }).url;
+    },
+    readEnabled: () => step.value === 'forms' && !!draftForm.value?.id,
+    notifySaveError: () => toast.error('Gagal menyimpan otomatis. Perubahan tetap ada di kanvas.'),
+});
+const saveState = builderAutosave.status;
+const flushPending = (): Promise<void> => builderAutosave.flush();
 
 /**
  * Invalid inline untuk required yang dikosongkan (pola render mengikuti
@@ -195,17 +149,12 @@ function hydrateBuilder(): void {
     const f = draftForm.value;
     if (!f) return;
     // Guard anti-timpa: draft id SAMA + mutasi lokal belum tersimpan sukses
-    // → jangan timpa kanvas (termasuk bannerFile / file opsi pending yang
-    // dibuang hydrate via null). Mount segar / id berubah tetap hydrate.
+    // → jangan timpa kanvas (termasuk file pending yang dibuang hydrate via null).
     if (
-        shouldSkipHydrate({
-            lastHydratedId: lastHydratedFormId.value,
-            currentId: f.id,
-            lastCleanSnapshot: lastCleanSnapshot.value,
-            currentSnapshot: buildBuilderSnapshot(),
-            hasPendingBannerFile:
-                hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value),
-        })
+        builderAutosave.evaluateHydrate(
+            f.id,
+            hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value),
+        )
     ) {
         return;
     }
@@ -228,12 +177,7 @@ function hydrateBuilder(): void {
     bannerState.value.bannerPreviewUrl = '';
     bannerState.value.order = syntheticBanner.order ?? null;
     formFields.value = canvasFields;
-    lastSentHeader.value = buildHeaderPayload();
-    lastSentFields.value = snapshotBackendFields(
-        toBackendFields(prependFormBannerToBackendPayload(formFields.value, bannerState.value)),
-    );
-    lastHydratedFormId.value = f.id;
-    lastCleanSnapshot.value = buildBuilderSnapshot();
+    builderAutosave.registerHydrated(f.id);
 }
 
 watch(
@@ -244,171 +188,9 @@ watch(
     { immediate: true }
 );
 
-// ── Autosave global (optimistik + debounce 800ms): SEMUA mutasi builder ──
-function buildBuilderSnapshot(): string {
-    return JSON.stringify({
-        fields: formFields.value,
-        title: formTitle.value,
-        description: formDescription.value,
-        bannerUrl: bannerState.value.bannerUrl,
-        bannerCaption: bannerState.value.caption,
-        bannerFileName: bannerState.value.bannerFileName,
-        bannerPending: pendingBannerSnapshotKey(bannerState.value),
-        optionImagesPending: pendingOptionImagesSnapshotKey(formFields.value),
-        success: successContent.value,
-        closedAt: closedAt.value,
-        visibleFor: visibleFor.value,
-        metadata: formMetadata.value,
-    });
-}
-
-// Snapshot backend terakhir yang sukses terkirim (per id). POST /fields hanya
-// berisi baris tambah/edit (termasuk yang order-nya berubah) + deleted_ids
-// eksplisit; steady-empty = nol request, transisi ke kosong = full-delete.
-// Banner baru dikirim sebagai multipart (part banner_file + fields
-// JSON-string), bukan base64 — DB hanya menyimpan path.
-// Order spaced: existing dipertahankan via lastSent sehingga insert depan
-// hanya mengotori baris baru (anti order-shift).
-async function saveBuilderSnapshot(snapshot?: string): Promise<boolean> {
-    void snapshot;
-    const formId = draftForm.value?.id;
-    const eventId = draftEvent.value?.id;
-    if (!formId || !eventId) return false;
-    const merged = prependFormBannerToBackendPayload(formFields.value, bannerState.value);
-    const backend = toBackendFields(merged, lastSentFields.value);
-    const fieldDiff = diffBackendFields(backend, lastSentFields.value);
-    const pendingBannerFile = hasPendingBannerFile(bannerState.value)
-        ? (bannerState.value.bannerFile as File)
-        : null;
-    const pendingOptionFiles = collectPendingOptionImageFiles(formFields.value);
-    let dirty = fieldDiff.dirty;
-    let hasFieldChanges = fieldDiff.hasChanges;
-    if (pendingBannerFile) {
-        dirty = ensureBannerRowDirty(backend, dirty);
-        hasFieldChanges = true;
-    }
-    if (pendingOptionFiles.length > 0) {
-        dirty = ensureOptionImageRowsDirty(backend, dirty);
-        hasFieldChanges = true;
-    }
-    if (hasFieldChanges) {
-        if (pendingBannerFile || pendingOptionFiles.length > 0) {
-            const formData =
-                pendingOptionFiles.length === 0 && pendingBannerFile
-                    ? buildBannerFieldsFormData(dirty, fieldDiff.deletedIds, pendingBannerFile)
-                    : buildOptionImageFieldsFormData(
-                          dirty,
-                          fieldDiff.deletedIds,
-                          pendingOptionFiles,
-                          pendingBannerFile,
-                      );
-            const res = await axios.post(postFields({ event: eventId, form: formId }).url, formData, {
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-            });
-            const storedPath = readBannerPathFromResponse(res.data);
-            if (storedPath) {
-                applyBannerUploadSuccess(bannerState.value, storedPath, pendingBannerFile?.name);
-            } else if (pendingBannerFile) {
-                bannerState.value.bannerFile = null;
-                bannerState.value.bannerPreviewUrl = '';
-            }
-            const storedOptionMap = readOptionImagePathsFromResponse(res.data);
-            if (storedOptionMap) {
-                applyOptionImageUploadSuccess(formFields.value, storedOptionMap);
-            } else if (pendingOptionFiles.length > 0) {
-                discardPendingOptionImageFiles(formFields.value);
-            }
-        } else {
-            await axios.post(
-                postFields({ event: eventId, form: formId }).url,
-                { fields: dirty, deleted_ids: fieldDiff.deletedIds },
-                { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
-            );
-        }
-        lastSentFields.value = snapshotBackendFields(
-            toBackendFields(
-                prependFormBannerToBackendPayload(formFields.value, bannerState.value),
-                lastSentFields.value,
-            ),
-        );
-    }
-    // Header parsial via PATCH lenient: hanya key yang berubah dibanding snapshot
-    // sukses terakhir (hemat payload + hindari tulis null ke kolom NOT NULL).
-    // Title/description yang kosong/blank dikecualikan dari payload (bukan
-    // ''/null) + ditandai invalid inline — '' yang terkirim hanya akan
-    // dilewati server lalu terlihat "resurrect" diam-diam saat reload.
-    // Clear banner tetap menolkan kolom banner_url/banner_caption di save yang
-    // sama dengan hapus baris field banner. Dibangun SETELAH upload banner
-    // agar banner_url baru ikut terkirim dalam save yang sama.
-    const header: AutosaveHeaderPayload = buildHeaderPayload();
-    const headerDiff: Partial<AutosaveHeaderPayload> = stripBlankRequiredKeys(diffHeaderPayload(header), header);
-    if (Object.keys(headerDiff).length > 0) {
-        await axios.patch(
-            FormAutosaveController.patch({ event: eventId, form: formId }).url,
-            headerDiff,
-            { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
-        );
-        lastSentHeader.value = mergeSentHeader(lastSentHeader.value, header, headerDiff);
-        lastCleanSnapshot.value = buildBuilderSnapshot();
-        return true;
-    }
-    if (hasFieldChanges) {
-        lastCleanSnapshot.value = buildBuilderSnapshot();
-    }
-    return hasFieldChanges;
-}
-
-const autosaveEnabled = computed(() => step.value === 'forms' && !!draftForm.value?.id);
-const autosave = useAutosaveSync(buildBuilderSnapshot, saveBuilderSnapshot, {
-    debounceMs: 800,
-    enabled: autosaveEnabled,
-    onError: () => toast.error('Gagal menyimpan otomatis. Perubahan tetap ada di kanvas.'),
-});
-const saveState = autosave.status;
-const flushPending = (): Promise<void> => autosave.flush();
-
-/** Baca XSRF-TOKEN untuk CSRF beacon (Laravel cek input `_token`). */
-function readXsrfToken(): string | null {
-    const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-    return match?.[1] ? decodeURIComponent(match[1]) : null;
-}
-
-/**
- * Flush unload anti data-loss (Fase 1-A): kirim snapshot saat ini via
- * navigator.sendBeacon (full fields + deleted_ids terkini, fire-and-forget;
- * sendBeacon tak bisa baca respons — itu diterima). Banner file pending tak
- * bisa ikut via beacon (tanpa multipart) — field lain tetap terselamatkan.
- * Didaftarkan sekali per mount, dibersihkan saat unmount.
- */
-function handleBeforeUnload(): void {
-    const formId = draftForm.value?.id;
-    const eventId = draftEvent.value?.id;
-    if (!formId || !eventId) return;
-    if (typeof navigator === 'undefined' || typeof navigator.sendBeacon !== 'function') return;
-    try {
-        const payload = buildUnloadPayload({
-            canvasFields: formFields.value,
-            banner: bannerState.value,
-            lastSent: lastSentFields.value,
-        });
-        if (!payload) return;
-        const url = postFields({ event: eventId, form: formId }).url;
-        const token = readXsrfToken();
-        const body = JSON.stringify({
-            fields: payload.fields,
-            deleted_ids: payload.deleted_ids,
-            ...(token ? { _token: token } : {}),
-        });
-        const blob = new Blob([body], { type: 'application/json' });
-        navigator.sendBeacon(url, blob);
-    } catch {
-        /* fire-and-forget: abaikan */
-    }
-}
-
 onUnmounted(() => {
-    window.removeEventListener('beforeunload', handleBeforeUnload);
-    void autosave.flush();
+    window.removeEventListener('beforeunload', builderAutosave.flushBeacon);
+    void builderAutosave.flush();
 });
 
 // ── Navigasi ────────────────────────────────────────────────────
