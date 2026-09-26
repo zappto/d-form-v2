@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { ImageUp, RefreshCw, X } from 'lucide-vue-next';
 import type { FormBannerState } from './formBanner';
-import { normalizeBannerSrc } from './formBanner';
+import { hasPendingBannerFile, normalizeBannerSrc, revokeBannerPreview } from './formBanner';
 
 const banner = defineModel<FormBannerState>('banner', { required: true });
 
@@ -23,8 +23,18 @@ const isDragging = ref(false);
 const bannerUploadError = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
 
-const previewSrc = computed(() => props.bannerPreviewSrc || normalizeBannerSrc(banner.value.bannerUrl));
+const MAX_BANNER_BYTES = 10 * 1024 * 1024;
+
+const previewSrc = computed(() => {
+    const pending = (banner.value.bannerPreviewUrl ?? '').trim();
+    if (pending !== '') return pending;
+    if (props.bannerPreviewSrc) return props.bannerPreviewSrc;
+    return normalizeBannerSrc(banner.value.bannerUrl);
+});
 const hasImage = computed(() => previewSrc.value !== '');
+const isNewUpload = computed(
+    () => hasPendingBannerFile(banner.value) || banner.value.bannerUrl.startsWith('data:'),
+);
 
 function patch(partial: Partial<FormBannerState>): void {
     Object.assign(banner.value, partial);
@@ -39,19 +49,20 @@ function applyFile(file: File | null | undefined): void {
         bannerUploadError.value = 'Gunakan PNG, JPG, JPEG, atau GIF.';
         return;
     }
+    if (file.size > MAX_BANNER_BYTES) {
+        bannerUploadError.value = 'Ukuran banner maksimal 10 MB.';
+        return;
+    }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-        if (typeof reader.result !== 'string') return;
-        patch({
-            bannerUrl: reader.result,
-            bannerFileName: file.name,
-        });
-    };
-    reader.onerror = () => {
-        bannerUploadError.value = 'Gagal membaca file.';
-    };
-    reader.readAsDataURL(file);
+    // Simpan File object untuk upload multipart; preview via object URL.
+    // JANGAN base64 ke state — DB hanya menyimpan path hasil upload.
+    revokeBannerPreview(banner.value);
+    const objectUrl = URL.createObjectURL(file);
+    patch({
+        bannerFile: file,
+        bannerPreviewUrl: objectUrl,
+        bannerFileName: file.name,
+    });
 }
 
 function openPicker(): void {
@@ -70,8 +81,13 @@ function onDrop(e: DragEvent): void {
 }
 
 function clearImage(): void {
-    patch({ bannerUrl: '', bannerFileName: '' });
+    revokeBannerPreview(banner.value);
+    patch({ bannerUrl: '', bannerFileName: '', bannerFile: null, bannerPreviewUrl: '' });
 }
+
+onBeforeUnmount(() => {
+    revokeBannerPreview(banner.value);
+});
 </script>
 
 <template>
@@ -129,7 +145,7 @@ function clearImage(): void {
                         {{ banner.bannerFileName || 'banner-form' }}
                     </span>
                     <span
-                        v-if="banner.bannerUrl.startsWith('data:')"
+                        v-if="isNewUpload"
                         class="border-primary/20 bg-primary/8 text-primary shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
                     >
                         baru

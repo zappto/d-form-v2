@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { optionLabel, optionImageUrl } from '@/components/modules/builder/fieldMapping'
+import { optionLabel } from '@/components/modules/builder/fieldMapping'
+import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage'
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
 import type { BuilderField, FieldOptionEntry } from '@/types/form-builder'
 import {
     Type,
@@ -107,8 +107,8 @@ const choiceOptions = computed((): FieldOptionEntry[] => {
 })
 
 function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
-    const u = optionImageUrl(entry)
-    return u ? normalizeBannerSrc(u) : undefined
+    const src = resolveOptionImagePreviewSrc(entry)
+    return src !== '' ? src : undefined
 }
 </script>
 

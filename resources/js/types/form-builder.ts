@@ -5,6 +5,10 @@ export interface FieldOptionEntry {
     type: FieldOptionType
     label: string
     imageUrl?: string
+    /** File baru yang belum terupload — tidak diserialisasi ke DB, hanya di state. */
+    imageFile?: File | null
+    /** Object URL untuk preview file baru — tidak diserialisasi ke DB. */
+    imagePreviewUrl?: string
 }
 
 export interface BuilderField {
@@ -19,6 +23,11 @@ export interface BuilderField {
     metadata: Record<string, unknown>
     /** Field may be edited by invited members (team flow); persisted as `form_fields.is_append`. */
     is_append?: boolean
+    /**
+     * Persisted backend `order` carried on the canvas to avoid renumbering.
+     * Undefined for brand-new rows (allocated via spaced ordering on save).
+     */
+    order?: number
 }
 
 export type BackendFieldType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'checkbox' | 'radio'

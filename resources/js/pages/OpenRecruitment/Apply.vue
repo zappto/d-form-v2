@@ -163,7 +163,7 @@ const {
     status: draftStatus,
     flush: flushDraft,
     cancel: cancelDraft,
-} = useAutosaveSync(draftSnapshot, async () => {}, {
+} = useAutosaveSync(draftSnapshot, async () => false, {
     debounceMs: 800,
     storageKey: DRAFT_KEY,
     storage: {

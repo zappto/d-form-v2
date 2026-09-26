@@ -5,7 +5,16 @@ import { toast } from 'vue-sonner'
 import { handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue'
-import { defaultFormBannerState, prependFormBannerToBackendPayload } from '@/components/modules/builder/formBanner'
+import {
+    defaultFormBannerState,
+    hasPendingBannerFile,
+    prependFormBannerToBackendPayload,
+    revokeBannerPreview,
+} from '@/components/modules/builder/formBanner'
+import {
+    discardPendingOptionImageFiles,
+    hasPendingOptionImageFiles,
+} from '@/components/modules/builder/optionImage'
 import { toBackendFields } from '@/components/modules/builder/fieldMapping'
 import type { BuilderField } from '@/types/form-builder'
 import type { CreateDashboardFormPayload, FormSiblingOption } from '@/types/form'
@@ -47,6 +56,25 @@ const createForm = useForm<CreateFormClientPayload>({
 })
 
 function onSave(): void {
+    // Form belum ada (tanpa id) sehingga file banner tak bisa diupload via
+    // POST /fields di sini — DB hanya path. Buang file pending agar tak
+    // tersimpan sebagai baris banner ber-url kosong; pengguna unggah ulang
+    // di halaman edit setelah form terbuat.
+    if (hasPendingBannerFile(bannerState.value)) {
+        revokeBannerPreview(bannerState.value)
+        bannerState.value.bannerFile = null
+        bannerState.value.bannerPreviewUrl = ''
+        bannerState.value.bannerUrl = ''
+        bannerState.value.bannerFileName = ''
+        toast.error('Banner belum terunggah — buat form dulu, lalu unggah banner di halaman edit.')
+    }
+    // Opsi gambar: File mentah tak bisa ikut via POST store di sini (tanpa
+    // id) — buang file pending agar tak ada base64 yang tertulis; URL teks
+    // yang diketik manual tetap tersimpan, file diunggah ulang di edit.
+    if (hasPendingOptionImageFiles(formFields.value)) {
+        discardPendingOptionImageFiles(formFields.value)
+        toast.error('Gambar opsi belum terunggah — buat form dulu, lalu unggah di halaman edit.')
+    }
     createForm.title = formTitle.value
     createForm.description = formDescription.value
     createForm.success_content = successContent.value

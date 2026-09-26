@@ -37,6 +37,7 @@ const props = defineProps<{
     dropIndicatorIndex: number;
     dragSourceId: string | null;
     showSuccessZone: boolean;
+    fieldErrors?: Partial<Record<'title' | 'description', string>>;
 }>();
 
 defineEmits<{
@@ -195,6 +196,7 @@ const showDropChrome = computed(
                                     @input="onTitleInput"
                                 />
                             </div>
+                            <p v-if="fieldErrors?.title" class="text-destructive text-xs">{{ fieldErrors.title }}</p>
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <div class="flex items-baseline justify-between gap-2">
@@ -218,6 +220,7 @@ const showDropChrome = computed(
                                     @input="onSubtitleInput"
                                 ></textarea>
                             </div>
+                            <p v-if="fieldErrors?.description" class="text-destructive text-xs">{{ fieldErrors.description }}</p>
                         </div>
                     </div>
                 </section>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { BuilderField, FieldOptionEntry } from '@/types/form-builder'
+import { resolveOptionImagePreviewSrc, revokeOptionImagePreviewUrl } from '@/components/modules/builder/optionImage'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -76,12 +77,14 @@ function emitOptions(next: FieldOptionEntry[]) {
 
 function addOption() {
     const text = newOption.value
-    emitOptions([...optionRows(), { id: crypto.randomUUID(), type: 'text', label: text, imageUrl: '' }])
+    emitOptions([...optionRows(), { id: crypto.randomUUID(), type: 'text', label: text, imageUrl: '', imageFile: null, imagePreviewUrl: '' }])
     newOption.value = ''
 }
 
 function removeOption(index: number) {
     const opts = [...optionRows()]
+    const removed = opts[index]
+    revokeOptionImagePreviewUrl(removed?.imagePreviewUrl)
     opts.splice(index, 1)
     emitOptions(opts)
 }
@@ -90,7 +93,8 @@ function toggleOptionType(index: number) {
     if (props.field.type === 'dropdown') return
     const opts = [...optionRows()]
     const cur = opts[index]
-    opts[index] = { ...cur, type: cur.type === 'text' ? 'image' : 'text' }
+    revokeOptionImagePreviewUrl(cur.imagePreviewUrl)
+    opts[index] = { ...cur, type: cur.type === 'text' ? 'image' : 'text', imageFile: null, imagePreviewUrl: '' }
     emitOptions(opts)
 }
 
@@ -102,7 +106,10 @@ function setOptionLabel(index: number, label: string) {
 
 function setOptionImageUrl(index: number, url: string) {
     const opts = [...optionRows()]
-    opts[index] = { ...opts[index], imageUrl: url.trim() }
+    const cur = opts[index]
+    // URL manual eksplisit → file pending dibuang (preview dicabut).
+    revokeOptionImagePreviewUrl(cur.imagePreviewUrl)
+    opts[index] = { ...cur, imageUrl: url.trim(), imageFile: null, imagePreviewUrl: '' }
     emitOptions(opts)
 }
 
@@ -111,12 +118,18 @@ function onOptionImageFile(index: number, event: Event) {
     const file = input.files?.[0]
     input.value = ''
     if (!file || !file.type.startsWith('image/')) return
-    const reader = new FileReader()
-    reader.onload = () => {
-        if (typeof reader.result !== 'string') return
-        setOptionImageUrl(index, reader.result)
-    }
-    reader.readAsDataURL(file)
+    const opts = [...optionRows()]
+    const cur = opts[index]
+    // Simpan File mentah untuk upload multipart; preview via object URL.
+    // JANGAN base64 ke state — DB hanya menyimpan path hasil upload.
+    revokeOptionImagePreviewUrl(cur.imagePreviewUrl)
+    const objectUrl = URL.createObjectURL(file)
+    opts[index] = { ...cur, imageFile: file, imagePreviewUrl: objectUrl }
+    emitOptions(opts)
+}
+
+function optionPreviewSrc(opt: FieldOptionEntry): string {
+    return resolveOptionImagePreviewSrc(opt)
 }
 
 const hasPlaceholder = computed(() =>
@@ -323,11 +336,11 @@ const hasAdvancedFlags = computed(
                             </div>
                             <div v-else class="flex flex-col gap-1.5">
                                 <div
-                                    v-if="opt.imageUrl"
+                                    v-if="optionPreviewSrc(opt)"
                                     class="h-20 w-full overflow-hidden rounded-lg border border-border bg-card"
                                 >
                                     <img
-                                        :src="opt.imageUrl"
+                                        :src="optionPreviewSrc(opt)"
                                         alt=""
                                         class="size-full object-cover"
                                     />

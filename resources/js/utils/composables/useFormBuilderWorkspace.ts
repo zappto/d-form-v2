@@ -1,6 +1,6 @@
 import { ref, computed, type Ref } from 'vue'
 import { showErrorToast } from '@/lib/error-message'
-import { normalizeBannerSrc, type FormBannerState } from '@/components/modules/builder/formBanner'
+import { resolveBannerPreviewSrc, type FormBannerState } from '@/components/modules/builder/formBanner'
 import {
     cloneFormBuilderPalette,
     type FormBuilderPaletteCategory,
@@ -80,7 +80,7 @@ export function useFormBuilderWorkspace(
     )
 
     const isEmpty = computed<boolean>(() => models.formFields.value.length === 0)
-    const bannerPreviewSrc = computed<string>(() => normalizeBannerSrc(models.banner.value.bannerUrl))
+    const bannerPreviewSrc = computed<string>(() => resolveBannerPreviewSrc(models.banner.value))
 
     const validationIssues = computed<FormBuilderValidationIssue[]>(() => {
         const issues: FormBuilderValidationIssue[] = []
@@ -152,6 +152,9 @@ export function useFormBuilderWorkspace(
         const copy = JSON.parse(JSON.stringify(models.formFields.value[i])) as BuilderField
         copy.id = crypto.randomUUID()
         copy.name = `field_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`
+        // Duplikat = baris baru: buang order bawaan agar spaced ordering
+        // mengalokasikan midpoint sesudah aslinya (hindari order ganda).
+        copy.order = undefined
         const next = [...models.formFields.value]
         next.splice(i + 1, 0, copy)
         models.formFields.value = next

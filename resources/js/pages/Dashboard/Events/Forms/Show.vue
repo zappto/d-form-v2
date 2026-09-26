@@ -5,12 +5,20 @@ import axios from 'axios';
 import { toast } from 'vue-sonner';
 import { useAutosaveSync } from '@/utils/composables/useAutosaveSync';
 import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
+import {
+    DESCRIPTION_REQUIRED_MESSAGE,
+    TITLE_REQUIRED_MESSAGE,
+    isBlankRequiredValue,
+    mergeSentHeader,
+    stripBlankRequiredKeys,
+} from '@/lib/autosaveHeader';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     Tooltip,
     TooltipContent,
@@ -25,11 +33,28 @@ import {
     type BackendField,
     type BuilderField,
 } from '@/components/modules/builder/fieldMapping';
+import { diffBackendFields, snapshotBackendFields } from '@/components/modules/builder/dirtyFields';
 import {
+    applyBannerUploadSuccess,
+    buildBannerFieldsFormData,
     defaultFormBannerState,
-    prependFormBannerToBackendPayload,
+    ensureBannerRowDirty,
     extractFormBannerFromBuilderFields,
+    hasPendingBannerFile,
+    pendingBannerSnapshotKey,
+    prependFormBannerToBackendPayload,
+    readBannerPathFromResponse,
 } from '@/components/modules/builder/formBanner';
+import {
+    applyOptionImageUploadSuccess,
+    buildOptionImageFieldsFormData,
+    collectPendingOptionImageFiles,
+    discardPendingOptionImageFiles,
+    ensureOptionImageRowsDirty,
+    hasPendingOptionImageFiles,
+    pendingOptionImagesSnapshotKey,
+    readOptionImagePathsFromResponse,
+} from '@/components/modules/builder/optionImage';
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
 import type { FormSiblingOption } from '@/types/form';
 import {
@@ -60,6 +85,7 @@ const props = defineProps<{
     siblingForms?: FormSiblingOption[];
     saveFieldsUrl: string;
     updateFormUrl: string;
+    autosaveFormUrl: string;
     submissions?: IFormSubmission[];
     submissionsCount?: number;
 }>();
@@ -81,8 +107,13 @@ watch(activeTab, (tab) => {
         preserveState: true,
         preserveScroll: true,
         replace: true,
+        onStart: () => { isLoadingSubmissions.value = true; },
+        onFinish: () => { isLoadingSubmissions.value = false; },
     });
 });
+
+/** Skeleton area jawaban selama tab visit / reload partial (pola M2 Task 1). */
+const isLoadingSubmissions = ref(false);
 
 const settingsForm = useForm({
     _method: 'put',
@@ -99,7 +130,54 @@ const bannerState = ref(defaultFormBannerState());
 const formFields = ref<BuilderField[]>([]);
 const formMetadata = ref(emptyFormRegistrationMetadata());
 
+/** Header autosave yang dinormalisasi persis seperti payload PATCH yang dikirim. */
+interface AutosaveHeaderPayload {
+    title: string;
+    description: string;
+    success_content: string | null;
+    closed_at: string | null;
+    visible_for: string[];
+    banner_url: string | null;
+    banner_caption: string | null;
+    metadata: Record<string, unknown>;
+}
+
+function buildHeaderPayload(): AutosaveHeaderPayload {
+    return {
+        title: settingsForm.title,
+        description: settingsForm.description,
+        success_content: settingsForm.success_content ?? '',
+        closed_at: (settingsForm.closed_at ?? '').trim() !== '' ? (settingsForm.closed_at as string) : null,
+        visible_for: [...settingsForm.visible_for],
+        banner_url: bannerState.value.bannerUrl || null,
+        banner_caption: bannerState.value.caption || null,
+        metadata: toFormMetadataPayload(formMetadata.value),
+    };
+}
+
+/**
+ * Snapshot header terakhir yang sukses terkirim. PATCH hanya mengirim key yang
+ * berubah (diff per-key) — hemat payload + tidak menulis null ke kolom NOT NULL
+ * (mis. description '' → null oleh ConvertEmptyStringsToNull).
+ */
+const lastSentHeader = ref<AutosaveHeaderPayload | null>(null);
+
+function diffHeaderPayload(current: AutosaveHeaderPayload): Partial<AutosaveHeaderPayload> {
+    const prev: AutosaveHeaderPayload | null = lastSentHeader.value;
+    if (prev === null) return { ...current };
+    const diff: Partial<AutosaveHeaderPayload> = {};
+    (Object.keys(current) as Array<keyof AutosaveHeaderPayload>).forEach((key: keyof AutosaveHeaderPayload) => {
+        if (JSON.stringify(current[key]) !== JSON.stringify(prev[key])) {
+            (diff as Record<string, unknown>)[key] = current[key];
+        }
+    });
+    return diff;
+}
+
 // ── Autosave global: semua mutasi builder (fields + header/settings) ──
+// Snapshot backend terakhir yang sukses terkirim (per id) untuk dirty-subset.
+const lastSentFields = ref<BackendField[] | null>(null);
+
 function buildShowSnapshot(): string {
     return JSON.stringify({
         fields: formFields.value,
@@ -107,6 +185,9 @@ function buildShowSnapshot(): string {
         description: settingsForm.description,
         bannerUrl: bannerState.value.bannerUrl,
         bannerCaption: bannerState.value.caption,
+        bannerFileName: bannerState.value.bannerFileName,
+        bannerPending: pendingBannerSnapshotKey(bannerState.value),
+        optionImagesPending: pendingOptionImagesSnapshotKey(formFields.value),
         success: settingsForm.success_content ?? '',
         closedAt: settingsForm.closed_at ?? '',
         visibleFor: settingsForm.visible_for,
@@ -114,29 +195,88 @@ function buildShowSnapshot(): string {
     });
 }
 
-async function saveShowSnapshot(): Promise<void> {
+async function saveShowSnapshot(snapshot?: string): Promise<boolean> {
+    void snapshot;
     const merged = prependFormBannerToBackendPayload(formFields.value, bannerState.value);
     const backendFields = toBackendFields(merged);
-    await axios.post(
-        props.saveFieldsUrl,
-        { fields: backendFields },
-        { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
-    );
-    await axios.put(
-        props.updateFormUrl,
-        {
-            title: settingsForm.title,
-            description: settingsForm.description,
-            success_content: settingsForm.success_content ?? '',
-            closed_at: settingsForm.closed_at ?? '',
-            visible_for: settingsForm.visible_for,
-            banner_url: bannerState.value.bannerUrl || null,
-            banner_caption: bannerState.value.caption || null,
-            fields: backendFields,
-            metadata: toFormMetadataPayload(formMetadata.value),
-        },
-        { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
-    );
+    const fieldDiff = diffBackendFields(backendFields, lastSentFields.value);
+    const pendingBannerFile = hasPendingBannerFile(bannerState.value)
+        ? (bannerState.value.bannerFile as File)
+        : null;
+    const pendingOptionFiles = collectPendingOptionImageFiles(formFields.value);
+    // File banner/opsi baru wajib ikut terkirim walau diff per-id bersih.
+    let dirty = fieldDiff.dirty;
+    let hasFieldChanges = fieldDiff.hasChanges;
+    if (pendingBannerFile) {
+        dirty = ensureBannerRowDirty(backendFields, dirty);
+        hasFieldChanges = true;
+    }
+    if (pendingOptionFiles.length > 0) {
+        dirty = ensureOptionImageRowsDirty(backendFields, dirty);
+        hasFieldChanges = true;
+    }
+    // Dirty-subset: POST /fields hanya berisi baris tambah/edit (termasuk yang
+    // order-nya berubah) + deleted_ids eksplisit; tanpa field kotor dan tanpa
+    // deleted → skip POST. Snapshot sukses diperbarui setelah berhasil.
+    if (hasFieldChanges) {
+        if (pendingBannerFile || pendingOptionFiles.length > 0) {
+            // Multipart: fields + deleted_ids sebagai JSON-string part,
+            // banner_file + option_images[fieldId][optionId] sebagai file part
+            // (Laravel parse native + decode). Tanpa file pending berperilaku
+            // seperti sekarang (JSON).
+            const formData =
+                pendingOptionFiles.length === 0 && pendingBannerFile
+                    ? buildBannerFieldsFormData(dirty, fieldDiff.deletedIds, pendingBannerFile)
+                    : buildOptionImageFieldsFormData(
+                          dirty,
+                          fieldDiff.deletedIds,
+                          pendingOptionFiles,
+                          pendingBannerFile,
+                      );
+            const res = await axios.post(props.saveFieldsUrl, formData, {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const storedPath = readBannerPathFromResponse(res.data);
+            if (storedPath) {
+                // State pegang path string hasil upload, bukan File/base64.
+                applyBannerUploadSuccess(bannerState.value, storedPath, pendingBannerFile?.name);
+            } else if (pendingBannerFile) {
+                bannerState.value.bannerFile = null;
+                bannerState.value.bannerPreviewUrl = '';
+            }
+            const storedOptionMap = readOptionImagePathsFromResponse(res.data);
+            if (storedOptionMap) {
+                // State pegang path string hasil upload, bukan File/base64.
+                applyOptionImageUploadSuccess(formFields.value, storedOptionMap);
+            } else if (pendingOptionFiles.length > 0) {
+                discardPendingOptionImageFiles(formFields.value);
+            }
+        } else {
+            await axios.post(
+                props.saveFieldsUrl,
+                { fields: dirty, deleted_ids: fieldDiff.deletedIds },
+                { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
+            );
+        }
+        lastSentFields.value = snapshotBackendFields(
+            toBackendFields(prependFormBannerToBackendPayload(formFields.value, bannerState.value)),
+        );
+    }
+    // Header parsial via PATCH lenient (tanpa fields): hanya key yang berubah
+    // dibanding snapshot sukses terakhir. Title/description yang kosong/blank
+    // dikecualikan dari payload (bukan ''/null) + ditandai invalid inline —
+    // '' yang terkirim hanya akan dilewati server lalu terlihat "resurrect"
+    // diam-diam saat reload. Clear banner tetap menolkan
+    // kolom banner_url/banner_caption di save yang sama dengan hapus baris field banner.
+    const header: AutosaveHeaderPayload = buildHeaderPayload();
+    const headerDiff: Partial<AutosaveHeaderPayload> = stripBlankRequiredKeys(diffHeaderPayload(header), header);
+    if (Object.keys(headerDiff).length > 0) {
+        await axios.patch(props.autosaveFormUrl, headerDiff, {
+            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        lastSentHeader.value = mergeSentHeader(lastSentHeader.value, header, headerDiff);
+    }
+    return hasFieldChanges || Object.keys(headerDiff).length > 0;
 }
 
 /** Ref ke FormBuilderWorkspace untuk memicu preview/save dari bar aksi inline (toolbar disembunyikan). */
@@ -185,8 +325,12 @@ const visibleFor = computed({
 });
 
 const fieldErrors = computed(() => ({
-    title: getFieldError(settingsForm.errors, 'title'),
-    description: getFieldError(settingsForm.errors, 'description'),
+    title:
+        getFieldError(settingsForm.errors, 'title') ??
+        (isBlankRequiredValue(settingsForm.title) ? TITLE_REQUIRED_MESSAGE : undefined),
+    description:
+        getFieldError(settingsForm.errors, 'description') ??
+        (isBlankRequiredValue(settingsForm.description) ? DESCRIPTION_REQUIRED_MESSAGE : undefined),
     closed_at: getFieldError(settingsForm.errors, 'closed_at'),
     visible_for: getFieldError(settingsForm.errors, 'visible_for'),
 }));
@@ -201,8 +345,11 @@ function syncFieldsFromProps(): void {
     bannerState.value.bannerUrl = props.form.banner_url ?? syntheticBanner.bannerUrl;
     bannerState.value.caption = props.form.banner_caption ?? syntheticBanner.caption;
     bannerState.value.bannerFileName = syntheticBanner.bannerFileName;
+    bannerState.value.bannerFile = null;
+    bannerState.value.bannerPreviewUrl = '';
 
     formFields.value = canvasFields;
+    lastSentFields.value = snapshotBackendFields(toBackendFields(prependFormBannerToBackendPayload(canvasFields, bannerState.value)));
 }
 
 watch(
@@ -222,6 +369,7 @@ watch(
         settingsForm.banner_url = f.banner_url ?? '';
         settingsForm.banner_caption = f.banner_caption ?? '';
         formMetadata.value = parseFormRegistrationMetadata(f.metadata);
+        lastSentHeader.value = buildHeaderPayload();
     },
     { deep: true, immediate: true }
 );
@@ -239,25 +387,38 @@ onUnmounted(() => {
 });
 
 function onSave(): void {
-    settingsForm.banner_url = bannerState.value.bannerUrl;
-    settingsForm.banner_caption = bannerState.value.caption;
+    // Bila ada file banner/opsi pending, flush autosave dulu (upload multipart →
+    // state jadi path string), lalu PUT manual dengan path tersebut.
+    const proceed = (): void => {
+        settingsForm.banner_url = bannerState.value.bannerUrl;
+        settingsForm.banner_caption = bannerState.value.caption;
 
-    const merged = prependFormBannerToBackendPayload(formFields.value, bannerState.value);
-    const backendFields = toBackendFields(merged);
+        const merged = prependFormBannerToBackendPayload(formFields.value, bannerState.value);
+        const backendFields = toBackendFields(merged);
 
-    settingsForm
-        .transform((data) => ({
-            ...data,
-            fields: backendFields,
-            metadata: toFormMetadataPayload(formMetadata.value),
-        }))
-        .put(props.updateFormUrl, {
-            preserveScroll: true,
-            onSuccess: () => toast.success(humanizeErrorMessage('Form and fields saved successfully.')),
-            onError: (errors) => {
-                handleInertiaFormErrors(errors, { title: 'Gagal menyimpan form' });
-            },
-        });
+        settingsForm
+            .transform((data) => ({
+                ...data,
+                fields: backendFields,
+                metadata: toFormMetadataPayload(formMetadata.value),
+            }))
+            .put(props.updateFormUrl, {
+                preserveScroll: true,
+                onSuccess: () => toast.success(humanizeErrorMessage('Form and fields saved successfully.')),
+                onError: (errors) => {
+                    handleInertiaFormErrors(errors, { title: 'Gagal menyimpan form' });
+                },
+            });
+    };
+
+    if (hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value)) {
+        void showAutosave
+            .flush()
+            .catch(() => toast.error('Gagal mengunggah banner. Coba lagi.'))
+            .then(() => proceed());
+        return;
+    }
+    proceed();
 }
 
 /** Jawaban terurut mengikuti urutan field di builder; sisa key (legacy) di akhir. */
@@ -409,7 +570,11 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
                     404: 'Jawaban tidak ditemukan.',
                 });
                 if (res.status === 409 || res.status === 422) {
-                    router.reload({ only: ['submissions'] });
+                    router.reload({
+                        only: ['submissions'],
+                        onStart: () => { isLoadingSubmissions.value = true; },
+                        onFinish: () => { isLoadingSubmissions.value = false; },
+                    });
                 }
                 return;
             }
@@ -417,12 +582,14 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
             toast.success(action === 'accept' ? 'Jawaban diterima.' : 'Jawaban ditolak.');
             router.reload({
                 only: ['submissions'],
+                onStart: () => { isLoadingSubmissions.value = true; },
                 onSuccess: () => {
                     const next = (props.submissions ?? []).find((s) => s.id === id) ?? null;
                     if (next && selectedSubmission.value?.id === id) {
                         selectedSubmission.value = next;
                     }
                 },
+                onFinish: () => { isLoadingSubmissions.value = false; },
             });
         } catch {
             showErrorToast('Tidak dapat menghubungi server. Coba lagi.');
@@ -530,7 +697,107 @@ function rejectLabel(submission: IFormSubmission): string {
 
             <TabsContent value="jawaban" class="mt-0">
                 <div
-                    v-if="submissionRows.length === 0"
+                    v-if="isLoadingSubmissions"
+                    aria-busy="true"
+                    aria-label="Memuat jawaban"
+                >
+                    <div class="app-surface overflow-hidden rounded-2xl p-0">
+                        <div class="border-border/60 flex items-center gap-2.5 border-b px-5 py-4">
+                            <Skeleton class="size-9 shrink-0 rounded-full" />
+                            <div class="space-y-1.5">
+                                <Skeleton class="h-4 w-32" />
+                                <Skeleton class="h-3 w-48" />
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow class="hover:bg-transparent">
+                                        <TableHead
+                                            class="bg-muted/40 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                        >
+                                            Pengirim
+                                        </TableHead>
+                                        <TableHead
+                                            class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                        >
+                                            Status review
+                                        </TableHead>
+                                        <TableHead
+                                            v-for="key in tableAnswerKeys"
+                                            :key="`skel-${key}`"
+                                            class="bg-muted/30 text-muted-foreground h-11 min-w-[160px] px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                        >
+                                            {{ humanizeKey(key) }}
+                                        </TableHead>
+                                        <TableHead
+                                            class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                        >
+                                            Dikirim
+                                        </TableHead>
+                                        <TableHead
+                                            class="bg-muted/30 text-muted-foreground h-11 px-5 text-right text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                        >
+                                            Aksi
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow
+                                        v-for="n in 10"
+                                        :key="`jawaban-skel-${n}`"
+                                        class="jawaban-row-skeleton border-border/60 border-b"
+                                    >
+                                        <TableCell class="border-border/60 bg-card border-r px-5 py-3.5">
+                                            <div class="flex items-center gap-3">
+                                                <Skeleton class="size-8 shrink-0 rounded-lg" />
+                                                <div class="min-w-0 flex-1 space-y-1.5">
+                                                    <Skeleton class="h-3.5 w-3/4" />
+                                                    <Skeleton class="h-2.5 w-full" />
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell class="px-5 py-3.5 whitespace-nowrap">
+                                            <Skeleton class="h-6 w-20 rounded-full" />
+                                        </TableCell>
+                                        <TableCell
+                                            v-for="key in tableAnswerKeys"
+                                            :key="`skel-sel-${n}-${key}`"
+                                            class="max-w-[220px] px-5 py-3.5"
+                                        >
+                                            <Skeleton class="h-3 w-full" />
+                                        </TableCell>
+                                        <TableCell class="px-5 py-3.5 whitespace-nowrap">
+                                            <Skeleton class="h-3 w-20" />
+                                        </TableCell>
+                                        <TableCell class="px-5 py-3.5 whitespace-nowrap text-right">
+                                            <div class="flex items-center justify-end gap-1">
+                                                <Skeleton class="size-7 shrink-0" />
+                                                <Skeleton class="size-7 shrink-0" />
+                                                <Skeleton class="size-7 shrink-0" />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
+
+                        <div
+                            class="jawaban-pager-skeleton flex items-center justify-between gap-2 px-5 py-3.5"
+                            aria-hidden="true"
+                        >
+                            <Skeleton class="h-4 w-40" />
+                            <div class="flex gap-2">
+                                <Skeleton class="h-8 w-24" />
+                                <Skeleton class="h-8 w-24" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    v-else-if="submissionRows.length === 0"
                     class="border-border/70 bg-muted/10 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-6 py-20 text-center"
                 >
                     <div class="border-border bg-card grid size-14 place-items-center rounded-full border shadow-xs">
@@ -545,7 +812,7 @@ function rejectLabel(submission: IFormSubmission): string {
                     </p>
                 </div>
 
-                <div v-else class="app-surface overflow-hidden rounded-2xl p-0">
+                <div v-else class="fade-up app-surface overflow-hidden rounded-2xl p-0">
                     <div class="border-border/60 flex items-center gap-2.5 border-b px-5 py-4">
                         <div class="bg-primary/10 text-primary grid size-9 place-items-center rounded-full">
                             <Inbox class="size-4" aria-hidden="true" />
@@ -729,6 +996,7 @@ function rejectLabel(submission: IFormSubmission): string {
                     :format-date="formatDate"
                     :humanize-key="humanizeKey"
                     :is-submission-reviewing="isSubmissionReviewing"
+                    :loading="isLoadingSubmissions"
                     @review="onDetailReview"
                 />
             </TabsContent>

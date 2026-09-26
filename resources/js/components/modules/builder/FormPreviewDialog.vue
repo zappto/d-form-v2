@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { X, Star, Upload, ImagePlus, Send } from 'lucide-vue-next'
-import { optionLabel, optionImageUrl, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping'
+import { optionLabel, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping'
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
+import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage'
 import PageHeader from '@/components/modules/dashboard/PageHeader.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,14 +39,7 @@ const emit = defineEmits<{ close: [] }>()
 
 const fieldsSafe = computed(() => props.fields ?? [])
 
-const bannerResolved = computed(() => {
-    const u = (props.formBannerUrl || '').trim()
-    if (!u) return ''
-    if (u.startsWith('data:')) return u
-    if (/^https?:\/\//i.test(u)) return u
-    if (u.startsWith('/')) return u
-    return `/storage/${u.replace(/^\/+/, '')}`
-})
+const bannerResolved = computed(() => normalizeBannerSrc(props.formBannerUrl || ''))
 
 const bannerCaptionTrim = computed(() => (props.formBannerCaption || '').trim())
 
@@ -96,8 +90,12 @@ function dropdownOptions(field: FormPreviewField): SimpleSelectOption[] {
     }))
 }
 
-function choiceThumb(url: string): string {
-    return normalizeBannerSrc(url)
+function choiceThumb(entry: FieldOptionEntry): string {
+    return resolveOptionImagePreviewSrc(entry)
+}
+
+function hasChoiceImage(entry: FieldOptionEntry): boolean {
+    return choiceThumb(entry) !== ''
 }
 
 function optKey(opt: FieldOptionEntry, i: number): string {
@@ -285,9 +283,9 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         :name="`preview_${field.id}`"
                                                         tabindex="-1"
                                                     />
-                                                    <div v-if="opt.type === 'image' && optionImageUrl(opt)" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
+                                                    <div v-if="opt.type === 'image' && hasChoiceImage(opt)" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
                                                         <img
-                                                            :src="choiceThumb(optionImageUrl(opt)!)"
+                                                            :src="choiceThumb(opt)"
                                                             alt=""
                                                             class="size-full object-cover"
                                                         />
@@ -307,9 +305,9 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         disabled
                                                         class="pointer-events-none opacity-80"
                                                     />
-                                                    <div v-if="opt.type === 'image' && optionImageUrl(opt)" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
+                                                    <div v-if="opt.type === 'image' && hasChoiceImage(opt)" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
                                                         <img
-                                                            :src="choiceThumb(optionImageUrl(opt)!)"
+                                                            :src="choiceThumb(opt)"
                                                             alt=""
                                                             class="size-full object-cover"
                                                         />

@@ -18,11 +18,14 @@ export function optionImageUrl(entry: FieldOptionEntry): string | undefined {
 function serializeOptionChoices(options: readonly FieldOptionEntry[]): Record<string, unknown>[] {
     return options.map((o) => {
         const label = String(o.label ?? '').trim()
+        // File pending → kirim imageUrl '' agar tak ada base64 baru yang
+        // tertulis; server mengganti dengan stored path hasil upload.
+        const hasPendingFile = o.imageFile instanceof File
         return {
             id: o.id,
             type: o.type,
             label,
-            imageUrl: o.imageUrl ?? ''
+            imageUrl: hasPendingFile ? '' : (o.imageUrl ?? '')
         }
     })
 }
@@ -262,6 +265,7 @@ export function fromBackendField(bf: BackendField): BuilderField {
         required: !!rules.required,
         options: opts,
         is_append: bf.is_append === true,
+        order: bf.order,
         metadata: {
             ...m,
             maxStars: (m.maxStars as number) || 5,
@@ -272,6 +276,195 @@ export function fromBackendField(bf: BackendField): BuilderField {
     }
 }
 
-export function toBackendFields(builderFields: BuilderField[]): BackendField[] {
-    return builderFields.map((f, i) => toBackendField(f, i + 1))
+/**
+ * Spaced ordering (anti order-shift): gap antar baris 1000.
+ * Insert baru dialokasikan di tengah antar tetangga (midpoint; di ujung
+ * tetangga ± 1000), baris existing TAK dinomori ulang sehingga diff
+ * per-id hanya menandai baris baru sebagai kotor.
+ * Backend memvalidasi `order` integer min:0 + mengurutkan numerik murni
+ * (ORDER BY `order` + index komposit) sehingga nilai spaced tetap valid.
+ */
+export const FIELD_ORDER_GAP = 1000
+
+/** Alokasi satu order di antara tetangga (edge ± GAP, tengah midpoint floor). */
+export function allocateSpacedOrder(prev: number | null, next: number | null): number {
+    if (prev === null && next === null) return FIELD_ORDER_GAP
+    if (prev === null) return (next as number) - FIELD_ORDER_GAP
+    if (next === null) return prev + FIELD_ORDER_GAP
+    return Math.floor((prev + next) / 2)
+}
+
+function asKnownOrder(value: unknown): number | null {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return null
+    return Math.trunc(value)
+}
+
+/**
+ * Alokasikan `count` order integer >=0 strictly di antara anchor.
+ * Null bila tak ada slot integer (pemanggil fallback rebalance penuh).
+ */
+export function allocateOrderRun(
+    prev: number | null,
+    next: number | null,
+    count: number,
+): number[] | null {
+    if (count <= 0) return []
+    if (prev === null && next === null) {
+        return Array.from({ length: count }, (_, i) => (i + 1) * FIELD_ORDER_GAP)
+    }
+    if (prev === null && next !== null) {
+        const spacedFirst = next - count * FIELD_ORDER_GAP
+        if (spacedFirst >= 0) {
+            return Array.from({ length: count }, (_, i) => spacedFirst + i * FIELD_ORDER_GAP)
+        }
+        // Fallback padat: [next-count, .., next-1] bila muat di >=0.
+        if (next >= count && next > 0) {
+            return Array.from({ length: count }, (_, i) => next - count + i)
+        }
+        return null
+    }
+    if (prev !== null && next === null) {
+        return Array.from({ length: count }, (_, i) => prev + (i + 1) * FIELD_ORDER_GAP)
+    }
+    const gap = (next as number) - (prev as number)
+    if (gap <= count) return null
+    const step = Math.floor(gap / (count + 1))
+    if (step < 1) return null
+    return Array.from({ length: count }, (_, i) => (prev as number) + (i + 1) * step)
+}
+
+function prevMapFrom(
+    prevOrders: Map<string, number> | BackendField[] | null | undefined,
+): Map<string, number> {
+    if (prevOrders instanceof Map) return prevOrders
+    const map = new Map<string, number>()
+    if (Array.isArray(prevOrders)) {
+        for (const row of prevOrders) {
+            const order = asKnownOrder(row?.order)
+            if (typeof row?.id === 'string' && order !== null) map.set(row.id, order)
+        }
+    }
+    return map
+}
+
+/**
+ * Konversi canvas → backend dengan order spaced.
+ * - Baris existing (order terbawa via `BuilderField.order` atau `prevOrders`)
+ *   dipertahankan apa adanya bila urutan kanvas masih menaik.
+ * - Baris baru (tanpa order dikenal) dialokasikan midpoint antar tetangga.
+ * - Reorder eksplisit (urutan dikenal tak lagi menaik) menulis ulang HANYA
+ *   rentang kanvas yang dipindah (genuinely kotor); bila slot integer habis,
+ *   fallback rebalance penuh `(i+1)*GAP` (langka: >10 insert di celah sama).
+ */
+export function toBackendFields(
+    builderFields: BuilderField[],
+    prevOrders?: Map<string, number> | BackendField[] | null,
+): BackendField[] {
+    const n = builderFields.length
+    if (n === 0) return []
+    const prevMap = prevMapFrom(prevOrders)
+    const known: (number | null)[] = builderFields.map((f) => {
+        const carried = asKnownOrder(f.order)
+        if (carried !== null) return carried
+        const prev = prevMap.get(f.id)
+        return asKnownOrder(prev ?? null)
+    })
+
+    if (!known.some((v) => v !== null)) {
+        return builderFields.map((f, i) => toBackendField(f, (i + 1) * FIELD_ORDER_GAP))
+    }
+
+    const knownSeq: Array<{ idx: number; order: number }> = []
+    known.forEach((v, idx) => {
+        if (v !== null) knownSeq.push({ idx, order: v })
+    })
+    let increasing = true
+    for (let k = 1; k < knownSeq.length; k++) {
+        if (knownSeq[k].order <= knownSeq[k - 1].order) {
+            increasing = false
+            break
+        }
+    }
+
+    const resultOrders: number[] = new Array<number>(n)
+
+    if (increasing) {
+        known.forEach((v, i) => {
+            if (v !== null) resultOrders[i] = v
+        })
+        let i = 0
+        while (i < n) {
+            if (known[i] !== null) {
+                i++
+                continue
+            }
+            let j = i
+            while (j < n && known[j] === null) j++
+            const count = j - i
+            const prevVal: number | null = i > 0 ? resultOrders[i - 1] : null
+            const nextVal: number | null = j < n ? (known[j] as number) : null
+            const alloc = allocateOrderRun(prevVal, nextVal, count)
+            if (alloc === null) {
+                return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP))
+            }
+            for (let k = 0; k < count; k++) resultOrders[i + k] = alloc[k]
+            i = j
+        }
+        return builderFields.map((f, idx) => toBackendField(f, resultOrders[idx]))
+    }
+
+    // ── Reorder eksplisit: tulis ulang hanya rentang yang dipindah ──
+    let firstInvSeq = -1
+    let lastInvSeq = -1
+    for (let k = 1; k < knownSeq.length; k++) {
+        if (knownSeq[k].order <= knownSeq[k - 1].order) {
+            if (firstInvSeq === -1) firstInvSeq = k - 1
+            lastInvSeq = k
+        }
+    }
+    const lo = knownSeq[firstInvSeq].idx
+    const hi = knownSeq[lastInvSeq].idx
+    const prevAnchor: number | null = firstInvSeq > 0 ? knownSeq[firstInvSeq - 1].order : null
+    const nextAnchor: number | null =
+        lastInvSeq + 1 < knownSeq.length ? knownSeq[lastInvSeq + 1].order : null
+    const windowSize = hi - lo + 1
+    const windowAlloc = allocateOrderRun(prevAnchor, nextAnchor, windowSize)
+    if (windowAlloc === null) {
+        return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP))
+    }
+    for (let k = 0; k < windowSize; k++) resultOrders[lo + k] = windowAlloc[k]
+    // Known di luar window dipertahankan.
+    known.forEach((v, i) => {
+        if (v !== null && (i < lo || i > hi)) resultOrders[i] = v
+    })
+    // Unknown di luar window dialokasikan seperti kasus increasing.
+    let i = 0
+    while (i < n) {
+        if (i >= lo && i <= hi) {
+            i = hi + 1
+            continue
+        }
+        if (known[i] !== null) {
+            i++
+            continue
+        }
+        let j = i
+        while (j < n && !(j >= lo && j <= hi) && known[j] === null) j++
+        // j berhenti di window atau known berikutnya; next anchor = resultOrders[j] bila j di window/known.
+        const count = j - i
+        const prevVal: number | null = i > 0 ? resultOrders[i - 1] : null
+        let nextVal: number | null = null
+        if (j < n) {
+            if (j >= lo && j <= hi) nextVal = resultOrders[j]
+            else if (known[j] !== null) nextVal = known[j] as number
+            else nextVal = null
+        }
+        const alloc = allocateOrderRun(prevVal, nextVal, count)
+        if (alloc === null) {
+            return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP))
+        }
+        for (let k = 0; k < count; k++) resultOrders[i + k] = alloc[k]
+        i = j
+    }
+    return builderFields.map((f, idx) => toBackendField(f, resultOrders[idx]))
 }
