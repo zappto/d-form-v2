@@ -49,12 +49,13 @@ class SendRegistrationRejectedJob implements ShouldQueue
         }
 
         $recipientEmail = $recipientResolver->email($submission);
-        $event = $submission->form->event;
+        $event = $submission->form?->event;
+        $eventId = $event?->id;
 
         if ($recipientEmail === null || $recipientEmail === '') {
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'user_id' => $recipientResolver->userIdForLog($submission),
                 'recipient_email' => '',
                 'status' => EmailLogStatus::Failed,
@@ -77,7 +78,7 @@ class SendRegistrationRejectedJob implements ShouldQueue
 
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'user_id' => $recipientResolver->userIdForLog($submission),
                 'recipient_email' => $recipientEmail,
                 'status' => EmailLogStatus::Sent,
@@ -88,7 +89,7 @@ class SendRegistrationRejectedJob implements ShouldQueue
         } catch (\Throwable $e) {
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'user_id' => $recipientResolver->userIdForLog($submission),
                 'recipient_email' => $recipientEmail,
                 'status' => EmailLogStatus::Failed,
@@ -100,7 +101,7 @@ class SendRegistrationRejectedJob implements ShouldQueue
             Log::error('[SendRegistrationRejectedJob] Email send failed.', [
                 'notification_type' => EmailNotificationType::RegistrationRejected->value,
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'recipient_email' => $recipientEmail,
                 'exception_class' => $e::class,
                 'exception_message' => $e->getMessage(),

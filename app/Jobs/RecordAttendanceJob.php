@@ -23,19 +23,37 @@ class RecordAttendanceJob implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public string $attendanceId,
+        public ?string $attendanceId = null,
+        // Legacy payload keys (pre-attendanceId signature: eventId, formAnswerId,
+        // scannerUserId). Kept nullable so queued payloads serialized with the old
+        // constructor still unserialize without dynamic-property warnings.
+        public ?string $eventId = null,
+        public ?string $formAnswerId = null,
+        public ?string $scannerUserId = null,
     ) {
     }
 
     public function handle(FormAnswerRecipientResolver $recipientResolver): void
     {
+        // Null-coalescing avoids "must not be accessed before initialization"
+        // when an old-payload instance somehow misses the default.
+        $attendanceId = $this->attendanceId ?? null;
+
+        if ($attendanceId === null || $attendanceId === '') {
+            Log::warning('[RecordAttendanceJob] Missing attendance id; skipping stale payload.', [
+                'attendance_id' => $attendanceId,
+            ]);
+
+            return;
+        }
+
         $attendance = EventAttendance::query()
             ->with(['formAnswer.form.event', 'formAnswer.user'])
-            ->find($this->attendanceId);
+            ->find($attendanceId);
 
         if ($attendance === null || $attendance->formAnswer === null || $attendance->formAnswer->form === null) {
             Log::warning('[RecordAttendanceJob] Attendance row missing or incomplete.', [
-                'attendance_id' => $this->attendanceId,
+                'attendance_id' => $attendanceId,
             ]);
 
             return;
@@ -65,13 +83,14 @@ class RecordAttendanceJob implements ShouldQueue
             return;
         }
 
-        $event = $submission->form->event;
+        $event = $submission->form?->event;
+        $eventId = $event?->id;
         $recipientEmail = $recipientResolver->email($submission);
 
         if ($recipientEmail === null || $recipientEmail === '') {
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'user_id' => $recipientResolver->userIdForLog($submission),
                 'recipient_email' => '',
                 'status' => EmailLogStatus::Failed,
@@ -94,7 +113,7 @@ class RecordAttendanceJob implements ShouldQueue
 
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'user_id' => $recipientResolver->userIdForLog($submission),
                 'recipient_email' => $recipientEmail,
                 'status' => EmailLogStatus::Sent,
@@ -105,7 +124,7 @@ class RecordAttendanceJob implements ShouldQueue
         } catch (\Throwable $e) {
             EmailLog::query()->create([
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'user_id' => $recipientResolver->userIdForLog($submission),
                 'recipient_email' => $recipientEmail,
                 'status' => EmailLogStatus::Failed,
@@ -117,7 +136,7 @@ class RecordAttendanceJob implements ShouldQueue
             Log::error('[RecordAttendanceJob] Email send failed.', [
                 'notification_type' => EmailNotificationType::AttendanceConfirmed->value,
                 'form_answer_id' => $submission->id,
-                'event_id' => $event->id,
+                'event_id' => $eventId,
                 'recipient_email' => $recipientEmail,
                 'exception_class' => $e::class,
                 'exception_message' => $e->getMessage(),
