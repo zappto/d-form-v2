@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { useRespondentDraft } from '@/utils/composables/useRespondentDraft';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import OpRecFeedbackForm from '@/components/modules/open-recruitment/OpRecFeedbackForm.vue';
 import { Button } from '@/components/ui/button';
@@ -129,6 +130,37 @@ const correctionForm = useForm({
     request_message: '',
 });
 
+function correctionDraftSnapshot(): string {
+    return JSON.stringify({ values: { request_message: correctionForm.request_message } });
+}
+
+const {
+    restore: restoreCorrectionDraft,
+    clear: clearCorrectionDraft,
+    cancel: cancelCorrectionDraft,
+} = useRespondentDraft<{ values?: unknown }>(correctionDraftSnapshot, 'dform:track-correction', {
+    debounceMs: 800,
+});
+
+function applyCorrectionDraft(): void {
+    const parsed = restoreCorrectionDraft();
+    if (!parsed || typeof parsed !== 'object') return;
+    const values = (parsed as { values?: unknown }).values;
+    if (typeof values !== 'object' || values === null) return;
+    const message = (values as Record<string, unknown>).request_message;
+    if (typeof message === 'string' && message !== '') {
+        correctionForm.request_message = message;
+    }
+}
+
+onMounted(() => {
+    applyCorrectionDraft();
+});
+
+onBeforeUnmount(() => {
+    cancelCorrectionDraft();
+});
+
 const heroToneClass = computed(() => {
     const tone = props.tracking.next_action.tone;
     if (tone === 'warning') return 'border-amber-200 bg-amber-50 text-amber-950';
@@ -194,6 +226,7 @@ function submitCorrection(): void {
     correctionForm.post(props.correctionUrl, {
         preserveScroll: true,
         onSuccess: () => {
+            clearCorrectionDraft();
             // Manual: CorrectionRequestController::store memakai ->with('toast') sesi
             // biasa yang tidak dibaca usePageFlashToast (hanya page.flash.toast).
             showFlashToast({

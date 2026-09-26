@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted } from 'vue'
 import { useForm } from '@inertiajs/vue3'
+import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { CometSpinner } from '@/components/ui/comet'
@@ -32,11 +34,45 @@ const form = useForm({
     feedback_text: '',
 })
 
+function feedbackDraftSnapshot(): string {
+    return JSON.stringify({ values: snapshotRespondentValues(form) })
+}
+
+const {
+    restore: restoreFeedbackDraft,
+    clear: clearFeedbackDraft,
+    cancel: cancelFeedbackDraft,
+} = useRespondentDraft<{ values?: unknown }>(feedbackDraftSnapshot, 'dform:track-feedback', {
+    debounceMs: 800,
+})
+
+function applyFeedbackDraft(): void {
+    const parsed = restoreFeedbackDraft()
+    if (!parsed || typeof parsed !== 'object') return
+    const values = (parsed as { values?: unknown }).values
+    if (typeof values !== 'object' || values === null) return
+    for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
+        if (!(key in form)) continue
+        if (typeof value === 'string') {
+            ;(form as unknown as Record<string, unknown>)[key] = value
+        }
+    }
+}
+
+onMounted(() => {
+    applyFeedbackDraft()
+})
+
+onBeforeUnmount(() => {
+    cancelFeedbackDraft()
+})
+
 function submit(): void {
     if (form.processing) return
     form.post(props.storeUrl, {
         preserveScroll: true,
         onSuccess: () => {
+            clearFeedbackDraft()
             form.reset()
             showFlashToast({ type: 'success', message: 'Terima kasih! Feedback kamu telah kami terima.' })
             emit('success')

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { AutosaveStatus } from '@/components/ui/autosave-status';
 import FormFillFieldSlotRows from '@/components/modules/dashboard/FormFillFieldSlotRows.vue';
 import { useFormFillPage } from '@/utils/composables/useFormFillPage';
-import { useAutosaveSync, type AutosaveStatus as AutosaveStatusType } from '@/utils/composables/useAutosaveSync';
+import { snapshotRespondentValues, useRespondentDraft } from '@/utils/composables/useRespondentDraft';
 import { readFieldRules } from '@/lib/formFieldMetadata';
 import type { FormFillPageEvent, FormFillPageForm } from '@/types/form';
 import { routes } from '@/lib/routes';
@@ -38,13 +38,11 @@ const ctx = useFormFillPage({
     registrationMode: 'single',
 });
 
-const DRAFT_KEY = 'oprec-apply-draft-v1';
 const TOTAL_STEPS = 3;
 const STEP_LIST = [1, 2, 3];
 const currentStep = ref<number>(1);
 const clientErrors = ref<Record<string, string>>({});
 const isSubmitting = ref(false);
-const savedAt = ref<Date | null>(null);
 
 function stepOf(field: IFormField): number {
     return typeof field.metadata.step === 'number' ? field.metadata.step : 0;
@@ -151,31 +149,18 @@ function onPopState(): void {
 }
 
 function draftSnapshot(): string {
-    const values: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(ctx.answerForm.data())) {
-        if (value instanceof File) continue;
-        values[key] = value;
-    }
-    return JSON.stringify({ step: currentStep.value, values });
+    return JSON.stringify({ step: currentStep.value, values: snapshotRespondentValues(ctx.answerForm) });
 }
 
 const {
     status: draftStatus,
+    lastSavedAt,
+    restore: restoreRawDraft,
+    clear: clearDraft,
     flush: flushDraft,
     cancel: cancelDraft,
-} = useAutosaveSync(draftSnapshot, async () => false, {
+} = useRespondentDraft<{ step?: unknown; values?: unknown }>(draftSnapshot, 'oprec-apply-draft-v1', {
     debounceMs: 800,
-    storageKey: DRAFT_KEY,
-    storage: {
-        read: (key: string): string | null => window.localStorage.getItem(key),
-        write: (key: string, value: string): void => window.localStorage.setItem(key, value),
-        remove: (key: string): void => window.localStorage.removeItem(key),
-    },
-    onError: () => {},
-});
-
-watch(draftStatus, (value: AutosaveStatusType): void => {
-    if (value === 'saved') savedAt.value = new Date();
 });
 
 /** Hapus pesan error begitu isian sudah diperbaiki, agar card-nya tidak tetap merah. */
@@ -195,7 +180,7 @@ watch(
 const draftStatusText = computed((): string => {
     if (draftStatus.value === 'saving') return 'Menyimpan…';
     if (draftStatus.value === 'saved') {
-        const time = savedAt.value?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) ?? '';
+        const time = lastSavedAt.value?.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) ?? '';
         return `Draft tersimpan otomatis · ${time}`;
     }
     return '';
@@ -206,15 +191,8 @@ function isDraftShape(value: unknown): value is { step?: unknown; values?: unkno
 }
 
 function restoreDraft(): void {
-    const raw = window.localStorage.getItem(DRAFT_KEY);
-    if (!raw) return;
-    let parsed: unknown;
-    try {
-        parsed = JSON.parse(raw);
-    } catch {
-        return;
-    }
-    if (!isDraftShape(parsed)) return;
+    const parsed = restoreRawDraft();
+    if (!parsed || !isDraftShape(parsed)) return;
     if (typeof parsed.step === 'number' && parsed.step >= 1 && parsed.step <= TOTAL_STEPS) {
         currentStep.value = parsed.step;
     }
@@ -255,7 +233,7 @@ async function submitStep(): Promise<void> {
     await flushDraft();
     ctx.answerForm.post(props.submitUrl, {
         forceFormData: true,
-        onSuccess: () => window.localStorage.removeItem(DRAFT_KEY),
+        onSuccess: () => clearDraft(),
         onError: () => {
             isSubmitting.value = false;
             const step = firstStepWithErrors();

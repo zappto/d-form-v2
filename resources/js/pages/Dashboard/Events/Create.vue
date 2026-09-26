@@ -437,16 +437,6 @@ function goToForms(): void {
     router.get(routes.admin.events.create, { step: 'forms', draftId: String(eventId) }, { preserveState: false });
 }
 
-function clearDraftCache(): void {
-    const id = draftEvent.value?.id;
-    if (!id) return;
-    try {
-        localStorage.removeItem(`dform:draft:form:${id}`);
-    } catch {
-        /* localStorage tidak tersedia */
-    }
-}
-
 // ── Selesai ─────────────────────────────────────────────────────
 const finishing = ref(false);
 
@@ -456,7 +446,6 @@ function finishWizard(): void {
     finishing.value = true;
     void flushPending()
         .then(() => {
-            clearDraftCache();
             router.visit(routes.admin.events.show(eventId));
         })
         .finally(() => {
@@ -467,7 +456,6 @@ function finishWizard(): void {
 function skipWizard(): void {
     const eventId = draftEvent.value?.id;
     if (!eventId) return;
-    clearDraftCache();
     router.visit(routes.admin.events.show(eventId));
 }
 
@@ -479,7 +467,6 @@ function confirmCancel(): void {
     const eventId = draftEvent.value?.id;
     if (!eventId || cancelBusy.value) return;
     cancelBusy.value = true;
-    clearDraftCache();
     router.delete(destroyEvent({ event: eventId }).url, {
         onSuccess: () => {
             // BE redirect ke index — Inertia mengikuti; fallback bila URL belum berubah.

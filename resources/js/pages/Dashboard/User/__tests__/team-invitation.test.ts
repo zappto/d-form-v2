@@ -228,15 +228,20 @@ describe('TeamInvitation accept (Task 7)', () => {
         }
     })
 
-    it('sukses → flash path (tanpa toast manual): onSuccess absence terkunci', async () => {
+    it('sukses → flash path (tanpa toast manual) + draft lokal dibersihkan', async () => {
         const wrapper = mountInvitation()
         try {
             await confirmAccept(wrapper)
 
             // Controller memakai Inertia::flash('toast') → toast global;
-            // tidak ada handler onSuccess manual yang memanggil toast.
-            expect(confirmCalls()[0]?.options?.onSuccess).toBeUndefined()
+            // onSuccess hanya membersihkan draft lokal, tanpa toast manual.
+            expect(confirmCalls()[0]?.options?.onSuccess).toBeDefined()
             expect(confirmCalls()[0]?.options?.onError).toBeDefined()
+
+            window.localStorage.setItem('dform:invite:fo-1', '{"values":{"catatan":"draft"}}')
+            confirmCalls()[0]?.options?.onSuccess?.()
+            expect(window.localStorage.getItem('dform:invite:fo-1')).toBeNull()
+
             expect(showFlashToast).not.toHaveBeenCalled()
             expect(toast.success).not.toHaveBeenCalled()
         } finally {

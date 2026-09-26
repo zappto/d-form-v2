@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import { Button } from '@/components/ui/button';
 import { CometSpinner } from '@/components/ui/comet';
@@ -61,6 +62,39 @@ const form = useForm({
     cv: null as File | null,
     instagram_follow_proof: null as File | null,
     twibbon_url: props.application?.twibbon_url ?? '',
+});
+
+function trackEditSnapshot(): string {
+    return JSON.stringify({ values: snapshotRespondentValues(form) });
+}
+
+const {
+    restore: restoreTrackEditDraft,
+    clear: clearTrackEditDraft,
+    cancel: cancelTrackEditDraft,
+} = useRespondentDraft<{ values?: unknown }>(trackEditSnapshot, 'dform:track-edit', {
+    debounceMs: 800,
+});
+
+function applyTrackEditDraft(): void {
+    const parsed = restoreTrackEditDraft();
+    if (!parsed || typeof parsed !== 'object') return;
+    const values = (parsed as { values?: unknown }).values;
+    if (typeof values !== 'object' || values === null) return;
+    for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
+        if (!(key in form)) continue;
+        if (typeof value === 'string') {
+            (form as unknown as Record<string, unknown>)[key] = value;
+        }
+    }
+}
+
+onMounted(() => {
+    applyTrackEditDraft();
+});
+
+onBeforeUnmount(() => {
+    cancelTrackEditDraft();
 });
 
 const semesterOptions: SimpleSelectOption[] = [
@@ -127,6 +161,7 @@ function submit(): void {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
+            clearTrackEditDraft();
             // Manual: TrackingController::update memakai ->with('toast') sesi biasa
             // yang tidak dibaca usePageFlashToast (hanya page.flash.toast).
             showFlashToast({ type: 'success', message: 'Perubahan pendaftaran berhasil disimpan.' });

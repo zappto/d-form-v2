@@ -43,6 +43,7 @@ const ctx = reactive(
         accessMessage: props.accessMessage,
         memberSlots: props.memberSlots,
         registrationMode: props.registrationMode,
+        draftKey: `dform:fill:${props.form.id}`,
     }),
 )
 

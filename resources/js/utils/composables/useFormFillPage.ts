@@ -1,5 +1,6 @@
-import { computed, onBeforeUnmount, reactive } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
+import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft'
 import { normalizeBannerSrc, pickFormBannerField } from '@/components/modules/builder/formBanner'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
 import {
@@ -30,6 +31,7 @@ export function useFormFillPage(props: {
     accessMessage: string
     memberSlots: number
     registrationMode: string
+    draftKey?: string | null
 }) {
     const fields = props.fields ?? []
     const page = usePage()
@@ -143,6 +145,40 @@ export function useFormFillPage(props: {
     }
 
     const answerForm = useForm<FormFillAnswerMap>(initialValues)
+
+    /** Draft lokal responden (tanpa server): File dikecualikan seperti pola Apply. */
+    function fillDraftSnapshot(): string {
+        return JSON.stringify({ values: snapshotRespondentValues(answerForm) })
+    }
+
+    const fillDraft = props.draftKey
+        ? useRespondentDraft<{ values?: unknown }>(fillDraftSnapshot, props.draftKey, { debounceMs: 800 })
+        : null
+
+    function restoreFillDraft(): void {
+        if (!fillDraft) return
+        const parsed = fillDraft.restore()
+        if (!parsed || typeof parsed !== 'object') return
+        const values = (parsed as { values?: unknown }).values
+        if (typeof values !== 'object' || values === null) return
+        for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
+            if (!(key in answerForm)) continue
+            if (typeof value === 'string') {
+                answerForm[key] = value
+            } else if (Array.isArray(value) && value.every((v) => typeof v === 'string')) {
+                answerForm[key] = [...value]
+            }
+        }
+    }
+
+    if (fillDraft) {
+        onMounted(() => {
+            restoreFillDraft()
+        })
+        onBeforeUnmount(() => {
+            fillDraft.cancel()
+        })
+    }
 
     const errorContext = computed<ErrorMessageContext>(() => ({
         fields,
@@ -308,6 +344,9 @@ export function useFormFillPage(props: {
 
         answerForm.post(props.submitUrl, {
             forceFormData: true,
+            onSuccess: () => {
+                fillDraft?.clear()
+            },
             onError: (errors) => {
                 handleInertiaFormErrors(errors, {
                     ...errorContext.value,

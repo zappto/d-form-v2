@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
+import { useRespondentDraft, snapshotRespondentValues } from '@/utils/composables/useRespondentDraft'
 import FormFillLayout from '@/layouts/FormFillLayout.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -82,6 +83,41 @@ function initialFormState(): Record<string, unknown> {
 
 const confirmForm = useForm(initialFormState())
 
+function inviteDraftSnapshot(): string {
+    return JSON.stringify({ values: snapshotRespondentValues(confirmForm) })
+}
+
+const {
+    restore: restoreInviteDraft,
+    clear: clearInviteDraft,
+    cancel: cancelInviteDraft,
+} = useRespondentDraft<{ values?: unknown }>(inviteDraftSnapshot, `dform:invite:${props.form?.id ?? 'unknown'}`, {
+    debounceMs: 800,
+})
+
+function applyInviteDraft(): void {
+    const parsed = restoreInviteDraft()
+    if (!parsed || typeof parsed !== 'object') return
+    const values = (parsed as { values?: unknown }).values
+    if (typeof values !== 'object' || values === null) return
+    for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
+        if (!(key in confirmForm)) continue
+        if (typeof value === 'string') {
+            confirmForm[key] = value
+        } else if (Array.isArray(value) && value.every((v) => typeof v === 'string')) {
+            confirmForm[key] = [...value]
+        }
+    }
+}
+
+onMounted(() => {
+    applyInviteDraft()
+})
+
+onBeforeUnmount(() => {
+    cancelInviteDraft()
+})
+
 const declineDialogOpen = ref(false)
 const acceptConfirmOpen = ref(false)
 
@@ -95,6 +131,9 @@ function submitConfirm() {
         .transform((data) => ({ ...data, invitation_decision: 'accept' as const }))
         .post(props.confirmUrl, {
             forceFormData: true,
+            onSuccess: () => {
+                clearInviteDraft()
+            },
             onError: (errors) => {
                 handleInertiaFormErrors(errors, {
                     ...errorContext.value,
