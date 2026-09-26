@@ -7,7 +7,7 @@ import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/Sessi
 import {
     useRecruitmentQueue,
     type QueueSnapshot,
-} from '@/utils/composables/useRecruitmentQueue'
+} from '@/hooks/useRecruitmentQueue'
 import { showErrorToast } from '@/lib/error-message'
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */

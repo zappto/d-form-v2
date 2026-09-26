@@ -9,7 +9,7 @@ import FormFillFieldSlotRows from '@/components/modules/dashboard/FormFillFieldS
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
 import FormFillParticipantEmailsSection from '@/components/modules/dashboard/FormFillParticipantEmailsSection.vue'
 import { Send } from 'lucide-vue-next'
-import type { FormFillPageContext } from '@/utils/composables/useFormFillPage'
+import type { FormFillPageContext } from '@/hooks/useFormFillPage'
 import { routes } from '@/lib/routes'
 
 type FormSegment =

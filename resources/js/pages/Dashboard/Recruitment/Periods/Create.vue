@@ -11,7 +11,7 @@ import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker'
 import { routes } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 import { handleInertiaFormErrors } from '@/lib/error-message'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
 import { ImageUp, X } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardLayout })

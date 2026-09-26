@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import ApplicantDetailContent, { type ApplicationDetail } from './ApplicantDetailContent.vue'
 import { applicantAllowsTrackingResend, userAllowsTrackingResend } from '@/lib/recruitmentApplicantCapabilities'
-import useAuth from '@/utils/composables/useAuth'
+import useAuth from '@/hooks/useAuth'
 import { CheckCircle2, Mail, Trophy, XCircle } from 'lucide-vue-next'
 
 const props = withDefaults(

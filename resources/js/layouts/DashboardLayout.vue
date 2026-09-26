@@ -6,8 +6,8 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import DashboardSidebar from '@/components/modules/dashboard/DashboardSidebar.vue'
 import DashboardTopbar from '@/components/modules/dashboard/DashboardTopbar.vue'
-import { usePageFlashToast } from '@/utils/composables/usePageFlashToast'
-import { clearTopbar } from '@/utils/composables/useDashboardTopbar'
+import { usePageFlashToast } from '@/hooks/usePageFlashToast'
+import { clearTopbar } from '@/hooks/useDashboardTopbar'
 
 usePageFlashToast()
 

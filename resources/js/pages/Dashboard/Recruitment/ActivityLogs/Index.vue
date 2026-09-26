@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { routes } from '@/lib/routes'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
 
 defineOptions({ layout: DashboardLayout })
 

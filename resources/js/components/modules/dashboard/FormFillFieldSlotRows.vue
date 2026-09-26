@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { StyledSelect } from '@/components/ui/styled-select'
 import type { UnwrapNestedRefs } from 'vue'
 import { Star, ImagePlus, Upload, X } from 'lucide-vue-next'
-import type { FormFillPageContext } from '@/utils/composables/useFormFillPage'
+import type { FormFillPageContext } from '@/hooks/useFormFillPage'
 import { formatParagraphContentToHtml } from '@/lib/formParagraphContent'
 
 const props = withDefaults(

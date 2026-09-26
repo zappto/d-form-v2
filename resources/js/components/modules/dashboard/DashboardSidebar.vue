@@ -33,7 +33,7 @@ import {
     History,
 } from 'lucide-vue-next';
 import { isSidebarNavActive, routes } from '@/lib/routes';
-import useAuth from '@/utils/composables/useAuth';
+import useAuth from '@/hooks/useAuth';
 
 const page = usePage();
 const user = useAuth(page.props);

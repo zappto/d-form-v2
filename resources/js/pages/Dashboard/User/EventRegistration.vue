@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { statusColorMap } from '@/lib/dummyData'
 import { formatDisplayDate, formatDisplayDateTime } from '@/lib/format'
 import { routes } from '@/lib/routes'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
 
 defineOptions({ layout: DashboardLayout })
 

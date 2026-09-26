@@ -10,7 +10,7 @@ import EventShowRegistrantsPreviewCard from '@/components/modules/dashboard/Even
 import EventShowAsideRail from '@/components/modules/dashboard/EventShowAsideRail.vue'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useDashboardEventShowPage } from '@/utils/composables/useDashboardEventShowPage'
+import { useDashboardEventShowPage } from '@/hooks/useDashboardEventShowPage'
 import { routes } from '@/lib/routes'
 
 defineOptions({ layout: DashboardFocusLayout })

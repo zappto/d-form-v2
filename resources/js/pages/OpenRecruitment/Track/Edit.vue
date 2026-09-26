@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { buildValuesDraftSnapshot, useDraftRestore } from '@/utils/composables/useDraftRestore';
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import { Button } from '@/components/ui/button';
 import { CometSpinner } from '@/components/ui/comet';

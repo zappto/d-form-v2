@@ -14,8 +14,8 @@ import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { handleInertiaFormErrors } from '@/lib/error-message'
 import { formatBytes } from '@/lib/format'
 import { routes } from '@/lib/routes'
-import { setTopbar } from '@/utils/composables/useDashboardTopbar'
-import useAuth from '@/utils/composables/useAuth'
+import { setTopbar } from '@/hooks/useDashboardTopbar'
+import useAuth from '@/hooks/useAuth'
 import {
     Check,
     CheckCircle2,
