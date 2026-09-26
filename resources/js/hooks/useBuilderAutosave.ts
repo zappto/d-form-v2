@@ -90,24 +90,48 @@ function buildHeaderPayload(state: IBuilderAutosaveState): IHeaderPayload {
     };
 }
 
-/** True bila dua nilai header berbeda secara serialisasi (hemat payload per-key). */
-function headerValueChanged(currentValue: unknown, sentValue: unknown): boolean {
+/** Field header yang ikut diff PATCH; `Record` memaksa daftarnya exhaustive. */
+const HEADER_FIELDS: Record<keyof IHeaderPayload, true> = {
+    title: true,
+    description: true,
+    success_content: true,
+    closed_at: true,
+    visible_for: true,
+    banner_url: true,
+    banner_caption: true,
+    metadata: true,
+};
+
+/** True bila dua nilai berbeda menurut serialisasi JSON (hemat payload per-key). */
+function headerValueChanged<GValue>(currentValue: GValue, sentValue: GValue): boolean {
     return JSON.stringify(currentValue) !== JSON.stringify(sentValue);
+}
+
+/** Argumen diff per-key: objek live + snapshot + daftar field yang dibandingkan. */
+interface IChangedFieldsRequest<GObject extends object, GKey extends keyof GObject> {
+    current: GObject;
+    sent: GObject;
+    fields: Record<GKey, true>;
+}
+
+/** Ambil key yang nilainya berbeda antara current dan sent (satu objek argumen, maks dua param). */
+function pickChangedFields<GObject extends object, GKey extends keyof GObject>(
+    request: IChangedFieldsRequest<GObject, GKey>,
+): Partial<GObject> {
+    const diff: Partial<GObject> = {};
+    // Object.keys selalu string[] di TS; cast sempit ini satu-satunya cara iterasi runtime.
+    for (const key of Object.keys(request.fields) as GKey[]) {
+        if (headerValueChanged(request.current[key], request.sent[key])) {
+            diff[key] = request.current[key];
+        }
+    }
+    return diff;
 }
 
 /** Diff header per-key vs snapshot sukses terakhir; penuh bila belum pernah kirim. */
 function diffHeaderPayload(current: IHeaderPayload, sent: IHeaderPayload | null): Partial<IHeaderPayload> {
     if (sent === null) return { ...current };
-    const diff: Partial<IHeaderPayload> = {};
-    if (headerValueChanged(current.title, sent.title)) diff.title = current.title;
-    if (headerValueChanged(current.description, sent.description)) diff.description = current.description;
-    if (headerValueChanged(current.success_content, sent.success_content)) diff.success_content = current.success_content;
-    if (headerValueChanged(current.closed_at, sent.closed_at)) diff.closed_at = current.closed_at;
-    if (headerValueChanged(current.visible_for, sent.visible_for)) diff.visible_for = current.visible_for;
-    if (headerValueChanged(current.banner_url, sent.banner_url)) diff.banner_url = current.banner_url;
-    if (headerValueChanged(current.banner_caption, sent.banner_caption)) diff.banner_caption = current.banner_caption;
-    if (headerValueChanged(current.metadata, sent.metadata)) diff.metadata = current.metadata;
-    return diff;
+    return pickChangedFields({ current, sent, fields: HEADER_FIELDS });
 }
 
 /** String snapshot autosave; kunci sama persis seperti builder halaman lama. */

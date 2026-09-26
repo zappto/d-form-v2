@@ -22,6 +22,12 @@ export interface IRequiredHeaderFields {
     description: string;
 }
 
+/** Pesan invalid per key required; sumber tunggal untuk guard + strip. */
+const REQUIRED_HEADER_MESSAGE: Record<TRequiredHeaderKey, string> = {
+    title: TITLE_REQUIRED_MESSAGE,
+    description: DESCRIPTION_REQUIRED_MESSAGE,
+};
+
 /** True bila nilai adalah string kosong/blank (trimmed ''). */
 export function isBlankRequiredValue(value: unknown): boolean {
     return typeof value === 'string' && value.trim() === '';
@@ -29,8 +35,7 @@ export function isBlankRequiredValue(value: unknown): boolean {
 
 /** Pesan invalid inline untuk key required, atau undefined bila valid. */
 export function requiredHeaderError(kind: TRequiredHeaderKey, value: unknown): string | undefined {
-    if (!isBlankRequiredValue(value)) return undefined;
-    return kind === 'title' ? TITLE_REQUIRED_MESSAGE : DESCRIPTION_REQUIRED_MESSAGE;
+    return isBlankRequiredValue(value) ? REQUIRED_HEADER_MESSAGE[kind] : undefined;
 }
 
 /**
@@ -38,14 +43,16 @@ export function requiredHeaderError(kind: TRequiredHeaderKey, value: unknown): s
  * Key lain (closed_at, visible_for, banner_*, success_content, metadata)
  * diteruskan apa adanya.
  */
-export function stripBlankRequiredKeys<GDiff extends object>(
+export function stripBlankRequiredKeys<GDiff extends Partial<IRequiredHeaderFields>>(
     diff: GDiff,
     current: IRequiredHeaderFields,
 ): GDiff {
-    const next: Record<string, unknown> = { ...diff };
-    if (isBlankRequiredValue(current.title)) delete next.title;
-    if (isBlankRequiredValue(current.description)) delete next.description;
-    return next as GDiff;
+    const next: GDiff = { ...diff };
+    // Object.keys selalu string[] di TS; cast sempit ini satu-satunya cara iterasi runtime.
+    for (const key of Object.keys(REQUIRED_HEADER_MESSAGE) as TRequiredHeaderKey[]) {
+        if (isBlankRequiredValue(current[key])) delete next[key];
+    }
+    return next;
 }
 
 /**
