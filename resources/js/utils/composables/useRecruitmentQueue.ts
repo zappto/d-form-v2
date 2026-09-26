@@ -1,5 +1,6 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import axios from 'axios'
+import { showErrorToast } from '@/lib/error-message'
 
 export interface QueueEntryRow {
     id: string
@@ -32,6 +33,10 @@ const POLL_INTERVAL_MS = 10_000
 export function useRecruitmentQueue(pollUrl: string, initial: QueueSnapshot) {
     const queue = ref<QueueSnapshot>(initial)
     const polling = ref(true)
+    /** Tick pertama (refresh awal) → skeleton; tick berikut diam. Sekali false, tak pernah true lagi. */
+    const isInitialLoading = ref(true)
+    /** Throttle toast error: hanya sekali per transisi ke gagal. */
+    const pollErrorShown = ref(false)
     let timer: ReturnType<typeof setInterval> | null = null
 
     async function refresh() {
@@ -40,8 +45,15 @@ export function useRecruitmentQueue(pollUrl: string, initial: QueueSnapshot) {
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
             })
             queue.value = data
+            pollErrorShown.value = false
         } catch {
-            // Keep last snapshot on transient errors.
+            // Keep last snapshot on transient errors; toast sekali per transisi gagal.
+            if (!pollErrorShown.value) {
+                pollErrorShown.value = true
+                showErrorToast('Gagal memperbarui antrean. Menampilkan data terakhir.')
+            }
+        } finally {
+            isInitialLoading.value = false
         }
     }
 
@@ -75,6 +87,7 @@ export function useRecruitmentQueue(pollUrl: string, initial: QueueSnapshot) {
     return {
         queue,
         polling,
+        isInitialLoading,
         refresh,
         startPolling,
         stopPolling,

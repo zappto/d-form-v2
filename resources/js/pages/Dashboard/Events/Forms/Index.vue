@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
-import { toast } from 'vue-sonner'
-import { handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message'
+import { handleInertiaFormErrors } from '@/lib/error-message'
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Plus, FileText, Pencil, Trash2, Inbox, CalendarClock, Users } from 'lucide-vue-next'
 import { formatDateTime } from '@/lib/dummyData'
 import FormSubmissionsController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormSubmissionsController'
@@ -18,34 +18,45 @@ import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 defineOptions({ layout: DashboardFocusLayout })
 
 const props = defineProps<{
-    event: { id: string; title: string }
-    forms: IForm[]
+    event: { id: string; title: string } | undefined
+    forms: IForm[] | undefined
 }>()
 
 onMounted(() => {
-    setTopbar({ title: props.event.title, subtitle: 'Kelola formulir pendaftaran' })
+    setTopbar({ title: props.event?.title ?? 'Formulir', subtitle: 'Kelola formulir pendaftaran' })
 })
 
 const showDeleteModal = ref(false)
 const deleteTarget = ref<IForm | null>(null)
+const isDeleting = ref(false)
 
 function startDelete(form: IForm) {
     deleteTarget.value = form
     showDeleteModal.value = true
 }
 
+function cancelDelete() {
+    if (isDeleting.value) return
+    showDeleteModal.value = false
+}
+
 function confirmDelete() {
-    if (!deleteTarget.value) return
+    if (!deleteTarget.value || isDeleting.value) return
     const id = deleteTarget.value.id
+    isDeleting.value = true
     router.delete(routes.admin.events.forms.destroy(props.event.id, id), {
         preserveScroll: true,
         onSuccess: () => {
-            toast.success(humanizeErrorMessage('Form deleted.'))
+            // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+            // dari flash `toast` server (messages.event.delete.success).
             showDeleteModal.value = false
             deleteTarget.value = null
         },
         onError: (errors) => {
             handleInertiaFormErrors(errors, { title: 'Gagal menghapus form' })
+        },
+        onFinish: () => {
+            isDeleting.value = false
         },
     })
 }
@@ -61,11 +72,11 @@ function submissionsHref(formId: string): string {
     <div class="flex min-w-0 flex-col gap-5 sm:gap-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <p class="text-muted-foreground text-sm">
-                {{ forms.length }} formulir untuk {{ event.title }}
+                {{ (forms ?? []).length }} formulir untuk {{ event?.title ?? '' }}
             </p>
             <Button as-child class="h-10 w-full md:h-9 md:w-auto">
                 <Link
-                    :href="routes.admin.events.forms.create(event.id)"
+                    :href="event ? routes.admin.events.forms.create(event.id) : '#'"
                     class="inline-flex items-center justify-center gap-2"
                 >
                     <Plus class="size-4" />
@@ -74,7 +85,35 @@ function submissionsHref(formId: string): string {
             </Button>
         </div>
 
-        <div v-if="forms.length > 0" class="grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
+        <div v-if="!event || !forms" class="grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3" aria-busy="true" aria-label="Memuat formulir">
+            <div v-for="n in 4" :key="`form-${n}`" class="form-card-skeleton group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+                <div class="flex h-full flex-col p-0">
+                    <div class="flex min-w-0 flex-1 items-start gap-3 p-4 sm:p-5">
+                        <Skeleton class="size-10 shrink-0 rounded-full" />
+                        <div class="min-w-0 flex-1 space-y-2">
+                            <Skeleton class="h-4 w-3/4" />
+                            <Skeleton class="h-3 w-full" />
+                            <div class="mt-3 flex flex-wrap gap-1.5">
+                                <Skeleton class="h-5 w-16 rounded-full" />
+                                <Skeleton class="h-5 w-20 rounded-full" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-border/60 bg-muted/20 px-4 py-3 sm:px-5">
+                        <div class="grid gap-2">
+                            <Skeleton class="h-3 w-2/3" />
+                            <Skeleton class="h-3 w-1/2" />
+                        </div>
+                        <div class="mt-3 flex flex-col gap-2 sm:grid sm:grid-cols-3 sm:gap-2">
+                            <Skeleton class="h-9 w-full sm:h-9" />
+                            <Skeleton class="h-9 w-full sm:h-9" />
+                            <Skeleton class="h-9 w-full sm:h-9" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="forms.length > 0" class="fade-up grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
             <Card
                 v-for="form in forms"
                 :key="form.id"
@@ -219,8 +258,9 @@ function submissionsHref(formId: string): string {
         :description="`Are you sure you want to delete &quot;${deleteTarget?.title}&quot;? This action cannot be undone.`"
         confirm-text="Delete"
         variant="destructive"
+        :loading="isDeleting"
         @confirm="confirmDelete"
-        @cancel="showDeleteModal = false"
-        @update:open="showDeleteModal = $event"
+        @cancel="cancelDelete"
+        @update:open="(v) => { if (!isDeleting) showDeleteModal = v }"
     />
 </template>

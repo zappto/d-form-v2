@@ -3,13 +3,15 @@ import { computed, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import { Button } from '@/components/ui/button';
+import { CometSpinner } from '@/components/ui/comet';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
+import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
 
 defineOptions({ layout: FormFillLayout });
 
@@ -37,28 +39,28 @@ interface ApplicationFormData {
 }
 
 const props = defineProps<{
-    application: ApplicationFormData;
-    divisions: DivisionOption[];
+    application: ApplicationFormData | undefined;
+    divisions: DivisionOption[] | undefined;
     updateUrl: string;
     dashboardUrl: string;
 }>();
 
 const form = useForm({
-    full_name: props.application.full_name,
-    nim: props.application.nim,
-    semester: String(props.application.semester),
-    phone: props.application.phone,
-    personal_email: props.application.personal_email,
-    student_email: props.application.student_email,
-    instagram_username: props.application.instagram_username,
-    primary_division_id: props.application.primary_division_id,
-    secondary_division_id: props.application.secondary_division_id ?? '',
-    portfolio_type: (props.application.portfolio_type as 'url' | 'file' | 'none') || 'none',
-    portfolio_url: props.application.portfolio_url ?? '',
+    full_name: props.application?.full_name ?? '',
+    nim: props.application?.nim ?? '',
+    semester: String(props.application?.semester ?? ''),
+    phone: props.application?.phone ?? '',
+    personal_email: props.application?.personal_email ?? '',
+    student_email: props.application?.student_email ?? '',
+    instagram_username: props.application?.instagram_username ?? '',
+    primary_division_id: props.application?.primary_division_id ?? '',
+    secondary_division_id: props.application?.secondary_division_id ?? '',
+    portfolio_type: (props.application?.portfolio_type as 'url' | 'file' | 'none') || 'none',
+    portfolio_url: props.application?.portfolio_url ?? '',
     portfolio_file: null as File | null,
     cv: null as File | null,
     instagram_follow_proof: null as File | null,
-    twibbon_url: props.application.twibbon_url ?? '',
+    twibbon_url: props.application?.twibbon_url ?? '',
 });
 
 const semesterOptions: SimpleSelectOption[] = [
@@ -67,7 +69,7 @@ const semesterOptions: SimpleSelectOption[] = [
 ];
 
 const divisionOptions = computed<SimpleSelectOption[]>(() =>
-    props.divisions.map((division: DivisionOption): SimpleSelectOption => ({
+    (props.divisions ?? []).map((division: DivisionOption): SimpleSelectOption => ({
         value: division.id,
         label: division.name,
     }))
@@ -79,13 +81,13 @@ const secondaryDivisionOptions = computed<SimpleSelectOption[]>(() => [
 ]);
 
 const cvHint = computed(() =>
-    props.application.cv_original_name
+    props.application?.cv_original_name
         ? `File saat ini: ${props.application.cv_original_name} (kosongkan jika tidak diganti)`
         : 'Unggah CV PDF'
 );
 
 const instagramFollowHint = computed(() =>
-    props.application.instagram_follow_original_name
+    props.application?.instagram_follow_original_name
         ? `File saat ini: ${props.application.instagram_follow_original_name} (kosongkan jika tidak diganti)`
         : 'Unggah screenshot follow Instagram (jpg/jpeg/png/webp)'
 );
@@ -105,7 +107,8 @@ function onInstagramFollowChange(event: Event) {
     form.instagram_follow_proof = target.files?.[0] ?? null;
 }
 
-function submit() {
+function submit(): void {
+    if (form.processing) return
     form.clearErrors('semester', 'primary_division_id', 'secondary_division_id');
     let firstEmpty: string | null = null;
     if (form.semester === '') {
@@ -123,6 +126,14 @@ function submit() {
     form.put(props.updateUrl, {
         forceFormData: true,
         preserveScroll: true,
+        onSuccess: () => {
+            // Manual: TrackingController::update memakai ->with('toast') sesi biasa
+            // yang tidak dibaca usePageFlashToast (hanya page.flash.toast).
+            showFlashToast({ type: 'success', message: 'Perubahan pendaftaran berhasil disimpan.' });
+        },
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal menyimpan perubahan' });
+        },
     });
 }
 
@@ -175,6 +186,102 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
     <Head title="Edit Pendaftaran OpRec" />
 
     <div class="mx-auto max-w-2xl px-2 pb-8">
+        <div v-if="!application" aria-busy="true" aria-label="Memuat formulir pendaftaran">
+            <div class="mb-6 space-y-3">
+                <div class="flex flex-col items-center gap-1">
+                    <Skeleton class="h-6 w-56" />
+                    <Skeleton class="h-4 w-72 max-w-full" />
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="rounded-2xl border border-border/70 bg-card">
+                    <div class="px-4 pt-4 sm:px-6">
+                        <Skeleton class="h-5 w-32" />
+                        <Skeleton class="mt-1.5 h-4 w-64 max-w-full" />
+                    </div>
+                    <div class="grid gap-4 p-4 sm:grid-cols-2 sm:p-6">
+                        <div class="track-edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-28" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-20" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-20" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-24" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-28" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-28" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-border/70 bg-card">
+                    <div class="px-4 pt-4 sm:px-6">
+                        <Skeleton class="h-5 w-40" />
+                        <Skeleton class="mt-1.5 h-4 w-56 max-w-full" />
+                    </div>
+                    <div class="grid gap-4 p-4 sm:grid-cols-2 sm:p-6">
+                        <div class="track-edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-24" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-28" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-32" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-border/70 bg-card">
+                    <div class="px-4 pt-4 sm:px-6">
+                        <Skeleton class="h-5 w-24" />
+                        <Skeleton class="mt-1.5 h-4 w-72 max-w-full" />
+                    </div>
+                    <div class="space-y-5 p-4 sm:p-6">
+                        <div class="track-edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-20" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                            <Skeleton class="h-3 w-2/3" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-3">
+                            <Skeleton class="h-4 w-36" />
+                            <Skeleton class="h-11 w-full rounded-lg" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-44" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="track-edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-32" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+                    <Skeleton class="h-10 w-full sm:w-44" />
+                    <Skeleton class="h-10 w-full sm:w-28" />
+                </div>
+            </div>
+        </div>
+        <template v-else>
         <div class="mb-6 space-y-3">
             <div class="flex flex-col items-center gap-1">
                 <h1 class="text-xl font-bold tracking-tight">Perbarui pendaftaran</h1>
@@ -182,7 +289,7 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
             </div>
         </div>
 
-        <form class="space-y-4" @submit.prevent="submit">
+        <form class="fade-up space-y-4" @submit.prevent="submit">
             <p v-if="form.errors.application" class="text-destructive text-sm">
                 {{ form.errors.application }}
             </p>
@@ -445,19 +552,26 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
             </Card>
 
             <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
-                <Button type="submit" :disabled="form.processing" class="sm:min-w-44">
-                    {{ form.processing ? 'Menyimpan…' : 'Simpan perubahan' }}
+                <Button
+                    type="submit"
+                    :disabled="form.processing"
+                    :aria-busy="form.processing"
+                    class="sm:min-w-44"
+                >
+                    <CometSpinner v-if="form.processing" :size="16" />
+                    {{ form.processing ? 'Menyimpan...' : 'Simpan perubahan' }}
                 </Button>
                 <Button as-child variant="outline">
                     <Link :href="dashboardUrl">Batal</Link>
                 </Button>
             </div>
-
-            <p class="text-muted-foreground text-center text-xs">
-                <Link :href="routes.recruitment.landing" class="underline-offset-2 hover:underline">
-                    Info OpenRecruitment
-                </Link>
-            </p>
         </form>
+        </template>
+
+        <p class="text-muted-foreground mt-4 text-center text-xs">
+            <Link :href="routes.recruitment.landing" class="underline-offset-2 hover:underline">
+                Info OpenRecruitment
+            </Link>
+        </p>
     </div>
 </template>

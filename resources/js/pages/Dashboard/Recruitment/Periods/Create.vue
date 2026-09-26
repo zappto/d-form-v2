@@ -3,12 +3,14 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { Button } from '@/components/ui/button'
+import { CometSpinner } from '@/components/ui/comet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker'
 import { routes } from '@/lib/routes'
 import { cn } from '@/lib/utils'
+import { handleInertiaFormErrors } from '@/lib/error-message'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 import { ImageUp, X } from 'lucide-vue-next'
 
@@ -76,8 +78,16 @@ function removeBanner(): void {
     bannerPreview.value = null
 }
 
-function submit() {
-    form.post(routes.admin.recruitment.periods.store, { forceFormData: true })
+function submit(): void {
+    if (form.processing) return
+    // Tanpa toast sukses manual: RecruitmentPeriodController::store memakai
+    // Inertia::flash('toast') yang sudah ditampilkan global oleh usePageFlashToast.
+    form.post(routes.admin.recruitment.periods.store, {
+        forceFormData: true,
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal membuat periode' })
+        },
+    })
 }
 </script>
 
@@ -96,9 +106,11 @@ function submit() {
                 type="submit"
                 form="period-form"
                 :disabled="form.processing"
+                :aria-busy="form.processing"
                 class="w-full shrink-0 sm:w-auto"
             >
-                Simpan
+                <CometSpinner v-if="form.processing" :size="16" />
+                {{ form.processing ? 'Menyimpan...' : 'Simpan' }}
             </Button>
         </div>
 

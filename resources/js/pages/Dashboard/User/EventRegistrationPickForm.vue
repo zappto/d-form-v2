@@ -5,6 +5,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { FileText, ChevronRight, Lock, AlertCircle } from 'lucide-vue-next'
 import type { FormAccessStatus } from '@/types/form'
 import { routes } from '@/lib/routes'
@@ -13,7 +14,7 @@ import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 defineOptions({ layout: DashboardLayout })
 
 const props = defineProps<{
-    event: IEvent
+    event: IEvent | undefined
     forms: Array<{
         id: string
         title: string
@@ -22,11 +23,11 @@ const props = defineProps<{
         access_status: FormAccessStatus
         access_message: string
         can_start: boolean
-    }>
+    }> | undefined
 }>()
 
 onMounted(() => {
-    setTopbar({ title: props.event.title, subtitle: 'Pilih formulir pendaftaran' })
+    setTopbar({ title: props.event?.title ?? 'Pilih formulir', subtitle: 'Pilih formulir pendaftaran' })
 })
 
 function statusBadgeVariant(s: FormAccessStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -55,7 +56,7 @@ function statusLabel(s: FormAccessStatus): string {
 </script>
 
 <template>
-    <Head :title="`Pilih formulir — ${event.title}`" />
+    <Head :title="props.event ? `Pilih formulir — ${props.event.title}` : 'Pilih formulir'" />
 
     <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 sm:gap-8 xl:max-w-7xl">
         <div
@@ -76,7 +77,27 @@ function statusLabel(s: FormAccessStatus): string {
             </div>
         </div>
 
-        <ul class="flex w-full flex-col gap-4">
+        <ul v-if="!props.event || !props.forms" class="flex w-full flex-col gap-4" aria-busy="true" aria-label="Memuat formulir">
+            <li v-for="n in 3" :key="`form-${n}`" class="form-card-skeleton w-full">
+                <div class="w-full overflow-hidden rounded-2xl border border-border/80 shadow-sm">
+                    <div class="space-y-2 pb-2 sm:space-y-3 sm:pb-3">
+                        <div class="flex w-full flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                            <div class="flex min-w-0 flex-1 gap-3">
+                                <Skeleton class="size-10 shrink-0 rounded-full" />
+                                <div class="min-w-0 flex-1 space-y-2">
+                                    <Skeleton class="h-5 w-2/3" />
+                                    <Skeleton class="h-5 w-24 rounded-full" />
+                                </div>
+                            </div>
+                            <div class="flex w-full shrink-0 sm:w-auto sm:justify-end">
+                                <Skeleton class="h-10 w-full sm:w-32" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul v-else class="fade-up flex w-full flex-col gap-4">
             <li v-for="form in forms" :key="form.id" class="w-full">
                 <Card
                     class="w-full overflow-hidden rounded-2xl border-border/80 shadow-sm transition-shadow"

@@ -5,6 +5,7 @@ import axios from 'axios'
 import LandingLayout from '@/layouts/LandingLayout.vue'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { Megaphone, WifiOff } from 'lucide-vue-next'
 
@@ -53,6 +54,8 @@ const live = ref<QueueDisplaySnapshot>(props.snapshot)
 const loadError = ref<boolean>(false)
 const isOffline = ref<boolean>(false)
 const lastUpdatedAt = ref<Date | null>(null)
+/** Tick pertama (refresh awal) → skeleton; tick berikut diam. Sekali false, tak pernah true lagi. */
+const isInitialLoading = ref<boolean>(false)
 
 const divisionFilter = ref<string>('')
 const roomFilter = ref<string>('')
@@ -129,8 +132,20 @@ async function refreshDisplay(): Promise<void> {
         loadError.value = true
     } finally {
         isRefreshing = false
+        isInitialLoading.value = false
     }
 }
+
+/** Skeleton hanya bila tick pertama belum selesai DAN belum ada data awal. */
+const hasDisplayData = computed<boolean>(
+    () =>
+        (live.value.entries?.length ?? 0) > 0 ||
+        (live.value.current ?? null) !== null ||
+        (live.value.next ?? null) !== null,
+)
+const showDisplaySkeleton = computed<boolean>(
+    () => isInitialLoading.value && !hasDisplayData.value,
+)
 
 function startPolling(): void {
     if (pollTimer !== null || !props.pollUrl) return
@@ -169,6 +184,10 @@ onMounted((): void => {
     document.addEventListener('visibilitychange', handleVisibilityChange)
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
+    if (props.pollUrl) {
+        isInitialLoading.value = true
+        void refreshDisplay()
+    }
     startPolling()
 })
 
@@ -193,10 +212,16 @@ onUnmounted((): void => {
                     OpenRecruitment DOSCOM · Papan antrean
                 </p>
                 <h1 class="font-display text-foreground mt-3 text-2xl font-bold tracking-tight text-balance sm:text-4xl lg:text-5xl">
-                    {{ live.session?.name?.trim() || 'Antrean interview' }}
+                    <template v-if="!showDisplaySkeleton">
+                        {{ live.session?.name?.trim() || 'Antrean interview' }}
+                    </template>
+                    <Skeleton v-else class="mx-auto h-10 w-2/3 sm:h-12" />
                 </h1>
                 <p class="text-muted-foreground mt-3 text-sm leading-relaxed sm:text-base">
-                    {{ [live.session?.time, live.session?.room].filter((v) => (v ?? '').trim() !== '').join(' · ') || '—' }}
+                    <template v-if="!showDisplaySkeleton">
+                        {{ [live.session?.time, live.session?.room].filter((v) => (v ?? '').trim() !== '').join(' · ') || '—' }}
+                    </template>
+                    <Skeleton v-else class="mx-auto h-4 w-1/3" />
                 </p>
             </div>
         </section>
@@ -224,7 +249,12 @@ onUnmounted((): void => {
                             <Megaphone class="size-4 sm:size-5" aria-hidden="true" />
                             Sedang dipanggil
                         </p>
-                        <template v-if="live.current">
+                        <div v-if="showDisplaySkeleton" aria-busy="true" aria-label="Memuat antrean" class="display-hero-skeleton">
+                            <Skeleton class="mx-auto mt-4 h-20 w-40 sm:h-24" />
+                            <Skeleton class="mx-auto mt-3 h-8 w-2/3 sm:w-1/2" />
+                            <Skeleton class="mx-auto mt-2 h-4 w-1/3" />
+                        </div>
+                        <div v-else-if="live.current" class="fade-up">
                             <p aria-live="polite" class="mt-4 text-7xl font-bold tabular-nums tracking-tight sm:text-8xl lg:text-9xl">
                                 {{ queueNumberLabel(live.current.queue_number) }}
                             </p>
@@ -237,7 +267,7 @@ onUnmounted((): void => {
                             >
                                 {{ live.current.division }}
                             </p>
-                        </template>
+                        </div>
                         <p v-else class="text-muted-foreground mt-6 text-lg sm:text-2xl">
                             Belum ada yang dipanggil.
                         </p>
@@ -245,7 +275,17 @@ onUnmounted((): void => {
                 </Card>
             </section>
 
-            <section v-if="live.next" aria-label="Berikutnya" class="mb-6 sm:mb-8">
+            <section v-if="showDisplaySkeleton" aria-label="Berikutnya" class="mb-6 sm:mb-8">
+                <Card class="rounded-2xl border-border/70 bg-muted/40">
+                    <CardContent class="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 p-5 text-center sm:p-6">
+                        <Skeleton class="h-4 w-24" />
+                        <Skeleton class="h-10 w-20" />
+                        <Skeleton class="h-7 w-40" />
+                    </CardContent>
+                </Card>
+            </section>
+
+            <section v-else-if="live.next" aria-label="Berikutnya" class="fade-up mb-6 sm:mb-8">
                 <Card class="rounded-2xl border-border/70 bg-muted/40">
                     <CardContent class="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 p-5 text-center sm:p-6">
                         <p class="text-muted-foreground text-xs font-semibold tracking-widest uppercase sm:text-sm">
@@ -291,7 +331,27 @@ onUnmounted((): void => {
 
                 <Card class="rounded-2xl border-border/70">
                     <CardContent class="p-2 sm:p-4">
-                        <ul v-if="filteredEntries.length > 0" class="divide-y divide-border/60">
+                        <div
+                            v-if="showDisplaySkeleton"
+                            aria-busy="true"
+                            aria-label="Memuat daftar antrean"
+                        >
+                            <ul class="divide-y divide-border/60">
+                                <li
+                                    v-for="n in 6"
+                                    :key="`display-skel-${n}`"
+                                    class="display-row-skeleton flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-4"
+                                >
+                                    <Skeleton class="h-7 w-14 shrink-0 sm:h-8 sm:w-20" />
+                                    <span class="min-w-0 flex-1 space-y-1.5">
+                                        <Skeleton class="h-4 w-2/3 sm:h-5" />
+                                        <Skeleton class="h-3 w-1/3" />
+                                    </span>
+                                    <Skeleton class="h-6 w-20 shrink-0 rounded-full" />
+                                </li>
+                            </ul>
+                        </div>
+                        <ul v-else-if="filteredEntries.length > 0" class="fade-up divide-y divide-border/60">
                             <li
                                 v-for="entry in filteredEntries"
                                 :key="`${entry.queue_number}-${entry.display_name}`"

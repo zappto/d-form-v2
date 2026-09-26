@@ -10,6 +10,7 @@ import { showErrorToast } from '@/lib/error-message'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { routes } from '@/lib/routes'
@@ -148,6 +149,9 @@ const periodStatusOptions = computed<SimpleSelectOption[]>(() => [
     ...props.statusOptions,
 ])
 
+/** Skeleton zona daftar selama partial visit filter/paginasi (pola M2 Task 1). */
+const isLoadingPeriods = ref<boolean>(false)
+
 function applyPeriodFilters(page: number = 1): void {
     router.get(
         routes.admin.recruitment.index,
@@ -156,7 +160,12 @@ function applyPeriodFilters(page: number = 1): void {
             status: periodStatus.value || undefined,
             page: page > 1 ? page : undefined,
         },
-        { preserveState: true, replace: true },
+        {
+            preserveState: true,
+            replace: true,
+            onStart: () => { isLoadingPeriods.value = true },
+            onFinish: () => { isLoadingPeriods.value = false },
+        },
     )
 }
 
@@ -228,11 +237,11 @@ onMounted(() => {
 
     <div class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
         <!-- Perlu tindakan (di atas: prioritas utama halaman) -->
-        <section v-if="canManagePeriods && summary.active_period" aria-label="Perlu tindakan">
+        <section v-if="canManagePeriods && summary.active_period && !isLoadingPeriods" aria-label="Perlu tindakan">
             <h2 class="mb-3 text-sm font-semibold tracking-wide uppercase text-muted-foreground">
                 Perlu tindakan
             </h2>
-            <div v-if="actionQueues.length > 0" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div v-if="actionQueues.length > 0" class="fade-up grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <Link
                     v-for="queue in actionQueues"
                     :key="`${queue.key}-${queue.label}`"
@@ -288,7 +297,35 @@ onMounted(() => {
                 </Button>
             </div>
 
-            <div v-if="periodRows.length > 0" class="grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div
+                v-if="isLoadingPeriods"
+                class="grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                aria-busy="true"
+                aria-label="Memuat periode"
+            >
+                <div
+                    v-for="n in 6"
+                    :key="`periode-${n}`"
+                    class="period-card-skeleton flex flex-col rounded-2xl border border-border/70 shadow-xs"
+                >
+                    <div class="flex flex-1 flex-col gap-4 px-5 pt-4 pb-3">
+                        <Skeleton class="aspect-video w-full" />
+                        <div class="flex items-start justify-between gap-x-3 gap-y-2">
+                            <Skeleton class="h-5 min-w-0 flex-1" />
+                            <Skeleton class="h-6 w-16 shrink-0" />
+                        </div>
+                        <div class="space-y-2">
+                            <Skeleton class="h-4 w-3/4" />
+                            <Skeleton class="h-4 w-1/2" />
+                        </div>
+                        <div class="mt-auto flex flex-wrap items-center gap-2 border-t border-border/60 pt-2.5">
+                            <Skeleton class="h-8 w-20" />
+                            <Skeleton class="h-8 w-16" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="periodRows.length > 0" class="fade-up grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <Card
                     v-for="period in periodRows"
                     :key="period.id"
@@ -395,7 +432,7 @@ onMounted(() => {
                 </CardContent>
             </Card>
 
-            <div v-if="periodLastPage > 1" class="mt-4 flex justify-center gap-2">
+            <div v-if="periodLastPage > 1 && !isLoadingPeriods" class="mt-4 flex justify-center gap-2">
                 <Button
                     variant="outline"
                     size="sm"
@@ -419,11 +456,11 @@ onMounted(() => {
         </section>
 
         <!-- Today's interview sessions -->
-        <section v-if="todaySessions.length > 0">
+        <section v-if="todaySessions.length > 0 && !isLoadingPeriods">
             <h2 class="mb-3 text-sm font-semibold tracking-wide uppercase text-muted-foreground">
                 Interview hari ini
             </h2>
-            <div class="grid gap-3">
+            <div class="fade-up grid gap-3">
                 <Card
                     v-for="session in todaySessions"
                     :key="session.id"
@@ -460,8 +497,8 @@ onMounted(() => {
 
         <!-- Quick access when no queues -->
         <div
-            v-if="actionQueues.length === 0 && (canManagePeriods || canScheduleInterviews)"
-            class="grid gap-3 sm:grid-cols-2"
+            v-if="actionQueues.length === 0 && (canManagePeriods || canScheduleInterviews) && !isLoadingPeriods"
+            class="fade-up grid gap-3 sm:grid-cols-2"
         >
             <Card v-if="canManagePeriods" class="rounded-2xl border-dashed border-border/70">
                 <CardContent class="flex items-center justify-between gap-4 p-5">
@@ -488,6 +525,84 @@ onMounted(() => {
                     </Button>
                 </CardContent>
             </Card>
+        </div>
+        <!-- Skeleton zona daftar selama partial visit (pola M2 Task 1) -->
+        <div
+            v-if="isLoadingPeriods"
+            class="flex w-full max-w-full min-w-0 flex-col gap-6"
+            aria-busy="true"
+            aria-label="Memuat rekrutmen"
+        >
+            <section v-if="canManagePeriods && summary.active_period && actionQueues.length > 0" aria-label="Perlu tindakan">
+                <h2 class="mb-3 text-sm font-semibold tracking-wide uppercase text-muted-foreground">
+                    Perlu tindakan
+                </h2>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <div
+                        v-for="n in 3"
+                        :key="`antrean-${n}`"
+                        class="queue-skeleton rounded-2xl border border-border/70 bg-card p-5"
+                    >
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <Skeleton class="size-9 shrink-0 rounded-lg" />
+                                <div class="space-y-2">
+                                    <Skeleton class="h-4 w-32" />
+                                    <Skeleton class="h-3 w-44" />
+                                </div>
+                            </div>
+                            <Skeleton class="h-7 w-10 shrink-0" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section v-if="todaySessions.length > 0" aria-label="Interview hari ini">
+                <h2 class="mb-3 text-sm font-semibold tracking-wide uppercase text-muted-foreground">
+                    Interview hari ini
+                </h2>
+                <div class="grid gap-3">
+                    <div
+                        v-for="n in 2"
+                        :key="`sesi-${n}`"
+                        class="session-skeleton rounded-2xl border border-border/70"
+                    >
+                        <div class="flex flex-wrap items-center justify-between gap-4 p-5">
+                            <div class="min-w-0 flex-1 space-y-2">
+                                <Skeleton class="h-4 w-1/2" />
+                                <Skeleton class="h-3 w-2/3" />
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <Skeleton class="h-8 w-24" />
+                                <Skeleton class="h-8 w-20" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div
+                v-if="actionQueues.length === 0 && (canManagePeriods || canScheduleInterviews)"
+                class="grid gap-3 sm:grid-cols-2"
+                aria-label="Akses cepat"
+            >
+                <div
+                    v-for="n in 2"
+                    :key="`cepat-${n}`"
+                    class="quick-skeleton rounded-2xl border border-dashed border-border/70"
+                >
+                    <div class="flex items-center justify-between gap-4 p-5">
+                        <div class="flex items-center gap-3">
+                            <Skeleton class="size-5 shrink-0" />
+                            <div class="space-y-2">
+                                <Skeleton class="h-4 w-32" />
+                                <Skeleton class="h-3 w-48" />
+                            </div>
+                        </div>
+                        <Skeleton class="h-8 w-16 shrink-0" />
+                    </div>
+                </div>
+            </div>
         </div>
         <DivisionListSheet
             :open="divisionDrawerOpen"

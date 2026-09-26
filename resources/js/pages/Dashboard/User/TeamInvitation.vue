@@ -16,6 +16,8 @@ import { getFormFieldOptionRows, formFieldBuilderType } from '@/lib/formFieldOpt
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
 import FormFieldAnswerDisplay from '@/components/modules/dashboard/FormFieldAnswerDisplay.vue'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
+import { CometSpinner } from '@/components/ui/comet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CheckCircle2, Users } from 'lucide-vue-next'
 import { routes } from '@/lib/routes'
@@ -30,9 +32,9 @@ import {
 defineOptions({ layout: FormFillLayout })
 
 const props = defineProps<{
-    event: { id: string; slug: string; title: string }
-    form: { id: string; title: string }
-    fields: IFormField[]
+    event: { id: string; slug: string; title: string } | undefined
+    form: { id: string; title: string } | undefined
+    fields: IFormField[] | undefined
     answers: Record<string, unknown>
     leader: { name: string; email: string }
     alreadyConfirmed: boolean
@@ -51,7 +53,7 @@ function dropdownOptions(field: IFormField): SimpleSelectOption[] {
     return getFormFieldOptionRows(field).map((row) => ({ value: row.label, label: row.label }))
 }
 
-const appendableFields = computed(() => props.fields.filter((f) => f.is_append))
+const appendableFields = computed(() => (props.fields ?? []).filter((f) => f.is_append))
 
 const errorContext = computed<ErrorMessageContext>(() => ({
     fields: appendableFields.value,
@@ -88,6 +90,7 @@ function onCheckboxToggle(fieldName: string, option: string, checked: boolean) {
 }
 
 function submitConfirm() {
+    if (confirmForm.processing) return
     confirmForm
         .transform((data) => ({ ...data, invitation_decision: 'accept' as const }))
         .post(props.confirmUrl, {
@@ -114,6 +117,7 @@ function openDeclineDialog() {
 }
 
 function submitDeclineFromDialog() {
+    if (declineForm.processing) return
     declineForm.post(props.confirmUrl, {
         preserveScroll: true,
         onSuccess: () => {
@@ -132,9 +136,50 @@ function submitDeclineFromDialog() {
     <Head title="Registration invitation" />
 
     <div class="mx-auto max-w-2xl space-y-6 px-2 pb-16">
+        <div v-if="!event || !form || !fields" aria-busy="true" aria-label="Memuat undangan">
+            <section
+                class="overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-6"
+            >
+                <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+                    <div class="min-w-0 flex-1 space-y-1">
+                        <Skeleton class="h-3 w-40" />
+                        <Skeleton class="mt-1 h-7 w-2/3" />
+                        <Skeleton class="mt-1 h-4 w-1/3" />
+                    </div>
+                    <div class="w-full shrink-0 rounded-xl border border-border/80 bg-muted/30 p-3 sm:w-auto sm:min-w-[14rem]">
+                        <Skeleton class="h-3 w-20" />
+                        <div class="mt-2 flex items-start gap-3">
+                            <Skeleton class="size-10 shrink-0 rounded-full" />
+                            <div class="min-w-0 flex-1 space-y-1.5">
+                                <Skeleton class="h-4 w-3/4" />
+                                <Skeleton class="h-3 w-full" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="mt-6 flex flex-col gap-6">
+                <div v-for="n in 3" :key="`field-${n}`" class="field-skeleton overflow-hidden rounded-2xl border border-border bg-card">
+                    <div class="px-5 pt-4 sm:px-6">
+                        <Skeleton class="h-4 w-40" />
+                        <Skeleton class="mt-1.5 h-3 w-2/3" />
+                    </div>
+                    <div class="px-5 pb-4 sm:px-6">
+                        <Skeleton class="mt-2 h-11 w-full" />
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-end gap-3">
+                    <Skeleton class="h-11 w-28" />
+                    <Skeleton class="h-11 w-44" />
+                </div>
+            </div>
+        </div>
+        <template v-else>
         <!-- Summary: same surface as other dashboard cards (white / card) -->
         <section
-            class="overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-6"
+            class="fade-up overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-6"
             aria-labelledby="invitation-heading"
         >
             <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
@@ -167,7 +212,7 @@ function submitDeclineFromDialog() {
             </div>
         </section>
 
-        <Card v-if="alreadyConfirmed" class="border-success/30 bg-success/5">
+        <Card v-if="alreadyConfirmed" class="fade-up border-success/30 bg-success/5">
             <CardContent class="flex flex-col items-center gap-3 py-10 text-center">
                 <CheckCircle2 class="size-10 text-success" />
                 <p class="font-medium text-foreground">You have already confirmed this team registration.</p>
@@ -178,7 +223,7 @@ function submitDeclineFromDialog() {
         </Card>
 
         <template v-else>
-            <div class="flex flex-col gap-6">
+            <div class="fade-up flex flex-col gap-6">
                 <template v-for="field in fields" :key="field.id">
                     <div
                         v-if="builderType(field) === 'heading'"
@@ -337,12 +382,20 @@ function submitDeclineFromDialog() {
                 <Button type="button" variant="outline" size="lg" :disabled="confirmForm.processing" @click="openDeclineDialog">
                     Decline
                 </Button>
-                <Button type="button" size="lg" class="gap-2" :disabled="confirmForm.processing" @click="acceptConfirmOpen = true">
-                    
-                    Accept invitation
+                <Button
+                    type="button"
+                    size="lg"
+                    class="gap-2"
+                    :disabled="confirmForm.processing"
+                    :aria-busy="confirmForm.processing"
+                    @click="acceptConfirmOpen = true"
+                >
+                    <CometSpinner v-if="confirmForm.processing" :size="16" />
+                    {{ confirmForm.processing ? 'Mengirim...' : 'Accept invitation' }}
                 </Button>
             </div>
             </div>
+        </template>
         </template>
         <ConfirmationModal
             v-model:open="acceptConfirmOpen"
@@ -387,8 +440,15 @@ function submitDeclineFromDialog() {
                     >
                         Cancel
                     </Button>
-                    <Button type="button" variant="destructive" :disabled="declineForm.processing" @click="submitDeclineFromDialog">
-                        Decline invitation
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        :disabled="declineForm.processing"
+                        :aria-busy="declineForm.processing"
+                        @click="submitDeclineFromDialog"
+                    >
+                        <CometSpinner v-if="declineForm.processing" :size="16" />
+                        {{ declineForm.processing ? 'Mengirim...' : 'Decline invitation' }}
                     </Button>
                 </DialogFooter>
             </DialogContent>

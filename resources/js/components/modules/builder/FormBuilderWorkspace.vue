@@ -2,6 +2,7 @@
 import { computed, reactive, ref } from 'vue';
 import FormPreviewDialog from '@/components/modules/builder/FormPreviewDialog.vue';
 import { Button } from '@/components/ui/button';
+import { CometSpinner } from '@/components/ui/comet';
 import type { FormBannerState } from '@/components/modules/builder/formBanner';
 import { FORM_VISIBILITY_OPTIONS } from '@/components/modules/builder/formBuilderPalette';
 import type { BuilderField } from '@/types/form-builder';
@@ -136,6 +137,7 @@ defineExpose({
                     v-model:form-description="formDescription"
                     v-model:success-content="successContent"
                     v-model:banner="banner"
+                    :field-errors="fieldErrors"
                     :show-success-zone="wb.showSuccessZone"
                     :hide-on-mobile-settings="wb.mobileTab === 'settings'"
                     :banner-preview-src="wb.bannerPreviewSrc"
@@ -188,8 +190,14 @@ defineExpose({
                     >
                         Pratinjau
                     </Button>
-                    <Button class="h-11 text-sm font-medium shadow-sm" :disabled="processing" @click="wb.requestSave">
-                        Simpan
+                    <Button
+                        class="h-11 text-sm font-medium shadow-sm"
+                        :disabled="processing"
+                        :aria-busy="processing"
+                        @click="wb.requestSave"
+                    >
+                        <CometSpinner v-if="processing" :size="16" />
+                        {{ processing ? 'Menyimpan...' : 'Simpan' }}
                     </Button>
                 </div>
             </div>
@@ -215,7 +223,7 @@ defineExpose({
         :open="wb.showPreview"
         :title="formTitle || 'Untitled Form'"
         :description="formDescription"
-        :form-banner-url="banner.bannerUrl"
+        :form-banner-url="wb.bannerPreviewSrc"
         :form-banner-caption="banner.caption"
         :fields="formFields"
         @close="wb.showPreview = false"

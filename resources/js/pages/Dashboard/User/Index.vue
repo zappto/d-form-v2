@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import KpiCard from '@/components/modules/dashboard/KpiCard.vue'
@@ -7,6 +7,7 @@ import EventCalendar from '@/components/modules/dashboard/EventCalendar.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { CalendarDays, Zap, Clock, MapPin, ArrowRight } from 'lucide-vue-next'
 import { formatDate, categoryLabelMap, categoryColorMap } from '@/lib/dummyData'
 import { toCategoryList } from '@/lib/eventCategories'
@@ -17,28 +18,36 @@ import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 defineOptions({ layout: DashboardLayout })
 
 interface Props {
-    stats: {
-        eventsJoined: number
-        upcomingEvents: number
-        pendingRegistrations: number
-        acceptedRegistrations: number
-    }
-    upcomingEvents: IEvent[]
+    stats:
+        | {
+              eventsJoined: number
+              upcomingEvents: number
+              pendingRegistrations: number
+              acceptedRegistrations: number
+          }
+        | undefined
+    upcomingEvents: IEvent[] | undefined
     pendingInvitations: Array<{
         event: IEvent
         invitationUrl: string
     }>
-    calendarEvents: Array<{
-        id: string | number
-        title: string
-        start_date: string
-        end_date: string | null
-        category: string | string[] | null
-        href: string
-    }>
+    calendarEvents:
+        | Array<{
+              id: string | number
+              title: string
+              start_date: string
+              end_date: string | null
+              category: string | string[] | null
+              href: string
+          }>
+        | undefined
 }
 
 const props = defineProps<Props>()
+
+/** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */
+const statsReady = computed<boolean>(() => props.stats !== undefined)
+const upcomingReady = computed<boolean>(() => props.upcomingEvents !== undefined)
 
 onMounted(() => {
     setTopbar({ title: 'My Dashboard', subtitle: 'Ringkasan partisipasimu' })
@@ -49,10 +58,21 @@ onMounted(() => {
     <Head title="My Dashboard" />
 
     <div class="flex flex-col gap-6">
-        <div class="grid gap-4 sm:grid-cols-3">
-            <KpiCard label="Events Joined" :value="props.stats.eventsJoined" :trend="20" :icon="CalendarDays" color="primary" />
-            <KpiCard label="Upcoming Events" :value="props.stats.upcomingEvents" :trend="0" :icon="Zap" color="warning" />
-            <KpiCard label="Pending Registrations" :value="props.stats.pendingRegistrations" :trend="-10" :icon="Clock" color="destructive" />
+        <div
+            v-if="!statsReady"
+            class="grid gap-4 sm:grid-cols-3"
+            aria-busy="true"
+            aria-label="Memuat ringkasan dasbor"
+        >
+            <div v-for="n in 3" :key="`kpi-${n}`" class="kpi-skeleton rounded-2xl border border-border/70 p-4 shadow-xs">
+                <Skeleton class="h-3 w-1/2" />
+                <Skeleton class="mt-2 h-7 w-1/3" />
+            </div>
+        </div>
+        <div v-else class="fade-up grid gap-4 sm:grid-cols-3">
+            <KpiCard label="Events Joined" :value="props.stats?.eventsJoined ?? 0" :trend="20" :icon="CalendarDays" color="primary" />
+            <KpiCard label="Upcoming Events" :value="props.stats?.upcomingEvents ?? 0" :trend="0" :icon="Zap" color="warning" />
+            <KpiCard label="Pending Registrations" :value="props.stats?.pendingRegistrations ?? 0" :trend="-10" :icon="Clock" color="destructive" />
         </div>
 
         <Card class="rounded-xl border shadow-xs">
@@ -63,11 +83,26 @@ onMounted(() => {
                 </Button>
             </CardHeader>
             <CardContent class="flex flex-col gap-3 pt-0">
+                <div
+                    v-if="!upcomingReady"
+                    aria-busy="true"
+                    aria-label="Memuat acara mendatang"
+                >
+                    <div v-for="n in 4" :key="`upcoming-${n}`" class="upcoming-skeleton flex items-center gap-4 rounded-lg border border-border/70 p-3">
+                        <Skeleton class="h-14 w-20 shrink-0 rounded-md" />
+                        <div class="min-w-0 flex-1 space-y-1.5">
+                            <Skeleton class="h-4 w-2/3" />
+                            <Skeleton class="h-3 w-1/2" />
+                        </div>
+                        <Skeleton class="h-5 w-16 shrink-0 rounded-full" />
+                    </div>
+                </div>
+                <template v-else>
                 <Link
-                    v-for="event in props.upcomingEvents"
+                    v-for="event in props.upcomingEvents ?? []"
                     :key="event.id"
                         :href="routes.member.event.show(event.slug)"
-                    class="flex items-center gap-4 rounded-lg border p-3 transition-colors hover:bg-muted/30"
+                    class="fade-up flex items-center gap-4 rounded-lg border p-3 transition-colors hover:bg-muted/30"
                 >
                     <div :class="['w-20 shrink-0 overflow-hidden rounded-md bg-muted', EVENT_CARD_BANNER_ASPECT]">
                         <img :src="event.banner_url ?? ''" :alt="event.title" class="h-full w-full object-cover" />
@@ -90,12 +125,13 @@ onMounted(() => {
                         </Badge>
                     </div>
                 </Link>
-                <p v-if="props.upcomingEvents.length === 0" class="py-4 text-center text-sm text-muted-foreground">
+                <p v-if="(props.upcomingEvents ?? []).length === 0" class="py-4 text-center text-sm text-muted-foreground">
                     No upcoming events. Browse events to find something interesting!
                 </p>
+                </template>
             </CardContent>
         </Card>
 
-        <EventCalendar :events="props.calendarEvents" />
+        <EventCalendar :events="props.calendarEvents ?? []" />
     </div>
 </template>

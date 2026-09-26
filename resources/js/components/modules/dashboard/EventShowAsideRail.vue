@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
-import { toast } from 'vue-sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -17,10 +16,11 @@ import {
     ChevronDown,
     ChevronUp,
     Eye,
+    Send,
 } from 'lucide-vue-next';
 import { edit as editEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { routes } from '@/lib/routes';
-import { handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
+import { handleInertiaFormErrors } from '@/lib/error-message';
 
 const props = defineProps<{
     event: IEvent;
@@ -28,7 +28,11 @@ const props = defineProps<{
     cardShadow: string;
     /** URL halaman laporan & log kehadiran untuk acara ini. */
     laporanHref?: string | null;
+    /** True saat request toggle draft/publish sedang berjalan (button disabled). */
+    isTogglingPublish?: boolean;
 }>();
+
+const isDraft = computed<boolean>(() => props.event.status === 'draft');
 
 const VISIBLE_LIMIT = 4;
 const showAllForms = ref(false);
@@ -37,26 +41,37 @@ const hiddenCount = computed(() => Math.max(0, props.forms.length - VISIBLE_LIMI
 
 const showDeleteModal = ref(false);
 const deleteTarget = ref<{ id: string; title: string } | null>(null);
+const isDeleting = ref(false);
 function startDelete(f: { id: string; title: string }): void {
     deleteTarget.value = f;
     showDeleteModal.value = true;
 }
+function cancelDelete(): void {
+    if (isDeleting.value) return;
+    showDeleteModal.value = false;
+}
 function confirmDelete(): void {
-    if (!deleteTarget.value) return;
+    if (!deleteTarget.value || isDeleting.value) return;
+    isDeleting.value = true;
     router.delete(routes.admin.events.forms.destroy(props.event.id, deleteTarget.value.id), {
         preserveScroll: true,
         onSuccess: () => {
-            toast.success(humanizeErrorMessage('Form deleted.'));
+            // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+            // dari flash `toast` server (messages.form.delete.success).
             showDeleteModal.value = false;
             deleteTarget.value = null;
         },
         onError: (errors: Record<string, string>) => handleInertiaFormErrors(errors, { title: 'Gagal menghapus form' }),
+        onFinish: () => {
+            isDeleting.value = false;
+        },
     });
 }
 
 defineEmits<{
     openArchive: [];
     openRestore: [];
+    togglePublish: [];
 }>();
 </script>
 
@@ -195,6 +210,18 @@ defineEmits<{
                 <Button v-else variant="outline" size="sm" class="w-full justify-start" @click="$emit('openRestore')">
                     <RotateCcw class="mr-2 size-4" />Restore event
                 </Button>
+                <Button
+                    v-if="!event.deleted_at"
+                    variant="outline"
+                    size="sm"
+                    class="w-full justify-start"
+                    :disabled="isTogglingPublish"
+                    @click="$emit('togglePublish')"
+                >
+                    <Send v-if="isDraft" class="mr-2 size-4" />
+                    <FileText v-else class="mr-2 size-4" />
+                    {{ isDraft ? 'Publish event' : 'Move to draft' }}
+                </Button>
                 <Separator class="my-1" />
                 <p class="text-muted-foreground px-1 text-[11px] leading-relaxed">
                     Archiving hides this event from the public but keeps all registrant data safe. You can restore it
@@ -209,9 +236,10 @@ defineEmits<{
             :description="`Yakin hapus &quot;${deleteTarget?.title}&quot;? Tindakan tidak bisa dibatalkan.`"
             confirm-text="Hapus"
             variant="destructive"
+            :loading="isDeleting"
             @confirm="confirmDelete"
-            @cancel="showDeleteModal = false"
-            @update:open="showDeleteModal = $event"
+            @cancel="cancelDelete"
+            @update:open="(v) => { if (!isDeleting) showDeleteModal = v }"
         />
     </aside>
 </template>

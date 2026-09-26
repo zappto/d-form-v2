@@ -3,10 +3,12 @@ import { computed, ref, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { CometSpinner } from '@/components/ui/comet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { routes } from '@/lib/routes'
+import { handleInertiaFormErrors } from '@/lib/error-message'
 import { Eye, EyeOff } from 'lucide-vue-next'
 
 export interface InterviewerDivisionChoice {
@@ -97,8 +99,13 @@ function submit(): void {
     form.post(storeUrl.value, {
         preserveScroll: true,
         onSuccess: () => {
+            // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+            // dari flash `toast` server (RecruitmentDivisionController::storeInterviewer).
             emit('created', form.email)
             emit('close')
+        },
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal menambah interviewer' })
         },
     })
 }
@@ -237,8 +244,14 @@ function submit(): void {
                         <Button variant="outline" type="button" class="flex-1" @click="emit('close')">
                             Batal
                         </Button>
-                        <Button type="submit" class="flex-1" :disabled="!canSubmit">
-                            {{ form.processing ? 'Menyimpan…' : 'Simpan interviewer' }}
+                        <Button
+                            type="submit"
+                            class="flex-1"
+                            :disabled="!canSubmit"
+                            :aria-busy="form.processing"
+                        >
+                            <CometSpinner v-if="form.processing" :size="16" />
+                            {{ form.processing ? 'Menyimpan...' : 'Simpan interviewer' }}
                         </Button>
                     </div>
                 </footer>

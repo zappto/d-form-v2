@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { handleInertiaFormErrors } from '@/lib/error-message';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
@@ -8,6 +9,7 @@ import EventCard from '@/components/modules/dashboard/events/EventCard.vue';
 import EventFilterBar from '@/components/modules/dashboard/events/EventFilterBar.vue';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, ChevronsLeft, ChevronsRight } from 'lucide-vue-next';
 import {
     index as eventsIndex,
@@ -104,12 +106,17 @@ function buildQueryParams(page?: number) {
     return params;
 }
 
+/** Skeleton grid selama partial visit filter/paginasi (pola M2 Task 1). */
+const isLoadingEvents = ref(false);
+
 function applyFilters() {
     if (suppressFilterApply) return;
     router.get(eventsIndex().url, buildQueryParams() as never, {
         preserveState: true,
         preserveScroll: true,
         only: ['events', 'query'],
+        onStart: () => { isLoadingEvents.value = true; },
+        onFinish: () => { isLoadingEvents.value = false; },
     });
 }
 
@@ -120,8 +127,12 @@ function goToPage(page: number) {
         preserveState: true,
         preserveScroll: true,
         only: ['events', 'query'],
+        onStart: () => { isLoadingEvents.value = true; },
+        onFinish: () => { isLoadingEvents.value = false; },
     });
 }
+
+/** Skeleton grid selama partial visit filter/paginasi (pola M2 Task 1). */
 
 const eventsList = computed(() => props.events.data);
 
@@ -137,16 +148,31 @@ function confirmDelete(event: IEvent): void {
 /** Modal konfirmasi hapus acara. */
 const deleteTarget = ref<IEvent | null>(null);
 const deleteDialogOpen = ref(false);
+const isDeleting = ref(false);
 
 function cancelDelete(): void {
+    if (isDeleting.value) return;
     deleteDialogOpen.value = false;
 }
 
 function handleDeleteConfirm(): void {
-    if (!deleteTarget.value) return;
-    router.delete(destroyEvent({ event: deleteTarget.value.id }).url);
-    deleteTarget.value = null;
-    deleteDialogOpen.value = false;
+    if (!deleteTarget.value || isDeleting.value) return;
+    isDeleting.value = true;
+    router.delete(destroyEvent({ event: deleteTarget.value.id }).url, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+            // dari flash `toast` server (messages.event.delete.success).
+            deleteDialogOpen.value = false;
+            deleteTarget.value = null;
+        },
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal menghapus acara' });
+        },
+        onFinish: () => {
+            isDeleting.value = false;
+        },
+    });
 }
 </script>
 
@@ -170,8 +196,37 @@ function handleDeleteConfirm(): void {
         </div>
 
         <div
-            v-if="eventsList.length > 0"
+            v-if="isLoadingEvents"
             class="grid min-w-0 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4"
+            aria-busy="true"
+            aria-label="Memuat event"
+        >
+            <div
+                v-for="n in 8"
+                :key="`event-skeleton-${n}`"
+                class="event-card-skeleton flex min-w-0 flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:p-5"
+            >
+                <div class="flex items-center justify-between gap-3">
+                    <Skeleton class="h-6 w-20" />
+                    <Skeleton class="size-8 shrink-0" />
+                </div>
+                <Skeleton class="aspect-[16/7] w-full" />
+                <div class="flex items-center gap-3">
+                    <Skeleton class="h-4 min-w-0 flex-1" />
+                    <Skeleton class="h-6 w-16 shrink-0" />
+                </div>
+                <Skeleton class="h-3 w-3/4" />
+                <Skeleton class="h-3 w-1/2" />
+                <div class="mt-auto flex items-center justify-between gap-3 border-t border-border/60 pt-3">
+                    <Skeleton class="h-3 w-1/3" />
+                    <Skeleton class="h-4 w-16 shrink-0" />
+                </div>
+            </div>
+        </div>
+
+        <div
+            v-else-if="eventsList.length > 0"
+            class="fade-up grid min-w-0 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4"
         >
             <EventCard
                 v-for="event in eventsList"
@@ -190,13 +245,14 @@ function handleDeleteConfirm(): void {
             confirm-text="Hapus"
             cancel-text="Batal"
             variant="destructive"
+            :loading="isDeleting"
             @confirm="handleDeleteConfirm"
             @cancel="cancelDelete"
-            @update:open="(v) => { deleteDialogOpen = v }"
+            @update:open="(v) => { if (!isDeleting) deleteDialogOpen = v }"
         />
 
         <EmptyState
-            v-if="eventsList.length === 0"
+            v-if="eventsList.length === 0 && !isLoadingEvents"
             title="Tidak ada acara"
             description="Sesuaikan pencarian, kategori, atau sesi — atau buat acara baru."
             animation-name="errorState"

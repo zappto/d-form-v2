@@ -3,12 +3,15 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { Button } from '@/components/ui/button'
+import { CometSpinner } from '@/components/ui/comet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker'
 import { routes } from '@/lib/routes'
 import { cn } from '@/lib/utils'
+import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 import { ImageUp, X } from 'lucide-vue-next'
 
@@ -26,7 +29,7 @@ interface Period {
     banner_url: string | null
 }
 
-const props = defineProps<{ period: Period }>()
+const props = defineProps<{ period: Period | undefined }>()
 
 function toDatetimeLocal(value: string | null): string {
     if (!value) return ''
@@ -41,16 +44,16 @@ function toDateInput(value: string | null): string {
     return value.slice(0, 10)
 }
 
-const existingBannerUrl = computed<string | null>(() => props.period.banner_url ?? null)
+const existingBannerUrl = computed<string | null>(() => props.period?.banner_url ?? null)
 
 const form = useForm({
-    name: props.period.name,
-    description: props.period.description ?? '',
-    registration_opens_at: toDatetimeLocal(props.period.registration_opens_at),
-    registration_closes_at: toDatetimeLocal(props.period.registration_closes_at),
-    interview_starts_at: toDateInput(props.period.interview_starts_at),
-    interview_ends_at: toDateInput(props.period.interview_ends_at),
-    finalization_deadline_at: toDateInput(props.period.finalization_deadline_at),
+    name: props.period?.name ?? '',
+    description: props.period?.description ?? '',
+    registration_opens_at: toDatetimeLocal(props.period?.registration_opens_at ?? null),
+    registration_closes_at: toDatetimeLocal(props.period?.registration_closes_at ?? null),
+    interview_starts_at: toDateInput(props.period?.interview_starts_at ?? null),
+    interview_ends_at: toDateInput(props.period?.interview_ends_at ?? null),
+    finalization_deadline_at: toDateInput(props.period?.finalization_deadline_at ?? null),
     banner: null as File | null,
 })
 
@@ -63,7 +66,7 @@ const dateErrorClass =
     'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10'
 
 onMounted(() => {
-    setTopbar({ title: 'Edit periode', subtitle: props.period.name })
+    setTopbar({ title: 'Edit periode', subtitle: props.period?.name ?? '' })
 })
 
 onUnmounted(releaseBannerObjectUrl)
@@ -106,8 +109,19 @@ function removeBanner(): void {
     bannerPreview.value = existingBannerUrl.value
 }
 
-function submit() {
-    form.put(routes.admin.recruitment.periods.update(props.period.id), { forceFormData: true })
+function submit(): void {
+    if (form.processing) return
+    form.put(routes.admin.recruitment.periods.update(props.period.id), {
+        forceFormData: true,
+        onSuccess: () => {
+            // Manual: RecruitmentPeriodController::update memakai ->with('message')
+            // yang tidak dibaca usePageFlashToast (hanya page.flash.toast).
+            showFlashToast({ type: 'success', message: 'Periode recruitment berhasil diperbarui.' })
+        },
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal memperbarui periode' })
+        },
+    })
 }
 </script>
 
@@ -115,7 +129,56 @@ function submit() {
     <Head title="Edit periode Open Recruitment" />
 
     <div class="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
-        <div class="flex flex-wrap items-center justify-between gap-4">
+        <div v-if="!period" aria-busy="true" aria-label="Memuat formulir periode">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="min-w-0 space-y-1.5">
+                    <Skeleton class="h-8 w-48" />
+                    <Skeleton class="h-4 w-64 max-w-full" />
+                </div>
+                <Skeleton class="edit-save-skeleton h-10 w-full shrink-0 sm:w-40" />
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-border/70 bg-card p-6">
+                <div class="space-y-4">
+                    <div class="edit-field-skeleton space-y-2">
+                        <Skeleton class="h-4 w-28" />
+                        <Skeleton class="h-10 w-full rounded-md" />
+                    </div>
+                    <div class="edit-field-skeleton space-y-2">
+                        <Skeleton class="h-4 w-24" />
+                        <Skeleton class="h-20 w-full rounded-md" />
+                    </div>
+                    <div class="edit-field-skeleton space-y-2">
+                        <Skeleton class="h-4 w-20" />
+                        <Skeleton class="aspect-video w-full rounded-xl" />
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-36" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-36" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-32" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="edit-field-skeleton space-y-2">
+                            <Skeleton class="h-4 w-32" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                        <div class="edit-field-skeleton space-y-2 sm:col-span-2">
+                            <Skeleton class="h-4 w-36" />
+                            <Skeleton class="h-10 w-full rounded-md" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <template v-else>
+        <div class="fade-up flex flex-wrap items-center justify-between gap-4">
             <div class="min-w-0">
                 <h1 class="font-display text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
                     Edit periode
@@ -126,13 +189,15 @@ function submit() {
                 type="submit"
                 form="period-form"
                 :disabled="form.processing"
+                :aria-busy="form.processing"
                 class="w-full shrink-0 sm:w-auto"
             >
-                Simpan perubahan
+                <CometSpinner v-if="form.processing" :size="16" />
+                {{ form.processing ? 'Menyimpan...' : 'Simpan perubahan' }}
             </Button>
         </div>
 
-        <Card class="rounded-2xl border-border/70">
+        <Card class="fade-up rounded-2xl border-border/70">
             <CardContent class="p-6">
                 <form id="period-form" class="space-y-4" @submit.prevent="submit">
                     <div class="space-y-2">
@@ -298,5 +363,6 @@ function submit() {
                 </form>
             </CardContent>
         </Card>
+        </template>
     </div>
 </template>

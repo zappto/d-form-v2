@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
     registrantRelativeTimeId,
     registrantStatusBadgeClass,
@@ -11,7 +12,7 @@ import { userAvatarSeed } from '@/lib/userAvatarFallback'
 import { FileText } from 'lucide-vue-next'
 
 defineProps<{
-    rows: IRegistrant[]
+    rows: IRegistrant[] | undefined
 }>()
 
 function formatSubmittedDetail(iso: string): string {
@@ -24,12 +25,13 @@ function formatSubmittedDetail(iso: string): string {
 </script>
 
 <template>
-    <Card class="rounded-xl border-border/70 shadow-xs">
+    <Card :class="['rounded-xl border-border/70 shadow-xs', rows ? 'fade-up' : '']">
         <CardHeader class="pb-3">
             <CardTitle class="text-base font-medium">Daftar pengiriman</CardTitle>
-            <CardDescription class="text-sm">
+            <CardDescription v-if="rows" class="text-sm">
                 Menampilkan {{ rows.length }} baris sesuai filter saat ini. Kolom formulir menunjukkan sumber pengiriman.
             </CardDescription>
+            <Skeleton v-else class="h-4 w-2/5" aria-hidden="true" />
         </CardHeader>
         <CardContent class="overflow-x-auto px-0 pt-0 sm:px-6">
             <table class="w-full min-w-[640px] text-sm">
@@ -42,7 +44,39 @@ function formatSubmittedDetail(iso: string): string {
                         <th class="px-4 py-3 sm:px-6">Waktu kirim</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="!rows" aria-busy="true" aria-label="Memuat pendaftar">
+                    <tr
+                        v-for="n in 10"
+                        :key="`reg-skel-${n}`"
+                        class="reg-row-skeleton border-b border-border/60 last:border-0"
+                    >
+                        <td class="px-4 py-4 align-top sm:px-6">
+                            <div class="flex items-start gap-3">
+                                <Skeleton class="size-10 shrink-0 rounded-full" />
+                                <div class="min-w-0 flex-1 space-y-2">
+                                    <Skeleton class="h-4 w-3/4" />
+                                    <Skeleton class="h-3 w-full" />
+                                </div>
+                            </div>
+                        </td>
+                        <td class="hidden max-w-[14rem] px-4 py-4 align-top md:table-cell md:px-6">
+                            <Skeleton class="h-4 w-full" />
+                        </td>
+                        <td class="px-4 py-4 align-top sm:px-6">
+                            <Skeleton class="h-6 w-20 rounded-full" />
+                        </td>
+                        <td class="hidden px-4 py-4 align-top lg:table-cell lg:px-6">
+                            <Skeleton class="h-3 w-16" />
+                        </td>
+                        <td class="px-4 py-4 align-top sm:px-6">
+                            <div class="space-y-2">
+                                <Skeleton class="h-4 w-24" />
+                                <Skeleton class="h-3 w-32" />
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody v-else>
                     <tr
                         v-for="reg in rows"
                         :key="reg.id"
@@ -94,6 +128,17 @@ function formatSubmittedDetail(iso: string): string {
                     </tr>
                 </tbody>
             </table>
+            <div
+                v-if="!rows"
+                class="reg-pager-skeleton flex items-center justify-between gap-2 px-4 py-3.5 sm:px-6"
+                aria-hidden="true"
+            >
+                <Skeleton class="h-4 w-32" />
+                <div class="flex gap-2">
+                    <Skeleton class="h-8 w-24" />
+                    <Skeleton class="h-8 w-24" />
+                </div>
+            </div>
         </CardContent>
     </Card>
 </template>

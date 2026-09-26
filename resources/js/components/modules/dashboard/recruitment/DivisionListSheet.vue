@@ -3,9 +3,11 @@ import { computed, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { CometSpinner } from '@/components/ui/comet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { routes } from '@/lib/routes'
+import { handleInertiaFormErrors } from '@/lib/error-message'
 
 export interface DashboardDivision {
     id: string
@@ -58,7 +60,7 @@ function cancelEdit(): void {
 }
 
 function saveDivision(division: DashboardDivision): void {
-    if (editName.value.trim() === '') return
+    if (isSaving.value || editName.value.trim() === '') return
     isSaving.value = true
     router.put(
         routes.admin.recruitment.divisions.update(division.id),
@@ -66,7 +68,12 @@ function saveDivision(division: DashboardDivision): void {
         {
             preserveScroll: true,
             onSuccess: () => {
+                // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+                // dari flash `toast` server (RecruitmentDivisionController::update).
                 editingId.value = null
+            },
+            onError: (errors) => {
+                handleInertiaFormErrors(errors, { title: 'Gagal memperbarui divisi' })
             },
             onFinish: () => {
                 isSaving.value = false
@@ -107,8 +114,14 @@ function saveDivision(division: DashboardDivision): void {
                                 Aktif
                             </label>
                             <div class="flex gap-2">
-                                <Button size="sm" type="submit" :disabled="isSaving || editName.trim() === ''">
-                                    {{ isSaving ? 'Menyimpan…' : 'Simpan' }}
+                                <Button
+                                    size="sm"
+                                    type="submit"
+                                    :disabled="isSaving || editName.trim() === ''"
+                                    :aria-busy="isSaving"
+                                >
+                                    <CometSpinner v-if="isSaving" :size="16" />
+                                    {{ isSaving ? 'Menyimpan...' : 'Simpan' }}
                                 </Button>
                                 <Button size="sm" variant="ghost" type="button" @click="cancelEdit">Batal</Button>
                             </div>

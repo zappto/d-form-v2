@@ -4,6 +4,8 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import OpRecFeedbackForm from '@/components/modules/open-recruitment/OpRecFeedbackForm.vue';
 import { Button } from '@/components/ui/button';
+import { CometSpinner } from '@/components/ui/comet';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -18,6 +20,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { routes } from '@/lib/routes';
+import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
 import {
     ArrowRight,
     CalendarClock,
@@ -110,15 +113,16 @@ interface TrackingPayload {
 }
 
 const props = defineProps<{
-    tracking: TrackingPayload;
+    tracking: TrackingPayload | undefined;
     logoutUrl: string;
     editUrl: string;
     correctionUrl: string;
     feedbackStoreUrl: string;
 }>();
 
+/** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */
 const correctionModalOpen = ref(false);
-const feedbackExpanded = ref(props.tracking.feedback.can_submit);
+const feedbackExpanded = ref(props.tracking?.feedback.can_submit ?? false);
 const interviewSectionRef = ref<HTMLElement | null>(null);
 
 const correctionForm = useForm({
@@ -185,21 +189,118 @@ function logout() {
     router.post(props.logoutUrl);
 }
 
-function submitCorrection() {
+function submitCorrection(): void {
+    if (correctionForm.processing) return
     correctionForm.post(props.correctionUrl, {
         preserveScroll: true,
         onSuccess: () => {
-            correctionModalOpen.value = false;
-            correctionForm.reset();
+            // Manual: CorrectionRequestController::store memakai ->with('toast') sesi
+            // biasa yang tidak dibaca usePageFlashToast (hanya page.flash.toast).
+            showFlashToast({
+                type: 'success',
+                message: 'Permintaan koreksi berhasil dikirim. Tim akan meninjau segera.',
+            })
+            correctionModalOpen.value = false
+            correctionForm.reset()
         },
-    });
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal mengirim permintaan koreksi' })
+        },
+    })
 }
 </script>
 
 <template>
     <Head title="Portal OpRec" />
 
-    <div class="mx-auto max-w-2xl space-y-5 px-2 pb-10">
+    <div v-if="!tracking" class="mx-auto max-w-2xl space-y-5 px-2 pb-10" aria-busy="true" aria-label="Memuat portal">
+        <!-- Header identitas ringkas -->
+        <div class="flex items-start justify-between gap-3 pt-2">
+            <div class="min-w-0 flex-1 space-y-2">
+                <Skeleton class="h-3 w-24" />
+                <Skeleton class="h-6 w-2/3" />
+                <div class="mt-1.5 flex flex-wrap items-center gap-2">
+                    <Skeleton class="h-3 w-28 font-mono" />
+                    <Skeleton class="h-5 w-20 rounded-full" />
+                </div>
+            </div>
+            <Skeleton class="size-9 shrink-0" />
+        </div>
+
+        <!-- Langkah selanjutnya -->
+        <div class="track-hero-skeleton rounded-2xl border p-5 shadow-sm">
+            <Skeleton class="h-3 w-40" />
+            <Skeleton class="mt-2 h-6 w-3/4" />
+            <Skeleton class="mt-2 h-4 w-full" />
+            <Skeleton class="mt-3 h-8 w-32" />
+        </div>
+
+        <!-- Hari-H interview -->
+        <div class="track-interview-skeleton rounded-2xl border border-border/70">
+            <div class="space-y-4 p-4">
+                <Skeleton class="h-5 w-40" />
+                <Skeleton class="h-4 w-2/3" />
+                <Skeleton class="h-4 w-1/2" />
+                <Skeleton class="h-9 w-24" />
+            </div>
+        </div>
+
+        <!-- Alur proses -->
+        <div class="rounded-2xl border border-border/70">
+            <div class="space-y-2 px-4 pt-4">
+                <Skeleton class="h-5 w-28" />
+            </div>
+            <div class="p-4">
+                <ol
+                    class="before:bg-border relative space-y-4 before:absolute before:top-2 before:bottom-2 before:left-[7px] before:w-px"
+                >
+                    <li v-for="n in 4" :key="`linimasa-${n}`" class="track-timeline-node relative flex gap-2.5">
+                        <Skeleton class="relative z-10 mt-0.5 size-4 shrink-0 rounded-full" />
+                        <div class="min-w-0 flex-1 space-y-1.5">
+                            <Skeleton class="h-4 w-1/2" />
+                            <Skeleton class="h-3 w-3/4" />
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Data pendaftaran -->
+        <div class="rounded-2xl border border-border/70">
+            <div class="space-y-2 px-4 pt-4">
+                <Skeleton class="h-5 w-36" />
+            </div>
+            <div class="space-y-2 p-4">
+                <div v-for="n in 5" :key="`data-${n}`" class="flex items-center justify-between gap-4 py-1.5">
+                    <Skeleton class="h-3 w-20" />
+                    <Skeleton class="h-4 w-32" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Keputusan akhir -->
+        <div class="track-final-skeleton rounded-2xl border border-border/70 p-4">
+            <Skeleton class="h-5 w-36" />
+            <Skeleton class="mt-3 h-6 w-1/2" />
+            <Skeleton class="mt-2 h-4 w-2/3" />
+            <Skeleton class="mt-1.5 h-4 w-full" />
+        </div>
+
+        <!-- Feedback inline -->
+        <div class="track-feedback-skeleton rounded-2xl border border-border/70 p-4">
+            <Skeleton class="h-5 w-28" />
+            <Skeleton class="mt-3 h-4 w-full" />
+            <Skeleton class="mt-2 h-9 w-32" />
+        </div>
+
+        <p class="text-muted-foreground text-center text-xs">
+            <Link :href="routes.recruitment.landing" class="underline-offset-2 hover:underline">
+                Info OpenRecruitment
+            </Link>
+        </p>
+    </div>
+
+    <div v-else class="fade-up mx-auto max-w-2xl space-y-5 px-2 pb-10">
         <!-- Header identitas ringkas -->
         <div class="flex items-start justify-between gap-3 pt-2">
             <div class="min-w-0">
@@ -485,7 +586,14 @@ function submitCorrection() {
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" @click="correctionModalOpen = false">Batal</Button>
-                    <Button type="submit" :disabled="correctionForm.processing">Kirim</Button>
+                    <Button
+                        type="submit"
+                        :disabled="correctionForm.processing"
+                        :aria-busy="correctionForm.processing"
+                    >
+                        <CometSpinner v-if="correctionForm.processing" :size="16" />
+                        {{ correctionForm.processing ? 'Mengirim...' : 'Kirim' }}
+                    </Button>
                 </DialogFooter>
             </form>
         </DialogContent>

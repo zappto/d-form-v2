@@ -4,6 +4,7 @@ import SeoHead from '@/components/seo/SeoHead.vue';
 import { computed, ref, onMounted } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { MapPin, CalendarDays, ArrowRight, Check, Shield } from 'lucide-vue-next';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate, categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummyData';
 import { toCategoryList } from '@/lib/eventCategories';
 import { stripHtmlToText } from '@/utils/stripHtml';
@@ -12,14 +13,42 @@ import { routes } from '@/lib/routes';
 import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect';
 
 const props = defineProps<{
-    event: IEvent;
+    event: IEvent | undefined;
     memberPortalEventUrl: string;
 }>();
 
 const page = usePage();
 const seo = computed(() => (page.props as { seo: SharedSeoProps }).seo);
 
-const event = computed(() => props.event);
+/** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */
+const eventReady = computed<boolean>(() => props.event !== undefined);
+
+/** Fallback agar komputasi/SEO tak membaca props yang belum ada (tak pernah tampil). */
+const EMPTY_EVENT_FALLBACK: IEvent = {
+    id: '',
+    slug: '',
+    title: '',
+    description: '',
+    start_date: '',
+    end_date: '',
+    registration_start: '',
+    registration_end: '',
+    location: '',
+    quota: 0,
+    registered_count: 0,
+    banner: '',
+    banner_url: null,
+    price: 0,
+    session: [],
+    category: [],
+    status: 'draft',
+    registration_status: 'not_yet_open',
+    deleted_at: null,
+    created_at: '',
+    updated_at: '',
+};
+
+const event = computed<IEvent>(() => props.event ?? EMPTY_EVENT_FALLBACK);
 
 const metaDescription = computed(() => {
     const plain = stripHtmlToText(event.value.description, 170);
@@ -87,7 +116,10 @@ const eventJsonLd = computed<Record<string, unknown>[]>(() => {
 const visible = ref<boolean>(false);
 onMounted(() => setTimeout(() => (visible.value = true), 100));
 
-const capacityPercent = computed<number>(() => Math.round((event.value.registered_count / event.value.quota) * 100));
+const capacityPercent = computed<number>(() => {
+    if (event.value.quota <= 0) return 0;
+    return Math.round((event.value.registered_count / event.value.quota) * 100);
+});
 
 const registrationBadgeLabel = computed<string>(() => {
     const s = event.value.registration_status;
@@ -122,7 +154,62 @@ const highlights: string[] = [
             og-type="website"
             :json-ld="eventJsonLd"
         />
-        <section class="relative bg-background pt-20 sm:pt-24 lg:pt-20">
+        <section v-if="!eventReady" aria-busy="true" aria-label="Memuat detail acara" class="relative bg-background pt-20 sm:pt-24 lg:pt-20">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="rounded-[2rem] bg-muted/40 p-1.5 ring-1 ring-border/70 sm:p-2 lg:rounded-[2.25rem]">
+                    <div class="hero-skeleton overflow-hidden rounded-[calc(2rem-0.375rem)] border border-border/70 bg-card shadow-sm lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(23rem,0.85fr)]">
+                        <Skeleton class="aspect-[16/9] w-full rounded-none lg:aspect-auto lg:h-full lg:min-h-[320px]" />
+                        <div class="flex min-w-0 flex-col gap-5 p-5 sm:p-7 lg:p-9">
+                            <div class="flex flex-wrap gap-2">
+                                <Skeleton class="h-6 w-20 rounded-full" />
+                                <Skeleton class="h-6 w-24 rounded-full" />
+                            </div>
+                            <Skeleton class="h-10 w-3/4" />
+                            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                                <Skeleton class="h-20 w-full rounded-2xl" />
+                                <Skeleton class="h-20 w-full rounded-2xl" />
+                            </div>
+                            <Skeleton class="h-24 w-full rounded-2xl" />
+                            <Skeleton class="cta-skeleton h-[52px] w-full rounded-2xl" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-skeleton mt-8 grid gap-6 pb-14 sm:gap-8 sm:pb-20 lg:grid-cols-3 lg:gap-10">
+                    <div class="order-2 space-y-6 lg:order-1 lg:col-span-2">
+                        <div class="rounded-[1.5rem] border border-border bg-card p-5 sm:p-7">
+                            <Skeleton class="h-8 w-1/2" />
+                            <Skeleton class="mt-4 h-4 w-full" />
+                            <Skeleton class="mt-2 h-4 w-full" />
+                            <Skeleton class="mt-2 h-4 w-2/3" />
+                        </div>
+                        <div class="grid gap-3 sm:grid-cols-2">
+                            <Skeleton v-for="n in 4" :key="`sorot-${n}`" class="h-[68px] rounded-2xl" />
+                        </div>
+                    </div>
+                    <div class="order-1 space-y-6 lg:order-2">
+                        <div class="rounded-2xl border border-border bg-card p-6">
+                            <Skeleton class="h-6 w-1/2" />
+                            <Skeleton class="mt-4 h-2.5 w-full rounded-full" />
+                            <Skeleton class="cta-skeleton mt-6 h-12 w-full rounded-xl" />
+                        </div>
+                        <div class="rounded-2xl border border-border bg-card p-6">
+                            <Skeleton class="mb-5 h-6 w-2/3" />
+                            <div class="flex flex-col gap-4">
+                                <div v-for="n in 3" :key="`rinci-${n}`" class="flex items-start gap-3">
+                                    <Skeleton class="size-8 shrink-0 rounded-full" />
+                                    <div class="min-w-0 flex-1 space-y-1.5">
+                                        <Skeleton class="h-3 w-20" />
+                                        <Skeleton class="h-4 w-3/4" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section v-else class="relative bg-background pt-20 sm:pt-24 lg:pt-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="rounded-[2rem] bg-muted/40 p-1.5 ring-1 ring-border/70 sm:p-2 lg:rounded-[2.25rem]">
                     <article

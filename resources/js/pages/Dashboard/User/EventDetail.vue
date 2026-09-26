@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { MapPin, CalendarDays, Clock, DollarSign, Users, Send, Mail, MailOpen, FileText, ChevronRight, Lock } from 'lucide-vue-next';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     formatDate,
     formatDateTime,
@@ -36,7 +37,7 @@ type ParticipantFormRow = {
 };
 
 const props = defineProps<{
-    event: IEvent;
+    event: IEvent | undefined;
     isRegistered: boolean;
     /** Undangan tim/bundle: belum accept/reject — bukan peserta resmi sampai dikonfirmasi */
     pendingTeamInvitationUrl?: string | null;
@@ -46,7 +47,35 @@ const props = defineProps<{
     participantForms?: ParticipantFormRow[];
 }>();
 
-const event = props.event;
+/** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */
+const eventReady = computed<boolean>(() => props.event !== undefined);
+
+/** Fallback agar komputasi tak membaca props yang belum ada (tak pernah tampil). */
+const EMPTY_EVENT_FALLBACK: IEvent = {
+    id: '',
+    slug: '',
+    title: '',
+    description: '',
+    start_date: '',
+    end_date: '',
+    registration_start: '',
+    registration_end: '',
+    location: '',
+    quota: 0,
+    registered_count: 0,
+    banner: '',
+    banner_url: null,
+    price: 0,
+    session: [],
+    category: [],
+    status: 'draft',
+    registration_status: 'not_yet_open',
+    deleted_at: null,
+    created_at: '',
+    updated_at: '',
+};
+
+const event = computed<IEvent>(() => props.event ?? EMPTY_EVENT_FALLBACK);
 const isRegistered = computed(() => props.isRegistered);
 const registrationStatus = computed(() => props.registrationStatus);
 const participantForms = computed(() => props.participantForms ?? []);
@@ -75,34 +104,139 @@ function participantStatusLabel(s: FormAccessStatus): string {
 const metaBlocks = computed(() => [
     {
         title: 'Jadwal',
-        value: `${formatDate(event.start_date)} — ${formatDate(event.end_date)}`,
+        value: `${formatDate(event.value.start_date)} — ${formatDate(event.value.end_date)}`,
         icon: CalendarDays,
     },
-    { title: 'Lokasi', value: event.location || '—', icon: MapPin },
+    { title: 'Lokasi', value: event.value.location || '—', icon: MapPin },
     {
         title: 'Sesi',
         value:
-            toCategoryList(event.session)
+            toCategoryList(event.value.session)
                 .map((s) => sessionLabelMap[s] ?? s)
                 .join(', ') || '—',
         icon: Clock,
     },
     {
         title: 'Biaya',
-        value: event.price > 0 ? `Rp ${Number(event.price).toLocaleString('id-ID')}` : 'Gratis',
+        value: event.value.price > 0 ? `Rp ${Number(event.value.price).toLocaleString('id-ID')}` : 'Gratis',
         icon: DollarSign,
     },
 ]);
 
 const quotaPercent = computed(() => {
-    if (!event.quota || event.quota <= 0) return 0;
-    return Math.min(100, Math.round((event.registered_count / event.quota) * 100));
+    if (!event.value.quota || event.value.quota <= 0) return 0;
+    return Math.min(100, Math.round((event.value.registered_count / event.value.quota) * 100));
 });
 </script>
 
 <template>
-    <Head :title="event.title" />
-    <div class="mx-auto flex w-full flex-col gap-6 pb-6 sm:gap-8">
+    <Head :title="eventReady ? event.title : 'Detail acara'" />
+    <div v-if="!eventReady" class="mx-auto flex w-full flex-col gap-6 pb-6 sm:gap-8" aria-busy="true" aria-label="Memuat detail acara">
+        <section
+            class="border-border/70 bg-card overflow-hidden rounded-2xl border shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+        >
+            <div class="flex flex-col lg:grid lg:min-h-[min(26rem,70vh)] lg:grid-cols-2 lg:items-stretch">
+                <div
+                    class="border-border/60 from-card via-card to-muted/25 order-2 flex flex-col justify-center gap-5 border-t bg-gradient-to-b px-5 py-7 sm:gap-6 sm:px-8 sm:py-9 lg:order-none lg:border-t-0 lg:border-r lg:px-10 xl:px-12"
+                >
+                    <div class="flex flex-wrap items-center gap-2">
+                        <Skeleton class="h-5 w-20 rounded-full" />
+                        <Skeleton class="h-5 w-24 rounded-full" />
+                    </div>
+                    <div class="max-w-xl space-y-4">
+                        <Skeleton class="h-8 w-3/4" />
+                        <div class="flex flex-col gap-3">
+                            <Skeleton class="h-4 w-2/3" />
+                            <Skeleton class="h-4 w-1/2" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative order-1 w-full lg:order-none lg:min-h-full lg:min-w-0">
+                    <Skeleton class="hero-skeleton aspect-[16/9] h-full w-full rounded-none lg:aspect-auto lg:min-h-[min(26rem,70vh)]" />
+                </div>
+            </div>
+        </section>
+
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div
+                v-for="n in 4"
+                :key="`meta-${n}`"
+                class="group border-border/70 from-card to-muted/10 flex min-w-0 gap-3 rounded-2xl border bg-gradient-to-b p-4 shadow-sm"
+            >
+                <Skeleton class="size-10 shrink-0 rounded-full sm:size-11" />
+                <div class="min-w-0 flex-1 space-y-1.5">
+                    <Skeleton class="h-2.5 w-16" />
+                    <Skeleton class="h-4 w-full" />
+                </div>
+            </div>
+        </div>
+
+        <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
+            <div class="flex min-w-0 flex-col gap-8">
+                <div class="border-border/70 rounded-2xl border shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
+                    <div class="border-border/50 bg-muted/10 border-b px-5 py-4 sm:px-6">
+                        <Skeleton class="h-5 w-36" />
+                    </div>
+                    <div class="space-y-2 px-5 py-6 sm:px-6 sm:py-8">
+                        <Skeleton class="h-4 w-full" />
+                        <Skeleton class="h-4 w-full" />
+                        <Skeleton class="h-4 w-2/3" />
+                    </div>
+                </div>
+
+                <div class="border-border/70 rounded-2xl border shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
+                    <div class="border-border/50 bg-muted/10 border-b px-5 py-4 sm:px-6">
+                        <Skeleton class="h-5 w-44" />
+                    </div>
+                    <div class="space-y-3 px-5 py-5 sm:px-6">
+                        <div
+                            v-for="n in 3"
+                            :key="`form-${n}`"
+                            class="border-border/70 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div class="flex min-w-0 gap-3">
+                                <Skeleton class="size-10 shrink-0 rounded-full" />
+                                <div class="min-w-0 flex-1 space-y-1.5">
+                                    <Skeleton class="h-4 w-40" />
+                                    <Skeleton class="h-3 w-24 rounded-full" />
+                                </div>
+                            </div>
+                            <Skeleton class="h-9 w-full sm:w-28" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="flex min-w-0 flex-col gap-4 xl:sticky xl:top-24">
+                <div
+                    class="border-border/70 ring-primary/10 from-card via-card to-primary/[0.03] rounded-2xl bg-gradient-to-b shadow-md ring-1"
+                >
+                    <div class="space-y-1 px-5 pt-5">
+                        <Skeleton class="h-4 w-28" />
+                        <Skeleton class="h-3 w-40" />
+                    </div>
+                    <div class="space-y-5 px-5 py-5">
+                        <div class="space-y-2">
+                            <Skeleton class="h-4 w-2/3" />
+                            <Skeleton class="h-2.5 w-full rounded-full" />
+                        </div>
+                        <div class="rounded-xl border border-border/60 bg-muted/15 px-3 py-3">
+                            <Skeleton class="h-3 w-1/2" />
+                            <Skeleton class="mt-2 h-3 w-3/4" />
+                        </div>
+                        <Skeleton class="h-11 w-full" />
+                        <div class="flex flex-col items-center gap-3 rounded-xl border border-border/60 p-4">
+                            <Skeleton class="h-2.5 w-24" />
+                            <Skeleton class="size-40 rounded-xl" />
+                            <Skeleton class="h-6 w-32 font-mono" />
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+    <div v-else class="fade-up mx-auto flex w-full flex-col gap-6 pb-6 sm:gap-8">
         <section
             class="border-border/70 bg-card overflow-hidden rounded-2xl border shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
         >

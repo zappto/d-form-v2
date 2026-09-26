@@ -2,6 +2,8 @@
 import { useForm } from '@inertiajs/vue3'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { CometSpinner } from '@/components/ui/comet'
+import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
 
 const props = defineProps<{
     storeUrl: string
@@ -30,12 +32,17 @@ const form = useForm({
     feedback_text: '',
 })
 
-function submit() {
+function submit(): void {
+    if (form.processing) return
     form.post(props.storeUrl, {
         preserveScroll: true,
         onSuccess: () => {
             form.reset()
+            showFlashToast({ type: 'success', message: 'Terima kasih! Feedback kamu telah kami terima.' })
             emit('success')
+        },
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal mengirim feedback' })
         },
     })
 }
@@ -78,7 +85,13 @@ function submit() {
         <p v-if="form.errors.feedback" class="text-destructive text-sm">{{ form.errors.feedback }}</p>
 
         <div class="flex flex-wrap gap-2 pt-1">
-            <Button type="submit" size="sm" :disabled="form.processing">
+            <Button
+                type="submit"
+                size="sm"
+                :disabled="form.processing"
+                :aria-busy="form.processing"
+            >
+                <CometSpinner v-if="form.processing" :size="16" />
                 {{ form.processing ? 'Mengirim...' : 'Kirim feedback' }}
             </Button>
             <Button v-if="$attrs.onCancel !== undefined" type="button" variant="ghost" size="sm" @click="emit('cancel')">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onMounted } from 'vue'
+import { computed, reactive, onMounted } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
@@ -21,16 +21,19 @@ defineOptions({ layout: DashboardFocusLayout })
 const props = defineProps<{
     event: IEvent
     forms: { id: string; title: string }[]
-    registrants: IRegistrant[]
+    registrants: IRegistrant[] | undefined
 }>()
 
 const p = reactive(
     useEventRegistrantsPage({
         event: props.event,
         forms: props.forms,
-        registrants: props.registrants,
+        registrants: props.registrants ?? [],
     }),
 )
+
+/** Filter lokal tanpa request: skeleton hanya untuk props awal yang belum ada. */
+const isRegistrantsReady = computed(() => Array.isArray(props.registrants))
 
 onMounted(() => {
     setTopbar({ title: props.event.title, subtitle: 'Pengiriman formulir & status review' })
@@ -79,7 +82,7 @@ onMounted(() => {
                     <Label class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Baris pada tabel</Label>
                     <p class="flex min-h-10 items-center gap-2 rounded-md border border-input bg-muted/30 px-3 text-sm tabular-nums text-foreground">
                         <CalendarDays class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                        {{ props.registrants.length.toLocaleString('id-ID') }} pengiriman tercantum
+                        {{ (props.registrants ?? []).length.toLocaleString('id-ID') }} pengiriman tercantum
                     </p>
                 </div>
             </CardContent>
@@ -103,8 +106,13 @@ onMounted(() => {
         <RegistrantsPendingBanner :pending-count="p.pendingCount" :active-status-tab="p.activeStatusTab" />
 
         <RegistrantsDataTable
-            v-if="p.filteredRegistrants.length > 0"
+            v-if="isRegistrantsReady && p.filteredRegistrants.length > 0"
             :rows="p.filteredRegistrants"
+        />
+
+        <RegistrantsDataTable
+            v-else-if="!isRegistrantsReady"
+            :rows="undefined"
         />
 
         <template v-else>

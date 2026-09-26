@@ -4,6 +4,7 @@ import { router, useForm, usePage } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { CometSpinner } from '@/components/ui/comet'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { SimpleSelect } from '@/components/ui/simple-select'
@@ -17,7 +18,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { routes } from '@/lib/routes'
-import { showErrorToast } from '@/lib/error-message'
+import { showErrorToast, showFlashToast } from '@/lib/error-message'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
 import useAuth from '@/utils/composables/useAuth'
 import {
@@ -174,6 +175,8 @@ const canDecideFinal = computed(
 const correctionReviewForm = useForm({
     review_notes: '',
 })
+
+const reviewingCorrectionId = ref<string | null>(null)
 
 const screeningModalOpen = ref(false)
 const screeningAction = ref<ScreeningAction>(null)
@@ -369,17 +372,35 @@ function verifyApplication() {
     )
 }
 
-function approveCorrection(correctionId: string) {
+function approveCorrection(correctionId: string): void {
+    if (reviewingCorrectionId.value !== null) return
+    reviewingCorrectionId.value = correctionId
     correctionReviewForm.post(routes.admin.recruitment.corrections.approve(correctionId), {
         preserveScroll: true,
-        onSuccess: () => correctionReviewForm.reset(),
+        onSuccess: () => {
+            correctionReviewForm.reset()
+            showFlashToast({ type: 'success', message: 'Permintaan koreksi disetujui.' })
+        },
+        onError: () => showErrorToast('Gagal menyetujui permintaan koreksi.'),
+        onFinish: () => {
+            reviewingCorrectionId.value = null
+        },
     })
 }
 
-function rejectCorrection(correctionId: string) {
+function rejectCorrection(correctionId: string): void {
+    if (reviewingCorrectionId.value !== null) return
+    reviewingCorrectionId.value = correctionId
     correctionReviewForm.post(routes.admin.recruitment.corrections.reject(correctionId), {
         preserveScroll: true,
-        onSuccess: () => correctionReviewForm.reset(),
+        onSuccess: () => {
+            correctionReviewForm.reset()
+            showFlashToast({ type: 'success', message: 'Permintaan koreksi ditolak.' })
+        },
+        onError: () => showErrorToast('Gagal menolak permintaan koreksi.'),
+        onFinish: () => {
+            reviewingCorrectionId.value = null
+        },
     })
 }
 
@@ -984,15 +1005,24 @@ const defaultTab = computed(() => {
                                 v-if="!readonly && canReviewCorrections && correction.status === 'pending'"
                                 class="mt-4 flex flex-wrap gap-2"
                             >
-                                <Button size="sm" @click="approveCorrection(correction.id)">
-                                    Setujui
+                                <Button
+                                    size="sm"
+                                    :disabled="reviewingCorrectionId === correction.id"
+                                    :aria-busy="reviewingCorrectionId === correction.id"
+                                    @click="approveCorrection(correction.id)"
+                                >
+                                    <CometSpinner v-if="reviewingCorrectionId === correction.id" :size="16" />
+                                    {{ reviewingCorrectionId === correction.id ? 'Menyimpan...' : 'Setujui' }}
                                 </Button>
                                 <Button
                                     size="sm"
                                     variant="destructive"
+                                    :disabled="reviewingCorrectionId === correction.id"
+                                    :aria-busy="reviewingCorrectionId === correction.id"
                                     @click="rejectCorrection(correction.id)"
                                 >
-                                    Tolak
+                                    <CometSpinner v-if="reviewingCorrectionId === correction.id" :size="16" />
+                                    {{ reviewingCorrectionId === correction.id ? 'Menghapus...' : 'Tolak' }}
                                 </Button>
                             </div>
                         </div>

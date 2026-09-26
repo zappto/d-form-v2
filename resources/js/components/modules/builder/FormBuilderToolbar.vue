@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
 import { Button } from '@/components/ui/button'
+import { CometSpinner } from '@/components/ui/comet'
 import { Link } from '@inertiajs/vue3'
 import { ArrowLeft, Eye } from 'lucide-vue-next'
 
@@ -86,10 +87,15 @@ onMounted(() => {
  hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
   "
                     :disabled="processing"
+                    :aria-busy="processing"
                     @click="$emit('save')"
                 >
-                    <span class="sm:hidden">Simpan</span>
-                    <span class="hidden sm:inline">{{ saveLabel }}</span>
+                    <CometSpinner v-if="processing" :size="16" />
+                    <span v-if="processing">Menyimpan...</span>
+                    <template v-else>
+                        <span class="sm:hidden">Simpan</span>
+                        <span class="hidden sm:inline">{{ saveLabel }}</span>
+                    </template>
                 </Button>
             </div>
         </div>
@@ -143,10 +149,15 @@ onMounted(() => {
  hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
  "
                 :disabled="processing"
+                :aria-busy="processing"
                 @click="$emit('save')"
             >
-                <span class="sm:hidden">Simpan</span>
-                <span class="hidden sm:inline">{{ saveLabel }}</span>
+                <CometSpinner v-if="processing" :size="16" />
+                <span v-if="processing">Menyimpan...</span>
+                <template v-else>
+                    <span class="sm:hidden">Simpan</span>
+                    <span class="hidden sm:inline">{{ saveLabel }}</span>
+                </template>
             </Button>
         </div>
     </Teleport>

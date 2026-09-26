@@ -16,6 +16,9 @@ import { Label } from '@/components/ui/label'
 import { ArrowRight, Check, X } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { CometSpinner } from '@/components/ui/comet'
+import { Skeleton } from '@/components/ui/skeleton'
+import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/error-message'
 import { routes } from '@/lib/routes'
 
 interface ApplicationRow {
@@ -55,6 +58,7 @@ const props = withDefaults(
         tab: string
         canScreen?: boolean
         selectedId?: string | null
+        loading?: boolean
         query?: {
             search?: string
             division_id?: string
@@ -64,7 +68,7 @@ const props = withDefaults(
             per_page?: string | number
         }
     }>(),
-    { semesterOptions: () => [], canScreen: false, query: () => ({}) },
+    { semesterOptions: () => [], canScreen: false, loading: false, query: () => ({}) },
 )
 
 const emit = defineEmits<{
@@ -324,6 +328,12 @@ function confirmPass(): void {
         {
             preserveState: true,
             preserveScroll: true,
+            onSuccess: () => {
+                showFlashToast({ type: 'success', message: 'Applicant lolos screening.' })
+            },
+            onError: () => {
+                showErrorToast('Gagal meloloskan applicant.')
+            },
             onFinish: () => {
                 processingId.value = null
                 passTarget.value = null
@@ -368,7 +378,13 @@ function submitReject(): void {
         {
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => closeReject(),
+            onSuccess: () => {
+                showFlashToast({ type: 'success', message: 'Applicant ditolak pada tahap screening.' })
+                closeReject()
+            },
+            onError: (errors) => {
+                handleInertiaFormErrors(errors, { title: 'Gagal menolak applicant.' })
+            },
             onFinish: () => {
                 processingId.value = null
             },
@@ -445,7 +461,7 @@ function submitReject(): void {
                                 <th class="px-4 py-3"><span class="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="!loading" class="fade-up">
                             <tr
                                 v-for="row in pagedRows"
                                 :key="row.id"
@@ -483,9 +499,11 @@ function submitReject(): void {
                                             class="text-success hover:text-success"
                                             :aria-label="`Loloskan ${row.full_name}`"
                                             :disabled="processingId === row.id"
+                                            :aria-busy="processingId === row.id"
                                             @click.stop="openPass(row)"
                                         >
-                                            <Check class="size-4" aria-hidden="true" />
+                                            <CometSpinner v-if="processingId === row.id" :size="16" />
+                                            <Check v-else class="size-4" aria-hidden="true" />
                                         </Button>
                                         <Button
                                             v-if="canDecide(row)"
@@ -495,9 +513,11 @@ function submitReject(): void {
                                             class="text-destructive hover:text-destructive"
                                             :aria-label="`Tolak ${row.full_name}`"
                                             :disabled="processingId === row.id"
+                                            :aria-busy="processingId === row.id"
                                             @click.stop="openReject(row)"
                                         >
-                                            <X class="size-4" aria-hidden="true" />
+                                            <CometSpinner v-if="processingId === row.id" :size="16" />
+                                            <X v-else class="size-4" aria-hidden="true" />
                                         </Button>
                                         <Button
                                             radius="icon"
@@ -517,13 +537,45 @@ function submitReject(): void {
                                 </td>
                             </tr>
                         </tbody>
+                        <tbody v-else aria-busy="true" aria-label="Memuat aplikan">
+                            <tr
+                                v-for="n in 10"
+                                :key="`aplikan-skel-${n}`"
+                                class="applicant-row-skeleton border-b last:border-0"
+                            >
+                                <td class="px-4 py-3 font-mono text-xs">
+                                    <Skeleton class="h-3 w-16" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <Skeleton class="h-4 w-32" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <Skeleton class="h-3 w-24" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <Skeleton class="h-3 w-24" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <Skeleton class="h-5 w-20 rounded-full" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <Skeleton class="h-3 w-20" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-end gap-0.5">
+                                        <Skeleton class="size-7 shrink-0" />
+                                        <Skeleton class="size-7 shrink-0" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </CardContent>
         </Card>
 
         <div
-            v-if="applications"
+            v-if="applications && !loading"
             class="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between"
         >
             <div class="flex flex-wrap items-center gap-3">
@@ -667,8 +719,10 @@ function submitReject(): void {
                             type="submit"
                             variant="destructive"
                             :disabled="rejectForm.processing"
+                            :aria-busy="rejectForm.processing"
                         >
-                            Tolak applicant
+                            <CometSpinner v-if="rejectForm.processing" :size="16" />
+                            {{ rejectForm.processing ? 'Menghapus...' : 'Tolak applicant' }}
                         </Button>
                     </DialogFooter>
                 </form>

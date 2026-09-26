@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
     Pagination,
     PaginationContent,
@@ -642,21 +643,67 @@ const emptyDescription = computed<string>((): string =>
             </button>
         </div>
 
-        <div v-if="isNavigating" class="grid gap-3" aria-hidden="true">
-            <Card v-for="n in 3" :key="n" class="rounded-2xl border-border/70">
-                <CardContent class="flex animate-pulse items-start justify-between gap-4 p-5">
-                    <div class="min-w-0 flex-1 space-y-2">
-                        <div class="h-4 w-2/5 rounded bg-muted" />
-                        <div class="h-3 w-3/5 rounded bg-muted" />
-                        <div class="h-3 w-1/3 rounded bg-muted" />
+        <div
+            v-if="isNavigating"
+            class="flex w-full max-w-full min-w-0 flex-col gap-6"
+            aria-busy="true"
+            aria-label="Memuat daftar interview"
+        >
+            <section aria-label="Sesi hari ini">
+                <div class="mb-3 flex items-baseline justify-between gap-3">
+                    <Skeleton class="h-4 w-24" />
+                    <Skeleton class="h-3 w-12" />
+                </div>
+                <div class="rounded-2xl border border-border/70">
+                    <div
+                        v-for="n in 2"
+                        :key="`sesi-${n}`"
+                        class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-5"
+                    >
+                        <div class="min-w-0 flex-1 space-y-2">
+                            <Skeleton class="h-4 w-2/5" />
+                            <Skeleton class="h-3 w-3/5" />
+                        </div>
+                        <Skeleton class="h-8 w-28 shrink-0" />
                     </div>
-                    <div class="h-8 w-20 shrink-0 rounded-lg bg-muted" />
-                </CardContent>
-            </Card>
+                </div>
+            </section>
+
+            <section aria-label="Daftar interview">
+                <div class="mt-1 mb-2 flex items-center gap-2">
+                    <Skeleton class="h-4 w-24" />
+                    <Skeleton class="h-5 w-8" />
+                </div>
+                <div class="grid gap-3">
+                    <div
+                        v-for="n in 3"
+                        :key="`baris-${n}`"
+                        class="rounded-2xl border border-border/70 p-4 sm:p-5"
+                    >
+                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                            <Skeleton class="h-4 w-40" />
+                            <Skeleton class="h-5 w-24" />
+                        </div>
+                        <Skeleton class="mt-1 h-3 w-3/5" />
+                        <div
+                            class="mt-3 flex flex-wrap items-end justify-between gap-x-4 gap-y-3 border-t border-border/60 pt-3"
+                        >
+                            <div class="min-w-0 flex-1 space-y-2">
+                                <Skeleton class="h-4 w-1/2" />
+                                <Skeleton class="h-3 w-1/3" />
+                            </div>
+                            <div class="relative flex shrink-0 flex-wrap gap-2">
+                                <Skeleton class="h-8 w-24" />
+                                <Skeleton class="h-8 w-20" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <template v-else-if="interviews.data.length > 0">
-            <section v-for="group in interviewGroups" :key="group.key" :aria-label="group.title">
+            <section v-for="group in interviewGroups" :key="group.key" :aria-label="group.title" class="fade-up">
                 <div class="mt-1 mb-2 flex items-center gap-2">
                     <h2 class="text-sm font-semibold">{{ group.title }}</h2>
                     <Badge variant="secondary" class="tabular-nums">{{ formatInt(group.rows.length) }}</Badge>

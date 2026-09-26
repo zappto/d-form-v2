@@ -8,6 +8,7 @@ import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vu
 import TiptapRichHtml from '@/components/modules/dashboard/events/TiptapRichHtml.vue'
 import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect'
 import { CalendarDays, MapPin } from 'lucide-vue-next'
+import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate, formatDateTime, statusColorMap } from '@/lib/dummyData'
 import { routes } from '@/lib/routes'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
@@ -23,7 +24,7 @@ interface BundleParticipant {
 }
 
 const props = defineProps<{
-    event: IEvent
+    event: IEvent | undefined
     form: {
         id: string
         title: string
@@ -38,7 +39,7 @@ const props = defineProps<{
         registration_role: 'leader' | 'member' | null
         answers_summary: Record<string, string>
         qr_base64: string | null
-    }
+    } | undefined
     bundle_participants?: BundleParticipant[]
 }>()
 
@@ -86,8 +87,8 @@ const participationLabel = computed(() => {
 
 onMounted(() => {
     setTopbar({
-        title: props.form?.title ?? props.event.title,
-        subtitle: `Registration — ${props.event.title}`,
+        title: props.form?.title ?? props.event?.title ?? 'Registration',
+        subtitle: `Registration — ${props.event?.title ?? ''}`,
     })
 })
 
@@ -102,9 +103,75 @@ function isImageFileUrl(value: string): boolean {
 </script>
 
 <template>
-    <Head :title="`Registration — ${props.event.title}`" />
+    <Head :title="props.event ? `Registration — ${props.event.title}` : 'Registration'" />
 
-    <div class="flex flex-col gap-6">
+    <div v-if="!props.event || !props.registration" class="flex flex-col gap-6" aria-busy="true" aria-label="Memuat pendaftaran">
+        <div class="flex flex-wrap items-center gap-2">
+            <Skeleton class="h-6 w-40 rounded-full" />
+        </div>
+
+        <div class="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <Skeleton class="aspect-[16/7] w-full rounded-none" />
+            <div class="border-t border-border px-4 py-4 sm:px-6">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="space-y-1.5">
+                        <Skeleton class="h-3 w-16" />
+                        <Skeleton class="h-5 w-24 rounded-full" />
+                    </div>
+                    <div class="space-y-1.5 text-right">
+                        <Skeleton class="ml-auto h-3 w-32" />
+                        <Skeleton class="ml-auto h-3 w-24" />
+                    </div>
+                </div>
+                <div class="mt-4 grid gap-2 sm:grid-cols-2">
+                    <Skeleton class="h-4 w-full" />
+                    <Skeleton class="h-4 w-2/3" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl border shadow-xs">
+            <div class="px-4 py-4 sm:px-6">
+                <Skeleton class="h-4 w-32" />
+            </div>
+            <div class="space-y-3 px-4 pb-4 sm:px-6">
+                <div v-for="n in 5" :key="`jawaban-${n}`" class="rounded-lg border border-border/60 bg-muted/15 px-3 py-2">
+                    <Skeleton class="h-2.5 w-20" />
+                    <Skeleton class="mt-1.5 h-4 w-3/4" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-success/25 bg-success/5 shadow-xs">
+            <div class="flex flex-col items-center gap-4 p-4 sm:flex-row sm:items-start sm:px-6">
+                <Skeleton class="size-[240px] shrink-0 rounded-xl" />
+                <div class="w-full max-w-sm space-y-2 text-center sm:text-left">
+                    <Skeleton class="mx-auto h-3 w-32 sm:mx-0" />
+                    <Skeleton class="mx-auto h-7 w-40 font-mono sm:mx-0" />
+                    <Skeleton class="h-3 w-full" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl border shadow-xs">
+            <div class="px-4 py-4 sm:px-6">
+                <Skeleton class="h-4 w-44" />
+            </div>
+            <div class="space-y-4 px-4 pb-4 sm:px-6">
+                <div v-for="n in 2" :key="`peserta-${n}`" class="rounded-lg border border-border/60 bg-muted/15 px-3 py-3">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div class="min-w-0 space-y-1.5">
+                            <Skeleton class="h-4 w-32" />
+                            <Skeleton class="h-3 w-44" />
+                        </div>
+                        <Skeleton class="h-5 w-20 rounded-full" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-else class="fade-up flex flex-col gap-6">
         <div v-if="participationLabel" class="flex flex-wrap items-center gap-2">
             <Badge variant="outline" class="text-[11px] font-medium">{{ participationLabel }}</Badge>
         </div>

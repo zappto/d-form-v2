@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { Check, Clock, FileText, X } from 'lucide-vue-next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     Sheet,
     SheetContent,
@@ -26,6 +27,7 @@ const props = defineProps<{
     formatDate: (value: string) => string;
     humanizeKey: (value: string) => string;
     isSubmissionReviewing: (submissionId: string) => boolean;
+    loading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -63,6 +65,46 @@ const answerSections = computed(() => {
             side="right"
             class="flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-md lg:max-w-lg"
         >
+            <template v-if="loading">
+                <div aria-busy="true" aria-label="Memuat detail jawaban" class="contents">
+                    <SheetHeader class="shrink-0 gap-0 border-b border-border/70 px-5 pt-5 pb-4 text-left sm:px-6">
+                        <div class="flex items-start gap-3.5 pr-8">
+                            <Skeleton class="size-11 shrink-0 rounded-xl" />
+                            <div class="min-w-0 flex-1 space-y-2">
+                                <Skeleton class="h-4 w-2/3" />
+                                <Skeleton class="h-3 w-1/2" />
+                                <div class="mt-2 flex flex-wrap items-center gap-2">
+                                    <Skeleton class="h-5 w-20 rounded-full" />
+                                    <Skeleton class="h-4 w-28" />
+                                </div>
+                            </div>
+                        </div>
+                    </SheetHeader>
+
+                    <div class="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5 sm:px-6">
+                        <div
+                            v-for="n in 5"
+                            :key="`field-${n}`"
+                            class="sheet-field-skeleton rounded-xl border border-border/70 bg-card/50 p-4"
+                        >
+                            <Skeleton class="mb-3 h-4 w-1/3" />
+                            <Skeleton class="h-4 w-full" />
+                            <Skeleton class="mt-2 h-4 w-2/3" />
+                        </div>
+                    </div>
+
+                    <SheetFooter
+                        class="shrink-0 flex-col gap-2 border-t border-border/70 bg-muted/20 px-5 py-4 sm:flex-col sm:px-6"
+                    >
+                        <Skeleton class="h-4 w-3/4" />
+                        <div class="flex w-full flex-col gap-2 sm:flex-row">
+                            <Skeleton class="sheet-action-skeleton h-10 flex-1" />
+                            <Skeleton class="sheet-action-skeleton h-10 flex-1" />
+                        </div>
+                    </SheetFooter>
+                </div>
+            </template>
+            <template v-else>
             <SheetHeader class="shrink-0 gap-0 border-b border-border/70 px-5 pt-5 pb-4 text-left sm:px-6">
                 <div class="flex items-start gap-3.5 pr-8">
                     <UserAvatarFallback
@@ -187,6 +229,7 @@ const answerSections = computed(() => {
                     </template>
                 </p>
             </SheetFooter>
+            </template>
         </SheetContent>
     </Sheet>
 </template>

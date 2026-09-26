@@ -3,11 +3,14 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue'
+import { CometSpinner } from '@/components/ui/comet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { routes } from '@/lib/routes'
+import { showErrorToast, showFlashToast } from '@/lib/error-message'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 import useAuth from '@/utils/composables/useAuth'
 import { usePage } from '@inertiajs/vue3'
@@ -53,7 +56,7 @@ interface ApplicantOption {
 }
 
 const props = defineProps<{
-    session: SessionDetail
+    session: SessionDetail | undefined
     eligibleApplicants: ApplicantOption[]
     interviewerOptions: { id: string; name: string }[]
     otherSessions: { id: string; session_date: string; starts_at: string; division: { name: string } | null }[]
@@ -70,6 +73,7 @@ const reassignErrors = ref<Record<string, string>>({})
 const reassignProcessing = ref<Record<string, boolean>>({})
 
 const rescheduleSessionId = ref<Record<string, string>>({})
+const reschedulingId = ref<string | null>(null)
 
 const page = usePage()
 const user = useAuth(page.props)
@@ -78,7 +82,7 @@ const canViewQueue = computed(() => user.value?.can_view_recruitment_queue === t
 onMounted(() => {
     setTopbar({
         title: 'Detail sesi interview',
-        subtitle: props.session.division?.name ?? '',
+        subtitle: props.session?.division?.name ?? '',
     })
 })
 
@@ -202,14 +206,27 @@ watch(
     },
 )
 
-function rescheduleInterview(interviewId: string) {
-    const sessionId = rescheduleSessionId.value[interviewId]
-    if (!sessionId) return
+function rescheduleInterview(interviewId: string): void {
+    const sessionId: string = rescheduleSessionId.value[interviewId] ?? ''
+    if (sessionId === '' || reschedulingId.value !== null) return
 
+    reschedulingId.value = interviewId
     router.post(
         routes.admin.recruitment.interviews.reschedule(interviewId),
         { recruitment_interview_session_id: sessionId },
-        { preserveScroll: true },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                rescheduleSessionId.value[interviewId] = ''
+                showFlashToast({ type: 'success', message: 'Jadwal interview diperbarui.' })
+            },
+            onError: () => {
+                showErrorToast('Gagal memindahkan jadwal interview. Coba lagi.')
+            },
+            onFinish: () => {
+                reschedulingId.value = null
+            },
+        },
     )
 }
 </script>
@@ -217,7 +234,57 @@ function rescheduleInterview(interviewId: string) {
 <template>
     <Head title="Detail Sesi Interview" />
 
-    <div class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
+    <div v-if="!session" class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10" aria-busy="true" aria-label="Memuat detail sesi">
+        <div class="flex flex-wrap items-center justify-end gap-3">
+            <Skeleton class="h-9 w-36" />
+        </div>
+
+        <div class="rounded-2xl border border-border/70 bg-card p-4 sm:p-6">
+            <Skeleton class="h-5 w-32" />
+            <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                <Skeleton class="h-4 w-3/4" />
+                <Skeleton class="h-4 w-2/3" />
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-border/70 bg-card p-4 sm:p-6">
+            <Skeleton class="h-5 w-44" />
+            <div class="mt-4 space-y-2">
+                <Skeleton class="h-4 w-40" />
+                <div v-for="n in 3" :key="`calon-${n}`" class="flex items-center gap-3 rounded-lg border border-border/70 p-3">
+                    <Skeleton class="size-4 shrink-0 rounded" />
+                    <div class="space-y-1.5">
+                        <Skeleton class="h-4 w-40" />
+                        <Skeleton class="h-3 w-32 font-mono" />
+                    </div>
+                </div>
+            </div>
+            <Skeleton class="mt-4 h-9 w-36" />
+        </div>
+
+        <div class="rounded-2xl border border-border/70 bg-card p-4 sm:p-6">
+            <Skeleton class="h-5 w-36" />
+            <div class="mt-4 space-y-4">
+                <div v-for="n in 4" :key="`jadwal-${n}`" class="rounded-xl border border-border/70 p-4">
+                    <Skeleton class="h-4 w-1/2" />
+                    <Skeleton class="mt-1.5 h-3 w-2/3 font-mono" />
+                    <Skeleton class="mt-1 h-3 w-3/4" />
+                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                        <div class="space-y-2">
+                            <Skeleton class="h-4 w-32" />
+                            <Skeleton class="h-9 w-full" />
+                        </div>
+                        <div class="space-y-2">
+                            <Skeleton class="h-4 w-32" />
+                            <Skeleton class="h-9 w-full" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div v-else class="fade-up flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
         <div class="flex flex-wrap items-center justify-end gap-3">
             <Button v-if="canViewQueue" as-child>
                 <Link :href="routes.admin.recruitment.queue.show(session.id)">
@@ -351,10 +418,12 @@ function rescheduleInterview(interviewId: string) {
                                     size="sm"
                                     variant="outline"
                                     class="mt-0.5 shrink-0"
-                                    :disabled="!rescheduleSessionId[interview.id]"
+                                    :disabled="!rescheduleSessionId[interview.id] || reschedulingId === interview.id"
+                                    :aria-busy="reschedulingId === interview.id"
                                     @click="rescheduleInterview(interview.id)"
                                 >
-                                    Pindah
+                                    <CometSpinner v-if="reschedulingId === interview.id" :size="16" />
+                                    {{ reschedulingId === interview.id ? 'Menyimpan...' : 'Pindah' }}
                                 </Button>
                             </div>
                         </div>

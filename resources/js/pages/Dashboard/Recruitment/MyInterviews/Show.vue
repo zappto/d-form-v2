@@ -6,9 +6,12 @@ import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/Sessi
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { CometSpinner } from '@/components/ui/comet'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { handleInertiaFormErrors } from '@/lib/error-message'
 import { routes } from '@/lib/routes'
 import { setTopbar } from '@/utils/composables/useDashboardTopbar'
 import useAuth from '@/utils/composables/useAuth'
@@ -82,7 +85,7 @@ interface QueuePermission {
 }
 
 const props = defineProps<{
-    detail: DetailPayload
+    detail: DetailPayload | undefined
     evaluateUrl: string
     recommendationOptions: { value: string; label: string }[]
     flashMessage: string | null
@@ -98,12 +101,12 @@ const canViewQueue = computed<boolean>((): boolean => {
 
 const queueDrawerOpen = ref<boolean>(false)
 
-const canEdit = computed(() => props.detail.evaluation.can_edit !== false)
+const canEdit = computed(() => props.detail?.evaluation.can_edit !== false)
 
-const isLocked = computed<boolean>((): boolean => props.detail.evaluation.is_locked === true)
+const isLocked = computed<boolean>((): boolean => props.detail?.evaluation.is_locked === true)
 
 const interviewStartsInFuture = computed<boolean>((): boolean => {
-    const iso: string | null = props.detail.interview?.scheduled_at ?? null
+    const iso: string | null = props.detail?.interview?.scheduled_at ?? null
     if (!iso) return false
     const starts: Date = new Date(iso)
     if (Number.isNaN(starts.getTime())) return false
@@ -112,7 +115,7 @@ const interviewStartsInFuture = computed<boolean>((): boolean => {
 
 const blockReason = computed<string | null>((): string | null => {
     if (isLocked.value) return 'Penilaian sudah terkunci. Hubungi staff jika perlu koreksi.'
-    if (!props.detail.interview) {
+    if (!props.detail?.interview) {
         return 'Jadwal interview belum tersedia. Penilaian bisa disimpan setelah jadwal ditentukan.'
     }
     if (interviewStartsInFuture.value) {
@@ -179,11 +182,11 @@ function clampScore(value: number): number {
 }
 
 const form = useForm({
-    speaking_score: clampScore(props.detail.evaluation.speaking_score ?? SCORE_DEFAULT),
-    technical_score: clampScore(props.detail.evaluation.technical_score ?? SCORE_DEFAULT),
-    attitude_score: clampScore(props.detail.evaluation.attitude_score ?? SCORE_DEFAULT),
-    recommendation: props.detail.evaluation.recommendation ?? 'recommended',
-    notes: props.detail.evaluation.notes ?? '',
+    speaking_score: clampScore(props.detail?.evaluation.speaking_score ?? SCORE_DEFAULT),
+    technical_score: clampScore(props.detail?.evaluation.technical_score ?? SCORE_DEFAULT),
+    attitude_score: clampScore(props.detail?.evaluation.attitude_score ?? SCORE_DEFAULT),
+    recommendation: props.detail?.evaluation.recommendation ?? 'recommended',
+    notes: props.detail?.evaluation.notes ?? '',
 })
 
 function scoreValue(field: ScoreField): number {
@@ -232,8 +235,8 @@ function onScoreKeydown(field: ScoreField, event: KeyboardEvent): void {
 }
 
 const interviewSchedule = computed(() => {
-    if (!props.detail.interview?.scheduled_at) return null
-    return new Date(props.detail.interview.scheduled_at).toLocaleString('id-ID', {
+    if (!props.detail?.interview?.scheduled_at) return null
+    return new Date(props.detail?.interview.scheduled_at).toLocaleString('id-ID', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -243,7 +246,7 @@ const interviewSchedule = computed(() => {
 })
 
 const queuePollUrl = computed<string>((): string => {
-    const sessionId: string | null = props.detail.interview?.session?.id ?? null
+    const sessionId: string | null = props.detail?.interview?.session?.id ?? null
     return sessionId !== null ? routes.admin.recruitment.queue.poll(sessionId) : ''
 })
 
@@ -259,50 +262,50 @@ function formatBytes(bytes: number | null | undefined): string | null {
 }
 
 const cvPreviewUrl = computed<string | null>(() => {
-    const url = props.detail.documents.cv_preview_url
+    const url = props.detail?.documents.cv_preview_url
     return isFilled(url) ? url : null
 })
 
 const cvDownloadUrl = computed<string | null>(() => {
-    const url = props.detail.documents.cv_download_url
+    const url = props.detail?.documents.cv_download_url
     return isFilled(url) ? url : null
 })
 
 const cvOriginalName = computed<string>(() => {
-    const name = props.detail.documents.cv_original_name
+    const name = props.detail?.documents.cv_original_name
     return isFilled(name) ? name : 'Berkas CV'
 })
 
 const cvMetaLabel = computed<string>(() => {
-    const size: string | null = formatBytes(props.detail.documents.cv_size_bytes)
+    const size: string | null = formatBytes(props.detail?.documents.cv_size_bytes)
     return size !== null ? `CV · ${size}` : 'CV'
 })
 
 const cvAvailable = computed<boolean>(() => cvPreviewUrl.value !== null || cvDownloadUrl.value !== null)
 
 const portfolioExternalUrl = computed<string | null>(() => {
-    const documents = props.detail.documents
+    const documents = props.detail?.documents
     if (documents.portfolio_is_url === false) return null
     return isFilled(documents.portfolio_url) ? documents.portfolio_url : null
 })
 
 const portfolioPreviewUrl = computed<string | null>(() => {
-    const url = props.detail.documents.portfolio_preview_url
+    const url = props.detail?.documents.portfolio_preview_url
     return isFilled(url) ? url : null
 })
 
 const portfolioDownloadUrl = computed<string | null>(() => {
-    const url = props.detail.documents.portfolio_download_url
+    const url = props.detail?.documents.portfolio_download_url
     return isFilled(url) ? url : null
 })
 
 const portfolioOriginalName = computed<string>(() => {
-    const name = props.detail.documents.portfolio_original_name
+    const name = props.detail?.documents.portfolio_original_name
     return isFilled(name) ? name : 'Berkas portfolio'
 })
 
 const portfolioMetaLabel = computed<string>(() => {
-    const size: string | null = formatBytes(props.detail.documents.portfolio_size_bytes)
+    const size: string | null = formatBytes(props.detail?.documents.portfolio_size_bytes)
     return size !== null ? `Portfolio · ${size}` : 'Portfolio'
 })
 
@@ -313,34 +316,34 @@ const portfolioFileAvailable = computed<boolean>(
 )
 
 const instagramFollowDownloadUrl = computed<string | null>(() => {
-    const url = props.detail.documents.instagram_follow_download_url
+    const url = props.detail?.documents.instagram_follow_download_url
     return isFilled(url) ? url : null
 })
 
 const instagramFollowPreviewUrl = computed<string | null>(() => {
-    const url = props.detail.documents.instagram_follow_preview_url
+    const url = props.detail?.documents.instagram_follow_preview_url
     return isFilled(url) ? url : null
 })
 
 const instagramFollowOriginalName = computed<string>(() => {
-    const name = props.detail.documents.instagram_follow_original_name
+    const name = props.detail?.documents.instagram_follow_original_name
     return isFilled(name) ? name : 'Bukti follow Instagram'
 })
 
 const instagramFollowMetaLabel = computed<string>(() => {
-    const size: string | null = formatBytes(props.detail.documents.instagram_follow_size_bytes)
+    const size: string | null = formatBytes(props.detail?.documents.instagram_follow_size_bytes)
     return size !== null ? `Follow IG · ${size}` : 'Follow Instagram'
 })
 
 const instagramFollowAvailable = computed<boolean>(
     () =>
-        props.detail.documents.has_instagram_follow === true ||
+        props.detail?.documents.has_instagram_follow === true ||
         instagramFollowPreviewUrl.value !== null ||
         instagramFollowDownloadUrl.value !== null,
 )
 
 const twibbonUrl = computed<string | null>(() => {
-    const url = props.detail.documents.twibbon_url
+    const url = props.detail?.documents.twibbon_url
     return isFilled(url) ? url : null
 })
 
@@ -360,7 +363,7 @@ const portfolioPreviewFailed = ref<boolean>(false)
 const instagramFollowPreviewFailed = ref<boolean>(false)
 
 watch(
-    () => props.detail.application.id,
+    () => props.detail?.application.id,
     () => {
         cvPreviewLoading.value = true
         cvPreviewFailed.value = false
@@ -371,22 +374,102 @@ watch(
 )
 
 onMounted(() => {
+    const application = props.detail?.application
     setTopbar({
-        title: props.detail.application.full_name,
-        subtitle: props.detail.application.registration_number,
+        title: application?.full_name ?? 'Interview',
+        subtitle: application?.registration_number ?? '',
     })
 })
 
 function submit(): void {
     if (blockReason.value !== null || form.processing) return
-    form.post(props.evaluateUrl, { preserveScroll: true })
+    form.post(props.evaluateUrl, {
+        preserveScroll: true,
+        // Sukses tanpa toast manual: controller memakai ->with('message') yang
+        // disalurkan sebagai prop flashMessage (alert inline, termasuk sufiks
+        // antrean dinamis) — toast manual akan ganda.
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal menyimpan penilaian' })
+        },
+    })
 }
 </script>
 
 <template>
-    <Head :title="`Interview — ${detail.application.full_name}`" />
+    <Head :title="detail ? `Interview — ${detail.application.full_name}` : 'Interview'" />
 
-    <div class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
+    <div v-if="!detail" class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10" aria-busy="true" aria-label="Memuat penilaian interview">
+        <div class="rounded-2xl border border-border/70 bg-card p-6">
+            <Skeleton class="h-4 w-32" />
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="space-y-1.5">
+                    <Skeleton class="h-3 w-20" />
+                    <Skeleton class="h-4 w-3/4" />
+                </div>
+                <div class="space-y-1.5">
+                    <Skeleton class="h-3 w-20" />
+                    <Skeleton class="h-4 w-2/3" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-border/70 bg-card p-6">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+                <div class="space-y-2">
+                    <Skeleton class="h-6 w-48" />
+                    <Skeleton class="h-3 w-32 font-mono" />
+                </div>
+                <Skeleton class="h-6 w-20 rounded-full" />
+            </div>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="space-y-1.5">
+                    <Skeleton class="h-3 w-24" />
+                    <Skeleton class="h-4 w-16" />
+                </div>
+                <div class="space-y-1.5">
+                    <Skeleton class="h-3 w-24" />
+                    <Skeleton class="h-4 w-16" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-border/70 bg-card p-6">
+            <Skeleton class="h-4 w-28" />
+            <div class="mt-4 space-y-5">
+                <div v-for="n in 4" :key="`dokumen-${n}`" class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <Skeleton class="size-5 shrink-0" />
+                        <div class="space-y-1.5">
+                            <Skeleton class="h-4 w-40" />
+                            <Skeleton class="h-3 w-28" />
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <Skeleton class="h-8 w-28" />
+                        <Skeleton class="h-8 w-32" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-2xl border border-border/70 bg-card p-6">
+            <Skeleton class="h-4 w-36" />
+            <div class="mt-4 space-y-4">
+                <div v-for="n in 3" :key="`skor-${n}`" class="space-y-2">
+                    <Skeleton class="h-4 w-24" />
+                    <Skeleton class="h-11 w-full rounded-2xl" />
+                </div>
+                <div class="grid gap-2 sm:grid-cols-2">
+                    <Skeleton class="h-16 w-full rounded-xl" />
+                    <Skeleton class="h-16 w-full rounded-xl" />
+                </div>
+                <Skeleton class="h-24 w-full rounded-md" />
+                <Skeleton class="h-9 w-36" />
+            </div>
+        </div>
+    </div>
+
+    <div v-else class="fade-up flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
         <div class="grid items-start gap-6 lg:grid-cols-12">
             <div class="flex min-w-0 flex-col gap-6 lg:col-span-7">
                 <Card class="rounded-2xl border-border/70">
@@ -1071,8 +1154,13 @@ function submit(): void {
                             </p>
                         </div>
 
-                        <Button type="submit" :disabled="form.processing || blockReason !== null">
-                            Simpan penilaian
+                        <Button
+                            type="submit"
+                            :disabled="form.processing || blockReason !== null"
+                            :aria-busy="form.processing"
+                        >
+                            <CometSpinner v-if="form.processing" :size="16" />
+                            {{ form.processing ? 'Menyimpan...' : 'Simpan penilaian' }}
                         </Button>
                     </form>
 

@@ -9,6 +9,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { CometSpinner } from '@/components/ui/comet'
 
 defineProps<{
     open: boolean
@@ -41,9 +42,11 @@ const emit = defineEmits<{
                 <AlertDialogAction
                     :class="variant === 'destructive' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive/30' : ''"
                     :disabled="loading"
+                    :aria-busy="loading"
                     @click="emit('confirm')"
                 >
-                    {{ confirmText ?? 'Continue' }}
+                    <CometSpinner v-if="loading" :size="16" />
+                    {{ loading ? (variant === 'destructive' ? 'Menghapus...' : 'Menyimpan...') : (confirmText ?? 'Continue') }}
                 </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>

@@ -4,6 +4,7 @@ import { Link } from '@inertiajs/vue3'
 import { Plus } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import InterviewSessionCreateSheet, {
     type InterviewDivisionChoice,
 } from '@/components/modules/dashboard/recruitment/InterviewSessionCreateSheet.vue'
@@ -33,6 +34,7 @@ defineProps<{
     sessions: SessionPaginator | null
     periodId: string
     divisionOptions: InterviewDivisionChoice[]
+    loading?: boolean
 }>()
 
 const createOpen = ref<boolean>(false)
@@ -57,7 +59,45 @@ const createOpen = ref<boolean>(false)
             @close="createOpen = false"
         />
 
-        <Card v-if="sessions" class="overflow-hidden rounded-2xl border-border/70">
+        <div v-if="loading" aria-busy="true" aria-label="Memuat jadwal interview">
+            <div class="overflow-hidden rounded-2xl border border-border/70 bg-card">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-muted/40 border-b text-left">
+                            <tr>
+                                <th class="px-4 py-3 font-medium">Tanggal</th>
+                                <th class="px-4 py-3 font-medium">Waktu</th>
+                                <th class="px-4 py-3 font-medium">Divisi</th>
+                                <th class="px-4 py-3 font-medium">Lokasi</th>
+                                <th class="px-4 py-3 font-medium">Terjadwal</th>
+                                <th class="px-4 py-3 font-medium"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="n in 6"
+                                :key="`sesi-${n}`"
+                                class="interview-row-skeleton border-b last:border-0"
+                            >
+                                <td class="px-4 py-3"><Skeleton class="h-4 w-24" /></td>
+                                <td class="px-4 py-3"><Skeleton class="h-4 w-28" /></td>
+                                <td class="px-4 py-3"><Skeleton class="h-4 w-20" /></td>
+                                <td class="px-4 py-3"><Skeleton class="h-4 w-32" /></td>
+                                <td class="px-4 py-3"><Skeleton class="h-4 w-10" /></td>
+                                <td class="px-4 py-3 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <Skeleton class="h-8 w-16" />
+                                        <Skeleton class="h-8 w-16" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <Card v-else-if="sessions" class="fade-up overflow-hidden rounded-2xl border-border/70">
             <CardContent class="p-0">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">

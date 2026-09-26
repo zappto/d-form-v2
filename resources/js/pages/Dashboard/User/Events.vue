@@ -6,6 +6,7 @@ import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import EventCard from '@/components/modules/dashboard/events/EventCard.vue';
 import EventFilterBar from '@/components/modules/dashboard/events/EventFilterBar.vue';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { FilterX } from 'lucide-vue-next';
 import { categoryLabelMap, sessionLabelMap } from '@/lib/dummyData';
 import { toCategoryList } from '@/lib/eventCategories';
@@ -16,7 +17,7 @@ defineOptions({ layout: DashboardLayout });
 
 const props = withDefaults(
     defineProps<{
-        events: IEvent[];
+        events: IEvent[] | undefined;
         listMode?: 'mine' | 'browse';
     }>(),
     { listMode: 'browse' }
@@ -38,7 +39,7 @@ const categoryFilterOptions = computed(() => [
 
 const sessionOptions = computed(() => {
     const tokens = new Set<string>();
-    for (const event of props.events) {
+    for (const event of props.events ?? []) {
         for (const session of eventTokenList(event.session)) tokens.add(session);
     }
     return [...tokens]
@@ -78,7 +79,7 @@ const pageSubtitle = computed(() =>
 const headTitle = computed(() => (isBrowse.value ? 'Jelajah acara' : 'Acara diikuti'));
 
 const filteredEvents = computed(() => {
-    let list = props.events;
+    let list = props.events ?? [];
 
     if (filterCategory.value !== 'all')
         list = list.filter((e) => toCategoryList(e.category).includes(filterCategory.value));
@@ -123,7 +124,27 @@ onMounted(() => {
             </Button>
         </div>
 
-        <div v-if="filteredEvents.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div v-if="!events" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true" aria-label="Memuat event">
+            <div v-for="n in 6" :key="`event-${n}`" class="event-card-skeleton flex min-w-0 flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <Skeleton class="h-6 w-20 rounded-full" />
+                    <Skeleton class="size-8 shrink-0" />
+                </div>
+                <Skeleton class="aspect-[16/7] w-full rounded-xl" />
+                <div class="flex items-center gap-3">
+                    <Skeleton class="h-4 min-w-0 flex-1" />
+                    <Skeleton class="h-6 w-16 shrink-0 rounded-full" />
+                </div>
+                <Skeleton class="h-3 w-3/4" />
+                <Skeleton class="h-3 w-1/2" />
+                <div class="mt-auto flex items-center justify-between gap-3 border-t border-border/60 pt-3">
+                    <Skeleton class="h-3 w-1/3" />
+                    <Skeleton class="h-4 w-16 shrink-0" />
+                </div>
+            </div>
+        </div>
+
+        <div v-else-if="filteredEvents.length > 0" class="fade-up grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <EventCard
                 v-for="event in filteredEvents"
                 :key="event.id"

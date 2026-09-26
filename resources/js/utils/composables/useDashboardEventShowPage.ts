@@ -1,10 +1,10 @@
 import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import { toast } from 'vue-sonner'
-import { handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message'
+import { handleInertiaFormErrors } from '@/lib/error-message'
 import {
     destroy as destroyEvent,
     restore as restoreEvent,
+    update as updateEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController'
 import {
     formatDate,
@@ -25,6 +25,7 @@ export function useDashboardEventShowPage(
     const showRestoreModal = ref(false)
     const isDeleting = ref(false)
     const isRestoring = ref(false)
+    const isTogglingPublish = ref(false)
 
     const fillPercent = computed(() => {
         if (!event.quota) return 0
@@ -68,7 +69,9 @@ export function useDashboardEventShowPage(
     function handleDelete() {
         isDeleting.value = true
         router.delete(destroyEvent(event.id).url, {
-            onSuccess: () => toast.success(humanizeErrorMessage('Event has been archived.')),
+            // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+            // dari flash `toast` server (messages.event.delete.success).
+            onSuccess: () => { showDeleteModal.value = false },
             onError: (errors) => handleInertiaFormErrors(errors, { title: 'Gagal mengarsipkan event' }),
             onFinish: () => { isDeleting.value = false; showDeleteModal.value = false },
         })
@@ -77,9 +80,40 @@ export function useDashboardEventShowPage(
     function handleRestore() {
         isRestoring.value = true
         router.post(restoreEvent(event.id).url, {}, {
-            onSuccess: () => toast.success(humanizeErrorMessage('Event has been restored.')),
+            // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+            // dari flash `toast` server (messages.event.restore.success).
+            onSuccess: () => { showRestoreModal.value = false },
             onError: (errors) => handleInertiaFormErrors(errors, { title: 'Gagal memulihkan event' }),
             onFinish: () => { isRestoring.value = false; showRestoreModal.value = false },
+        })
+    }
+
+    function handleTogglePublish() {
+        if (isTogglingPublish.value || event.deleted_at) return
+        // UpdateEventRequest mewajibkan semua field, jadi kirim payload lengkap
+        // dari data event saat ini + flag publish yang dibalik. session/category
+        // boleh berupa array (dinormalisasi backend jadi string CSV).
+        const publish = event.status === 'draft'
+        isTogglingPublish.value = true
+        router.put(updateEvent(event.id).url, {
+            title: event.title,
+            description: event.description,
+            location: event.location,
+            start_date: event.start_date,
+            end_date: event.end_date,
+            registration_start: event.registration_start,
+            registration_end: event.registration_end,
+            quota: event.quota,
+            price: event.price,
+            session: event.session,
+            category: event.category,
+            publish,
+        }, {
+            preserveScroll: true,
+            onError: (errors) => handleInertiaFormErrors(errors, {
+                title: publish ? 'Gagal mempublikasikan event' : 'Gagal mengembalikan event ke draf',
+            }),
+            onFinish: () => { isTogglingPublish.value = false },
         })
     }
 
@@ -93,6 +127,7 @@ export function useDashboardEventShowPage(
         showRestoreModal,
         isDeleting,
         isRestoring,
+        isTogglingPublish,
         fillPercent,
         remainingSeats,
         progressTone,
@@ -103,6 +138,7 @@ export function useDashboardEventShowPage(
         formatDateTime,
         handleDelete,
         handleRestore,
+        handleTogglePublish,
         cardShadow,
     }
 }

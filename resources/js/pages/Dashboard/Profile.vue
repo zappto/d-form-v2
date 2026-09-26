@@ -6,6 +6,7 @@ import { getFieldError, handleInertiaFormErrors } from '@/lib/error-message';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
@@ -22,6 +23,9 @@ defineOptions({ layout: DashboardLayout });
 
 const page = usePage();
 const user = useAuth(page.props);
+
+/** Tanpa GET (props saja): skeleton hanya bila user awal belum ada. */
+const profileReady = computed<boolean>(() => user.value !== null && user.value !== undefined);
 
 const hasLocalPassword = computed<boolean>(() => user.value?.has_local_password !== false);
 
@@ -304,7 +308,76 @@ function saveAllChanges(): void {
                     @change="onAvatarFileChange"
                 />
 
-                <section class="bg-muted/20 p-5 sm:p-8">
+                <div v-if="!profileReady" aria-busy="true" aria-label="Memuat profil">
+                    <section class="bg-muted/20 p-5 sm:p-8">
+                        <div class="border-border/70 mb-6 border-b pb-4">
+                            <Skeleton class="h-3 w-40" />
+                            <Skeleton class="mt-2 h-6 w-56" />
+                            <Skeleton class="mt-1.5 h-4 w-72" />
+                        </div>
+
+                        <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
+                            <Skeleton class="size-20 shrink-0 rounded-full" />
+                            <div class="min-w-0 flex-1">
+                                <Skeleton class="h-6 w-32" />
+                                <div class="mt-3 flex flex-wrap items-center gap-3">
+                                    <Skeleton class="h-10 w-36" />
+                                    <Skeleton class="h-10 w-28" />
+                                </div>
+                                <Skeleton class="mt-3 h-4 w-full max-w-md" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-muted/20 px-5 pb-7 sm:px-8">
+                        <div class="grid gap-6">
+                            <div class="grid gap-5 md:grid-cols-2">
+                                <div class="grid gap-2">
+                                    <Skeleton class="h-4 w-28" />
+                                    <Skeleton class="h-12 w-full rounded-xl" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Skeleton class="h-4 w-20" />
+                                    <Skeleton class="h-12 w-full rounded-xl" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="border-border/70 bg-card border-t p-5 sm:p-8">
+                        <div class="border-border/70 mb-6 border-b pb-4">
+                            <Skeleton class="h-3 w-32" />
+                            <Skeleton class="mt-2 h-6 w-48" />
+                            <Skeleton class="mt-1.5 h-4 w-80 max-w-full" />
+                        </div>
+
+                        <div class="grid gap-5">
+                            <div class="grid gap-2">
+                                <Skeleton class="h-4 w-36" />
+                                <Skeleton class="h-12 w-full rounded-xl" />
+                            </div>
+                            <div class="grid gap-5 md:grid-cols-2">
+                                <div class="grid gap-2">
+                                    <Skeleton class="h-4 w-28" />
+                                    <Skeleton class="h-12 w-full rounded-xl" />
+                                </div>
+                                <div class="grid gap-2">
+                                    <Skeleton class="h-4 w-40" />
+                                    <Skeleton class="h-12 w-full rounded-xl" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="border-border/70 bg-muted/20 border-t p-5 sm:p-6">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <Skeleton class="h-4 w-64 max-w-full" />
+                            <Skeleton class="h-12 w-full sm:w-44" />
+                        </div>
+                    </section>
+                </div>
+                <template v-else>
+                <section class="fade-up bg-muted/20 p-5 sm:p-8">
                     <div class="border-border/70 mb-6 border-b pb-4">
                         <p class="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
                             Pengaturan Profil
@@ -372,7 +445,7 @@ function saveAllChanges(): void {
                     </div>
                 </section>
 
-                <section class="bg-muted/20 px-5 pb-7 sm:px-8">
+                <section class="fade-up bg-muted/20 px-5 pb-7 sm:px-8">
                     <form class="grid gap-6" @submit.prevent="saveAllChanges">
                         <div class="grid gap-5 md:grid-cols-2">
                             <div class="grid gap-2">
@@ -410,7 +483,7 @@ function saveAllChanges(): void {
                     </form>
                 </section>
 
-                <section class="border-border/70 bg-card border-t p-5 sm:p-8">
+                <section class="fade-up border-border/70 bg-card border-t p-5 sm:p-8">
                     <div class="border-border/70 mb-6 border-b pb-4">
                         <p class="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">Keamanan</p>
                         <h2 class="text-foreground mt-1 text-xl font-semibold tracking-[-0.02em]">Kata Sandi & Akses</h2>
@@ -521,7 +594,7 @@ function saveAllChanges(): void {
                     </form>
                 </section>
 
-                <section class="border-border/70 bg-muted/20 border-t p-5 sm:p-6">
+                <section class="fade-up border-border/70 bg-muted/20 border-t p-5 sm:p-6">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <p class="text-muted-foreground text-sm">
                             {{
@@ -541,6 +614,7 @@ function saveAllChanges(): void {
                         </Button>
                     </div>
                 </section>
+                </template>
             </CardContent>
         </Card>
     </div>

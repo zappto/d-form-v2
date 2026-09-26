@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Clock3, QrCode } from 'lucide-vue-next';
+import { Skeleton } from '@/components/ui/skeleton';
 import { SCAN_STATUS_THEME, type ScanEntry, type ScanResult } from '@/lib/qrScanUi';
 
 const props = withDefaults(
@@ -161,7 +162,30 @@ function onSubmitManual(): void {
                 <CardTitle class="text-base font-semibold">Hasil Scan Terakhir</CardTitle>
             </CardHeader>
             <CardContent class="pt-0">
-                <div v-if="scanResult" :class="['rounded-xl p-3', SCAN_STATUS_THEME[scanResult.status].bg]">
+                <div
+                    v-if="scanBusy"
+                    aria-busy="true"
+                    aria-label="Memuat hasil scan"
+                    class="scan-result-skeleton rounded-xl border border-border/70 p-3"
+                >
+                    <div class="flex items-start gap-3">
+                        <Skeleton class="mt-0.5 size-5 shrink-0 rounded-full" />
+                        <div class="min-w-0 flex-1 space-y-2">
+                            <div class="mb-1.5 flex items-center gap-2">
+                                <Skeleton class="h-5 w-16 shrink-0 rounded-full" />
+                                <Skeleton class="h-3 min-w-0 flex-1" />
+                            </div>
+                            <Skeleton class="h-4 w-2/3" />
+                            <Skeleton class="h-3 w-1/2" />
+                            <div class="mt-2 flex flex-wrap items-center gap-2">
+                                <Skeleton class="h-5 w-24 rounded-full" />
+                                <Skeleton class="h-5 w-16 rounded-full" />
+                            </div>
+                            <Skeleton class="mt-2 h-3 w-3/4" />
+                        </div>
+                    </div>
+                </div>
+                <div v-else-if="scanResult" :class="['fade-up rounded-xl p-3', SCAN_STATUS_THEME[scanResult.status].bg]">
                     <div class="flex items-start gap-3">
                         <component
                             :is="SCAN_STATUS_THEME[scanResult.status].icon"

@@ -6,7 +6,7 @@ import {
     type QueueEntryRow,
     type QueueSnapshot,
 } from '@/utils/composables/useRecruitmentQueue'
-import { Loader2 } from 'lucide-vue-next'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const props = defineProps<{
     pollUrl: string
@@ -86,10 +86,53 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
         </SheetHeader>
 
         <div class="min-h-0 flex-1 space-y-5 overflow-y-auto p-4" :aria-busy="loading">
-            <p v-if="loading" class="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 class="size-4 animate-spin" aria-hidden="true" />
-                Memuat antrean…
-            </p>
+            <div
+                v-if="loading"
+                aria-label="Memuat antrean"
+                class="space-y-5"
+            >
+                <div class="grid grid-cols-2 gap-2">
+                    <div
+                        v-for="n in 4"
+                        :key="`stat-${n}`"
+                        class="drawer-stat-skeleton rounded-xl border border-border/70 px-3 py-2"
+                    >
+                        <Skeleton class="h-3 w-16" />
+                        <Skeleton class="mt-1.5 h-6 w-10" />
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <Skeleton class="h-4 w-32" />
+                    <div class="drawer-current-skeleton flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-3.5 py-3">
+                        <Skeleton class="h-6 w-12 shrink-0 font-mono" />
+                        <div class="min-w-0 flex-1 space-y-1.5">
+                            <Skeleton class="h-4 w-2/3" />
+                            <Skeleton class="h-3 w-1/2 font-mono" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-baseline justify-between gap-2">
+                        <Skeleton class="h-4 w-24" />
+                        <Skeleton class="h-3 w-20" />
+                    </div>
+                    <ul class="divide-y divide-border/60 rounded-xl border border-border/70">
+                        <li
+                            v-for="n in 6"
+                            :key="`tunggu-${n}`"
+                            class="drawer-row-skeleton flex items-center gap-3 px-3.5 py-2.5"
+                        >
+                            <Skeleton class="size-8 shrink-0 rounded-full" />
+                            <div class="min-w-0 flex-1">
+                                <Skeleton class="h-4 w-3/4" />
+                                <Skeleton class="mt-1.5 h-3 w-1/2" />
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
             <template v-else>
                 <dl class="grid grid-cols-2 gap-2">

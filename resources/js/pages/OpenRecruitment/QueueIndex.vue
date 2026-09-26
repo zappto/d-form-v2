@@ -5,6 +5,7 @@ import LandingLayout from '@/layouts/LandingLayout.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { routes } from '@/lib/routes'
 import { ArrowUpRight, Building2, CalendarX2, Clock3, DoorOpen } from 'lucide-vue-next'
 
@@ -55,12 +56,31 @@ function boardHref(session: QueueIndexSession): string {
         </section>
 
         <div class="mx-auto w-full max-w-5xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:px-10 lg:pb-24">
-            <template v-if="sessions.length > 0">
+            <div v-if="props.sessions === undefined" aria-busy="true" aria-label="Memuat sesi antrean">
+                <Skeleton class="mb-4 h-4 w-48 sm:mb-5" />
+                <ul class="grid gap-4 sm:grid-cols-2 sm:gap-5" role="list">
+                    <li v-for="n in 4" :key="`sesi-${n}`" class="queue-index-skeleton h-full rounded-2xl border border-border/70 bg-card">
+                        <div class="flex h-full flex-col gap-4 p-5 sm:p-6">
+                            <div class="flex items-start gap-3">
+                                <Skeleton class="size-10 shrink-0 rounded-xl" />
+                                <Skeleton class="h-6 min-w-0 flex-1" />
+                            </div>
+                            <Skeleton class="h-5 w-1/3 rounded-full" />
+                            <div class="grid gap-2">
+                                <Skeleton class="h-4 w-2/3" />
+                                <Skeleton class="h-4 w-1/2" />
+                            </div>
+                            <Skeleton class="mt-auto h-4 w-36" />
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <template v-else-if="sessions.length > 0">
                 <p class="text-muted-foreground mb-4 text-xs sm:mb-5 sm:text-sm">
                     {{ sessions.length }} sesi antrean tersedia
                 </p>
 
-                <ul class="grid gap-4 sm:grid-cols-2 sm:gap-5" role="list">
+                <ul class="fade-up grid gap-4 sm:grid-cols-2 sm:gap-5" role="list">
                     <li v-for="session in sessions" :key="session.id">
                         <Link
                             :href="boardHref(session)"

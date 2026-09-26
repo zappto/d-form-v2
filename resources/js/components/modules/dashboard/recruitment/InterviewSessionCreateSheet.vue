@@ -3,6 +3,7 @@ import { computed, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { CometSpinner } from '@/components/ui/comet'
 import { DatePicker } from '@/components/ui/date-picker'
 import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue'
 import { Input } from '@/components/ui/input'
@@ -12,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { cn } from '@/lib/utils'
 import { routes } from '@/lib/routes'
+import { handleInertiaFormErrors } from '@/lib/error-message'
 
 const dateErrorClass =
     'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10'
@@ -89,7 +91,14 @@ function submit(): void {
 
     form.post(routes.admin.recruitment.interviewSessions.store, {
         preserveScroll: true,
-        onSuccess: () => emit('close'),
+        onSuccess: () => {
+            // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
+            // dari flash `toast` server (RecruitmentInterviewSessionController::store).
+            emit('close')
+        },
+        onError: (errors) => {
+            handleInertiaFormErrors(errors, { title: 'Gagal membuat sesi interview' })
+        },
     })
 }
 </script>
@@ -214,8 +223,14 @@ function submit(): void {
                         <Button variant="outline" type="button" class="flex-1" @click="emit('close')">
                             Batal
                         </Button>
-                        <Button type="submit" class="flex-1" :disabled="!canSubmit">
-                            {{ form.processing ? 'Menyimpan…' : 'Buat sesi' }}
+                        <Button
+                            type="submit"
+                            class="flex-1"
+                            :disabled="!canSubmit"
+                            :aria-busy="form.processing"
+                        >
+                            <CometSpinner v-if="form.processing" :size="16" />
+                            {{ form.processing ? 'Menyimpan...' : 'Buat sesi' }}
                         </Button>
                     </div>
                 </footer>

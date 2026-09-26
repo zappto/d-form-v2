@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { routes } from '@/lib/routes'
 import { Download, Funnel, GraduationCap, Users } from 'lucide-vue-next'
 
@@ -17,6 +18,7 @@ interface ReportPayload {
 const props = defineProps<{
     periodId: string
     report: ReportPayload | null
+    loading?: boolean
 }>()
 
 const maxFunnel = computed(() =>
@@ -25,7 +27,7 @@ const maxFunnel = computed(() =>
 </script>
 
 <template>
-    <div v-if="report" class="flex flex-col gap-5">
+    <div class="flex flex-col gap-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
                 Laporan periode ini
@@ -46,7 +48,44 @@ const maxFunnel = computed(() =>
             </div>
         </div>
 
-        <Card class="rounded-2xl border-border/70">
+        <div v-if="loading" aria-busy="true" aria-label="Memuat laporan periode">
+            <div class="report-funnel-skeleton rounded-2xl border border-border/70 bg-card">
+                <div class="flex items-center gap-2 px-4 pt-4 sm:px-6">
+                    <Skeleton class="size-4 shrink-0" />
+                    <Skeleton class="h-4 w-40" />
+                </div>
+                <div class="space-y-3 p-4 sm:p-6">
+                    <div class="rounded-xl border border-border/60 bg-muted/30 px-4 py-3">
+                        <Skeleton class="h-3 w-24" />
+                        <Skeleton class="mt-1.5 h-8 w-16" />
+                    </div>
+                    <div v-for="n in 4" :key="`funnel-${n}`" class="report-row-skeleton space-y-1.5">
+                        <div class="flex items-center justify-between gap-3">
+                            <Skeleton class="h-4 w-1/3" />
+                            <Skeleton class="h-4 w-10" />
+                        </div>
+                        <Skeleton class="h-2 w-full rounded-full" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 grid gap-5 lg:grid-cols-2">
+                <div v-for="n in 2" :key="`grid-${n}`" class="report-grid-skeleton rounded-2xl border border-border/70 bg-card">
+                    <div class="flex items-center gap-2 px-4 pt-4 sm:px-6">
+                        <Skeleton class="size-4 shrink-0" />
+                        <Skeleton class="h-4 w-32" />
+                    </div>
+                    <div class="space-y-2.5 p-4 text-sm sm:p-6">
+                        <div v-for="m in 3" :key="`baris-${n}-${m}`" class="flex items-center justify-between gap-3 py-0.5">
+                            <Skeleton class="h-4 w-1/2" />
+                            <Skeleton class="h-4 w-10" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <template v-else-if="report">
+        <Card class="fade-up rounded-2xl border-border/70">
             <CardHeader>
                 <CardTitle class="flex items-center gap-2 text-sm font-semibold">
                     <Funnel class="text-muted-foreground size-4" aria-hidden="true" />
@@ -78,7 +117,7 @@ const maxFunnel = computed(() =>
             </CardContent>
         </Card>
 
-        <div class="grid gap-5 lg:grid-cols-2">
+        <div class="fade-up grid gap-5 lg:grid-cols-2">
             <Card class="rounded-2xl border-border/70">
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2 text-sm font-semibold">
@@ -123,6 +162,7 @@ const maxFunnel = computed(() =>
                 </CardContent>
             </Card>
         </div>
+        </template>
+        <p v-else class="text-muted-foreground text-sm">Data laporan tidak tersedia untuk tab ini.</p>
     </div>
-    <p v-else class="text-muted-foreground text-sm">Data laporan tidak tersedia untuk tab ini.</p>
 </template>

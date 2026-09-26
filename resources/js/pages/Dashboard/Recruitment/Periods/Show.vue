@@ -10,6 +10,8 @@ import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/App
 import { type ApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue'
+import { CometSpinner } from '@/components/ui/comet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,7 +21,7 @@ import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/s
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { BarChart3, CalendarClock, Plus, Trash2, UserCheck, Users } from 'lucide-vue-next'
-import { showErrorToast } from '@/lib/error-message'
+import { showErrorToast, showFlashToast } from '@/lib/error-message'
 import { routes } from '@/lib/routes'
 import type { PeriodStatusValue } from '@/lib/recruitmentPeriodPhase'
 import {
@@ -391,9 +393,23 @@ function onTabChange(value: string | number): void {
     router.get(
         routes.admin.recruitment.periods.show(props.period.id),
         { tab: next === 'peserta' ? undefined : next },
-        { preserveState: true, preserveScroll: true },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onStart: () => { isLoadingApplicants.value = true; isLoadingTab.value = true },
+            onFinish: () => { isLoadingApplicants.value = false; isLoadingTab.value = false },
+        },
     )
 }
+
+/** Skeleton area tabel aplikan selama visit tab / reload daftar (pola M2 Task 1). */
+const isLoadingApplicants = ref<boolean>(false)
+
+/**
+ * Skeleton tab interview/laporan/interviewer selama visit tab.
+ * Cabang skeleton di tiap tab (tab aktif yang sedang ter-mount); visit dipertahankan.
+ */
+const isLoadingTab = ref<boolean>(false)
 
 const selectedApplication = ref<ApplicationDetail | null>(null)
 const detailLoading = ref<boolean>(false)
@@ -430,7 +446,11 @@ function closePanel(): void {
 
 function refreshList(): void {
     detailCache.clear()
-    router.reload({ only: ['applications', 'queue_counts', 'screening_reason_options', 'division_options', 'membership_type_options'] })
+    router.reload({
+        only: ['applications', 'queue_counts', 'screening_reason_options', 'division_options', 'membership_type_options'],
+        onStart: () => { isLoadingApplicants.value = true },
+        onFinish: () => { isLoadingApplicants.value = false },
+    })
 }
 
 function onGlobalKeydown(event: KeyboardEvent): void {
@@ -530,12 +550,41 @@ onMounted(() => {
     setTopbar({ title: props.period.name, subtitle: 'Detail periode Open Recruitment' })
 })
 
+const isOpeningPeriod = ref<boolean>(false)
+const isClosingPeriod = ref<boolean>(false)
+
 function openPeriod(): void {
-    router.post(routes.admin.recruitment.periods.open(props.period.id))
+    if (isOpeningPeriod.value) return
+    isOpeningPeriod.value = true
+    router.post(routes.admin.recruitment.periods.open(props.period.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showFlashToast({ type: 'success', message: 'Periode recruitment dibuka untuk pendaftaran.' })
+        },
+        onError: () => {
+            showErrorToast('Gagal membuka periode recruitment. Coba lagi.')
+        },
+        onFinish: () => {
+            isOpeningPeriod.value = false
+        },
+    })
 }
 
 function closePeriod(): void {
-    router.post(routes.admin.recruitment.periods.close(props.period.id))
+    if (isClosingPeriod.value) return
+    isClosingPeriod.value = true
+    router.post(routes.admin.recruitment.periods.close(props.period.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showFlashToast({ type: 'success', message: 'Periode recruitment ditutup.' })
+        },
+        onError: () => {
+            showErrorToast('Gagal menutup periode recruitment. Coba lagi.')
+        },
+        onFinish: () => {
+            isClosingPeriod.value = false
+        },
+    })
 }
 </script>
 
@@ -575,18 +624,24 @@ function closePeriod(): void {
                             v-if="canOpen"
                             size="sm"
                             :aria-label="'Buka pendaftaran ' + period.name"
+                            :disabled="isOpeningPeriod"
+                            :aria-busy="isOpeningPeriod"
                             @click="openPeriod"
                         >
-                            Buka pendaftaran
+                            <CometSpinner v-if="isOpeningPeriod" :size="16" />
+                            {{ isOpeningPeriod ? 'Menyimpan...' : 'Buka pendaftaran' }}
                         </Button>
                         <Button
                             v-if="canClose"
                             size="sm"
                             variant="destructive"
                             :aria-label="'Tutup pendaftaran ' + period.name"
+                            :disabled="isClosingPeriod"
+                            :aria-busy="isClosingPeriod"
                             @click="closePeriod"
                         >
-                            Tutup pendaftaran
+                            <CometSpinner v-if="isClosingPeriod" :size="16" />
+                            {{ isClosingPeriod ? 'Menyimpan...' : 'Tutup pendaftaran' }}
                         </Button>
                         <Button as-child size="sm" variant="outline">
                             <Link
@@ -701,6 +756,7 @@ function closePeriod(): void {
                         :stage-options="stageOptions"
                         :semester-options="semesterOptions"
                         :query="query"
+                        :loading="isLoadingApplicants"
                         @select="selectApplicant"
                         @deselect="closePanel"
                     />
@@ -724,15 +780,69 @@ function closePeriod(): void {
                     :sessions="sessions ?? null"
                     :period-id="period.id"
                     :division-options="interview_division_options"
+                    :loading="isLoadingTab && activeTab === 'interview'"
                 />
             </TabsContent>
 
             <TabsContent value="laporan" class="mt-4">
-                <PeriodReportSection v-if="canViewReports" :period-id="period.id" :report="report ?? null" />
+                <PeriodReportSection
+                    v-if="canViewReports"
+                    :period-id="period.id"
+                    :report="report ?? null"
+                    :loading="isLoadingTab && activeTab === 'laporan'"
+                />
             </TabsContent>
 
             <TabsContent value="interviewer" class="mt-4">
-                <Card v-if="canManagePeriods" class="rounded-2xl border-border/70">
+                <div
+                    v-if="isLoadingTab && activeTab === 'interviewer'"
+                    aria-busy="true"
+                    aria-label="Memuat interviewer"
+                >
+                    <div class="rounded-2xl border border-border/70 bg-card">
+                        <div class="space-y-5 p-4 sm:p-5">
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <div class="space-y-2">
+                                    <Skeleton class="h-4 w-28" />
+                                    <Skeleton class="h-10 w-full rounded-md" />
+                                </div>
+                                <div class="space-y-2">
+                                    <Skeleton class="h-4 w-20" />
+                                    <Skeleton class="h-10 w-full rounded-md" />
+                                </div>
+                            </div>
+                            <Skeleton class="h-8 w-40" />
+                        </div>
+                        <div class="space-y-4 p-4 sm:p-5">
+                            <div v-for="g in 2" :key="`grup-${g}`" class="overflow-hidden rounded-xl border border-border/70">
+                                <div class="flex items-center justify-between gap-3 border-b border-border/60 bg-muted/40 px-4 py-2.5">
+                                    <div class="flex min-w-0 items-center gap-2">
+                                        <Skeleton class="size-7 shrink-0 rounded-full" />
+                                        <Skeleton class="h-4 w-32" />
+                                    </div>
+                                    <Skeleton class="h-5 w-16 shrink-0 rounded-full" />
+                                </div>
+                                <ul class="divide-y divide-border/70">
+                                    <li
+                                        v-for="n in 3"
+                                        :key="`pewawancara-${g}-${n}`"
+                                        class="interviewer-row-skeleton flex items-center justify-between gap-3 px-4 py-3"
+                                    >
+                                        <div class="flex min-w-0 items-center gap-3">
+                                            <Skeleton class="size-8 shrink-0 rounded-full" />
+                                            <div class="min-w-0 space-y-1.5">
+                                                <Skeleton class="h-4 w-32" />
+                                                <Skeleton class="h-3 w-44" />
+                                            </div>
+                                        </div>
+                                        <Skeleton class="size-8 shrink-0" />
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <Card v-else-if="canManagePeriods" class="fade-up rounded-2xl border-border/70">
                     <CardHeader class="pb-1">
                         <CardTitle class="text-base">Tugaskan interviewer</CardTitle>
                         <p class="text-sm text-muted-foreground">
