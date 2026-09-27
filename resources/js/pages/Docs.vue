@@ -30,6 +30,7 @@ import {
     Settings,
 } from 'lucide-vue-next';
 import SeoHead from '@/components/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/seo/SeoHead.vue';
 import { usePage } from '@inertiajs/vue3';
 import type { ISharedSeoProps } from '@/types/seo';
 import { routes } from '@/lib/routes';
@@ -42,7 +43,7 @@ const docsDescription = computed(
         `Dokumentasi resmi ${seo.value.siteName}: registrasi, menjelajah acara, mengisi formulir, absensi QR, peran organizer dan tim, serta tips integrasi.`
 );
 
-const docsJsonLd = computed<Record<string, unknown>>(() => ({
+const docsJsonLd = computed<TJsonLd>(() => ({
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     headline: 'Dokumentasi DForm',

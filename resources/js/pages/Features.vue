@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LandingLayout from '@/layouts/LandingLayout.vue';
 import SeoHead from '@/components/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/seo/SeoHead.vue';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import type { ISharedSeoProps } from '@/types/seo';
@@ -20,7 +21,7 @@ const featuresDescription = computed(
         `${seo.value.siteName}: fitur formulir pendaftaran, manajemen peserta, absensi QR, ekspor data, dan laporan acara.`
 );
 
-const featuresJsonLd = computed<Record<string, unknown>>(() => ({
+const featuresJsonLd = computed<TJsonLd>(() => ({
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: 'Fitur',

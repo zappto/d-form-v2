@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LandingLayout from '@/layouts/LandingLayout.vue';
 import SeoHead from '@/components/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/seo/SeoHead.vue';
 import { computed, ref, onMounted } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { MapPin, CalendarDays, ArrowRight, Check, Shield } from 'lucide-vue-next';
@@ -62,7 +63,7 @@ const metaDescription = computed(() => {
 
 const canonicalPath = computed(() => routes.landing.events.show(event.value.slug));
 
-const eventJsonLd = computed<Record<string, unknown>[]>(() => {
+const eventJsonLd = computed<TJsonLd[]>(() => {
     const e = event.value;
     const base = seo.value.siteUrl;
     const pageUrl = `${base}${routes.landing.events.show(e.slug)}`;
@@ -76,7 +77,7 @@ const eventJsonLd = computed<Record<string, unknown>[]>(() => {
         availability = 'https://schema.org/PreOrder';
     }
 
-    const eventSchema: Record<string, unknown> = {
+    const eventSchema: TJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Event',
         name: e.title,
@@ -102,7 +103,7 @@ const eventJsonLd = computed<Record<string, unknown>[]>(() => {
         eventSchema.image = images;
     }
 
-    const crumbs: Record<string, unknown> = {
+    const crumbs: TJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [

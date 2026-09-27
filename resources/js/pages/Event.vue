@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LandingLayout from '@/layouts/LandingLayout.vue';
 import SeoHead from '@/components/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/seo/SeoHead.vue';
 import EventHero from '@/components/modules/landing/events/EventHero.vue';
 import EventHighlight from '@/components/modules/landing/events/EventHighlight.vue';
 import EventList from '@/components/modules/landing/events/EventList.vue';
@@ -22,7 +23,7 @@ const listDescription = computed(
         'Daftar acara terpublikasi: jelajahi workshop, seminar, dan kompetisi. Daftar sebagai peserta dalam beberapa langkah.'
 );
 
-const jsonLd = computed<Record<string, unknown>[]>(() => {
+const jsonLd = computed<TJsonLd[]>((): TJsonLd[] => {
     const base = seo.value.siteUrl;
     const items = (props.events ?? []).slice(0, 24).map((e, i) => ({
         '@type': 'ListItem',

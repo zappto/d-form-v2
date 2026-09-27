@@ -3,6 +3,12 @@ import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import type { ISharedSeoProps } from '@/types/seo';
 
+/** Nilai JSON-LD rekursif: skalar, array, atau objek bertingkat. */
+export type TJsonLdValue = string | number | boolean | null | TJsonLdValue[] | { [key: string]: TJsonLdValue };
+
+/** Satu dokumen JSON-LD (schema.org) untuk tag script SEO. */
+export type TJsonLd = { [key: string]: TJsonLdValue };
+
 const props = withDefaults(
     defineProps<{
         /** Judul halaman (tanpa suffix brand; suffix ditambahkan otomatis ke <title>) */
@@ -14,7 +20,7 @@ const props = withDefaults(
         ogImage?: string | null;
         ogType?: 'website' | 'article';
         /** Satu atau beberapa objek JSON-LD schema.org (akan di-render sebagai satu blok atau array) */
-        jsonLd?: Record<string, unknown> | Record<string, unknown>[] | null;
+        jsonLd?: TJsonLd | TJsonLd[] | null;
     }>(),
     {
         description: undefined,
