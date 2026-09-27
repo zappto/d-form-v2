@@ -40,6 +40,7 @@ Baca aturan lengkap sebelum menulis kode:
 - `resources/js/hooks/` satu-satunya rumah logic stateful; nama `useXxx`, named export, tanpa default export di file baru.
 - `resources/js/lib/` fungsi murni: tanpa `ref`/`watch`/DOM/`localStorage`/`URL.createObjectURL`.
 - Factory objek kompleks bernama `createXxx` di modul builder/lib, bukan di hooks.
+- **Pengecualian disetujui:** spec migrasi (§2) MENANG atas `docs/rules/front-end.md` §2 untuk helper builder — factory + guard murni tetap di `resources/js/components/modules/builder/` (`formBuilderFieldFactory.ts`, `formBuilderPalette.ts`, `fieldMapping.ts`, `formBanner.ts`, `autosaveGuard.ts`, `dirtyFields.ts`, `optionImage.ts`); `resources/js/lib/` tetap untuk fungsi murni umum.
 - Alias import tetap `@/`.
 - `resources/js/components/ui/**` = Shadcn-Vue asli: **dilarang diubah**; kustomisasi lewat wrapper di `components/core/`. Pelanggaran historis (komponen kustom di dalam `ui/`) adalah utang teknis, bukan pola yang boleh diulang.
 - Komponen: `core/` (reusable global), `layout/` (dipakai hanya dari `layouts/`), `module/` (spesifik fitur).
