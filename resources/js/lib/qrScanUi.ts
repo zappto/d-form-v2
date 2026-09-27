@@ -190,26 +190,3 @@ export function parseGlobalScanCursor(payload: unknown): string {
 
     return readStringValue(payload.cursor);
 }
-
-/** Bunyikan beep (dan getar) sesuai status scan; dipakai sebagai umpan balik setelah scan QR. */
-export function playScanBeep(status: TScanStatus): void {
-    try {
-        const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = status === 'success' ? 880 : status === 'already' ? 440 : 200;
-        osc.start();
-        const ms = status === 'already' ? 320 : 160;
-        window.setTimeout(() => {
-            osc.stop();
-            void ctx.close();
-        }, ms);
-        if (navigator.vibrate) {
-            navigator.vibrate(50);
-        }
-    } catch {
-        return;
-    }
-}

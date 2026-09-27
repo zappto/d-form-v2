@@ -11,11 +11,11 @@ import {
     isGlobalScanFeedPayload,
     parseGlobalScanCursor,
     parseGlobalScanFeedRows,
-    playScanBeep,
     type TIGlobalScanFeedRow,
     type TIScanEntry,
     type TIScanResult,
 } from '@/lib/qrScanUi';
+import { useScanFeedback } from '@/hooks/useScanFeedback';
 
 /** Kunci sessionStorage agar id meja kasir stabil selama satu sesi tab. */
 const DESK_STORAGE_KEY = 'scan-desk-id';
@@ -136,6 +136,7 @@ function scanIdentity(
 /** Kelola pengiriman hasil scan, riwayat, dan identitas meja kasir. */
 export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
     const deskId = resolveDeskId();
+    const { playScanBeep } = useScanFeedback();
 
     const scanResult = ref<TIScanResult | null>(null);
     const scanHistory = ref<TIScanEntry[]>([]);
