@@ -39,11 +39,39 @@ describe('DataPagination — mode bernomor', () => {
         wrapper.unmount();
     });
 
-    it('tidak merender ellipsis pada rendering kanonik (reka show-edges nonaktif)', () => {
-        const wrapper = mountPagination({ page: 10, total: 2000, perPage: 10 });
+    it('tanpa edges (default) tidak ada ellipsis pada total besar', () => {
+        const wrapper = mountPagination({ page: 10, total: 2000, perPage: 10, edges: false });
 
         expect(pageItems(wrapper).map((item) => item.text())).toEqual(['9', '10', '11']);
         expect(wrapper.findAll('[data-slot="pagination-ellipsis"]')).toHaveLength(0);
+
+        wrapper.unmount();
+    });
+
+    it('edges menampilkan halaman pertama/terakhir + tepat 2 ellipsis', () => {
+        const wrapper = mountPagination({ page: 10, total: 2000, perPage: 10, edges: true });
+
+        expect(pageItems(wrapper).map((item) => item.text())).toEqual(['1', '9', '10', '11', '200']);
+        expect(wrapper.findAll('[data-slot="pagination-ellipsis"]')).toHaveLength(2);
+
+        wrapper.unmount();
+    });
+
+    it('klik halaman tepi saat edges meng-emit update:page tepi', async () => {
+        const wrapper = mountPagination({ page: 10, total: 2000, perPage: 10, edges: true });
+
+        await itemByText(wrapper, '200').trigger('click');
+
+        expect(wrapper.emitted('update:page')).toEqual([[200]]);
+
+        wrapper.unmount();
+    });
+
+    it('aria-label prev/next memakai bahasa Indonesia (menimpa label Inggris reka)', () => {
+        const wrapper = mountPagination({ page: 5, total: 200, perPage: 10 });
+
+        expect(wrapper.find('[data-slot="pagination-previous"]').attributes('aria-label')).toBe('Halaman sebelumnya');
+        expect(wrapper.find('[data-slot="pagination-next"]').attributes('aria-label')).toBe('Halaman berikutnya');
 
         wrapper.unmount();
     });
@@ -229,5 +257,17 @@ describe('DataPagination — mode kompak (numbers=false)', () => {
         const plain = mountPagination({ page: 3, total: 200, perPage: 10, numbers: false });
         expect(plain.findAll('button')[0]?.classes()).toContain('px-3');
         plain.unmount();
+    });
+
+    it('edges tidak mengubah rendering mode kompak', () => {
+        const wrapper = mountPagination({ page: 3, total: 2000, perPage: 10, numbers: false, edges: true });
+        const buttons = wrapper.findAll('button');
+
+        expect(wrapper.find('[data-slot="pagination"]').exists()).toBe(false);
+        expect(pageItems(wrapper)).toHaveLength(0);
+        expect(wrapper.findAll('[data-slot="pagination-ellipsis"]')).toHaveLength(0);
+        expect(buttons.map((button) => button.text())).toEqual(['Sebelumnya', 'Berikutnya']);
+
+        wrapper.unmount();
     });
 });

@@ -23,6 +23,8 @@ interface IDataPaginationProps {
     perPage: number;
     /** Page numbers kept on each side of the active page. */
     siblingCount?: number;
+    /** Keeps the first/last page always visible, with ellipsis between them. */
+    edges?: boolean;
     /** `true` renders numbered pages; `false` renders only prev/next. */
     numbers?: boolean;
     /** Adds icon-only First/Last buttons on both ends. */
@@ -35,6 +37,7 @@ interface IDataPaginationProps {
 
 const props = withDefaults(defineProps<IDataPaginationProps>(), {
     siblingCount: 1,
+    edges: false,
     numbers: true,
     firstLast: false,
     prevLabel: 'Sebelumnya',
@@ -67,11 +70,12 @@ function emitPage(page: number): void {
         :total="total"
         :items-per-page="perPage"
         :sibling-count="siblingCount"
+        :show-edges="edges"
         @update:page="emitPage"
     >
         <PaginationContent v-slot="{ items }">
             <PaginationFirst v-if="firstLast" />
-            <PaginationPrevious>
+            <PaginationPrevious aria-label="Halaman sebelumnya">
                 <ChevronLeft class="size-4" aria-hidden="true" />
                 <span class="hidden sm:block">{{ prevLabel }}</span>
             </PaginationPrevious>
@@ -86,7 +90,7 @@ function emitPage(page: number): void {
                 </PaginationItem>
                 <PaginationEllipsis v-else :index="index" />
             </template>
-            <PaginationNext>
+            <PaginationNext aria-label="Halaman berikutnya">
                 <span class="hidden sm:block">{{ nextLabel }}</span>
                 <ChevronRight class="size-4" aria-hidden="true" />
             </PaginationNext>
