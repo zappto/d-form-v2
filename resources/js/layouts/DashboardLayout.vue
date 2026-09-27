@@ -4,8 +4,8 @@ import { watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
-import DashboardSidebar from '@/components/modules/dashboard/DashboardSidebar.vue';
-import DashboardTopbar from '@/components/modules/dashboard/DashboardTopbar.vue';
+import Sidebar from '@/components/layout/Sidebar.vue';
+import Topbar from '@/components/layout/Topbar.vue';
 import { usePageFlashToast } from '@/hooks/usePageFlashToast';
 import { clearTopbar } from '@/hooks/useDashboardTopbar';
 
@@ -24,9 +24,9 @@ watch(
 
 <template>
     <SidebarProvider>
-        <DashboardSidebar />
+        <Sidebar />
         <SidebarInset class="h-svh overflow-x-hidden bg-gradient-to-b from-background via-muted/20 to-background">
-            <DashboardTopbar />
+            <Topbar />
             <div class="flex-1 overflow-y-auto px-4 pt-6 pb-10 md:px-6 md:pt-8 md:pb-12 lg:px-8">
                 <div class="w-full max-w-full">
                     <slot />

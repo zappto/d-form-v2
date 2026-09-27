@@ -7,8 +7,8 @@ import { Toaster } from '@/components/ui/sonner';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
 import { userAvatarSeed } from '@/lib/userAvatarFallback';
 import { Button } from '@/components/ui/button';
-import DashboardSidebar from '@/components/modules/dashboard/DashboardSidebar.vue';
-import DashboardTopbar from '@/components/modules/dashboard/DashboardTopbar.vue';
+import Sidebar from '@/components/layout/Sidebar.vue';
+import Topbar from '@/components/layout/Topbar.vue';
 import { usePageFlashToast } from '@/hooks/usePageFlashToast';
 import { clearTopbar } from '@/hooks/useDashboardTopbar';
 
@@ -52,14 +52,14 @@ function handleLogout(): void {
 
 <template>
     <SidebarProvider>
-        <DashboardSidebar />
+        <Sidebar />
         <SidebarInset class="h-svh overflow-x-hidden from-background via-muted/20 to-background">
             <div
                 aria-hidden="true"
                 class="pointer-events-none absolute inset-x-0 top-0 z-0 h-[360px] bg-[radial-gradient(120%_60%_at_50%_0%,color-mix(in_oklab,var(--primary)_6%,transparent),transparent_70%)]"
             />
 
-            <DashboardTopbar v-if="!isFormBuilderPage" />
+            <Topbar v-if="!isFormBuilderPage" />
 
             <header
                 v-if="isFormBuilderPage"
