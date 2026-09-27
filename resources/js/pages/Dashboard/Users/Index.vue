@@ -15,7 +15,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import {
     Table,
     TableBody,
@@ -73,7 +73,7 @@ const authUser = useAuth(page.props)
 const search = ref(props.query.search ?? '')
 const role = ref(props.query.role ?? '')
 
-const roleFilterOptions = computed<SimpleSelectOption[]>(() => [
+const roleFilterOptions = computed<SearchableSelectOption[]>(() => [
     { value: '', label: 'Semua role' },
     ...props.roleOptions.map((option) => ({ value: option.value, label: option.label })),
 ])
@@ -206,7 +206,7 @@ function confirmDelete(): void {
                         class="pl-9"
                     />
                 </div>
-                <SimpleSelect
+                <SearchableSelect
                     v-model="role"
                     :options="roleFilterOptions"
                     placeholder="Filter role"

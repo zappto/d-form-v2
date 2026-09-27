@@ -1,7 +1,7 @@
 <!--
 THESIS: Command center interviewer — satu bar filter + tab antrean + daftar terkelompok urgensi,
   menggantikan tumpukan kartu lama yang tanpa feedback. Back-button dan scroll terjaga.
-OWN-WORLD: Sistem admin yang sudah ada (Card rounded-2xl, Badge, Button, SimpleSelect, Input);
+OWN-WORLD: Sistem admin yang sudah ada (Card rounded-2xl, Badge, Button, SearchableSelect, Input);
   kartu slip janji: zona identitas (nama + satu badge prioritas + meta mono) di atas hairline,
   zona logistik (jadwal + antrean) dan aksi di bawahnya. Daftar sesi hari ini tampil sebagai
   panel baris ringkas, bukan kartu geser.
@@ -29,7 +29,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { routes } from '@/lib/routes'
 import { padQueueNumber } from '@/lib/format'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
@@ -380,12 +380,12 @@ const divisionOptions = computed<FilterOption[]>((): FilterOption[] => {
     return [{ value: '', label: 'Semua divisi' }, ...fallback]
 })
 
-const sessionOptions = computed<SimpleSelectOption[]>((): SimpleSelectOption[] => {
+const sessionOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => {
     if (props.session_options.length > 0) {
         return [{ value: '', label: 'Semua sesi' }, ...props.session_options]
     }
-    const fallback: SimpleSelectOption[] = props.today_sessions.map(
-        (session: TodaySession): SimpleSelectOption => ({
+    const fallback: SearchableSelectOption[] = props.today_sessions.map(
+        (session: TodaySession): SearchableSelectOption => ({
             value: session.id,
             label: sessionFallbackLabel(session),
         }),
@@ -393,8 +393,8 @@ const sessionOptions = computed<SimpleSelectOption[]>((): SimpleSelectOption[] =
     return [{ value: '', label: 'Semua sesi' }, ...fallback]
 })
 
-const evalOptions = computed<SimpleSelectOption[]>((): SimpleSelectOption[] => EVAL_OPTIONS)
-const sortOptions = computed<SimpleSelectOption[]>((): SimpleSelectOption[] => SORT_OPTIONS)
+const evalOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => EVAL_OPTIONS)
+const sortOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => SORT_OPTIONS)
 
 function queueBadgeCount(key: string): number | null {
     if (key === '') return props.queue_counts.all ?? null
@@ -581,25 +581,25 @@ const emptyDescription = computed<string>((): string =>
                     />
                 </div>
                 <div class="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
-                    <SimpleSelect
+                    <SearchableSelect
                         id="filter-divisi"
                         v-model="divisionId"
                         :options="divisionOptions"
                         aria-label="Filter divisi"
                     />
-                    <SimpleSelect
+                    <SearchableSelect
                         id="filter-sesi"
                         v-model="sessionId"
                         :options="sessionOptions"
                         aria-label="Filter sesi"
                     />
-                    <SimpleSelect
+                    <SearchableSelect
                         id="filter-status"
                         v-model="evalFilter"
                         :options="evalOptions"
                         aria-label="Filter status penilaian"
                     />
-                    <SimpleSelect
+                    <SearchableSelect
                         id="filter-urut"
                         v-model="sortKey"
                         :options="sortOptions"

@@ -324,7 +324,7 @@ describe('User/TeamInvitation skeleton (M2 Task 10)', () => {
                     ...UI_STUBS,
                     DatePicker: true,
                     Checkbox: true,
-                    SimpleSelect: true,
+                    SearchableSelect: true,
                     Textarea: true,
                     FormParagraphContent: true,
                     FormFieldAnswerDisplay: true,

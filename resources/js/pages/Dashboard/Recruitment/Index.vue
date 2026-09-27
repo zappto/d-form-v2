@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { routes } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
@@ -143,8 +143,8 @@ function periodStatusClass(status: string): string {
 const periodSearch = ref<string>(props.query?.search ?? '')
 const periodStatus = ref<string>(props.query?.status ?? '')
 
-/** Opsi dropdown status — nilai dari backend, UI SimpleSelect seperti admin/events. */
-const periodStatusOptions = computed<SimpleSelectOption[]>(() => [
+/** Opsi dropdown status — nilai dari backend, UI SearchableSelect seperti admin/events. */
+const periodStatusOptions = computed<SearchableSelectOption[]>(() => [
     { value: '', label: 'Semua status' },
     ...props.statusOptions,
 ])
@@ -278,7 +278,7 @@ onMounted(() => {
                     placeholder="Cari nama periode..."
                     class="min-w-0 flex-1 sm:max-w-xs sm:flex-none"
                 />
-                <SimpleSelect
+                <SearchableSelect
                     v-model="periodStatus"
                     :options="periodStatusOptions"
                     id="filter-status"

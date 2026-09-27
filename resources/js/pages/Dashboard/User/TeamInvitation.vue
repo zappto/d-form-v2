@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata'
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
@@ -50,7 +50,7 @@ function builderType(field: IFormField): string {
     return formFieldBuilderType(field)
 }
 
-function dropdownOptions(field: IFormField): SimpleSelectOption[] {
+function dropdownOptions(field: IFormField): SearchableSelectOption[] {
     return getFormFieldOptionRows(field).map((row) => ({ value: row.label, label: row.label }))
 }
 
@@ -364,7 +364,7 @@ function submitDeclineFromDialog() {
                                     {{ row.label }}
                                 </label>
                             </div>
-                            <SimpleSelect
+                            <SearchableSelect
                                 v-else-if="field.type === 'select'"
                                 v-model="confirmForm[field.name] as string"
                                 :options="dropdownOptions(field)"

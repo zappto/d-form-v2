@@ -209,7 +209,7 @@ function mountRegistrants(registrants: IRegistrant[] | undefined): VueWrapper {
                 Tabs: true,
                 TabsList: true,
                 TabsTrigger: true,
-                SimpleSelect: true,
+                SearchableSelect: true,
             },
         },
     }) as unknown as VueWrapper

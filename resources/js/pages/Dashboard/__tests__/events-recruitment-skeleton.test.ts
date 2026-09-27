@@ -196,7 +196,7 @@ function mountRecruitmentIndex(
                 Button: true,
                 Card: true,
                 CardContent: true,
-                SimpleSelect: true,
+                SearchableSelect: true,
                 DivisionListSheet: true,
                 ConfirmationModal: true,
             },

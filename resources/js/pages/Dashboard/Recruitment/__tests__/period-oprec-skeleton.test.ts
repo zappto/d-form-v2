@@ -547,7 +547,7 @@ describe('Track/Edit skeleton (M2 Task 12)', () => {
                     CardContent: true,
                     CardHeader: true,
                     CardTitle: true,
-                    SimpleSelect: true,
+                    SearchableSelect: true,
                     Separator: true,
                 },
             },

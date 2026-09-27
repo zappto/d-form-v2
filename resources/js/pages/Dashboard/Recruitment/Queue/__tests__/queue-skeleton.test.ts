@@ -165,7 +165,7 @@ function mountDisplay(snapshot: Record<string, unknown>): VueWrapper {
         props: { snapshot, pollUrl: '/display/poll' },
         global: {
             stubs: {
-                SimpleSelect: true,
+                SearchableSelect: true,
                 Badge: true,
             },
         },

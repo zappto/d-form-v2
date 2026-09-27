@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { routes } from '@/lib/routes'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
@@ -43,7 +43,7 @@ const form = useForm({
 })
 
 const selectOptions = props.roleOptions.map(
-    (option): SimpleSelectOption => ({ value: option.value, label: option.label }),
+    (option): SearchableSelectOption => ({ value: option.value, label: option.label }),
 )
 
 onMounted(() => {
@@ -122,7 +122,7 @@ function submit(): void {
 
                     <div class="space-y-2">
                         <Label for="role">Role</Label>
-                        <SimpleSelect
+                        <SearchableSelect
                             id="role"
                             v-model="form.role"
                             :options="selectOptions"

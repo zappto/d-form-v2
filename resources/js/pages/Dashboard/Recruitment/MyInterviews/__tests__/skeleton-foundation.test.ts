@@ -101,7 +101,7 @@ function mountIndex(data: Record<string, unknown>[] = [demoRow()]): VueWrapper {
                 Badge: true,
                 Card: true,
                 CardContent: true,
-                SimpleSelect: true,
+                SearchableSelect: true,
                 Pagination: true,
                 PaginationContent: true,
                 PaginationEllipsis: true,
