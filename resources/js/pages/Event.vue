@@ -19,7 +19,7 @@ const seo = computed(() => (page.props as { seo: SharedSeoProps }).seo);
 
 const listDescription = computed(
     () =>
-        'Daftar acara terpublikasi: jelajahi workshop, seminar, dan kompetisi. Daftar sebagai peserta dalam beberapa langkah.',
+        'Daftar acara terpublikasi: jelajahi workshop, seminar, dan kompetisi. Daftar sebagai peserta dalam beberapa langkah.'
 );
 
 const jsonLd = computed<Record<string, unknown>[]>(() => {

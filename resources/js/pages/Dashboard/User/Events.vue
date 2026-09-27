@@ -28,14 +28,9 @@ const filterSession = ref('all');
 
 const isBrowse = computed(() => props.listMode === 'browse');
 
-const categoryOptions = computed(() =>
-    Object.entries(categoryLabelMap).map(([value, label]) => ({ value, label }))
-);
+const categoryOptions = computed(() => Object.entries(categoryLabelMap).map(([value, label]) => ({ value, label })));
 
-const categoryFilterOptions = computed(() => [
-    { value: 'all', label: 'Semua kategori' },
-    ...categoryOptions.value,
-]);
+const categoryFilterOptions = computed(() => [{ value: 'all', label: 'Semua kategori' }, ...categoryOptions.value]);
 
 const sessionOptions = computed(() => {
     const tokens = new Set<string>();
@@ -47,10 +42,7 @@ const sessionOptions = computed(() => {
         .map((value) => ({ value, label: sessionLabelMap[value] ?? value }));
 });
 
-const sessionFilterOptions = computed(() => [
-    { value: 'all', label: 'Semua sesi' },
-    ...sessionOptions.value,
-]);
+const sessionFilterOptions = computed(() => [{ value: 'all', label: 'Semua sesi' }, ...sessionOptions.value]);
 
 function eventTokenList(v: unknown): string[] {
     if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
@@ -149,7 +141,7 @@ onMounted(() => {
             <Link
                 v-if="!isBrowse"
                 :href="routes.member.browse"
-                class="text-primary text-sm font-medium underline-offset-4 hover:underline"
+                class="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
                 Jelajah semua acara
             </Link>

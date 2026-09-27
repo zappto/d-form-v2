@@ -1,12 +1,12 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
-import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils'
-import TrackEdit from '../Edit.vue'
-import TrackShow from '../Show.vue'
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { nextTick } from 'vue';
+import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
+import TrackEdit from '../Edit.vue';
+import TrackShow from '../Show.vue';
+import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
-config.global.renderStubDefaultSlot = true
+config.global.renderStubDefaultSlot = true;
 
 /**
  * Spec §3.2/§3.4, Task 6: submit ubah pendaftaran + kirim koreksi —
@@ -24,10 +24,10 @@ const { formHolder, postMock, putMock } = vi.hoisted(() => ({
     formHolder: { state: null as Record<string, unknown> | null },
     postMock: vi.fn(),
     putMock: vi.fn(),
-}))
+}));
 
 vi.mock('@inertiajs/vue3', async () => {
-    const { reactive } = await import('vue')
+    const { reactive } = await import('vue');
     return {
         Head: { template: '<div style="display:none"></div>' },
         Link: { props: ['href'], template: '<a :href="href"><slot /></a>' },
@@ -39,7 +39,7 @@ vi.mock('@inertiajs/vue3', async () => {
             visit: vi.fn(),
         },
         useForm: (initial: Record<string, unknown>) => {
-            const errors = reactive<Record<string, string>>({})
+            const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
                 errors,
@@ -47,54 +47,54 @@ vi.mock('@inertiajs/vue3', async () => {
                 post: postMock,
                 put: putMock,
                 reset: vi.fn(() => {
-                    Object.assign(state, initial)
+                    Object.assign(state, initial);
                 }),
                 clearErrors: vi.fn((...fields: string[]) => {
                     if (fields.length === 0) {
-                        for (const key of Object.keys(errors)) delete errors[key]
-                        return
+                        for (const key of Object.keys(errors)) delete errors[key];
+                        return;
                     }
-                    for (const field of fields) delete errors[field]
+                    for (const field of fields) delete errors[field];
                 }),
                 setError: vi.fn((field: string, message: string) => {
-                    errors[field] = message
+                    errors[field] = message;
                 }),
-            })
-            formHolder.state = state as unknown as Record<string, unknown>
-            return state
+            });
+            formHolder.state = state as unknown as Record<string, unknown>;
+            return state;
         },
-    }
-})
+    };
+});
 
-vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />' } }))
+vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/lib/error-message', () => ({
     handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
     showErrorToast: vi.fn(),
     showFlashToast: vi.fn(),
-}))
+}));
 
 vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}))
+}));
 
 interface InertiaMutationOptions {
-    forceFormData?: boolean
-    preserveScroll?: boolean
-    onSuccess?: () => void
-    onError?: (errors: Record<string, string>) => void
-    onFinish?: () => void
+    forceFormData?: boolean;
+    preserveScroll?: boolean;
+    onSuccess?: () => void;
+    onError?: (errors: Record<string, string>) => void;
+    onFinish?: () => void;
 }
 
-let lastOptions: InertiaMutationOptions | undefined
-let lastMethod: 'post' | 'put' | undefined
+let lastOptions: InertiaMutationOptions | undefined;
+let lastMethod: 'post' | 'put' | undefined;
 
 function lastMutationOptions(): InertiaMutationOptions {
-    if (lastMethod === 'post') expect(postMock).toHaveBeenCalled()
-    else expect(putMock).toHaveBeenCalled()
-    expect(lastOptions).toBeDefined()
-    return lastOptions as InertiaMutationOptions
+    if (lastMethod === 'post') expect(postMock).toHaveBeenCalled();
+    else expect(putMock).toHaveBeenCalled();
+    expect(lastOptions).toBeDefined();
+    return lastOptions as InertiaMutationOptions;
 }
 
 const demoApplication = {
@@ -113,7 +113,7 @@ const demoApplication = {
     portfolio_original_name: null,
     instagram_follow_original_name: 'follow.jpg',
     twibbon_url: 'https://example.com/twibbon',
-}
+};
 
 function mountTrackEdit(): VueWrapper {
     return mount(TrackEdit, {
@@ -133,19 +133,19 @@ function mountTrackEdit(): VueWrapper {
                 Separator: true,
             },
         },
-    })
+    });
 }
 
 function editSubmitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
     const found = wrapper
         .findAll('button')
-        .find((b) => b.text().includes('Simpan perubahan') || b.text().includes('Menyimpan...'))
-    if (!found) throw new Error('tombol simpan Track/Edit tidak ditemukan')
-    return found as DOMWrapper<HTMLButtonElement>
+        .find((b) => b.text().includes('Simpan perubahan') || b.text().includes('Menyimpan...'));
+    if (!found) throw new Error('tombol simpan Track/Edit tidak ditemukan');
+    return found as DOMWrapper<HTMLButtonElement>;
 }
 
 /** Fixture demo bertipe sama dengan prop `tracking` milik Track/Show. */
-type TTrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>
+type TTrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>;
 
 const demoTracking: TTrackingPayload = {
     application: {
@@ -185,7 +185,7 @@ const demoTracking: TTrackingPayload = {
         submitted: false,
         submitted_at: null,
     },
-}
+};
 
 function mountTrackShow(): VueWrapper {
     return mount(TrackShow, {
@@ -207,223 +207,217 @@ function mountTrackShow(): VueWrapper {
                 DialogTitle: true,
             },
         },
-    })
+    });
 }
 
 function correctionSubmitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
-    const found = wrapper
-        .findAll('button')
-        .find((b) => b.text().includes('Kirim') || b.text().includes('Mengirim...'))
-    if (!found) throw new Error('tombol kirim koreksi tidak ditemukan')
-    return found as DOMWrapper<HTMLButtonElement>
+    const found = wrapper.findAll('button').find((b) => b.text().includes('Kirim') || b.text().includes('Mengirim...'));
+    if (!found) throw new Error('tombol kirim koreksi tidak ditemukan');
+    return found as DOMWrapper<HTMLButtonElement>;
 }
 
 function correctionFormEl(wrapper: VueWrapper): DOMWrapper<HTMLFormElement> {
     const found = wrapper
         .findAll('form')
-        .find((f) =>
-            f
-                .findAll('button')
-                .some((b) => b.text().includes('Kirim') || b.text().includes('Mengirim...')),
-        )
-    if (!found) throw new Error('formulir koreksi tidak ditemukan')
-    return found as DOMWrapper<HTMLFormElement>
+        .find((f) => f.findAll('button').some((b) => b.text().includes('Kirim') || b.text().includes('Mengirim...')));
+    if (!found) throw new Error('formulir koreksi tidak ditemukan');
+    return found as DOMWrapper<HTMLFormElement>;
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-    lastOptions = undefined
-    lastMethod = undefined
-    postMock.mockReset()
-    putMock.mockReset()
+    vi.clearAllMocks();
+    lastOptions = undefined;
+    lastMethod = undefined;
+    postMock.mockReset();
+    putMock.mockReset();
     postMock.mockImplementation((...args: unknown[]) => {
-        lastMethod = 'post'
-        lastOptions = args[1] as InertiaMutationOptions | undefined
-        const state = formHolder.state
-        if (state) state.processing = true
-        return undefined
-    })
+        lastMethod = 'post';
+        lastOptions = args[1] as InertiaMutationOptions | undefined;
+        const state = formHolder.state;
+        if (state) state.processing = true;
+        return undefined;
+    });
     putMock.mockImplementation((...args: unknown[]) => {
-        lastMethod = 'put'
-        lastOptions = args[1] as InertiaMutationOptions | undefined
-        const state = formHolder.state
-        if (state) state.processing = true
-        return undefined
-    })
-})
+        lastMethod = 'put';
+        lastOptions = args[1] as InertiaMutationOptions | undefined;
+        const state = formHolder.state;
+        if (state) state.processing = true;
+        return undefined;
+    });
+});
 
 function finishProcessing(): void {
-    const state = formHolder.state
-    if (state) state.processing = false
+    const state = formHolder.state;
+    if (state) state.processing = false;
 }
 
 describe('Track/Edit submit (Task 6)', () => {
     it("submit → sibuk (spinner + 'Menyimpan...' ASCII + disabled + aria-busy) + PUT ke updateUrl", async () => {
-        const wrapper = mountTrackEdit()
+        const wrapper = mountTrackEdit();
         try {
-            expect(editSubmitButton(wrapper).attributes('disabled')).toBeUndefined()
+            expect(editSubmitButton(wrapper).attributes('disabled')).toBeUndefined();
 
-            await wrapper.find('form').trigger('submit')
-            await nextTick()
+            await wrapper.find('form').trigger('submit');
+            await nextTick();
 
-            expect(putMock).toHaveBeenCalledTimes(1)
-            expect(putMock.mock.calls[0]?.[0]).toBe('/recruitment/track')
+            expect(putMock).toHaveBeenCalledTimes(1);
+            expect(putMock.mock.calls[0]?.[0]).toBe('/recruitment/track');
 
-            const btn = editSubmitButton(wrapper)
-            expect(btn.attributes('disabled')).not.toBeUndefined()
-            expect(btn.attributes('aria-busy')).toBe('true')
-            expect(btn.find('[role="status"]').exists()).toBe(true)
-            expect(btn.text()).toContain('Menyimpan...')
-            expect(btn.text()).not.toContain('…')
+            const btn = editSubmitButton(wrapper);
+            expect(btn.attributes('disabled')).not.toBeUndefined();
+            expect(btn.attributes('aria-busy')).toBe('true');
+            expect(btn.find('[role="status"]').exists()).toBe(true);
+            expect(btn.text()).toContain('Menyimpan...');
+            expect(btn.text()).not.toContain('…');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('sukses → toast sukses manual + tombol pulih', async () => {
-        const wrapper = mountTrackEdit()
+        const wrapper = mountTrackEdit();
         try {
-            await wrapper.find('form').trigger('submit')
-            await nextTick()
+            await wrapper.find('form').trigger('submit');
+            await nextTick();
 
-            lastMutationOptions().onSuccess?.()
-            finishProcessing()
-            await nextTick()
+            lastMutationOptions().onSuccess?.();
+            finishProcessing();
+            await nextTick();
 
             expect(showFlashToast).toHaveBeenCalledWith({
                 type: 'success',
                 message: 'Perubahan pendaftaran berhasil disimpan.',
-            })
+            });
 
-            const btn = editSubmitButton(wrapper)
-            expect(btn.attributes('disabled')).toBeUndefined()
-            expect(btn.attributes('aria-busy')).toBe('false')
-            expect(btn.find('[role="status"]').exists()).toBe(false)
-            expect(btn.text()).toContain('Simpan perubahan')
+            const btn = editSubmitButton(wrapper);
+            expect(btn.attributes('disabled')).toBeUndefined();
+            expect(btn.attributes('aria-busy')).toBe('false');
+            expect(btn.find('[role="status"]').exists()).toBe(false);
+            expect(btn.text()).toContain('Simpan perubahan');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('gagal → handleInertiaFormErrors + tombol pulih', async () => {
-        const wrapper = mountTrackEdit()
+        const wrapper = mountTrackEdit();
         try {
-            await wrapper.find('form').trigger('submit')
-            await nextTick()
+            await wrapper.find('form').trigger('submit');
+            await nextTick();
 
-            lastMutationOptions().onError?.({ phone: 'Nomor tidak valid.' })
-            await nextTick()
+            lastMutationOptions().onError?.({ phone: 'Nomor tidak valid.' });
+            await nextTick();
 
             expect(handleInertiaFormErrors).toHaveBeenCalledWith(
                 { phone: 'Nomor tidak valid.' },
-                { title: 'Gagal menyimpan perubahan' },
-            )
-            expect(showFlashToast).not.toHaveBeenCalled()
+                { title: 'Gagal menyimpan perubahan' }
+            );
+            expect(showFlashToast).not.toHaveBeenCalled();
 
-            finishProcessing()
-            await nextTick()
-            expect(editSubmitButton(wrapper).attributes('disabled')).toBeUndefined()
+            finishProcessing();
+            await nextTick();
+            expect(editSubmitButton(wrapper).attributes('disabled')).toBeUndefined();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('submit ganda saat processing → hanya satu request', async () => {
-        const wrapper = mountTrackEdit()
+        const wrapper = mountTrackEdit();
         try {
-            await wrapper.find('form').trigger('submit')
-            await nextTick()
-            await wrapper.find('form').trigger('submit')
-            await nextTick()
+            await wrapper.find('form').trigger('submit');
+            await nextTick();
+            await wrapper.find('form').trigger('submit');
+            await nextTick();
 
-            expect(putMock).toHaveBeenCalledTimes(1)
+            expect(putMock).toHaveBeenCalledTimes(1);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Track/Show koreksi (Task 6)', () => {
     it("kirim → sibuk (spinner + 'Mengirim...' + disabled + aria-busy) + POST ke correctionUrl", async () => {
-        const wrapper = mountTrackShow()
+        const wrapper = mountTrackShow();
         try {
-            expect(correctionSubmitButton(wrapper).attributes('disabled')).toBeUndefined()
+            expect(correctionSubmitButton(wrapper).attributes('disabled')).toBeUndefined();
 
-            await correctionFormEl(wrapper).trigger('submit')
-            await nextTick()
+            await correctionFormEl(wrapper).trigger('submit');
+            await nextTick();
 
-            expect(postMock).toHaveBeenCalledTimes(1)
-            expect(postMock.mock.calls[0]?.[0]).toBe('/recruitment/track/correction')
+            expect(postMock).toHaveBeenCalledTimes(1);
+            expect(postMock.mock.calls[0]?.[0]).toBe('/recruitment/track/correction');
 
-            const btn = correctionSubmitButton(wrapper)
-            expect(btn.attributes('disabled')).not.toBeUndefined()
-            expect(btn.attributes('aria-busy')).toBe('true')
-            expect(btn.find('[role="status"]').exists()).toBe(true)
-            expect(btn.text()).toContain('Mengirim...')
+            const btn = correctionSubmitButton(wrapper);
+            expect(btn.attributes('disabled')).not.toBeUndefined();
+            expect(btn.attributes('aria-busy')).toBe('true');
+            expect(btn.find('[role="status"]').exists()).toBe(true);
+            expect(btn.text()).toContain('Mengirim...');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('sukses → toast sukses manual + tombol pulih', async () => {
-        const wrapper = mountTrackShow()
+        const wrapper = mountTrackShow();
         try {
-            await correctionFormEl(wrapper).trigger('submit')
-            await nextTick()
+            await correctionFormEl(wrapper).trigger('submit');
+            await nextTick();
 
-            lastMutationOptions().onSuccess?.()
-            finishProcessing()
-            await nextTick()
+            lastMutationOptions().onSuccess?.();
+            finishProcessing();
+            await nextTick();
 
             expect(showFlashToast).toHaveBeenCalledWith({
                 type: 'success',
                 message: 'Permintaan koreksi berhasil dikirim. Tim akan meninjau segera.',
-            })
+            });
 
-            const btn = correctionSubmitButton(wrapper)
-            expect(btn.attributes('disabled')).toBeUndefined()
-            expect(btn.attributes('aria-busy')).toBe('false')
-            expect(btn.find('[role="status"]').exists()).toBe(false)
-            expect(btn.text()).toContain('Kirim')
+            const btn = correctionSubmitButton(wrapper);
+            expect(btn.attributes('disabled')).toBeUndefined();
+            expect(btn.attributes('aria-busy')).toBe('false');
+            expect(btn.find('[role="status"]').exists()).toBe(false);
+            expect(btn.text()).toContain('Kirim');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('gagal → handleInertiaFormErrors + tombol pulih', async () => {
-        const wrapper = mountTrackShow()
+        const wrapper = mountTrackShow();
         try {
-            await correctionFormEl(wrapper).trigger('submit')
-            await nextTick()
+            await correctionFormEl(wrapper).trigger('submit');
+            await nextTick();
 
-            lastMutationOptions().onError?.({ request_message: 'Pesan terlalu pendek.' })
-            await nextTick()
+            lastMutationOptions().onError?.({ request_message: 'Pesan terlalu pendek.' });
+            await nextTick();
 
             expect(handleInertiaFormErrors).toHaveBeenCalledWith(
                 { request_message: 'Pesan terlalu pendek.' },
-                { title: 'Gagal mengirim permintaan koreksi' },
-            )
-            expect(showFlashToast).not.toHaveBeenCalled()
+                { title: 'Gagal mengirim permintaan koreksi' }
+            );
+            expect(showFlashToast).not.toHaveBeenCalled();
 
-            finishProcessing()
-            await nextTick()
-            expect(correctionSubmitButton(wrapper).attributes('disabled')).toBeUndefined()
+            finishProcessing();
+            await nextTick();
+            expect(correctionSubmitButton(wrapper).attributes('disabled')).toBeUndefined();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('kirim ganda saat processing → hanya satu request', async () => {
-        const wrapper = mountTrackShow()
+        const wrapper = mountTrackShow();
         try {
-            await correctionFormEl(wrapper).trigger('submit')
-            await nextTick()
-            await correctionFormEl(wrapper).trigger('submit')
-            await nextTick()
+            await correctionFormEl(wrapper).trigger('submit');
+            await nextTick();
+            await correctionFormEl(wrapper).trigger('submit');
+            await nextTick();
 
-            expect(postMock).toHaveBeenCalledTimes(1)
+            expect(postMock).toHaveBeenCalledTimes(1);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});

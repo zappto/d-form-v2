@@ -141,7 +141,7 @@ onMounted(() => {
                     <div class="w-full space-y-1.5 sm:w-60">
                         <Label
                             for="scan-target-filter"
-                            class="text-muted-foreground text-xs font-semibold tracking-wide uppercase"
+                            class="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
                         >
                             Filter acara
                         </Label>
@@ -150,7 +150,7 @@ onMounted(() => {
                             :options="targetFilterOptions"
                             id="scan-target-filter"
                             placeholder="Semua acara"
-                            class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
+                            class="h-10 w-full border-border/80 bg-background/80 text-xs sm:text-sm"
                             aria-label="Filter KPI, hasil scan terakhir, dan riwayat scan per acara"
                         />
                     </div>
@@ -177,17 +177,17 @@ onMounted(() => {
             </div>
 
             <div class="grid gap-2 sm:grid-cols-3">
-                <div class="border-border/70 rounded-xl border px-3 py-2.5">
-                    <p class="text-muted-foreground text-xs">Check-in berhasil</p>
-                    <p class="text-success text-lg font-semibold">{{ s.successfulScansCount }}</p>
+                <div class="rounded-xl border border-border/70 px-3 py-2.5">
+                    <p class="text-xs text-muted-foreground">Check-in berhasil</p>
+                    <p class="text-lg font-semibold text-success">{{ s.successfulScansCount }}</p>
                 </div>
-                <div class="border-border/70 rounded-xl border px-3 py-2.5">
-                    <p class="text-muted-foreground text-xs">Sudah scan</p>
-                    <p class="text-warning text-lg font-semibold">{{ s.duplicateScansCount }}</p>
+                <div class="rounded-xl border border-border/70 px-3 py-2.5">
+                    <p class="text-xs text-muted-foreground">Sudah scan</p>
+                    <p class="text-lg font-semibold text-warning">{{ s.duplicateScansCount }}</p>
                 </div>
-                <div class="border-border/70 rounded-xl border px-3 py-2.5">
-                    <p class="text-muted-foreground text-xs">Tidak valid</p>
-                    <p class="text-destructive text-lg font-semibold">{{ s.invalidScansCount }}</p>
+                <div class="rounded-xl border border-border/70 px-3 py-2.5">
+                    <p class="text-xs text-muted-foreground">Tidak valid</p>
+                    <p class="text-lg font-semibold text-destructive">{{ s.invalidScansCount }}</p>
                 </div>
             </div>
         </section>

@@ -1,12 +1,12 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
-import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils'
-import EventsIndex from '../Events/Index.vue'
-import RecruitmentIndex from '../Recruitment/Index.vue'
-import EventCard from '@/components/modules/dashboard/events/EventCard.vue'
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { nextTick } from 'vue';
+import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
+import EventsIndex from '../Events/Index.vue';
+import RecruitmentIndex from '../Recruitment/Index.vue';
+import EventCard from '@/components/modules/dashboard/events/EventCard.vue';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
-config.global.renderStubDefaultSlot = true
+config.global.renderStubDefaultSlot = true;
 
 /**
  * Spec §3.5, M2 Task 2 (pola Task 1): skeleton navigasi memakai `Skeleton.vue`
@@ -20,7 +20,7 @@ config.global.renderStubDefaultSlot = true
  *   2 `.quick-skeleton` (bukan "3 stat + 6 konten" versi spec).
  */
 
-const { routerGetMock } = vi.hoisted(() => ({ routerGetMock: vi.fn() }))
+const { routerGetMock } = vi.hoisted(() => ({ routerGetMock: vi.fn() }));
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: { template: '<div style="display:none"></div>' },
@@ -45,9 +45,9 @@ vi.mock('@inertiajs/vue3', () => ({
         },
         url: '/dashboard',
     }),
-}))
+}));
 
-vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }))
+vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     default: {
@@ -55,22 +55,22 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
         template:
             '<div data-testid="empty-state"><p>{{ title }}</p><p v-if="description">{{ description }}</p><slot /></div>',
     },
-}))
+}));
 
 interface RouterGetOptions {
-    preserveState?: boolean
-    preserveScroll?: boolean
-    replace?: boolean
-    only?: string[]
-    onStart?: () => void
-    onFinish?: () => void
+    preserveState?: boolean;
+    preserveScroll?: boolean;
+    replace?: boolean;
+    only?: string[];
+    onStart?: () => void;
+    onFinish?: () => void;
 }
 
 function lastGetOptions(): RouterGetOptions {
-    expect(routerGetMock).toHaveBeenCalled()
-    const options = routerGetMock.mock.calls[0]?.[2] as RouterGetOptions | undefined
-    expect(options).toBeDefined()
-    return options as RouterGetOptions
+    expect(routerGetMock).toHaveBeenCalled();
+    const options = routerGetMock.mock.calls[0]?.[2] as RouterGetOptions | undefined;
+    expect(options).toBeDefined();
+    return options as RouterGetOptions;
 }
 
 function demoIEvent(id: string, title: string): IEvent {
@@ -96,13 +96,10 @@ function demoIEvent(id: string, title: string): IEvent {
         deleted_at: null,
         created_at: '2026-09-01',
         updated_at: '2026-09-01',
-    }
+    };
 }
 
-function mountEventsIndex(
-    events: IEvent[],
-    lastPage: number,
-): VueWrapper<InstanceType<typeof EventsIndex>> {
+function mountEventsIndex(events: IEvent[], lastPage: number): VueWrapper<InstanceType<typeof EventsIndex>> {
     return mount(EventsIndex, {
         props: {
             events: {
@@ -124,23 +121,21 @@ function mountEventsIndex(
                 ConfirmationModal: true,
             },
         },
-    })
+    });
 }
 
 function nextPageButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
-    const found = wrapper
-        .findAll('button')
-        .find((b) => b.text().includes('Berikutnya'))
-    if (!found) throw new Error('tombol Berikutnya tidak ditemukan')
-    return found as DOMWrapper<HTMLButtonElement>
+    const found = wrapper.findAll('button').find((b) => b.text().includes('Berikutnya'));
+    if (!found) throw new Error('tombol Berikutnya tidak ditemukan');
+    return found as DOMWrapper<HTMLButtonElement>;
 }
 
 /** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
-type TRecruitmentIndexProps = InstanceType<typeof RecruitmentIndex>['$props']
-type TRecruitmentSummary = TRecruitmentIndexProps['summary']
-type TPeriodRow = NonNullable<TRecruitmentIndexProps['periods']>['data'][number]
-type TActionQueue = NonNullable<TRecruitmentSummary['action_queues']>[number]
-type TTodaySession = NonNullable<TRecruitmentSummary['today_sessions']>[number]
+type TRecruitmentIndexProps = InstanceType<typeof RecruitmentIndex>['$props'];
+type TRecruitmentSummary = TRecruitmentIndexProps['summary'];
+type TPeriodRow = NonNullable<TRecruitmentIndexProps['periods']>['data'][number];
+type TActionQueue = NonNullable<TRecruitmentSummary['action_queues']>[number];
+type TTodaySession = NonNullable<TRecruitmentSummary['today_sessions']>[number];
 
 function demoPeriod(id: string, name: string): TPeriodRow {
     return {
@@ -156,7 +151,7 @@ function demoPeriod(id: string, name: string): TPeriodRow {
         creator: null,
         can_edit: false,
         can_delete: false,
-    }
+    };
 }
 
 function demoSummary(queues: TActionQueue[], sessions: TTodaySession[]): TRecruitmentSummary {
@@ -165,11 +160,11 @@ function demoSummary(queues: TActionQueue[], sessions: TTodaySession[]): TRecrui
         stats: {},
         action_queues: queues,
         today_sessions: sessions,
-    }
+    };
 }
 
 function demoQueue(key: string): TActionQueue {
-    return { key, label: `Antrean ${key}`, description: 'Deskripsi antrean', count: 2 }
+    return { key, label: `Antrean ${key}`, description: 'Deskripsi antrean', count: 2 };
 }
 
 function demoSession(): TTodaySession {
@@ -182,13 +177,13 @@ function demoSession(): TTodaySession {
         room: 'Ruang 1',
         interviews_count: 3,
         division: null,
-    }
+    };
 }
 
 function mountRecruitmentIndex(
     periods: TPeriodRow[],
     queues: TActionQueue[],
-    sessions: TTodaySession[],
+    sessions: TTodaySession[]
 ): VueWrapper<InstanceType<typeof RecruitmentIndex>> {
     return mount(RecruitmentIndex, {
         props: {
@@ -215,184 +210,184 @@ function mountRecruitmentIndex(
                 ConfirmationModal: true,
             },
         },
-    })
+    });
 }
 
 async function typePeriodSearch(wrapper: VueWrapper, text: string): Promise<void> {
-    await wrapper.find('input').setValue(text)
-    await nextTick()
+    await wrapper.find('input').setValue(text);
+    await nextTick();
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-    routerGetMock.mockReset()
+    vi.clearAllMocks();
+    routerGetMock.mockReset();
     // Cerminkan Inertia: onStart jalan saat request berangkat; onFinish hanya
     // bila test memicunya eksplisit (navigasi "menggantung" seperti throttle nyata).
     routerGetMock.mockImplementation((...args: unknown[]) => {
-        const options = args[2] as RouterGetOptions | undefined
-        options?.onStart?.()
-        return undefined
-    })
-})
+        const options = args[2] as RouterGetOptions | undefined;
+        options?.onStart?.();
+        return undefined;
+    });
+});
 
 describe('Events/Index grid skeleton (M2 Task 2)', () => {
     it('ada data + idle → grid EventCard fade-up, tanpa skeleton', async () => {
-        const wrapper = mountEventsIndex([demoIEvent('ev-1', 'Acara A')], 1)
+        const wrapper = mountEventsIndex([demoIEvent('ev-1', 'Acara A')], 1);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.findAllComponents(EventCard)).toHaveLength(1)
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
-            expect(wrapper.text()).toContain('Buat acara')
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.findAllComponents(EventCard)).toHaveLength(1);
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
+            expect(wrapper.text()).toContain('Buat acara');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('pindah halaman → tepat 8 skeleton kartu + konten hidden + header visible', async () => {
-        const wrapper = mountEventsIndex([demoIEvent('ev-1', 'Acara A')], 2)
+        const wrapper = mountEventsIndex([demoIEvent('ev-1', 'Acara A')], 2);
         try {
-            await nextPageButton(wrapper).trigger('click')
-            await nextTick()
+            await nextPageButton(wrapper).trigger('click');
+            await nextTick();
 
-            expect(routerGetMock).toHaveBeenCalledTimes(1)
+            expect(routerGetMock).toHaveBeenCalledTimes(1);
 
-            const region = wrapper.find('[aria-busy="true"]')
-            expect(region.exists()).toBe(true)
-            expect(region.attributes('aria-label')).toMatch(/memuat/i)
+            const region = wrapper.find('[aria-busy="true"]');
+            expect(region.exists()).toBe(true);
+            expect(region.attributes('aria-label')).toMatch(/memuat/i);
 
-            const cards = wrapper.findAll('.event-card-skeleton')
-            expect(cards).toHaveLength(8)
+            const cards = wrapper.findAll('.event-card-skeleton');
+            expect(cards).toHaveLength(8);
             for (const card of cards) {
-                expect(card.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
+                expect(card.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
             }
 
-            expect(wrapper.findAllComponents(EventCard)).toHaveLength(0)
+            expect(wrapper.findAllComponents(EventCard)).toHaveLength(0);
 
             // Header filter + aksi + paginasi tidak ikut hilang.
-            expect(wrapper.text()).toContain('Buat acara')
-            expect(wrapper.text()).toContain('Berikutnya')
+            expect(wrapper.text()).toContain('Buat acara');
+            expect(wrapper.text()).toContain('Berikutnya');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('navigasi selesai → skeleton hilang + grid fade-up kembali', async () => {
-        const wrapper = mountEventsIndex([demoIEvent('ev-1', 'Acara A')], 2)
+        const wrapper = mountEventsIndex([demoIEvent('ev-1', 'Acara A')], 2);
         try {
-            await nextPageButton(wrapper).trigger('click')
-            await nextTick()
-            expect(wrapper.findAll('.event-card-skeleton')).toHaveLength(8)
+            await nextPageButton(wrapper).trigger('click');
+            await nextTick();
+            expect(wrapper.findAll('.event-card-skeleton')).toHaveLength(8);
 
-            lastGetOptions().onFinish?.()
-            await nextTick()
+            lastGetOptions().onFinish?.();
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.findAllComponents(EventCard)).toHaveLength(1)
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.findAllComponents(EventCard)).toHaveLength(1);
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('events kosong + idle → empty state, tanpa skeleton/request', async () => {
-        const wrapper = mountEventsIndex([], 1)
+        const wrapper = mountEventsIndex([], 1);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true)
-            expect(routerGetMock).not.toHaveBeenCalled()
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true);
+            expect(routerGetMock).not.toHaveBeenCalled();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Recruitment/Index skeleton (M2 Task 2)', () => {
     it('ada data + idle → konten fade-up, tanpa skeleton', async () => {
         const wrapper = mountRecruitmentIndex(
             [demoPeriod('per-1', 'Gelombang 1')],
             [demoQueue('screening'), demoQueue('interview')],
-            [demoSession()],
-        )
+            [demoSession()]
+        );
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Gelombang 1')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Gelombang 1');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('filter periode → cermin layout aktual (3 antrean + 6 periode + 2 sesi) + konten hidden', async () => {
         const wrapper = mountRecruitmentIndex(
             [demoPeriod('per-1', 'Gelombang 1')],
             [demoQueue('screening'), demoQueue('interview')],
-            [demoSession()],
-        )
+            [demoSession()]
+        );
         try {
-            await typePeriodSearch(wrapper, 'gelombang')
-            await nextTick()
+            await typePeriodSearch(wrapper, 'gelombang');
+            await nextTick();
 
-            expect(routerGetMock).toHaveBeenCalledTimes(1)
+            expect(routerGetMock).toHaveBeenCalledTimes(1);
 
-            const region = wrapper.find('[aria-busy="true"]')
-            expect(region.exists()).toBe(true)
-            expect(region.attributes('aria-label')).toMatch(/memuat/i)
+            const region = wrapper.find('[aria-busy="true"]');
+            expect(region.exists()).toBe(true);
+            expect(region.attributes('aria-label')).toMatch(/memuat/i);
 
-            expect(wrapper.findAll('.queue-skeleton')).toHaveLength(3)
-            expect(wrapper.findAll('.period-card-skeleton')).toHaveLength(6)
-            expect(wrapper.findAll('.session-skeleton')).toHaveLength(2)
+            expect(wrapper.findAll('.queue-skeleton')).toHaveLength(3);
+            expect(wrapper.findAll('.period-card-skeleton')).toHaveLength(6);
+            expect(wrapper.findAll('.session-skeleton')).toHaveLength(2);
             // Antrean tak kosong → zona akses cepat tidak tampil.
-            expect(wrapper.findAll('.quick-skeleton')).toHaveLength(0)
+            expect(wrapper.findAll('.quick-skeleton')).toHaveLength(0);
 
-            expect(wrapper.text()).not.toContain('Gelombang 1')
+            expect(wrapper.text()).not.toContain('Gelombang 1');
 
             // Baris filter tetap terlihat.
-            expect(wrapper.find('input').exists()).toBe(true)
+            expect(wrapper.find('input').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('antrean kosong → skeleton akses cepat 2 kartu, tanpa skeleton antrean', async () => {
-        const wrapper = mountRecruitmentIndex([demoPeriod('per-1', 'Gelombang 1')], [], [])
+        const wrapper = mountRecruitmentIndex([demoPeriod('per-1', 'Gelombang 1')], [], []);
         try {
-            await typePeriodSearch(wrapper, 'gelombang')
-            await nextTick()
+            await typePeriodSearch(wrapper, 'gelombang');
+            await nextTick();
 
-            expect(wrapper.findAll('.quick-skeleton')).toHaveLength(2)
-            expect(wrapper.findAll('.queue-skeleton')).toHaveLength(0)
-            expect(wrapper.findAll('.session-skeleton')).toHaveLength(0)
-            expect(wrapper.findAll('.period-card-skeleton')).toHaveLength(6)
+            expect(wrapper.findAll('.quick-skeleton')).toHaveLength(2);
+            expect(wrapper.findAll('.queue-skeleton')).toHaveLength(0);
+            expect(wrapper.findAll('.session-skeleton')).toHaveLength(0);
+            expect(wrapper.findAll('.period-card-skeleton')).toHaveLength(6);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('navigasi selesai → skeleton hilang + konten fade-up kembali', async () => {
         const wrapper = mountRecruitmentIndex(
             [demoPeriod('per-1', 'Gelombang 1')],
             [demoQueue('screening')],
-            [demoSession()],
-        )
+            [demoSession()]
+        );
         try {
-            await typePeriodSearch(wrapper, 'gelombang')
-            await nextTick()
-            expect(wrapper.findAll('.period-card-skeleton')).toHaveLength(6)
+            await typePeriodSearch(wrapper, 'gelombang');
+            await nextTick();
+            expect(wrapper.findAll('.period-card-skeleton')).toHaveLength(6);
 
-            lastGetOptions().onFinish?.()
-            await nextTick()
+            lastGetOptions().onFinish?.();
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Gelombang 1')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Gelombang 1');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});

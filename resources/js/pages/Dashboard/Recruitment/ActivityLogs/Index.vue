@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { Card, CardContent } from '@/components/ui/card'
-import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { routes } from '@/lib/routes'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { onMounted, ref } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { Card, CardContent } from '@/components/ui/card';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { routes } from '@/lib/routes';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 interface LogRow {
-    id: string
-    action: string
-    actor_type: string
-    actor: { id: string; name: string } | null
+    id: string;
+    action: string;
+    actor_type: string;
+    actor: { id: string; name: string } | null;
     application: {
-        id: string
-        recruitment_period_id: string | null
-        registration_number: string
-        full_name: string
-    } | null
-    created_at: string | null
+        id: string;
+        recruitment_period_id: string | null;
+        registration_number: string;
+        full_name: string;
+    } | null;
+    created_at: string | null;
 }
 
 defineProps<{
-    logs: { data: LogRow[]; links: { url: string | null; label: string; active: boolean }[] }
-    periodOptions: { id: string; name: string }[]
-    query: { period_id: string | null; action: string | null }
-}>()
+    logs: { data: LogRow[]; links: { url: string | null; label: string; active: boolean }[] };
+    periodOptions: { id: string; name: string }[];
+    query: { period_id: string | null; action: string | null };
+}>();
 
 onMounted(() => {
-    setTopbar({ title: 'Activity log Open Recruitment', subtitle: 'Audit trail keputusan staff' })
-})
+    setTopbar({ title: 'Activity log Open Recruitment', subtitle: 'Audit trail keputusan staff' });
+});
 
 function applyFilters(periodId: string, action: string) {
     router.get(
@@ -44,14 +44,18 @@ function applyFilters(periodId: string, action: string) {
         },
         {
             preserveState: true,
-            onStart: () => { isLoadingLogs.value = true },
-            onFinish: () => { isLoadingLogs.value = false },
-        },
-    )
+            onStart: () => {
+                isLoadingLogs.value = true;
+            },
+            onFinish: () => {
+                isLoadingLogs.value = false;
+            },
+        }
+    );
 }
 
 /** Skeleton daftar selama partial visit filter (pola M2 Task 1). */
-const isLoadingLogs = ref(false)
+const isLoadingLogs = ref(false);
 </script>
 
 <template>
@@ -61,7 +65,7 @@ const isLoadingLogs = ref(false)
         <Card class="rounded-2xl border-border/70">
             <CardContent class="flex flex-wrap gap-3 p-4">
                 <select
-                    class="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                    class="h-9 rounded-md border border-input bg-background px-3 text-sm"
                     :value="query.period_id ?? ''"
                     @change="applyFilters(($event.target as HTMLSelectElement).value, query.action ?? '')"
                 >
@@ -72,7 +76,7 @@ const isLoadingLogs = ref(false)
                 </select>
                 <input
                     type="search"
-                    class="border-input bg-background h-9 min-w-[200px] flex-1 rounded-md border px-3 text-sm"
+                    class="h-9 min-w-[200px] flex-1 rounded-md border border-input bg-background px-3 text-sm"
                     placeholder="Filter action..."
                     :value="query.action ?? ''"
                     @change="applyFilters(query.period_id ?? '', ($event.target as HTMLInputElement).value)"
@@ -82,11 +86,7 @@ const isLoadingLogs = ref(false)
 
         <Card class="rounded-2xl border-border/70">
             <CardContent class="divide-y p-0">
-                <div
-                    v-if="isLoadingLogs"
-                    aria-busy="true"
-                    aria-label="Memuat activity log"
-                >
+                <div v-if="isLoadingLogs" aria-busy="true" aria-label="Memuat activity log">
                     <div v-for="n in 8" :key="`log-${n}`" class="log-row-skeleton space-y-1 p-4">
                         <div class="flex flex-wrap items-start justify-between gap-2">
                             <Skeleton class="h-4 w-2/5" />
@@ -99,11 +99,11 @@ const isLoadingLogs = ref(false)
                     <div v-for="log in logs.data" :key="log.id" class="fade-up space-y-1 p-4 text-sm">
                         <div class="flex flex-wrap items-start justify-between gap-2">
                             <p class="font-medium">{{ log.action }}</p>
-                            <p class="text-muted-foreground text-xs">
+                            <p class="text-xs text-muted-foreground">
                                 {{ log.created_at ? new Date(log.created_at).toLocaleString('id-ID') : '—' }}
                             </p>
                         </div>
-                        <p class="text-muted-foreground text-xs">
+                        <p class="text-xs text-muted-foreground">
                             {{ log.actor?.name ?? log.actor_type }}
                             <template v-if="log.application">
                                 ·

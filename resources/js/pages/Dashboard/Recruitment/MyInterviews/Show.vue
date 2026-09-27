@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { Head, useForm, usePage } from '@inertiajs/vue3'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/SessionQueueDrawer.vue'
-import FormSheet from '@/components/modules/dashboard/recruitment/FormSheet.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { CometSpinner } from '@/components/ui/comet'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { handleInertiaFormErrors } from '@/lib/error-message'
-import { formatBytes, padQueueNumber } from '@/lib/format'
-import { routes } from '@/lib/routes'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
-import useAuth from '@/hooks/useAuth'
+import { computed, onMounted, ref, watch } from 'vue';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/SessionQueueDrawer.vue';
+import FormSheet from '@/components/modules/dashboard/recruitment/FormSheet.vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { CometSpinner } from '@/components/ui/comet';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { handleInertiaFormErrors } from '@/lib/error-message';
+import { formatBytes, padQueueNumber } from '@/lib/format';
+import { routes } from '@/lib/routes';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
+import useAuth from '@/hooks/useAuth';
 import {
     Check,
     CheckCircle2,
@@ -27,104 +27,104 @@ import {
     Minus,
     Plus,
     XCircle,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 interface DetailPayload {
     application: {
-        id: string
-        registration_number: string
-        full_name: string
-        nim: string
-        semester: number
-        primary_division: string | null
-        secondary_division: string | null
-    }
+        id: string;
+        registration_number: string;
+        full_name: string;
+        nim: string;
+        semester: number;
+        primary_division: string | null;
+        secondary_division: string | null;
+    };
     documents: {
-        has_cv?: boolean
-        has_portfolio?: boolean
-        portfolio_is_url?: boolean
-        has_instagram_follow?: boolean
-        cv_download_url: string | null
-        portfolio_download_url: string | null
-        portfolio_url: string | null
-        twibbon_url?: string | null
-        cv_original_name?: string | null
-        cv_size_bytes?: number | null
-        cv_preview_url?: string | null
-        portfolio_original_name?: string | null
-        portfolio_size_bytes?: number | null
-        portfolio_preview_url?: string | null
-        instagram_follow_download_url?: string | null
-        instagram_follow_preview_url?: string | null
-        instagram_follow_original_name?: string | null
-        instagram_follow_size_bytes?: number | null
-    }
+        has_cv?: boolean;
+        has_portfolio?: boolean;
+        portfolio_is_url?: boolean;
+        has_instagram_follow?: boolean;
+        cv_download_url: string | null;
+        portfolio_download_url: string | null;
+        portfolio_url: string | null;
+        twibbon_url?: string | null;
+        cv_original_name?: string | null;
+        cv_size_bytes?: number | null;
+        cv_preview_url?: string | null;
+        portfolio_original_name?: string | null;
+        portfolio_size_bytes?: number | null;
+        portfolio_preview_url?: string | null;
+        instagram_follow_download_url?: string | null;
+        instagram_follow_preview_url?: string | null;
+        instagram_follow_original_name?: string | null;
+        instagram_follow_size_bytes?: number | null;
+    };
     interview: {
-        scheduled_at: string
-        location: string
-        room: string
-        status_label: string
-        session: { id: string; session_date: string; division: string | null } | null
-    } | null
-    queue: { queue_number: number; status_label: string } | null
+        scheduled_at: string;
+        location: string;
+        room: string;
+        status_label: string;
+        session: { id: string; session_date: string; division: string | null } | null;
+    } | null;
+    queue: { queue_number: number; status_label: string } | null;
     evaluation: {
-        speaking_score?: number
-        technical_score?: number
-        attitude_score?: number
-        recommendation?: string
-        recommendation_label?: string
-        notes?: string | null
-        is_locked?: boolean
-        can_edit?: boolean
-    }
+        speaking_score?: number;
+        technical_score?: number;
+        attitude_score?: number;
+        recommendation?: string;
+        recommendation_label?: string;
+        notes?: string | null;
+        is_locked?: boolean;
+        can_edit?: boolean;
+    };
 }
 
 interface QueuePermission {
-    can_view_recruitment_queue?: boolean
+    can_view_recruitment_queue?: boolean;
 }
 
 const props = defineProps<{
-    detail: DetailPayload | undefined
-    evaluateUrl: string
-    recommendationOptions: { value: string; label: string }[]
-    flashMessage: string | null
-}>()
+    detail: DetailPayload | undefined;
+    evaluateUrl: string;
+    recommendationOptions: { value: string; label: string }[];
+    flashMessage: string | null;
+}>();
 
-const page = usePage()
-const authUser = useAuth(page.props)
+const page = usePage();
+const authUser = useAuth(page.props);
 
 const canViewQueue = computed<boolean>((): boolean => {
-    const candidate: QueuePermission | null = authUser.value
-    return candidate?.can_view_recruitment_queue === true
-})
+    const candidate: QueuePermission | null = authUser.value;
+    return candidate?.can_view_recruitment_queue === true;
+});
 
-const queueDrawerOpen = ref<boolean>(false)
+const queueDrawerOpen = ref<boolean>(false);
 
-const canEdit = computed(() => props.detail?.evaluation.can_edit !== false)
+const canEdit = computed(() => props.detail?.evaluation.can_edit !== false);
 
-const isLocked = computed<boolean>((): boolean => props.detail?.evaluation.is_locked === true)
+const isLocked = computed<boolean>((): boolean => props.detail?.evaluation.is_locked === true);
 
 const interviewStartsInFuture = computed<boolean>((): boolean => {
-    const iso: string | null = props.detail?.interview?.scheduled_at ?? null
-    if (!iso) return false
-    const starts: Date = new Date(iso)
-    if (Number.isNaN(starts.getTime())) return false
-    return starts.getTime() > Date.now()
-})
+    const iso: string | null = props.detail?.interview?.scheduled_at ?? null;
+    if (!iso) return false;
+    const starts: Date = new Date(iso);
+    if (Number.isNaN(starts.getTime())) return false;
+    return starts.getTime() > Date.now();
+});
 
 const blockReason = computed<string | null>((): string | null => {
-    if (isLocked.value) return 'Penilaian sudah terkunci. Hubungi staff jika perlu koreksi.'
+    if (isLocked.value) return 'Penilaian sudah terkunci. Hubungi staff jika perlu koreksi.';
     if (!props.detail?.interview) {
-        return 'Jadwal interview belum tersedia. Penilaian bisa disimpan setelah jadwal ditentukan.'
+        return 'Jadwal interview belum tersedia. Penilaian bisa disimpan setelah jadwal ditentukan.';
     }
     if (interviewStartsInFuture.value) {
-        const schedule: string = interviewSchedule.value ?? 'jadwal yang tercantum'
-        return `Interview dijadwalkan ${schedule}. Penilaian bisa disimpan setelah jadwal dimulai.`
+        const schedule: string = interviewSchedule.value ?? 'jadwal yang tercantum';
+        return `Interview dijadwalkan ${schedule}. Penilaian bisa disimpan setelah jadwal dimulai.`;
     }
-    return null
-})
+    return null;
+});
 
 const recommendationChoices = computed(() =>
     props.recommendationOptions.length > 0
@@ -132,13 +132,13 @@ const recommendationChoices = computed(() =>
         : [
               { value: 'recommended', label: 'Direkomendasikan' },
               { value: 'not_recommended', label: 'Tidak direkomendasikan' },
-          ],
-)
+          ]
+);
 
 interface RecommendationStyle {
-    card: string
-    tile: string
-    indicator: string
+    card: string;
+    tile: string;
+    indicator: string;
 }
 
 const RECOMMENDATION_STYLES: Partial<Record<string, RecommendationStyle>> = {
@@ -152,34 +152,34 @@ const RECOMMENDATION_STYLES: Partial<Record<string, RecommendationStyle>> = {
         tile: 'border-destructive/30 bg-destructive/10 text-destructive',
         indicator: 'text-destructive',
     },
-}
+};
 
 const RECOMMENDATION_FALLBACK_STYLE: RecommendationStyle = {
     card: 'border-primary/40 bg-primary/5',
     tile: 'border-primary/30 bg-primary/10 text-primary',
     indicator: 'text-primary',
-}
+};
 
-const RECOMMENDATION_CARD_IDLE: string = 'border-border bg-card hover:bg-muted/40'
+const RECOMMENDATION_CARD_IDLE: string = 'border-border bg-card hover:bg-muted/40';
 const RECOMMENDATION_TILE_IDLE: string =
-    'border-border/70 bg-muted/40 text-muted-foreground group-hover:text-foreground'
+    'border-border/70 bg-muted/40 text-muted-foreground group-hover:text-foreground';
 
 function recommendationStyle(value: string): RecommendationStyle {
-    return RECOMMENDATION_STYLES[value] ?? RECOMMENDATION_FALLBACK_STYLE
+    return RECOMMENDATION_STYLES[value] ?? RECOMMENDATION_FALLBACK_STYLE;
 }
 
 function isRecommendationSelected(value: string): boolean {
-    return form.recommendation === value
+    return form.recommendation === value;
 }
 
-type ScoreField = 'speaking_score' | 'technical_score' | 'attitude_score'
+type ScoreField = 'speaking_score' | 'technical_score' | 'attitude_score';
 
-const SCORE_MIN: number = 1
-const SCORE_MAX: number = 10
-const SCORE_DEFAULT: number = 5
+const SCORE_MIN: number = 1;
+const SCORE_MAX: number = 10;
+const SCORE_DEFAULT: number = 5;
 
 function clampScore(value: number): number {
-    return Math.min(SCORE_MAX, Math.max(SCORE_MIN, Math.round(value)))
+    return Math.min(SCORE_MAX, Math.max(SCORE_MIN, Math.round(value)));
 }
 
 const form = useForm({
@@ -188,158 +188,158 @@ const form = useForm({
     attitude_score: clampScore(props.detail?.evaluation.attitude_score ?? SCORE_DEFAULT),
     recommendation: props.detail?.evaluation.recommendation ?? 'recommended',
     notes: props.detail?.evaluation.notes ?? '',
-})
+});
 
 function scoreValue(field: ScoreField): number {
-    const raw: unknown = form[field]
-    const parsed: number = typeof raw === 'number' ? raw : Number.parseInt(String(raw ?? ''), 10)
-    return Number.isFinite(parsed) ? clampScore(parsed) : SCORE_DEFAULT
+    const raw: unknown = form[field];
+    const parsed: number = typeof raw === 'number' ? raw : Number.parseInt(String(raw ?? ''), 10);
+    return Number.isFinite(parsed) ? clampScore(parsed) : SCORE_DEFAULT;
 }
 
 function canDecrease(field: ScoreField): boolean {
-    return !form.processing && !isLocked.value && scoreValue(field) > SCORE_MIN
+    return !form.processing && !isLocked.value && scoreValue(field) > SCORE_MIN;
 }
 
 function canIncrease(field: ScoreField): boolean {
-    return !form.processing && !isLocked.value && scoreValue(field) < SCORE_MAX
+    return !form.processing && !isLocked.value && scoreValue(field) < SCORE_MAX;
 }
 
 function adjustScore(field: ScoreField, delta: number): void {
-    form[field] = clampScore(scoreValue(field) + delta)
+    form[field] = clampScore(scoreValue(field) + delta);
 }
 
 function commitScore(field: ScoreField): void {
-    form[field] = scoreValue(field)
+    form[field] = scoreValue(field);
 }
 
 function onScoreInput(field: ScoreField, event: Event): void {
-    const target: EventTarget | null = event.target
-    if (!(target instanceof HTMLInputElement)) return
+    const target: EventTarget | null = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
 
-    const digits: string = target.value.replace(/\D+/g, '').slice(0, 2)
-    const next: string = digits === '' ? '' : String(clampScore(Number.parseInt(digits, 10)))
+    const digits: string = target.value.replace(/\D+/g, '').slice(0, 2);
+    const next: string = digits === '' ? '' : String(clampScore(Number.parseInt(digits, 10)));
 
-    if (next !== target.value) target.value = next
-    if (next !== '') form[field] = Number.parseInt(next, 10)
+    if (next !== target.value) target.value = next;
+    if (next !== '') form[field] = Number.parseInt(next, 10);
 }
 
 function onScoreKeydown(field: ScoreField, event: KeyboardEvent): void {
     if (event.key === 'Enter') {
-        commitScore(field)
-        return
+        commitScore(field);
+        return;
     }
 
-    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
 
-    event.preventDefault()
-    adjustScore(field, event.key === 'ArrowUp' ? 1 : -1)
+    event.preventDefault();
+    adjustScore(field, event.key === 'ArrowUp' ? 1 : -1);
 }
 
 const interviewSchedule = computed(() => {
-    if (!props.detail?.interview?.scheduled_at) return null
+    if (!props.detail?.interview?.scheduled_at) return null;
     return new Date(props.detail?.interview.scheduled_at).toLocaleString('id-ID', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         hour: '2-digit',
         minute: '2-digit',
-    })
-})
+    });
+});
 
 const queuePollUrl = computed<string>((): string => {
-    const sessionId: string | null = props.detail?.interview?.session?.id ?? null
-    return sessionId !== null ? routes.admin.recruitment.queue.poll(sessionId) : ''
-})
+    const sessionId: string | null = props.detail?.interview?.session?.id ?? null;
+    return sessionId !== null ? routes.admin.recruitment.queue.poll(sessionId) : '';
+});
 
 function isFilled(value: string | null | undefined): value is string {
-    return typeof value === 'string' && value.trim() !== ''
+    return typeof value === 'string' && value.trim() !== '';
 }
 
 const cvPreviewUrl = computed<string | null>(() => {
-    const url = props.detail?.documents.cv_preview_url
-    return isFilled(url) ? url : null
-})
+    const url = props.detail?.documents.cv_preview_url;
+    return isFilled(url) ? url : null;
+});
 
 const cvDownloadUrl = computed<string | null>(() => {
-    const url = props.detail?.documents.cv_download_url
-    return isFilled(url) ? url : null
-})
+    const url = props.detail?.documents.cv_download_url;
+    return isFilled(url) ? url : null;
+});
 
 const cvOriginalName = computed<string>(() => {
-    const name = props.detail?.documents.cv_original_name
-    return isFilled(name) ? name : 'Berkas CV'
-})
+    const name = props.detail?.documents.cv_original_name;
+    return isFilled(name) ? name : 'Berkas CV';
+});
 
 const cvMetaLabel = computed<string>(() => {
-    const size: string | null = formatBytes(props.detail?.documents.cv_size_bytes)
-    return size !== null ? `CV · ${size}` : 'CV'
-})
+    const size: string | null = formatBytes(props.detail?.documents.cv_size_bytes);
+    return size !== null ? `CV · ${size}` : 'CV';
+});
 
-const cvAvailable = computed<boolean>(() => cvPreviewUrl.value !== null || cvDownloadUrl.value !== null)
+const cvAvailable = computed<boolean>(() => cvPreviewUrl.value !== null || cvDownloadUrl.value !== null);
 
 const portfolioExternalUrl = computed<string | null>(() => {
-    if (props.detail?.documents.portfolio_is_url === false) return null
-    const url = props.detail?.documents?.portfolio_url
-    return isFilled(url) ? url : null
-})
+    if (props.detail?.documents.portfolio_is_url === false) return null;
+    const url = props.detail?.documents?.portfolio_url;
+    return isFilled(url) ? url : null;
+});
 
 const portfolioPreviewUrl = computed<string | null>(() => {
-    const url = props.detail?.documents.portfolio_preview_url
-    return isFilled(url) ? url : null
-})
+    const url = props.detail?.documents.portfolio_preview_url;
+    return isFilled(url) ? url : null;
+});
 
 const portfolioDownloadUrl = computed<string | null>(() => {
-    const url = props.detail?.documents.portfolio_download_url
-    return isFilled(url) ? url : null
-})
+    const url = props.detail?.documents.portfolio_download_url;
+    return isFilled(url) ? url : null;
+});
 
 const portfolioOriginalName = computed<string>(() => {
-    const name = props.detail?.documents.portfolio_original_name
-    return isFilled(name) ? name : 'Berkas portfolio'
-})
+    const name = props.detail?.documents.portfolio_original_name;
+    return isFilled(name) ? name : 'Berkas portfolio';
+});
 
 const portfolioMetaLabel = computed<string>(() => {
-    const size: string | null = formatBytes(props.detail?.documents.portfolio_size_bytes)
-    return size !== null ? `Portfolio · ${size}` : 'Portfolio'
-})
+    const size: string | null = formatBytes(props.detail?.documents.portfolio_size_bytes);
+    return size !== null ? `Portfolio · ${size}` : 'Portfolio';
+});
 
 const portfolioFileAvailable = computed<boolean>(
     () =>
         portfolioExternalUrl.value === null &&
-        (portfolioPreviewUrl.value !== null || portfolioDownloadUrl.value !== null),
-)
+        (portfolioPreviewUrl.value !== null || portfolioDownloadUrl.value !== null)
+);
 
 const instagramFollowDownloadUrl = computed<string | null>(() => {
-    const url = props.detail?.documents.instagram_follow_download_url
-    return isFilled(url) ? url : null
-})
+    const url = props.detail?.documents.instagram_follow_download_url;
+    return isFilled(url) ? url : null;
+});
 
 const instagramFollowPreviewUrl = computed<string | null>(() => {
-    const url = props.detail?.documents.instagram_follow_preview_url
-    return isFilled(url) ? url : null
-})
+    const url = props.detail?.documents.instagram_follow_preview_url;
+    return isFilled(url) ? url : null;
+});
 
 const instagramFollowOriginalName = computed<string>(() => {
-    const name = props.detail?.documents.instagram_follow_original_name
-    return isFilled(name) ? name : 'Bukti follow Instagram'
-})
+    const name = props.detail?.documents.instagram_follow_original_name;
+    return isFilled(name) ? name : 'Bukti follow Instagram';
+});
 
 const instagramFollowMetaLabel = computed<string>(() => {
-    const size: string | null = formatBytes(props.detail?.documents.instagram_follow_size_bytes)
-    return size !== null ? `Follow IG · ${size}` : 'Follow Instagram'
-})
+    const size: string | null = formatBytes(props.detail?.documents.instagram_follow_size_bytes);
+    return size !== null ? `Follow IG · ${size}` : 'Follow Instagram';
+});
 
 const instagramFollowAvailable = computed<boolean>(
     () =>
         props.detail?.documents.has_instagram_follow === true ||
         instagramFollowPreviewUrl.value !== null ||
-        instagramFollowDownloadUrl.value !== null,
-)
+        instagramFollowDownloadUrl.value !== null
+);
 
 const twibbonUrl = computed<string | null>(() => {
-    const url = props.detail?.documents.twibbon_url
-    return isFilled(url) ? url : null
-})
+    const url = props.detail?.documents.twibbon_url;
+    return isFilled(url) ? url : null;
+});
 
 const hasAnyDocument = computed<boolean>(
     () =>
@@ -347,52 +347,57 @@ const hasAnyDocument = computed<boolean>(
         portfolioExternalUrl.value !== null ||
         portfolioFileAvailable.value ||
         instagramFollowAvailable.value ||
-        twibbonUrl.value !== null,
-)
+        twibbonUrl.value !== null
+);
 
-const cvPreviewLoading = ref<boolean>(true)
-const cvPreviewFailed = ref<boolean>(false)
-const portfolioPreviewLoading = ref<boolean>(true)
-const portfolioPreviewFailed = ref<boolean>(false)
-const instagramFollowPreviewFailed = ref<boolean>(false)
+const cvPreviewLoading = ref<boolean>(true);
+const cvPreviewFailed = ref<boolean>(false);
+const portfolioPreviewLoading = ref<boolean>(true);
+const portfolioPreviewFailed = ref<boolean>(false);
+const instagramFollowPreviewFailed = ref<boolean>(false);
 
 watch(
     () => props.detail?.application.id,
     () => {
-        cvPreviewLoading.value = true
-        cvPreviewFailed.value = false
-        portfolioPreviewLoading.value = true
-        portfolioPreviewFailed.value = false
-        instagramFollowPreviewFailed.value = false
-    },
-)
+        cvPreviewLoading.value = true;
+        cvPreviewFailed.value = false;
+        portfolioPreviewLoading.value = true;
+        portfolioPreviewFailed.value = false;
+        instagramFollowPreviewFailed.value = false;
+    }
+);
 
 onMounted(() => {
-    const application = props.detail?.application
+    const application = props.detail?.application;
     setTopbar({
         title: application?.full_name ?? 'Interview',
         subtitle: application?.registration_number ?? '',
-    })
-})
+    });
+});
 
 function submit(): void {
-    if (blockReason.value !== null || form.processing) return
+    if (blockReason.value !== null || form.processing) return;
     form.post(props.evaluateUrl, {
         preserveScroll: true,
         // Sukses tanpa toast manual: controller memakai ->with('message') yang
         // disalurkan sebagai prop flashMessage (alert inline, termasuk sufiks
         // antrean dinamis) — toast manual akan ganda.
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal menyimpan penilaian' })
+            handleInertiaFormErrors(errors, { title: 'Gagal menyimpan penilaian' });
         },
-    })
+    });
 }
 </script>
 
 <template>
     <Head :title="detail ? `Interview — ${detail.application.full_name}` : 'Interview'" />
 
-    <div v-if="!detail" class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10" aria-busy="true" aria-label="Memuat penilaian interview">
+    <div
+        v-if="!detail"
+        class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10"
+        aria-busy="true"
+        aria-label="Memuat penilaian interview"
+    >
         <div class="rounded-2xl border border-border/70 bg-card p-6">
             <Skeleton class="h-4 w-32" />
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
@@ -485,21 +490,21 @@ function submit(): void {
 
                         <div class="mt-4 grid gap-4 sm:grid-cols-2">
                             <div class="sm:col-span-2">
-                                <p class="text-muted-foreground text-xs uppercase">Jadwal</p>
+                                <p class="text-xs text-muted-foreground uppercase">Jadwal</p>
                                 <p v-if="interviewSchedule" class="mt-0.5 font-medium">
                                     {{ interviewSchedule }}
                                 </p>
                                 <p v-else class="mt-0.5 text-muted-foreground">Jadwal belum ditetapkan</p>
                             </div>
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Lokasi</p>
+                                <p class="text-xs text-muted-foreground uppercase">Lokasi</p>
                                 <p v-if="detail.interview" class="mt-0.5 font-medium">
                                     {{ detail.interview.location }} · {{ detail.interview.room }}
                                 </p>
                                 <p v-else class="mt-0.5 text-muted-foreground">—</p>
                             </div>
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Antrean</p>
+                                <p class="text-xs text-muted-foreground uppercase">Antrean</p>
                                 <p v-if="detail.queue" class="mt-0.5 font-medium">
                                     <span class="font-mono tabular-nums">
                                         #{{ padQueueNumber(detail.queue.queue_number) }}
@@ -521,7 +526,7 @@ function submit(): void {
                                 <p class="text-xl font-semibold tracking-tight">
                                     {{ detail.application.full_name }}
                                 </p>
-                                <p class="mt-1 font-mono text-xs tabular-nums text-muted-foreground">
+                                <p class="mt-1 font-mono text-xs text-muted-foreground tabular-nums">
                                     {{ detail.application.registration_number }}
                                 </p>
                             </div>
@@ -532,15 +537,15 @@ function submit(): void {
 
                         <div class="mt-5 grid gap-4 sm:grid-cols-3">
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">NIM</p>
+                                <p class="text-xs text-muted-foreground uppercase">NIM</p>
                                 <p class="mt-0.5 font-medium">{{ detail.application.nim }}</p>
                             </div>
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Semester</p>
+                                <p class="text-xs text-muted-foreground uppercase">Semester</p>
                                 <p class="mt-0.5 font-medium tabular-nums">{{ detail.application.semester }}</p>
                             </div>
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Divisi</p>
+                                <p class="text-xs text-muted-foreground uppercase">Divisi</p>
                                 <p class="mt-0.5 font-medium">
                                     {{ detail.application.primary_division }}
                                     <span v-if="detail.application.secondary_division">
@@ -558,10 +563,10 @@ function submit(): void {
                             <div v-if="cvAvailable" class="space-y-3">
                                 <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
                                     <div class="flex min-w-0 items-center gap-3">
-                                        <FileText class="text-muted-foreground size-5 shrink-0" aria-hidden="true" />
+                                        <FileText class="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
                                         <div class="min-w-0">
                                             <p class="truncate font-medium">{{ cvOriginalName }}</p>
-                                            <p class="text-muted-foreground text-xs">{{ cvMetaLabel }}</p>
+                                            <p class="text-xs text-muted-foreground">{{ cvMetaLabel }}</p>
                                         </div>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-2">
@@ -596,7 +601,10 @@ function submit(): void {
                                         class="h-80 w-full bg-white"
                                         loading="lazy"
                                         @load="cvPreviewLoading = false"
-                                        @error="cvPreviewFailed = true; cvPreviewLoading = false"
+                                        @error="
+                                            cvPreviewFailed = true;
+                                            cvPreviewLoading = false;
+                                        "
                                     />
                                     <div
                                         v-if="cvPreviewLoading && !cvPreviewFailed"
@@ -604,16 +612,16 @@ function submit(): void {
                                         aria-live="polite"
                                     >
                                         <div
-                                            class="border-muted-foreground/30 border-t-foreground size-8 animate-spin rounded-full border-2"
+                                            class="size-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground"
                                             aria-hidden="true"
                                         />
-                                        <p class="text-muted-foreground text-sm">Memuat pratinjau CV…</p>
+                                        <p class="text-sm text-muted-foreground">Memuat pratinjau CV…</p>
                                     </div>
                                     <div
                                         v-if="cvPreviewFailed"
                                         class="flex flex-col items-center justify-center gap-3 p-6 text-center"
                                     >
-                                        <p class="text-muted-foreground text-sm">
+                                        <p class="text-sm text-muted-foreground">
                                             Pratinjau tidak dapat dimuat. Gunakan tombol unduh untuk membuka berkas.
                                         </p>
                                         <Button v-if="cvDownloadUrl" as-child variant="outline" size="sm">
@@ -624,7 +632,7 @@ function submit(): void {
                                         </Button>
                                     </div>
                                 </div>
-                                <p v-else class="text-muted-foreground text-sm">
+                                <p v-else class="text-sm text-muted-foreground">
                                     Pratinjau CV tidak tersedia. Gunakan tombol unduh untuk membuka berkas.
                                 </p>
                             </div>
@@ -639,7 +647,7 @@ function submit(): void {
                                         :href="portfolioExternalUrl"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="text-primary inline-flex min-w-0 max-w-full items-center gap-2 text-sm underline-offset-4 hover:underline"
+                                        class="inline-flex max-w-full min-w-0 items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
                                     >
                                         <ExternalLink class="size-4 shrink-0" aria-hidden="true" />
                                         <span class="truncate">{{ portfolioExternalUrl }}</span>
@@ -651,7 +659,7 @@ function submit(): void {
                                         </a>
                                     </Button>
                                 </div>
-                                <p class="text-muted-foreground text-xs">Portfolio · tautan eksternal</p>
+                                <p class="text-xs text-muted-foreground">Portfolio · tautan eksternal</p>
                             </div>
 
                             <div
@@ -661,10 +669,10 @@ function submit(): void {
                             >
                                 <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
                                     <div class="flex min-w-0 items-center gap-3">
-                                        <FileText class="text-muted-foreground size-5 shrink-0" aria-hidden="true" />
+                                        <FileText class="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
                                         <div class="min-w-0">
                                             <p class="truncate font-medium">{{ portfolioOriginalName }}</p>
-                                            <p class="text-muted-foreground text-xs">{{ portfolioMetaLabel }}</p>
+                                            <p class="text-xs text-muted-foreground">{{ portfolioMetaLabel }}</p>
                                         </div>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-2">
@@ -700,7 +708,8 @@ function submit(): void {
                                         loading="lazy"
                                         @load="portfolioPreviewLoading = false"
                                         @error="
-                                            portfolioPreviewFailed = true; portfolioPreviewLoading = false
+                                            portfolioPreviewFailed = true;
+                                            portfolioPreviewLoading = false;
                                         "
                                     />
                                     <div
@@ -709,16 +718,16 @@ function submit(): void {
                                         aria-live="polite"
                                     >
                                         <div
-                                            class="border-muted-foreground/30 border-t-foreground size-8 animate-spin rounded-full border-2"
+                                            class="size-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground"
                                             aria-hidden="true"
                                         />
-                                        <p class="text-muted-foreground text-sm">Memuat pratinjau portfolio…</p>
+                                        <p class="text-sm text-muted-foreground">Memuat pratinjau portfolio…</p>
                                     </div>
                                     <div
                                         v-if="portfolioPreviewFailed"
                                         class="flex flex-col items-center justify-center gap-3 p-6 text-center"
                                     >
-                                        <p class="text-muted-foreground text-sm">
+                                        <p class="text-sm text-muted-foreground">
                                             Pratinjau tidak dapat dimuat. Gunakan tombol unduh untuk membuka berkas.
                                         </p>
                                         <Button v-if="portfolioDownloadUrl" as-child variant="outline" size="sm">
@@ -729,7 +738,7 @@ function submit(): void {
                                         </Button>
                                     </div>
                                 </div>
-                                <p v-else class="text-muted-foreground text-sm">
+                                <p v-else class="text-sm text-muted-foreground">
                                     Pratinjau portfolio tidak tersedia. Gunakan tombol unduh untuk membuka berkas.
                                 </p>
                             </div>
@@ -745,10 +754,10 @@ function submit(): void {
                             >
                                 <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
                                     <div class="flex min-w-0 items-center gap-3">
-                                        <FileText class="text-muted-foreground size-5 shrink-0" aria-hidden="true" />
+                                        <FileText class="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
                                         <div class="min-w-0">
                                             <p class="truncate font-medium">{{ instagramFollowOriginalName }}</p>
-                                            <p class="text-muted-foreground text-xs">{{ instagramFollowMetaLabel }}</p>
+                                            <p class="text-xs text-muted-foreground">{{ instagramFollowMetaLabel }}</p>
                                         </div>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-2">
@@ -780,7 +789,7 @@ function submit(): void {
                                         v-show="!instagramFollowPreviewFailed"
                                         :src="instagramFollowPreviewUrl"
                                         alt="Pratinjau bukti follow Instagram"
-                                        class="max-h-80 w-full object-contain bg-white"
+                                        class="max-h-80 w-full bg-white object-contain"
                                         loading="lazy"
                                         @error="instagramFollowPreviewFailed = true"
                                     />
@@ -788,15 +797,10 @@ function submit(): void {
                                         v-if="instagramFollowPreviewFailed"
                                         class="flex flex-col items-center justify-center gap-3 p-6 text-center"
                                     >
-                                        <p class="text-muted-foreground text-sm">
+                                        <p class="text-sm text-muted-foreground">
                                             Pratinjau tidak dapat dimuat. Gunakan tombol unduh untuk membuka berkas.
                                         </p>
-                                        <Button
-                                            v-if="instagramFollowDownloadUrl"
-                                            as-child
-                                            variant="outline"
-                                            size="sm"
-                                        >
+                                        <Button v-if="instagramFollowDownloadUrl" as-child variant="outline" size="sm">
                                             <a :href="instagramFollowDownloadUrl">
                                                 <Download class="mr-2 size-4" aria-hidden="true" />
                                                 Unduh bukti IG
@@ -823,7 +827,7 @@ function submit(): void {
                                         :href="twibbonUrl"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="text-primary inline-flex min-w-0 max-w-full items-center gap-2 text-sm underline-offset-4 hover:underline"
+                                        class="inline-flex max-w-full min-w-0 items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
                                     >
                                         <ExternalLink class="size-4 shrink-0" aria-hidden="true" />
                                         <span class="truncate">{{ twibbonUrl }}</span>
@@ -835,7 +839,7 @@ function submit(): void {
                                         </a>
                                     </Button>
                                 </div>
-                                <p class="text-muted-foreground text-xs">Twibbon · tautan eksternal</p>
+                                <p class="text-xs text-muted-foreground">Twibbon · tautan eksternal</p>
                             </div>
                         </div>
                         <p v-else class="mt-4 text-sm text-muted-foreground">
@@ -876,7 +880,7 @@ function submit(): void {
                                         variant="ghost"
                                         size="icon"
                                         radius="xl"
-                                        class="text-muted-foreground shrink-0"
+                                        class="shrink-0 text-muted-foreground"
                                         aria-label="Kurangi nilai Speaking"
                                         :disabled="!canDecrease('speaking_score')"
                                         @click="adjustScore('speaking_score', -1)"
@@ -898,19 +902,19 @@ function submit(): void {
                                             :aria-valuenow="scoreValue('speaking_score')"
                                             :aria-invalid="form.errors.speaking_score ? true : undefined"
                                             :disabled="form.processing || isLocked"
-                                            class="text-foreground focus-visible:bg-background focus-visible:ring-ring/30 h-11 w-10 shrink-0 rounded-lg bg-transparent p-0 text-center text-2xl font-semibold tabular-nums outline-none transition-colors duration-150 focus-visible:ring-[3px] disabled:opacity-50 motion-reduce:transition-none"
+                                            class="h-11 w-10 shrink-0 rounded-lg bg-transparent p-0 text-center text-2xl font-semibold text-foreground tabular-nums transition-colors duration-150 outline-none focus-visible:bg-background focus-visible:ring-[3px] focus-visible:ring-ring/30 disabled:opacity-50 motion-reduce:transition-none"
                                             @input="onScoreInput('speaking_score', $event)"
                                             @keydown="onScoreKeydown('speaking_score', $event)"
                                             @blur="commitScore('speaking_score')"
                                         />
-                                        <span class="text-muted-foreground text-sm" aria-hidden="true">/10</span>
+                                        <span class="text-sm text-muted-foreground" aria-hidden="true">/10</span>
                                     </div>
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
                                         radius="xl"
-                                        class="text-muted-foreground shrink-0"
+                                        class="shrink-0 text-muted-foreground"
                                         aria-label="Tambah nilai Speaking"
                                         :disabled="!canIncrease('speaking_score')"
                                         @click="adjustScore('speaking_score', 1)"
@@ -926,7 +930,7 @@ function submit(): void {
                                         :class="tick <= scoreValue('speaking_score') ? 'bg-primary/70' : 'bg-muted'"
                                     />
                                 </div>
-                                <p v-if="form.errors.speaking_score" class="text-destructive text-xs">
+                                <p v-if="form.errors.speaking_score" class="text-xs text-destructive">
                                     {{ form.errors.speaking_score }}
                                 </p>
                             </div>
@@ -941,7 +945,7 @@ function submit(): void {
                                         variant="ghost"
                                         size="icon"
                                         radius="xl"
-                                        class="text-muted-foreground shrink-0"
+                                        class="shrink-0 text-muted-foreground"
                                         aria-label="Kurangi nilai Technical"
                                         :disabled="!canDecrease('technical_score')"
                                         @click="adjustScore('technical_score', -1)"
@@ -963,19 +967,19 @@ function submit(): void {
                                             :aria-valuenow="scoreValue('technical_score')"
                                             :aria-invalid="form.errors.technical_score ? true : undefined"
                                             :disabled="form.processing || isLocked"
-                                            class="text-foreground focus-visible:bg-background focus-visible:ring-ring/30 h-11 w-10 shrink-0 rounded-lg bg-transparent p-0 text-center text-2xl font-semibold tabular-nums outline-none transition-colors duration-150 focus-visible:ring-[3px] disabled:opacity-50 motion-reduce:transition-none"
+                                            class="h-11 w-10 shrink-0 rounded-lg bg-transparent p-0 text-center text-2xl font-semibold text-foreground tabular-nums transition-colors duration-150 outline-none focus-visible:bg-background focus-visible:ring-[3px] focus-visible:ring-ring/30 disabled:opacity-50 motion-reduce:transition-none"
                                             @input="onScoreInput('technical_score', $event)"
                                             @keydown="onScoreKeydown('technical_score', $event)"
                                             @blur="commitScore('technical_score')"
                                         />
-                                        <span class="text-muted-foreground text-sm" aria-hidden="true">/10</span>
+                                        <span class="text-sm text-muted-foreground" aria-hidden="true">/10</span>
                                     </div>
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
                                         radius="xl"
-                                        class="text-muted-foreground shrink-0"
+                                        class="shrink-0 text-muted-foreground"
                                         aria-label="Tambah nilai Technical"
                                         :disabled="!canIncrease('technical_score')"
                                         @click="adjustScore('technical_score', 1)"
@@ -991,7 +995,7 @@ function submit(): void {
                                         :class="tick <= scoreValue('technical_score') ? 'bg-primary/70' : 'bg-muted'"
                                     />
                                 </div>
-                                <p v-if="form.errors.technical_score" class="text-destructive text-xs">
+                                <p v-if="form.errors.technical_score" class="text-xs text-destructive">
                                     {{ form.errors.technical_score }}
                                 </p>
                             </div>
@@ -1006,7 +1010,7 @@ function submit(): void {
                                         variant="ghost"
                                         size="icon"
                                         radius="xl"
-                                        class="text-muted-foreground shrink-0"
+                                        class="shrink-0 text-muted-foreground"
                                         aria-label="Kurangi nilai Attitude"
                                         :disabled="!canDecrease('attitude_score')"
                                         @click="adjustScore('attitude_score', -1)"
@@ -1028,19 +1032,19 @@ function submit(): void {
                                             :aria-valuenow="scoreValue('attitude_score')"
                                             :aria-invalid="form.errors.attitude_score ? true : undefined"
                                             :disabled="form.processing || isLocked"
-                                            class="text-foreground focus-visible:bg-background focus-visible:ring-ring/30 h-11 w-10 shrink-0 rounded-lg bg-transparent p-0 text-center text-2xl font-semibold tabular-nums outline-none transition-colors duration-150 focus-visible:ring-[3px] disabled:opacity-50 motion-reduce:transition-none"
+                                            class="h-11 w-10 shrink-0 rounded-lg bg-transparent p-0 text-center text-2xl font-semibold text-foreground tabular-nums transition-colors duration-150 outline-none focus-visible:bg-background focus-visible:ring-[3px] focus-visible:ring-ring/30 disabled:opacity-50 motion-reduce:transition-none"
                                             @input="onScoreInput('attitude_score', $event)"
                                             @keydown="onScoreKeydown('attitude_score', $event)"
                                             @blur="commitScore('attitude_score')"
                                         />
-                                        <span class="text-muted-foreground text-sm" aria-hidden="true">/10</span>
+                                        <span class="text-sm text-muted-foreground" aria-hidden="true">/10</span>
                                     </div>
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
                                         radius="xl"
-                                        class="text-muted-foreground shrink-0"
+                                        class="shrink-0 text-muted-foreground"
                                         aria-label="Tambah nilai Attitude"
                                         :disabled="!canIncrease('attitude_score')"
                                         @click="adjustScore('attitude_score', 1)"
@@ -1056,19 +1060,19 @@ function submit(): void {
                                         :class="tick <= scoreValue('attitude_score') ? 'bg-primary/70' : 'bg-muted'"
                                     />
                                 </div>
-                                <p v-if="form.errors.attitude_score" class="text-destructive text-xs">
+                                <p v-if="form.errors.attitude_score" class="text-xs text-destructive">
                                     {{ form.errors.attitude_score }}
                                 </p>
                             </div>
                         </div>
 
                         <fieldset class="space-y-2" :disabled="form.processing || isLocked">
-                            <legend class="text-sm font-medium leading-none">Rekomendasi</legend>
+                            <legend class="text-sm leading-none font-medium">Rekomendasi</legend>
                             <div class="flex flex-col gap-2">
                                 <label
                                     v-for="opt in recommendationChoices"
                                     :key="opt.value"
-                                    class="group has-[:disabled]:cursor-not-allowed has-[:focus-visible]:border-ring has-[:focus-visible]:ring-ring/30 relative flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors duration-150 has-[:focus-visible]:ring-[3px] motion-reduce:transition-none"
+                                    class="group relative flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors duration-150 has-[:disabled]:cursor-not-allowed has-[:focus-visible]:border-ring has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-ring/30 motion-reduce:transition-none"
                                     :class="
                                         isRecommendationSelected(opt.value)
                                             ? recommendationStyle(opt.value).card
@@ -1107,11 +1111,7 @@ function submit(): void {
 
                                     <span
                                         class="min-w-0 flex-1 text-sm"
-                                        :class="
-                                            isRecommendationSelected(opt.value)
-                                                ? 'font-semibold'
-                                                : 'font-medium'
-                                        "
+                                        :class="isRecommendationSelected(opt.value) ? 'font-semibold' : 'font-medium'"
                                     >
                                         {{ opt.label }}
                                     </span>
@@ -1138,7 +1138,7 @@ function submit(): void {
                                 id="notes"
                                 v-model="form.notes"
                                 rows="4"
-                                class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                 placeholder="Observasi singkat..."
                                 :disabled="form.processing || isLocked"
                                 :aria-invalid="form.errors.notes ? true : undefined"
@@ -1169,21 +1169,15 @@ function submit(): void {
                         <dl class="divide-y divide-border/60 rounded-xl border border-border/70 text-sm">
                             <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
                                 <dt class="text-muted-foreground">Speaking</dt>
-                                <dd class="font-semibold tabular-nums">
-                                    {{ detail.evaluation.speaking_score }}/10
-                                </dd>
+                                <dd class="font-semibold tabular-nums">{{ detail.evaluation.speaking_score }}/10</dd>
                             </div>
                             <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
                                 <dt class="text-muted-foreground">Technical</dt>
-                                <dd class="font-semibold tabular-nums">
-                                    {{ detail.evaluation.technical_score }}/10
-                                </dd>
+                                <dd class="font-semibold tabular-nums">{{ detail.evaluation.technical_score }}/10</dd>
                             </div>
                             <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
                                 <dt class="text-muted-foreground">Attitude</dt>
-                                <dd class="font-semibold tabular-nums">
-                                    {{ detail.evaluation.attitude_score }}/10
-                                </dd>
+                                <dd class="font-semibold tabular-nums">{{ detail.evaluation.attitude_score }}/10</dd>
                             </div>
                             <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
                                 <dt class="text-muted-foreground">Rekomendasi</dt>
@@ -1191,8 +1185,8 @@ function submit(): void {
                             </div>
                         </dl>
                         <div v-if="detail.evaluation.notes">
-                            <p class="text-muted-foreground text-xs uppercase">Catatan</p>
-                            <p class="mt-1 whitespace-pre-wrap text-sm">{{ detail.evaluation.notes }}</p>
+                            <p class="text-xs text-muted-foreground uppercase">Catatan</p>
+                            <p class="mt-1 text-sm whitespace-pre-wrap">{{ detail.evaluation.notes }}</p>
                         </div>
                     </div>
                 </CardContent>

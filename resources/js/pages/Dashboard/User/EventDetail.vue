@@ -6,14 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { MapPin, CalendarDays, Clock, DollarSign, Users, Send, Mail, MailOpen, FileText, ChevronRight, Lock } from 'lucide-vue-next';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
-    statusColorMap,
-    categoryLabelMap,
-    categoryColorMap,
-    sessionLabelMap,
-} from '@/lib/dummyData';
+    MapPin,
+    CalendarDays,
+    Clock,
+    DollarSign,
+    Users,
+    Send,
+    Mail,
+    MailOpen,
+    FileText,
+    ChevronRight,
+    Lock,
+} from 'lucide-vue-next';
+import { Skeleton } from '@/components/ui/skeleton';
+import { statusColorMap, categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummyData';
 import { formatDisplayDate, formatDisplayDateTime, formatRupiahPrice } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
@@ -124,13 +131,18 @@ const quotaPercent = computed(() => {
 
 <template>
     <Head :title="eventReady ? event.title : 'Detail acara'" />
-    <div v-if="!eventReady" class="mx-auto flex w-full flex-col gap-6 pb-6 sm:gap-8" aria-busy="true" aria-label="Memuat detail acara">
+    <div
+        v-if="!eventReady"
+        class="mx-auto flex w-full flex-col gap-6 pb-6 sm:gap-8"
+        aria-busy="true"
+        aria-label="Memuat detail acara"
+    >
         <section
-            class="border-border/70 bg-card overflow-hidden rounded-2xl border shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+            class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
         >
             <div class="flex flex-col lg:grid lg:min-h-[min(26rem,70vh)] lg:grid-cols-2 lg:items-stretch">
                 <div
-                    class="border-border/60 from-card via-card to-muted/25 order-2 flex flex-col justify-center gap-5 border-t bg-gradient-to-b px-5 py-7 sm:gap-6 sm:px-8 sm:py-9 lg:order-none lg:border-t-0 lg:border-r lg:px-10 xl:px-12"
+                    class="order-2 flex flex-col justify-center gap-5 border-t border-border/60 bg-gradient-to-b from-card via-card to-muted/25 px-5 py-7 sm:gap-6 sm:px-8 sm:py-9 lg:order-none lg:border-t-0 lg:border-r lg:px-10 xl:px-12"
                 >
                     <div class="flex flex-wrap items-center gap-2">
                         <Skeleton class="h-5 w-20 rounded-full" />
@@ -146,7 +158,9 @@ const quotaPercent = computed(() => {
                 </div>
 
                 <div class="relative order-1 w-full lg:order-none lg:min-h-full lg:min-w-0">
-                    <Skeleton class="hero-skeleton aspect-[16/9] h-full w-full rounded-none lg:aspect-auto lg:min-h-[min(26rem,70vh)]" />
+                    <Skeleton
+                        class="hero-skeleton aspect-[16/9] h-full w-full rounded-none lg:aspect-auto lg:min-h-[min(26rem,70vh)]"
+                    />
                 </div>
             </div>
         </section>
@@ -155,7 +169,7 @@ const quotaPercent = computed(() => {
             <div
                 v-for="n in 4"
                 :key="`meta-${n}`"
-                class="group border-border/70 from-card to-muted/10 flex min-w-0 gap-3 rounded-2xl border bg-gradient-to-b p-4 shadow-sm"
+                class="group flex min-w-0 gap-3 rounded-2xl border border-border/70 bg-gradient-to-b from-card to-muted/10 p-4 shadow-sm"
             >
                 <Skeleton class="size-10 shrink-0 rounded-full sm:size-11" />
                 <div class="min-w-0 flex-1 space-y-1.5">
@@ -167,8 +181,10 @@ const quotaPercent = computed(() => {
 
         <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
             <div class="flex min-w-0 flex-col gap-8">
-                <div class="border-border/70 rounded-2xl border shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
-                    <div class="border-border/50 bg-muted/10 border-b px-5 py-4 sm:px-6">
+                <div
+                    class="rounded-2xl border border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
+                >
+                    <div class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <Skeleton class="h-5 w-36" />
                     </div>
                     <div class="space-y-2 px-5 py-6 sm:px-6 sm:py-8">
@@ -178,15 +194,17 @@ const quotaPercent = computed(() => {
                     </div>
                 </div>
 
-                <div class="border-border/70 rounded-2xl border shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
-                    <div class="border-border/50 bg-muted/10 border-b px-5 py-4 sm:px-6">
+                <div
+                    class="rounded-2xl border border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
+                >
+                    <div class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <Skeleton class="h-5 w-44" />
                     </div>
                     <div class="space-y-3 px-5 py-5 sm:px-6">
                         <div
                             v-for="n in 3"
                             :key="`form-${n}`"
-                            class="border-border/70 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
+                            class="flex flex-col gap-3 rounded-xl border border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between"
                         >
                             <div class="flex min-w-0 gap-3">
                                 <Skeleton class="size-10 shrink-0 rounded-full" />
@@ -203,7 +221,7 @@ const quotaPercent = computed(() => {
 
             <aside class="flex min-w-0 flex-col gap-4 xl:sticky xl:top-24">
                 <div
-                    class="border-border/70 ring-primary/10 from-card via-card to-primary/[0.03] rounded-2xl bg-gradient-to-b shadow-md ring-1"
+                    class="rounded-2xl border-border/70 bg-gradient-to-b from-card via-card to-primary/[0.03] shadow-md ring-1 ring-primary/10"
                 >
                     <div class="space-y-1 px-5 pt-5">
                         <Skeleton class="h-4 w-28" />
@@ -231,12 +249,12 @@ const quotaPercent = computed(() => {
     </div>
     <div v-else class="fade-up mx-auto flex w-full flex-col gap-6 pb-6 sm:gap-8">
         <section
-            class="border-border/70 bg-card overflow-hidden rounded-2xl border shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+            class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
         >
             <div class="flex flex-col lg:grid lg:min-h-[min(26rem,70vh)] lg:grid-cols-2 lg:items-stretch">
                 <!-- Kolom konten: permukaan solid, hierarki jelas -->
                 <div
-                    class="border-border/60 from-card via-card to-muted/25 order-2 flex flex-col justify-center gap-5 border-t bg-gradient-to-b px-5 py-7 sm:gap-6 sm:px-8 sm:py-9 lg:order-none lg:border-t-0 lg:border-r lg:px-10 xl:px-12"
+                    class="order-2 flex flex-col justify-center gap-5 border-t border-border/60 bg-gradient-to-b from-card via-card to-muted/25 px-5 py-7 sm:gap-6 sm:px-8 sm:py-9 lg:order-none lg:border-t-0 lg:border-r lg:px-10 xl:px-12"
                 >
                     <div class="flex flex-wrap items-center gap-2">
                         <Badge
@@ -260,17 +278,17 @@ const quotaPercent = computed(() => {
                     </div>
                     <div class="max-w-xl space-y-4">
                         <h1
-                            class="font-display text-foreground text-[1.625rem] leading-[1.2] font-bold tracking-[-0.02em] break-words sm:text-3xl lg:text-[2rem] xl:text-[2.25rem]"
+                            class="font-display text-[1.625rem] leading-[1.2] font-bold tracking-[-0.02em] break-words text-foreground sm:text-3xl lg:text-[2rem] xl:text-[2.25rem]"
                         >
                             {{ event.title }}
                         </h1>
                         <div class="flex flex-col gap-3 text-sm leading-snug sm:text-[15px]">
-                            <span class="text-muted-foreground inline-flex items-center gap-2.5 [&>svg]:shrink-0">
-                                <CalendarDays class="text-primary size-[1.125rem] opacity-90" aria-hidden="true" />
+                            <span class="inline-flex items-center gap-2.5 text-muted-foreground [&>svg]:shrink-0">
+                                <CalendarDays class="size-[1.125rem] text-primary opacity-90" aria-hidden="true" />
                                 {{ metaBlocks[0].value }}
                             </span>
-                            <span class="text-muted-foreground inline-flex items-start gap-2.5 [&>svg]:shrink-0">
-                                <MapPin class="text-primary mt-0.5 size-[1.125rem] opacity-90" aria-hidden="true" />
+                            <span class="inline-flex items-start gap-2.5 text-muted-foreground [&>svg]:shrink-0">
+                                <MapPin class="mt-0.5 size-[1.125rem] text-primary opacity-90" aria-hidden="true" />
                                 <span class="break-words">{{ metaBlocks[1].value }}</span>
                             </span>
                         </div>
@@ -279,7 +297,10 @@ const quotaPercent = computed(() => {
 
                 <!-- Kolom gambar: hanya visual, tanpa gradien/teks di atasnya -->
                 <div
-                    :class="[EVENT_HERO_BANNER_ASPECT, 'relative order-1 w-full lg:order-none lg:aspect-auto lg:min-h-full lg:min-w-0']"
+                    :class="[
+                        EVENT_HERO_BANNER_ASPECT,
+                        'relative order-1 w-full lg:order-none lg:aspect-auto lg:min-h-full lg:min-w-0',
+                    ]"
                 >
                     <EventBannerImage :src="event.banner_url" :alt="event.title" />
                 </div>
@@ -290,18 +311,18 @@ const quotaPercent = computed(() => {
             <div
                 v-for="m in metaBlocks"
                 :key="m.title"
-                class="group border-border/70 from-card to-muted/10 hover:border-primary/25 flex min-w-0 gap-3 rounded-2xl border bg-gradient-to-b p-4 shadow-sm transition-[border-color,box-shadow] duration-200 hover:shadow-md"
+                class="group flex min-w-0 gap-3 rounded-2xl border border-border/70 bg-gradient-to-b from-card to-muted/10 p-4 shadow-sm transition-[border-color,box-shadow] duration-200 hover:border-primary/25 hover:shadow-md"
             >
                 <div
-                    class="bg-primary/10 text-primary ring-primary/15 flex size-10 shrink-0 items-center justify-center rounded-full ring-1 sm:size-11"
+                    class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15 sm:size-11"
                 >
                     <component :is="m.icon" class="size-5" stroke-width="2" />
                 </div>
                 <div class="min-w-0 flex-1">
-                    <p class="text-muted-foreground text-[10px] font-bold tracking-[0.14em] uppercase">
+                    <p class="text-[10px] font-bold tracking-[0.14em] text-muted-foreground uppercase">
                         {{ m.title }}
                     </p>
-                    <p class="text-foreground mt-1 text-sm leading-snug font-semibold break-words">{{ m.value }}</p>
+                    <p class="mt-1 text-sm leading-snug font-semibold break-words text-foreground">{{ m.value }}</p>
                 </div>
             </div>
         </div>
@@ -309,8 +330,8 @@ const quotaPercent = computed(() => {
         <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
             <div class="flex min-w-0 flex-col gap-8">
                 <!-- Deskripsi -->
-                <Card class="border-border/70 rounded-2xl shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
-                    <CardHeader class="border-border/50 bg-muted/10 border-b px-5 py-4 sm:px-6">
+                <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
+                    <CardHeader class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <CardTitle class="font-display text-base font-bold tracking-tight sm:text-lg"
                             >Tentang acara</CardTitle
                         >
@@ -322,13 +343,13 @@ const quotaPercent = computed(() => {
 
                 <Card
                     v-if="isRegistered && participantForms.length > 0"
-                    class="border-border/70 rounded-2xl shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
+                    class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
                 >
-                    <CardHeader class="border-border/50 bg-muted/10 border-b px-5 py-4 sm:px-6">
+                    <CardHeader class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <CardTitle class="font-display text-base font-bold tracking-tight sm:text-lg"
                             >Form lainnya</CardTitle
                         >
-                        <p class="text-muted-foreground text-xs leading-relaxed">
+                        <p class="text-xs leading-relaxed text-muted-foreground">
                             Feedback atau survei tambahan untuk peserta terdaftar.
                         </p>
                     </CardHeader>
@@ -336,19 +357,19 @@ const quotaPercent = computed(() => {
                         <div
                             v-for="form in participantForms"
                             :key="form.id"
-                            class="border-border/70 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between"
+                            class="flex flex-col gap-3 rounded-xl border border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between"
                         >
                             <div class="flex min-w-0 gap-3">
                                 <div
-                                    class="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-full"
+                                    class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
                                 >
                                     <FileText class="size-4.5" aria-hidden="true" />
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-foreground text-sm font-semibold leading-snug">{{ form.title }}</p>
+                                    <p class="text-sm leading-snug font-semibold text-foreground">{{ form.title }}</p>
                                     <p
                                         v-if="form.description"
-                                        class="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed"
+                                        class="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground"
                                     >
                                         {{ form.description }}
                                     </p>
@@ -357,8 +378,11 @@ const quotaPercent = computed(() => {
                                             {{ participantStatusLabel(form.access_status) }}
                                         </Badge>
                                         <span
-                                            v-if="form.requires_form_title && form.access_status === 'prerequisite_not_met'"
-                                            class="text-muted-foreground text-[10px]"
+                                            v-if="
+                                                form.requires_form_title &&
+                                                form.access_status === 'prerequisite_not_met'
+                                            "
+                                            class="text-[10px] text-muted-foreground"
                                         >
                                             Perlu diterima di: {{ form.requires_form_title }}
                                         </span>
@@ -372,12 +396,7 @@ const quotaPercent = computed(() => {
                                         <ChevronRight class="ml-1 size-4" />
                                     </Link>
                                 </Button>
-                                <Button
-                                    v-else
-                                    variant="outline"
-                                    disabled
-                                    class="w-full sm:w-auto"
-                                >
+                                <Button v-else variant="outline" disabled class="w-full sm:w-auto">
                                     <Lock class="mr-1.5 size-3.5" aria-hidden="true" />
                                     {{ participantStatusLabel(form.access_status) }}
                                 </Button>
@@ -390,22 +409,22 @@ const quotaPercent = computed(() => {
             <!-- Sidebar pendaftaran -->
             <aside class="flex min-w-0 flex-col gap-4 xl:sticky xl:top-24">
                 <Card
-                    class="border-border/70 ring-primary/10 from-card via-card to-primary/[0.03] rounded-2xl bg-gradient-to-b shadow-md ring-1"
+                    class="rounded-2xl border-border/70 bg-gradient-to-b from-card via-card to-primary/[0.03] shadow-md ring-1 ring-primary/10"
                 >
                     <CardHeader class="space-y-1 pb-2">
                         <CardTitle class="font-display text-sm font-bold sm:text-base">Pendaftaran</CardTitle>
-                        <p class="text-muted-foreground text-xs">Kuota & jadwal buka tutup</p>
+                        <p class="text-xs text-muted-foreground">Kuota & jadwal buka tutup</p>
                     </CardHeader>
                     <CardContent class="space-y-5 pt-0">
                         <div>
                             <div class="mb-2 flex items-center justify-between text-sm">
-                                <span class="text-muted-foreground flex items-center gap-1.5">
+                                <span class="flex items-center gap-1.5 text-muted-foreground">
                                     <Users class="size-4 shrink-0" aria-hidden="true" />
                                     Terisi
                                 </span>
-                                <span class="text-foreground font-semibold tabular-nums">
+                                <span class="font-semibold text-foreground tabular-nums">
                                     {{ event.registered_count }}/{{ event.quota }}
-                                    <span class="text-muted-foreground ml-1 text-xs font-normal"
+                                    <span class="ml-1 text-xs font-normal text-muted-foreground"
                                         >({{ quotaPercent }}%)</span
                                     >
                                 </span>
@@ -416,23 +435,23 @@ const quotaPercent = computed(() => {
                                 class="h-2.5 rounded-full"
                             />
                         </div>
-                        <div class="border-border/60 bg-muted/15 space-y-2 rounded-xl border px-3 py-3 text-xs">
+                        <div class="space-y-2 rounded-xl border border-border/60 bg-muted/15 px-3 py-3 text-xs">
                             <p class="flex justify-between gap-2">
                                 <span class="text-muted-foreground">Buka</span>
-                                <span class="text-foreground text-right font-medium">{{
+                                <span class="text-right font-medium text-foreground">{{
                                     formatDisplayDateTime(event.registration_start)
                                 }}</span>
                             </p>
                             <p class="flex justify-between gap-2">
                                 <span class="text-muted-foreground">Tutup</span>
-                                <span class="text-foreground text-right font-medium">{{
+                                <span class="text-right font-medium text-foreground">{{
                                     formatDisplayDateTime(event.registration_end)
                                 }}</span>
                             </p>
                         </div>
 
                         <div v-if="pendingTeamInvitationUrl" class="flex flex-col gap-3">
-                            <p class="text-muted-foreground text-xs leading-relaxed">
+                            <p class="text-xs leading-relaxed text-muted-foreground">
                                 Anda diundang sebagai anggota tim atau paket pendaftaran. Belum tercatat sebagai peserta
                                 hingga Anda menyetujui undangan di tautan berikut.
                             </p>
@@ -453,18 +472,16 @@ const quotaPercent = computed(() => {
                         </div>
                         <div
                             v-else-if="!isRegistered"
-                            class="border-border bg-muted/20 text-muted-foreground rounded-xl border border-dashed px-3 py-4 text-center text-xs leading-relaxed"
+                            class="rounded-xl border border-dashed border-border bg-muted/20 px-3 py-4 text-center text-xs leading-relaxed text-muted-foreground"
                         >
                             Pendaftaran belum dibuka atau sudah berakhir.
                         </div>
                         <div v-else class="flex flex-col gap-4">
                             <Button class="w-full" variant="secondary" as-child>
-                                <Link :href="routes.member.event.registration(event.slug)"
-                                    >Detail pendaftaran</Link
-                                >
+                                <Link :href="routes.member.event.registration(event.slug)">Detail pendaftaran</Link>
                             </Button>
-                            <div class="border-success/25 bg-success/5 rounded-xl border p-4 text-center shadow-sm">
-                                <p class="text-success text-sm font-bold">Anda terdaftar</p>
+                            <div class="rounded-xl border border-success/25 bg-success/5 p-4 text-center shadow-sm">
+                                <p class="text-sm font-bold text-success">Anda terdaftar</p>
                                 <Badge
                                     variant="secondary"
                                     class="mt-2 text-[10px] capitalize"
@@ -483,17 +500,17 @@ const quotaPercent = computed(() => {
 
                             <div
                                 v-if="registrationStatus === 'accepted'"
-                                class="border-border bg-muted/15 grid gap-3 rounded-xl border p-4 2xl:grid-cols-2 2xl:items-start"
+                                class="grid gap-3 rounded-xl border border-border bg-muted/15 p-4 2xl:grid-cols-2 2xl:items-start"
                             >
                                 <div class="min-w-0 space-y-2">
                                     <p
-                                        class="text-muted-foreground flex items-center gap-2 text-[10px] font-black tracking-wider uppercase"
+                                        class="flex items-center gap-2 text-[10px] font-black tracking-wider text-muted-foreground uppercase"
                                     >
-                                        <Mail class="text-primary size-3.5 shrink-0" aria-hidden="true" />
+                                        <Mail class="size-3.5 shrink-0 text-primary" aria-hidden="true" />
                                         Check-in
                                     </p>
                                     <ul
-                                        class="text-muted-foreground list-inside list-disc space-y-1 text-[11px] leading-relaxed font-medium"
+                                        class="list-inside list-disc space-y-1 text-[11px] leading-relaxed font-medium text-muted-foreground"
                                     >
                                         <li>QR dan kode manual juga tampil di halaman ini.</li>
                                         <li>Email penerimaan berisi gambar QR yang sama.</li>
@@ -501,10 +518,10 @@ const quotaPercent = computed(() => {
                                     </ul>
                                 </div>
                                 <div class="min-w-0 space-y-2">
-                                    <p class="text-muted-foreground text-[10px] font-black tracking-wider uppercase">
+                                    <p class="text-[10px] font-black tracking-wider text-muted-foreground uppercase">
                                         Di lokasi
                                     </p>
-                                    <p class="text-foreground/85 text-[11px] leading-relaxed font-medium">
+                                    <p class="text-[11px] leading-relaxed font-medium text-foreground/85">
                                         Tunjukkan QR di pintu masuk. Panitia dapat memasukkan kode manual.
                                     </p>
                                 </div>
@@ -512,45 +529,45 @@ const quotaPercent = computed(() => {
 
                             <div
                                 v-else-if="registrationStatus === 'rejected'"
-                                class="border-border bg-muted/15 rounded-xl border p-4"
+                                class="rounded-xl border border-border bg-muted/15 p-4"
                             >
-                                <p class="text-muted-foreground text-[11px] leading-relaxed font-medium">
+                                <p class="text-[11px] leading-relaxed font-medium text-muted-foreground">
                                     Keputusan sudah dikirim lewat email. Periksa spam atau hubungi panitia.
                                 </p>
                             </div>
 
                             <div
                                 v-if="registrationStatus === 'accepted' && props.qr_base64"
-                                class="border-success/30 bg-success/5 flex flex-col items-center gap-3 rounded-xl border p-4 shadow-sm"
+                                class="flex flex-col items-center gap-3 rounded-xl border border-success/30 bg-success/5 p-4 shadow-sm"
                             >
-                                <p class="text-success text-[10px] font-bold tracking-wider uppercase">QR check-in</p>
+                                <p class="text-[10px] font-bold tracking-wider text-success uppercase">QR check-in</p>
                                 <img
                                     :src="`data:image/png;base64,${props.qr_base64}`"
                                     alt="Kode QR kehadiran"
                                     width="240"
                                     height="240"
-                                    class="border-border h-auto w-full max-w-[240px] rounded-xl border bg-white p-2 shadow-md"
+                                    class="h-auto w-full max-w-[240px] rounded-xl border border-border bg-white p-2 shadow-md"
                                 />
                                 <div v-if="props.registration_code" class="w-full space-y-1 text-center">
-                                    <p class="text-muted-foreground text-[10px] font-semibold tracking-wide uppercase">
+                                    <p class="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
                                         Kode manual
                                     </p>
-                                    <p class="text-foreground font-mono text-lg font-bold tracking-[0.12em]">
+                                    <p class="font-mono text-lg font-bold tracking-[0.12em] text-foreground">
                                         {{ props.registration_code }}
                                     </p>
                                 </div>
-                                <p class="text-muted-foreground max-w-[260px] text-center text-[10px] leading-snug">
+                                <p class="max-w-[260px] text-center text-[10px] leading-snug text-muted-foreground">
                                     Sama dengan di email penerimaan. Beri kode manual jika scan gagal.
                                 </p>
                             </div>
                             <div
                                 v-else-if="registrationStatus === 'accepted'"
-                                class="border-border bg-muted/15 text-muted-foreground rounded-xl border border-dashed p-4 text-center text-[11px]"
+                                class="rounded-xl border border-dashed border-border bg-muted/15 p-4 text-center text-[11px] text-muted-foreground"
                             >
                                 QR tidak dimuat. Buka
                                 <Link
                                     :href="routes.member.event.registration(event.slug)"
-                                    class="text-primary font-medium underline-offset-4 hover:underline"
+                                    class="font-medium text-primary underline-offset-4 hover:underline"
                                 >
                                     detail pendaftaran
                                 </Link>

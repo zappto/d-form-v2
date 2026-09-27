@@ -1,13 +1,13 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
-import { config, mount, type VueWrapper } from '@vue/test-utils'
-import PublicEventPage from '@/pages/Event.vue'
-import FormsIndex from '../Events/Forms/Index.vue'
-import EventsEdit from '../Events/Edit.vue'
-import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { nextTick } from 'vue';
+import { config, mount, type VueWrapper } from '@vue/test-utils';
+import PublicEventPage from '@/pages/Event.vue';
+import FormsIndex from '../Events/Forms/Index.vue';
+import EventsEdit from '../Events/Edit.vue';
+import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
-config.global.renderStubDefaultSlot = true
+config.global.renderStubDefaultSlot = true;
 
 /**
  * Spec §3.5/§7.2, M2 Task 11 (pola Task 1): skeleton missing-props —
@@ -30,10 +30,10 @@ vi.mock('@inertiajs/vue3', () => ({
         },
         url: '/events',
     }),
-}))
+}));
 
-vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<slot />' } }))
-vi.mock('@/layouts/LandingLayout.vue', () => ({ default: { template: '<slot />' } }))
+vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<slot />' } }));
+vi.mock('@/layouts/LandingLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     default: {
@@ -41,22 +41,22 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
         template:
             '<div data-testid="empty-state"><p>{{ title }}</p><p v-if="description">{{ description }}</p><slot /></div>',
     },
-}))
+}));
 
 vi.mock('vue3-lottie', () => ({
     Vue3Lottie: { template: '<div />' },
-}))
+}));
 
 vi.mock('@/lib/error-message', () => ({
     handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
     showErrorToast: vi.fn(),
     showFlashToast: vi.fn(),
-}))
+}));
 
 vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}))
+}));
 
 function demoIEvent(id: string, title: string): IEvent {
     return {
@@ -81,15 +81,13 @@ function demoIEvent(id: string, title: string): IEvent {
         deleted_at: null,
         created_at: '2026-09-01',
         updated_at: '2026-09-01',
-    }
+    };
 }
 
 /** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
-type TPublicEventProps = InstanceType<typeof PublicEventPage>['$props']
+type TPublicEventProps = InstanceType<typeof PublicEventPage>['$props'];
 
-function mountPublicEvent(
-    events: TPublicEventProps['events'],
-): VueWrapper<InstanceType<typeof PublicEventPage>> {
+function mountPublicEvent(events: TPublicEventProps['events']): VueWrapper<InstanceType<typeof PublicEventPage>> {
     return mount(PublicEventPage, {
         props: { events },
         global: {
@@ -100,7 +98,7 @@ function mountPublicEvent(
                 EventList: true,
             },
         },
-    })
+    });
 }
 
 function demoIForm(id: string, title: string): IForm {
@@ -113,15 +111,15 @@ function demoIForm(id: string, title: string): IForm {
         event_id: 'ev-1',
         banner_url: null,
         banner_caption: null,
-    }
+    };
 }
 
 /** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
-type TFormsIndexProps = InstanceType<typeof FormsIndex>['$props']
+type TFormsIndexProps = InstanceType<typeof FormsIndex>['$props'];
 
 function mountFormsIndex(
     event: TFormsIndexProps['event'],
-    forms: TFormsIndexProps['forms'],
+    forms: TFormsIndexProps['forms']
 ): VueWrapper<InstanceType<typeof FormsIndex>> {
     return mount(FormsIndex, {
         props: { event, forms },
@@ -134,15 +132,13 @@ function mountFormsIndex(
                 ConfirmationModal: true,
             },
         },
-    })
+    });
 }
 
 /** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
-type TEventsEditProps = InstanceType<typeof EventsEdit>['$props']
+type TEventsEditProps = InstanceType<typeof EventsEdit>['$props'];
 
-function mountEventsEdit(
-    event: TEventsEditProps['event'],
-): VueWrapper<InstanceType<typeof EventsEdit>> {
+function mountEventsEdit(event: TEventsEditProps['event']): VueWrapper<InstanceType<typeof EventsEdit>> {
     return mount(EventsEdit, {
         props: { event, options: { categories: [], sessions: [] } },
         global: {
@@ -150,103 +146,103 @@ function mountEventsEdit(
                 EventDashboardForm: true,
             },
         },
-    })
+    });
 }
 
 function busyRegions(wrapper: VueWrapper): void {
-    const regions = wrapper.findAll('[aria-busy="true"]')
-    expect(regions.length).toBeGreaterThan(0)
+    const regions = wrapper.findAll('[aria-busy="true"]');
+    expect(regions.length).toBeGreaterThan(0);
     for (const region of regions) {
-        expect(String(region.attributes('aria-label'))).toMatch(/memuat/i)
+        expect(String(region.attributes('aria-label'))).toMatch(/memuat/i);
     }
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-})
+    vi.clearAllMocks();
+});
 
 describe('Event.vue publik skeleton (M2 Task 11)', () => {
     it('props lengkap → highlight + list (reveal bawaan), tanpa skeleton/pagination', async () => {
-        const wrapper = mountPublicEvent([demoIEvent('ev-1', 'Acara A')])
+        const wrapper = mountPublicEvent([demoIEvent('ev-1', 'Acara A')]);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('events belum ada → hero tetap + skeleton highlight/list, tanpa crash', async () => {
-        const wrapper = mountPublicEvent(undefined)
+        const wrapper = mountPublicEvent(undefined);
         try {
-            await nextTick()
+            await nextTick();
 
-            busyRegions(wrapper)
-            expect(wrapper.findAll('.highlight-card-skeleton')).toHaveLength(3)
-            expect(wrapper.findAll('.event-row-skeleton')).toHaveLength(5)
-            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
+            busyRegions(wrapper);
+            expect(wrapper.findAll('.highlight-card-skeleton')).toHaveLength(3);
+            expect(wrapper.findAll('.event-row-skeleton')).toHaveLength(5);
+            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Forms/Index skeleton (M2 Task 11)', () => {
     it('props lengkap → grid fade-up + modal M1 tertutup, tanpa skeleton', async () => {
-        const wrapper = mountFormsIndex({ id: 'ev-1', title: 'Acara' }, [demoIForm('fo-1', 'Formulir A')])
+        const wrapper = mountFormsIndex({ id: 'ev-1', title: 'Acara' }, [demoIForm('fo-1', 'Formulir A')]);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Formulir A')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
-            expect(wrapper.findComponent(ConfirmationModal).props('open')).toBe(false)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Formulir A');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
+            expect(wrapper.findComponent(ConfirmationModal).props('open')).toBe(false);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('props belum ada → header tetap + 4 kartu skeleton + modal tertutup', async () => {
-        const wrapper = mountFormsIndex(undefined, undefined)
+        const wrapper = mountFormsIndex(undefined, undefined);
         try {
-            await nextTick()
+            await nextTick();
 
-            busyRegions(wrapper)
-            expect(wrapper.findAll('.form-card-skeleton')).toHaveLength(4)
-            expect(wrapper.text()).toContain('Create Form')
-            expect(wrapper.text()).not.toContain('Formulir A')
-            expect(wrapper.findComponent(ConfirmationModal).props('open')).toBe(false)
+            busyRegions(wrapper);
+            expect(wrapper.findAll('.form-card-skeleton')).toHaveLength(4);
+            expect(wrapper.text()).toContain('Create Form');
+            expect(wrapper.text()).not.toContain('Formulir A');
+            expect(wrapper.findComponent(ConfirmationModal).props('open')).toBe(false);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Events/Edit skeleton (M2 Task 11)', () => {
     it('props lengkap → form + fade-up, tanpa skeleton', async () => {
-        const wrapper = mountEventsEdit(demoIEvent('ev-1', 'Acara A'))
+        const wrapper = mountEventsEdit(demoIEvent('ev-1', 'Acara A'));
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('props belum ada → skeleton field + preview, form tak dirender', async () => {
-        const wrapper = mountEventsEdit(undefined)
+        const wrapper = mountEventsEdit(undefined);
         try {
-            await nextTick()
+            await nextTick();
 
-            busyRegions(wrapper)
-            expect(wrapper.find('.edit-fields-skeleton').exists()).toBe(true)
-            expect(wrapper.find('.edit-preview-skeleton').exists()).toBe(true)
-            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
+            busyRegions(wrapper);
+            expect(wrapper.find('.edit-fields-skeleton').exists()).toBe(true);
+            expect(wrapper.find('.edit-preview-skeleton').exists()).toBe(true);
+            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});

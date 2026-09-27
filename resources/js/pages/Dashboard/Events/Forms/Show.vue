@@ -4,11 +4,7 @@ import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { useBuilderAutosave } from '@/hooks/useBuilderAutosave';
 import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
-import {
-    DESCRIPTION_REQUIRED_MESSAGE,
-    TITLE_REQUIRED_MESSAGE,
-    isBlankRequiredValue,
-} from '@/lib/autosaveHeader';
+import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
@@ -17,12 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AutosaveStatus } from '@/components/ui/autosave-status';
 import { Check, Eye, FileText, Inbox, PenLine, X } from 'lucide-vue-next';
 import {
@@ -48,11 +39,7 @@ import {
     submissionFileUrl,
     submissionReviewBadge,
 } from '@/lib/formSubmissionsUi';
-import {
-    parseApiErrorMessage,
-    showErrorToast,
-    showHttpErrorToast,
-} from '@/lib/error-message';
+import { parseApiErrorMessage, showErrorToast, showHttpErrorToast } from '@/lib/error-message';
 import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAnswerReviewController';
 import FormAnswerDetailSheet from '@/components/modules/dashboard/FormAnswerDetailSheet.vue';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
@@ -90,8 +77,12 @@ watch(activeTab, (tab) => {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-        onStart: () => { isLoadingSubmissions.value = true; },
-        onFinish: () => { isLoadingSubmissions.value = false; },
+        onStart: () => {
+            isLoadingSubmissions.value = true;
+        },
+        onFinish: () => {
+            isLoadingSubmissions.value = false;
+        },
     });
 });
 
@@ -211,7 +202,7 @@ watch(
         if (
             builderAutosave.evaluateHydrate(
                 props.form.id,
-                hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value),
+                hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value)
             )
         ) {
             return;
@@ -228,7 +219,7 @@ watch(
         if (
             builderAutosave.evaluateHydrate(
                 f.id,
-                hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value),
+                hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value)
             )
         ) {
             return;
@@ -327,9 +318,7 @@ function isFileBackendField(field: BackendField): boolean {
     return FILE_FIELD_TYPE_NAMES.has(backendFieldBuilderType(field));
 }
 
-const fileFieldNames = computed(
-    () => new Set((props.fields ?? []).filter(isFileBackendField).map((f) => f.name)),
-);
+const fileFieldNames = computed(() => new Set((props.fields ?? []).filter(isFileBackendField).map((f) => f.name)));
 
 /**
  * Kolom jawaban untuk tabel: answerKeys tanpa field berkas/foto.
@@ -374,7 +363,7 @@ const detailFields = computed<IFormField[]>(() =>
         name: f.name,
         order: f.order,
         metadata: f.metadata ?? {},
-    })),
+    }))
 );
 
 // ── Detail drawer + review jawaban ──
@@ -441,8 +430,12 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
                 if (res.status === 409 || res.status === 422) {
                     router.reload({
                         only: ['submissions'],
-                        onStart: () => { isLoadingSubmissions.value = true; },
-                        onFinish: () => { isLoadingSubmissions.value = false; },
+                        onStart: () => {
+                            isLoadingSubmissions.value = true;
+                        },
+                        onFinish: () => {
+                            isLoadingSubmissions.value = false;
+                        },
                     });
                 }
                 return;
@@ -451,14 +444,18 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
             toast.success(action === 'accept' ? 'Jawaban diterima.' : 'Jawaban ditolak.');
             router.reload({
                 only: ['submissions'],
-                onStart: () => { isLoadingSubmissions.value = true; },
+                onStart: () => {
+                    isLoadingSubmissions.value = true;
+                },
                 onSuccess: () => {
                     const next = (props.submissions ?? []).find((s) => s.id === id) ?? null;
                     if (next && selectedSubmission.value?.id === id) {
                         selectedSubmission.value = next;
                     }
                 },
-                onFinish: () => { isLoadingSubmissions.value = false; },
+                onFinish: () => {
+                    isLoadingSubmissions.value = false;
+                },
             });
         } catch {
             showErrorToast('Tidak dapat menghubungi server. Coba lagi.');
@@ -490,19 +487,19 @@ function rejectLabel(submission: IFormSubmission): string {
 
     <div class="flex min-w-0 flex-col gap-4">
         <Tabs v-model="activeTab" class="flex w-full flex-col gap-4" :unmount-on-hide="false" aria-label="Konten form">
-            <div class="border-border/60 flex items-center justify-between gap-3 border-b pb-3">
+            <div class="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
                 <div class="flex min-w-0 items-center gap-4">
-                    <TabsList class="bg-muted/40 h-auto min-h-10 flex-wrap gap-1 rounded-xl p-1">
+                    <TabsList class="h-auto min-h-10 flex-wrap gap-1 rounded-xl bg-muted/40 p-1">
                         <TabsTrigger
                             value="editor"
-                            class="data-[state=active]:bg-card gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:shadow-sm"
+                            class="gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm"
                         >
                             <PenLine class="size-4 shrink-0" aria-hidden="true" />
                             Editor
                         </TabsTrigger>
                         <TabsTrigger
                             value="jawaban"
-                            class="data-[state=active]:bg-card gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:shadow-sm"
+                            class="gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm"
                         >
                             <Inbox class="size-4 shrink-0" aria-hidden="true" />
                             Jawaban
@@ -522,7 +519,7 @@ function rejectLabel(submission: IFormSubmission): string {
                     <Button
                         variant="outline"
                         size="sm"
-                        class="border-border/80 bg-background/90 hidden px-3 text-sm font-medium shadow-sm sm:inline-flex"
+                        class="hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm sm:inline-flex"
                         :disabled="builderEmpty"
                         aria-label="Pratinjau formulir"
                         @click="requestPreview"
@@ -565,13 +562,9 @@ function rejectLabel(submission: IFormSubmission): string {
             </TabsContent>
 
             <TabsContent value="jawaban" class="mt-0">
-                <div
-                    v-if="isLoadingSubmissions"
-                    aria-busy="true"
-                    aria-label="Memuat jawaban"
-                >
+                <div v-if="isLoadingSubmissions" aria-busy="true" aria-label="Memuat jawaban">
                     <div class="app-surface overflow-hidden rounded-2xl p-0">
-                        <div class="border-border/60 flex items-center gap-2.5 border-b px-5 py-4">
+                        <div class="flex items-center gap-2.5 border-b border-border/60 px-5 py-4">
                             <Skeleton class="size-9 shrink-0 rounded-full" />
                             <div class="space-y-1.5">
                                 <Skeleton class="h-4 w-32" />
@@ -584,29 +577,29 @@ function rejectLabel(submission: IFormSubmission): string {
                                 <TableHeader>
                                     <TableRow class="hover:bg-transparent">
                                         <TableHead
-                                            class="bg-muted/40 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                            class="h-11 bg-muted/40 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
                                         >
                                             Pengirim
                                         </TableHead>
                                         <TableHead
-                                            class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                            class="h-11 bg-muted/30 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
                                         >
                                             Status review
                                         </TableHead>
                                         <TableHead
                                             v-for="key in tableAnswerKeys"
                                             :key="`skel-${key}`"
-                                            class="bg-muted/30 text-muted-foreground h-11 min-w-[160px] px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                            class="h-11 min-w-[160px] bg-muted/30 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
                                         >
                                             {{ humanizeKey(key) }}
                                         </TableHead>
                                         <TableHead
-                                            class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                            class="h-11 bg-muted/30 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
                                         >
                                             Dikirim
                                         </TableHead>
                                         <TableHead
-                                            class="bg-muted/30 text-muted-foreground h-11 px-5 text-right text-[10px] font-semibold tracking-[0.14em] uppercase"
+                                            class="h-11 bg-muted/30 px-5 text-right text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
                                         >
                                             Aksi
                                         </TableHead>
@@ -616,9 +609,9 @@ function rejectLabel(submission: IFormSubmission): string {
                                     <TableRow
                                         v-for="n in 10"
                                         :key="`jawaban-skel-${n}`"
-                                        class="jawaban-row-skeleton border-border/60 border-b"
+                                        class="jawaban-row-skeleton border-b border-border/60"
                                     >
-                                        <TableCell class="border-border/60 bg-card border-r px-5 py-3.5">
+                                        <TableCell class="border-r border-border/60 bg-card px-5 py-3.5">
                                             <div class="flex items-center gap-3">
                                                 <Skeleton class="size-8 shrink-0 rounded-lg" />
                                                 <div class="min-w-0 flex-1 space-y-1.5">
@@ -640,7 +633,7 @@ function rejectLabel(submission: IFormSubmission): string {
                                         <TableCell class="px-5 py-3.5 whitespace-nowrap">
                                             <Skeleton class="h-3 w-20" />
                                         </TableCell>
-                                        <TableCell class="px-5 py-3.5 whitespace-nowrap text-right">
+                                        <TableCell class="px-5 py-3.5 text-right whitespace-nowrap">
                                             <div class="flex items-center justify-end gap-1">
                                                 <Skeleton class="size-7 shrink-0" />
                                                 <Skeleton class="size-7 shrink-0" />
@@ -673,13 +666,13 @@ function rejectLabel(submission: IFormSubmission): string {
                 />
 
                 <div v-else class="fade-up app-surface overflow-hidden rounded-2xl p-0">
-                    <div class="border-border/60 flex items-center gap-2.5 border-b px-5 py-4">
-                        <div class="bg-primary/10 text-primary grid size-9 place-items-center rounded-full">
+                    <div class="flex items-center gap-2.5 border-b border-border/60 px-5 py-4">
+                        <div class="grid size-9 place-items-center rounded-full bg-primary/10 text-primary">
                             <Inbox class="size-4" aria-hidden="true" />
                         </div>
                         <div>
-                            <h2 class="text-foreground text-sm font-semibold">Daftar jawaban</h2>
-                            <p class="text-muted-foreground text-xs">
+                            <h2 class="text-sm font-semibold text-foreground">Daftar jawaban</h2>
+                            <p class="text-xs text-muted-foreground">
                                 Total {{ submissionsCount ?? submissionRows.length }} jawaban masuk.
                             </p>
                         </div>
@@ -687,162 +680,164 @@ function rejectLabel(submission: IFormSubmission): string {
 
                     <div class="overflow-x-auto">
                         <TooltipProvider>
-                        <Table>
-                            <TableHeader>
-                                <TableRow class="hover:bg-transparent">
-                                    <TableHead
-                                        class="bg-muted/40 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                            <Table>
+                                <TableHeader>
+                                    <TableRow class="hover:bg-transparent">
+                                        <TableHead
+                                            class="h-11 bg-muted/40 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
+                                        >
+                                            Pengirim
+                                        </TableHead>
+                                        <TableHead
+                                            class="h-11 bg-muted/30 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
+                                        >
+                                            Status review
+                                        </TableHead>
+                                        <TableHead
+                                            v-for="key in tableAnswerKeys"
+                                            :key="key"
+                                            class="h-11 min-w-[160px] bg-muted/30 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
+                                        >
+                                            {{ humanizeKey(key) }}
+                                        </TableHead>
+                                        <TableHead
+                                            class="h-11 bg-muted/30 px-5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
+                                        >
+                                            Dikirim
+                                        </TableHead>
+                                        <TableHead
+                                            class="h-11 bg-muted/30 px-5 text-right text-[10px] font-semibold tracking-[0.14em] text-muted-foreground uppercase"
+                                        >
+                                            Aksi
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow
+                                        v-for="submission in submissionRows"
+                                        :key="submission.id"
+                                        class="border-b border-border/60 transition-colors hover:bg-muted/30"
                                     >
-                                        Pengirim
-                                    </TableHead>
-                                    <TableHead
-                                        class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
-                                    >
-                                        Status review
-                                    </TableHead>
-                                    <TableHead
-                                        v-for="key in tableAnswerKeys"
-                                        :key="key"
-                                        class="bg-muted/30 text-muted-foreground h-11 min-w-[160px] px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
-                                    >
-                                        {{ humanizeKey(key) }}
-                                    </TableHead>
-                                    <TableHead
-                                        class="bg-muted/30 text-muted-foreground h-11 px-5 text-[10px] font-semibold tracking-[0.14em] uppercase"
-                                    >
-                                        Dikirim
-                                    </TableHead>
-                                    <TableHead
-                                        class="bg-muted/30 text-muted-foreground h-11 px-5 text-right text-[10px] font-semibold tracking-[0.14em] uppercase"
-                                    >
-                                        Aksi
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow
-                                    v-for="submission in submissionRows"
-                                    :key="submission.id"
-                                    class="border-border/60 hover:bg-muted/30 border-b transition-colors"
-                                >
-                                    <TableCell class="border-border/60 bg-card border-r px-5 py-3.5">
-                                        <div class="flex items-center gap-3">
-                                            <UserAvatarFallback
-                                                :src="submission.user?.avatar ?? null"
-                                                :seed="userAvatarSeed(submission.user)"
-                                                avatar-class="size-8 rounded-lg border border-border"
-                                                fallback-round-class="rounded-lg"
-                                            />
-                                            <div class="min-w-0">
-                                                <p
-                                                    class="text-foreground truncate text-sm font-semibold tracking-[-0.005em]"
-                                                >
-                                                    {{ submission.user?.name ?? 'Tanpa nama' }}
-                                                </p>
-                                                <p class="text-muted-foreground truncate text-[10px]">
-                                                    {{ submission.user?.email ?? '—' }}
-                                                </p>
+                                        <TableCell class="border-r border-border/60 bg-card px-5 py-3.5">
+                                            <div class="flex items-center gap-3">
+                                                <UserAvatarFallback
+                                                    :src="submission.user?.avatar ?? null"
+                                                    :seed="userAvatarSeed(submission.user)"
+                                                    avatar-class="size-8 rounded-lg border border-border"
+                                                    fallback-round-class="rounded-lg"
+                                                />
+                                                <div class="min-w-0">
+                                                    <p
+                                                        class="truncate text-sm font-semibold tracking-[-0.005em] text-foreground"
+                                                    >
+                                                        {{ submission.user?.name ?? 'Tanpa nama' }}
+                                                    </p>
+                                                    <p class="truncate text-[10px] text-muted-foreground">
+                                                        {{ submission.user?.email ?? '—' }}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell class="px-5 py-3.5 whitespace-nowrap">
-                                        <Badge
-                                            variant="outline"
-                                            :class="[
-                                                'font-medium',
-                                                submissionReviewBadge(submission.review_status).class,
-                                            ]"
+                                        </TableCell>
+                                        <TableCell class="px-5 py-3.5 whitespace-nowrap">
+                                            <Badge
+                                                variant="outline"
+                                                :class="[
+                                                    'font-medium',
+                                                    submissionReviewBadge(submission.review_status).class,
+                                                ]"
+                                            >
+                                                {{ submissionReviewBadge(submission.review_status).label }}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell
+                                            v-for="key in tableAnswerKeys"
+                                            :key="key"
+                                            class="max-w-[220px] px-5 py-3.5 text-xs leading-relaxed text-muted-foreground"
                                         >
-                                            {{ submissionReviewBadge(submission.review_status).label }}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell
-                                        v-for="key in tableAnswerKeys"
-                                        :key="key"
-                                        class="text-muted-foreground max-w-[220px] px-5 py-3.5 text-xs leading-relaxed"
-                                    >
-                                        <span
-                                            v-if="submissionFileUrlOf(submission.answers?.[key])"
-                                            class="flex items-center gap-1.5"
-                                            :title="fileNameOf(submission.answers?.[key])"
-                                        >
-                                            <FileText
-                                                class="text-muted-foreground size-3.5 shrink-0"
-                                                aria-hidden="true"
-                                            />
-                                            <span class="text-foreground/85 line-clamp-2 font-normal break-all">
-                                                {{ fileNameOf(submission.answers?.[key]) }}
+                                            <span
+                                                v-if="submissionFileUrlOf(submission.answers?.[key])"
+                                                class="flex items-center gap-1.5"
+                                                :title="fileNameOf(submission.answers?.[key])"
+                                            >
+                                                <FileText
+                                                    class="size-3.5 shrink-0 text-muted-foreground"
+                                                    aria-hidden="true"
+                                                />
+                                                <span class="line-clamp-2 font-normal break-all text-foreground/85">
+                                                    {{ fileNameOf(submission.answers?.[key]) }}
+                                                </span>
                                             </span>
-                                        </span>
-                                        <span v-else class="text-foreground/85 line-clamp-2">
-                                            {{ answerPreviewOf(submission.answers?.[key]) }}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell class="text-muted-foreground px-5 py-3.5 text-[11px] whitespace-nowrap">
-                                        {{ formatDate(submission.submitted_at) }}
-                                    </TableCell>
-                                    <TableCell class="px-5 py-3.5 whitespace-nowrap text-right">
-                                        <div class="flex items-center justify-end gap-1">
-                                            <Tooltip v-if="formSubmissionReviewIsPending(submission)">
-                                                <TooltipTrigger as-child>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        radius="icon"
-                                                        size="icon-sm"
-                                                        class="text-success hover:bg-success/10 hover:text-success"
-                                                        :aria-label="`${acceptLabel(submission)} jawaban dari ${submission.user?.name ?? 'pengirim'}`"
-                                                        :disabled="isSubmissionReviewing(submission.id)"
-                                                        @click="submitSubmissionReview('accept', submission)"
-                                                    >
-                                                        <Check class="size-4" aria-hidden="true" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{{ acceptLabel(submission) }}</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                            <Tooltip v-if="formSubmissionReviewIsPending(submission)">
-                                                <TooltipTrigger as-child>
-                                                    <Button
-                                                        type="button"
-                                                        variant="destructive-ghost"
-                                                        radius="icon"
-                                                        size="icon-sm"
-                                                        :aria-label="`${rejectLabel(submission)} jawaban dari ${submission.user?.name ?? 'pengirim'}`"
-                                                        :disabled="isSubmissionReviewing(submission.id)"
-                                                        @click="submitSubmissionReview('reject', submission)"
-                                                    >
-                                                        <X class="size-4" aria-hidden="true" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{{ rejectLabel(submission) }}</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                            <Tooltip>
-                                                <TooltipTrigger as-child>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        radius="icon"
-                                                        size="icon-sm"
-                                                        class="hover:bg-primary/10 hover:text-primary"
-                                                        :aria-label="`Lihat detail jawaban dari ${submission.user?.name ?? 'pengirim'}`"
-                                                        @click="openSubmissionDetail(submission)"
-                                                    >
-                                                        <Eye class="size-4" aria-hidden="true" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Lihat detail</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
+                                            <span v-else class="line-clamp-2 text-foreground/85">
+                                                {{ answerPreviewOf(submission.answers?.[key]) }}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell
+                                            class="px-5 py-3.5 text-[11px] whitespace-nowrap text-muted-foreground"
+                                        >
+                                            {{ formatDate(submission.submitted_at) }}
+                                        </TableCell>
+                                        <TableCell class="px-5 py-3.5 text-right whitespace-nowrap">
+                                            <div class="flex items-center justify-end gap-1">
+                                                <Tooltip v-if="formSubmissionReviewIsPending(submission)">
+                                                    <TooltipTrigger as-child>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            radius="icon"
+                                                            size="icon-sm"
+                                                            class="text-success hover:bg-success/10 hover:text-success"
+                                                            :aria-label="`${acceptLabel(submission)} jawaban dari ${submission.user?.name ?? 'pengirim'}`"
+                                                            :disabled="isSubmissionReviewing(submission.id)"
+                                                            @click="submitSubmissionReview('accept', submission)"
+                                                        >
+                                                            <Check class="size-4" aria-hidden="true" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{{ acceptLabel(submission) }}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                                <Tooltip v-if="formSubmissionReviewIsPending(submission)">
+                                                    <TooltipTrigger as-child>
+                                                        <Button
+                                                            type="button"
+                                                            variant="destructive-ghost"
+                                                            radius="icon"
+                                                            size="icon-sm"
+                                                            :aria-label="`${rejectLabel(submission)} jawaban dari ${submission.user?.name ?? 'pengirim'}`"
+                                                            :disabled="isSubmissionReviewing(submission.id)"
+                                                            @click="submitSubmissionReview('reject', submission)"
+                                                        >
+                                                            <X class="size-4" aria-hidden="true" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{{ rejectLabel(submission) }}</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                                <Tooltip>
+                                                    <TooltipTrigger as-child>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            radius="icon"
+                                                            size="icon-sm"
+                                                            class="hover:bg-primary/10 hover:text-primary"
+                                                            :aria-label="`Lihat detail jawaban dari ${submission.user?.name ?? 'pengirim'}`"
+                                                            @click="openSubmissionDetail(submission)"
+                                                        >
+                                                            <Eye class="size-4" aria-hidden="true" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>Lihat detail</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
                         </TooltipProvider>
                     </div>
                 </div>

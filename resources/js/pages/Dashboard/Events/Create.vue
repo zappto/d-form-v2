@@ -24,11 +24,7 @@ import {
 } from '@/components/modules/builder/formBanner';
 import { hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata } from '@/types/form';
-import {
-    DESCRIPTION_REQUIRED_MESSAGE,
-    TITLE_REQUIRED_MESSAGE,
-    isBlankRequiredValue,
-} from '@/lib/autosaveHeader';
+import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
 import type { BuilderField } from '@/types/form-builder';
 import { routes } from '@/lib/routes';
 
@@ -153,7 +149,7 @@ function hydrateBuilder(): void {
     if (
         builderAutosave.evaluateHydrate(
             f.id,
-            hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value),
+            hasPendingBannerFile(bannerState.value) || hasPendingOptionImageFiles(formFields.value)
         )
     ) {
         return;
@@ -272,7 +268,6 @@ const steps = [
     { key: 'forms', label: 'Formulir pendaftaran' },
 ];
 const currentIndex = computed(() => (step.value === 'forms' ? 1 : 0));
-
 </script>
 
 <template>

@@ -17,7 +17,7 @@ const seo = computed(() => (page.props as { seo: SharedSeoProps }).seo);
 
 const featuresDescription = computed(
     () =>
-        `${seo.value.siteName}: fitur formulir pendaftaran, manajemen peserta, absensi QR, ekspor data, dan laporan acara.`,
+        `${seo.value.siteName}: fitur formulir pendaftaran, manajemen peserta, absensi QR, ekspor data, dan laporan acara.`
 );
 
 const featuresJsonLd = computed<Record<string, unknown>>(() => ({
@@ -36,7 +36,12 @@ const featuresJsonLd = computed<Record<string, unknown>>(() => ({
 
 <template>
     <LandingLayout>
-        <SeoHead title="Fitur" :description="featuresDescription" :canonical-path="routes.landing.features" :json-ld="featuresJsonLd" />
+        <SeoHead
+            title="Fitur"
+            :description="featuresDescription"
+            :canonical-path="routes.landing.features"
+            :json-ld="featuresJsonLd"
+        />
         <FeaturesHero />
         <FeaturesGrid />
         <FeaturesHowItWorks />

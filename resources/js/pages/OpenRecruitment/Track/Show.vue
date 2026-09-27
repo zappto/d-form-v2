@@ -219,7 +219,7 @@ function logout() {
 }
 
 function submitCorrection(): void {
-    if (correctionForm.processing) return
+    if (correctionForm.processing) return;
     correctionForm.post(props.correctionUrl, {
         preserveScroll: true,
         onSuccess: () => {
@@ -229,14 +229,14 @@ function submitCorrection(): void {
             showFlashToast({
                 type: 'success',
                 message: 'Permintaan koreksi berhasil dikirim. Tim akan meninjau segera.',
-            })
-            correctionModalOpen.value = false
-            correctionForm.reset()
+            });
+            correctionModalOpen.value = false;
+            correctionForm.reset();
         },
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal mengirim permintaan koreksi' })
+            handleInertiaFormErrors(errors, { title: 'Gagal mengirim permintaan koreksi' });
         },
-    })
+    });
 }
 </script>
 
@@ -282,7 +282,7 @@ function submitCorrection(): void {
             </div>
             <div class="p-4">
                 <ol
-                    class="before:bg-border relative space-y-4 before:absolute before:top-2 before:bottom-2 before:left-[7px] before:w-px"
+                    class="relative space-y-4 before:absolute before:top-2 before:bottom-2 before:left-[7px] before:w-px before:bg-border"
                 >
                     <li v-for="n in 4" :key="`linimasa-${n}`" class="track-timeline-node relative flex gap-2.5">
                         <Skeleton class="relative z-10 mt-0.5 size-4 shrink-0 rounded-full" />
@@ -323,7 +323,7 @@ function submitCorrection(): void {
             <Skeleton class="mt-2 h-9 w-32" />
         </div>
 
-        <p class="text-muted-foreground text-center text-xs">
+        <p class="text-center text-xs text-muted-foreground">
             <Link :href="routes.recruitment.landing" class="underline-offset-2 hover:underline">
                 Info OpenRecruitment
             </Link>
@@ -334,10 +334,10 @@ function submitCorrection(): void {
         <!-- Header identitas ringkas -->
         <div class="flex items-start justify-between gap-3 pt-2">
             <div class="min-w-0">
-                <p class="text-primary text-xs font-semibold tracking-wide uppercase">Portal OpRec</p>
+                <p class="text-xs font-semibold tracking-wide text-primary uppercase">Portal OpRec</p>
                 <h1 class="truncate text-xl font-bold tracking-tight">{{ tracking.application.full_name }}</h1>
                 <div class="mt-1.5 flex flex-wrap items-center gap-2">
-                    <p class="text-muted-foreground font-mono text-xs">
+                    <p class="font-mono text-xs text-muted-foreground">
                         {{ tracking.application.registration_number }}
                     </p>
                     <Badge variant="secondary">{{ tracking.application.stage_label }}</Badge>
@@ -394,7 +394,7 @@ function submitCorrection(): void {
         <!-- Koreksi pending -->
         <p
             v-if="tracking.edit.latest_correction?.status === 'pending'"
-            class="text-muted-foreground rounded-lg border border-dashed px-3 py-2 text-xs"
+            class="rounded-lg border border-dashed px-3 py-2 text-xs text-muted-foreground"
         >
             Koreksi: {{ tracking.edit.latest_correction.status_label }} —
             {{ tracking.edit.latest_correction.request_message }}
@@ -402,31 +402,31 @@ function submitCorrection(): void {
 
         <!-- Hari-H interview: satu kartu event kohesif -->
         <section v-if="showInterviewSection" ref="interviewSectionRef" id="interview-section" class="scroll-mt-24">
-            <Card class="border-border/70 rounded-2xl">
+            <Card class="rounded-2xl border-border/70">
                 <CardHeader class="pb-3">
                     <CardTitle class="flex items-center gap-2 text-base">
-                        <CalendarClock class="text-primary size-4" />
+                        <CalendarClock class="size-4 text-primary" />
                         Hari-H interview
                     </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-4">
                     <div v-if="tracking.interview" class="space-y-1.5 text-sm">
                         <p v-if="interviewSchedule" class="font-medium">{{ interviewSchedule }}</p>
-                        <p class="text-muted-foreground flex items-start gap-2">
+                        <p class="flex items-start gap-2 text-muted-foreground">
                             <MapPin class="mt-0.5 size-4 shrink-0" />
                             <span>{{ tracking.interview.location }} · Ruang {{ tracking.interview.room }}</span>
                         </p>
-                        <p class="text-muted-foreground text-xs">Status: {{ tracking.interview.status_label }}</p>
+                        <p class="text-xs text-muted-foreground">Status: {{ tracking.interview.status_label }}</p>
                     </div>
 
                     <div v-if="tracking.queue">
                         <Separator v-if="tracking.interview" class="mb-4" />
-                        <p class="text-muted-foreground flex items-center gap-1.5 text-xs">
+                        <p class="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <Users class="size-3.5" />
                             Nomor antrean
                         </p>
                         <p class="mt-0.5 text-3xl font-bold tabular-nums">#{{ tracking.queue.queue_number }}</p>
-                        <p class="text-muted-foreground text-sm">
+                        <p class="text-sm text-muted-foreground">
                             {{ tracking.queue.status_label ?? tracking.queue.status }}
                         </p>
                     </div>
@@ -443,13 +443,13 @@ function submitCorrection(): void {
                                 alt="QR code absensi"
                                 class="mx-auto size-48 rounded-xl border bg-white p-2"
                             />
-                            <p class="text-muted-foreground text-xs leading-relaxed">
+                            <p class="text-xs leading-relaxed text-muted-foreground">
                                 Tunjukkan ke panitia — tidak perlu check-in sendiri.
                             </p>
                         </div>
                     </div>
 
-                    <p v-if="tracking.attendance" class="text-muted-foreground text-xs">
+                    <p v-if="tracking.attendance" class="text-xs text-muted-foreground">
                         Check-in:
                         {{
                             tracking.attendance.checked_in_at
@@ -462,18 +462,18 @@ function submitCorrection(): void {
         </section>
 
         <!-- Alur proses: selalu terlihat -->
-        <Card class="border-border/70 rounded-2xl">
+        <Card class="rounded-2xl border-border/70">
             <CardHeader class="pb-2">
                 <CardTitle class="text-base">Alur proses</CardTitle>
             </CardHeader>
             <CardContent>
                 <ol
-                    class="before:bg-border relative space-y-4 before:absolute before:top-2 before:bottom-2 before:left-[7px] before:w-px"
+                    class="relative space-y-4 before:absolute before:top-2 before:bottom-2 before:left-[7px] before:w-px before:bg-border"
                 >
                     <li v-for="item in tracking.timeline" :key="item.key" class="relative flex gap-2.5">
                         <component
                             :is="timelineIcon(item.status)"
-                            class="bg-card relative z-10 mt-0.5 size-4 shrink-0"
+                            class="relative z-10 mt-0.5 size-4 shrink-0 bg-card"
                             :class="{
                                 'text-primary': item.status === 'current',
                                 'text-emerald-600': item.status === 'completed',
@@ -495,41 +495,41 @@ function submitCorrection(): void {
         </Card>
 
         <!-- Data pendaftaran -->
-        <Card class="border-border/70 rounded-2xl">
+        <Card class="rounded-2xl border-border/70">
             <CardHeader class="pb-2">
                 <CardTitle class="text-base">Data pendaftaran</CardTitle>
             </CardHeader>
             <CardContent>
-                <dl class="divide-border/60 divide-y text-sm">
+                <dl class="divide-y divide-border/60 text-sm">
                     <div class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0">
-                        <dt class="text-muted-foreground shrink-0">Tahap</dt>
+                        <dt class="shrink-0 text-muted-foreground">Tahap</dt>
                         <dd class="text-right font-medium">{{ tracking.application.stage_label }}</dd>
                     </div>
                     <div class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0">
-                        <dt class="text-muted-foreground shrink-0">Hasil</dt>
+                        <dt class="shrink-0 text-muted-foreground">Hasil</dt>
                         <dd class="text-right font-medium">{{ tracking.application.result_label }}</dd>
                     </div>
                     <div
                         v-if="tracking.period.name"
                         class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0"
                     >
-                        <dt class="text-muted-foreground shrink-0">Periode</dt>
+                        <dt class="shrink-0 text-muted-foreground">Periode</dt>
                         <dd class="text-right font-medium">{{ tracking.period.name }}</dd>
                     </div>
                     <div class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0">
-                        <dt class="text-muted-foreground shrink-0">Divisi</dt>
+                        <dt class="shrink-0 text-muted-foreground">Divisi</dt>
                         <dd class="text-right font-medium">
                             {{ tracking.application.primary_division ?? '—' }}
                             <span
                                 v-if="tracking.application.secondary_division"
-                                class="text-muted-foreground font-normal"
+                                class="font-normal text-muted-foreground"
                             >
                                 · cadangan {{ tracking.application.secondary_division }}
                             </span>
                         </dd>
                     </div>
                     <div class="flex items-center justify-between gap-4 py-2 first:pt-0 last:pb-0">
-                        <dt class="text-muted-foreground shrink-0">NIM</dt>
+                        <dt class="shrink-0 text-muted-foreground">NIM</dt>
                         <dd class="text-right font-medium">{{ tracking.application.nim }}</dd>
                     </div>
                 </dl>
@@ -537,7 +537,7 @@ function submitCorrection(): void {
         </Card>
 
         <!-- Keputusan akhir -->
-        <Card v-if="tracking.final" class="border-border/70 rounded-2xl">
+        <Card v-if="tracking.final" class="rounded-2xl border-border/70">
             <CardHeader class="pb-2">
                 <CardTitle class="text-base">Keputusan akhir</CardTitle>
             </CardHeader>
@@ -545,7 +545,7 @@ function submitCorrection(): void {
                 <p class="text-lg font-semibold">{{ tracking.final.result_label }}</p>
                 <p v-if="tracking.final.membership_type">Keanggotaan: {{ tracking.final.membership_type }}</p>
                 <p v-if="tracking.final.final_division">Divisi: {{ tracking.final.final_division }}</p>
-                <p v-if="tracking.final.public_message" class="text-muted-foreground pt-1">
+                <p v-if="tracking.final.public_message" class="pt-1 text-muted-foreground">
                     {{ tracking.final.public_message }}
                 </p>
             </CardContent>
@@ -555,7 +555,7 @@ function submitCorrection(): void {
         <Card
             v-if="tracking.feedback.can_submit || tracking.feedback.submitted"
             id="feedback-section"
-            class="border-border/70 scroll-mt-24 rounded-2xl"
+            class="scroll-mt-24 rounded-2xl border-border/70"
         >
             <CardHeader
                 class="cursor-pointer pb-2"
@@ -573,7 +573,7 @@ function submitCorrection(): void {
                     />
                 </CardTitle>
             </CardHeader>
-            <CardContent v-if="tracking.feedback.submitted" class="text-muted-foreground text-sm">
+            <CardContent v-if="tracking.feedback.submitted" class="text-sm text-muted-foreground">
                 Terima kasih! Feedback diterima
                 {{
                     tracking.feedback.submitted_at
@@ -586,7 +586,7 @@ function submitCorrection(): void {
             </CardContent>
         </Card>
 
-        <p class="text-muted-foreground text-center text-xs">
+        <p class="text-center text-xs text-muted-foreground">
             <Link :href="routes.recruitment.landing" class="underline-offset-2 hover:underline">
                 Info OpenRecruitment
             </Link>
@@ -610,17 +610,13 @@ function submitCorrection(): void {
                         minlength="10"
                         placeholder="Contoh: NIM saya salah ketik..."
                     />
-                    <p v-if="correctionForm.errors.request_message" class="text-destructive text-xs">
+                    <p v-if="correctionForm.errors.request_message" class="text-xs text-destructive">
                         {{ correctionForm.errors.request_message }}
                     </p>
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" @click="correctionModalOpen = false">Batal</Button>
-                    <Button
-                        type="submit"
-                        :disabled="correctionForm.processing"
-                        :aria-busy="correctionForm.processing"
-                    >
+                    <Button type="submit" :disabled="correctionForm.processing" :aria-busy="correctionForm.processing">
                         <CometSpinner v-if="correctionForm.processing" :size="16" />
                         {{ correctionForm.processing ? 'Mengirim...' : 'Kirim' }}
                     </Button>

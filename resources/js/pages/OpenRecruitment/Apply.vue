@@ -38,7 +38,7 @@ const ctx = reactive(
         accessMessage: '',
         memberSlots: 0,
         registrationMode: 'single',
-    }),
+    })
 );
 
 const TOTAL_STEPS = 3;
@@ -61,10 +61,10 @@ function isEmptyValue(value: unknown): boolean {
 
 /** Sembunyikan cabang portfolio yang tak dipilih; belum pilih / none = keduanya opsional tampil. */
 function isFieldVisible(field: IFormField): boolean {
-    const portfolioType: unknown = ctx.answerForm['portfolio_type']
-    if (field.name === 'portfolio_url') return portfolioType !== 'file' && portfolioType !== 'none'
-    if (field.name === 'portfolio_file') return portfolioType !== 'url' && portfolioType !== 'none'
-    return true
+    const portfolioType: unknown = ctx.answerForm['portfolio_type'];
+    if (field.name === 'portfolio_url') return portfolioType !== 'file' && portfolioType !== 'none';
+    if (field.name === 'portfolio_file') return portfolioType !== 'url' && portfolioType !== 'none';
+    return true;
 }
 
 function validateStep(step: number): boolean {
@@ -304,18 +304,18 @@ const periodName = computed((): string => {
 <template>
     <Head :title="`Daftar — ${periodName}`" />
 
-    <div class="selection:bg-primary/15 mx-auto max-w-2xl px-2">
+    <div class="mx-auto max-w-2xl px-2 selection:bg-primary/15">
         <div class="mb-6 space-y-2 text-center">
             <h1 class="text-2xl font-bold tracking-tight">Formulir Pendaftaran</h1>
-            <p v-if="period" class="text-muted-foreground text-sm">{{ periodName }}</p>
+            <p v-if="period" class="text-sm text-muted-foreground">{{ periodName }}</p>
 
             <AutosaveStatus :status="draftStatus" :saved-text="draftStatusText" variant="block" />
         </div>
 
-        <Card v-if="isBlocked" class="border-border/70 rounded-2xl">
+        <Card v-if="isBlocked" class="rounded-2xl border-border/70">
             <CardContent class="space-y-4 p-6 text-center">
                 <p class="font-medium">Pendaftaran belum tersedia</p>
-                <p class="text-muted-foreground text-sm">{{ registration.message }}</p>
+                <p class="text-sm text-muted-foreground">{{ registration.message }}</p>
                 <Button as-child variant="outline">
                     <Link :href="routes.recruitment.track.login">Ke portal tracking</Link>
                 </Button>
@@ -328,7 +328,7 @@ const periodName = computed((): string => {
                     <li v-for="s in STEPS" :key="s.n" class="flex-1">
                         <button
                             type="button"
-                            class="focus-visible:ring-ring flex w-full flex-col items-center gap-1 rounded-xl px-1 py-2 focus-visible:ring-2 focus-visible:outline-none"
+                            class="flex w-full flex-col items-center gap-1 rounded-xl px-1 py-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                             :aria-current="currentStep === s.n ? 'step' : undefined"
                             @click="goToStep(s.n)"
                         >
@@ -350,12 +350,12 @@ const periodName = computed((): string => {
                             >
                                 {{ s.label }}
                             </span>
-                            <span class="text-muted-foreground hidden text-[11px] sm:block">{{ s.hint }}</span>
+                            <span class="hidden text-[11px] text-muted-foreground sm:block">{{ s.hint }}</span>
                         </button>
                     </li>
                 </ol>
                 <div
-                    class="bg-muted mt-2 h-1.5 overflow-hidden rounded-full"
+                    class="mt-2 h-1.5 overflow-hidden rounded-full bg-muted"
                     role="progressbar"
                     aria-label="Progress pendaftaran"
                     :aria-valuenow="currentStep"
@@ -363,17 +363,17 @@ const periodName = computed((): string => {
                     :aria-valuemax="TOTAL_STEPS"
                 >
                     <div
-                        class="bg-primary h-full rounded-full transition-[width]"
+                        class="h-full rounded-full bg-primary transition-[width]"
                         :style="{ width: `${progressPct}%` }"
                     />
                 </div>
             </nav>
 
             <div
-                class="border-border/70 bg-muted/40 mb-4 rounded-xl border border-dashed px-4 py-3 text-xs leading-relaxed"
+                class="mb-4 rounded-xl border border-dashed border-border/70 bg-muted/40 px-4 py-3 text-xs leading-relaxed"
             >
-                <p class="text-foreground font-medium">Draft tersimpan otomatis di browser ini</p>
-                <p class="text-muted-foreground mt-0.5">
+                <p class="font-medium text-foreground">Draft tersimpan otomatis di browser ini</p>
+                <p class="mt-0.5 text-muted-foreground">
                     File tidak ikut tersimpan — pilih ulang CV dan file portfolio sebelum submit.
                 </p>
             </div>
@@ -384,7 +384,7 @@ const periodName = computed((): string => {
                         <Card
                             v-if="isFieldVisible(field)"
                             :id="fieldCardId(field)"
-                            :class="['border-border bg-card rounded-2xl border shadow-sm', cardErrorClass(field)]"
+                            :class="['rounded-2xl border border-border bg-card shadow-sm', cardErrorClass(field)]"
                             :tabindex="fieldHasError(field) ? -1 : undefined"
                             :role="fieldHasError(field) ? 'group' : undefined"
                             :aria-label="fieldHasError(field) ? field.label : undefined"
@@ -404,27 +404,27 @@ const periodName = computed((): string => {
                                 v-if="clientMessageFor(field)"
                                 :id="fieldErrorId(field)"
                                 role="alert"
-                                class="border-destructive/20 -mt-4 border-t px-6 pt-3 pb-4"
+                                class="-mt-4 border-t border-destructive/20 px-6 pt-3 pb-4"
                             >
-                                <p class="text-destructive flex items-start gap-1.5 text-xs font-medium">
+                                <p class="flex items-start gap-1.5 text-xs font-medium text-destructive">
                                     <CircleAlert class="mt-px size-3.5 shrink-0" aria-hidden="true" />
                                     <span>{{ clientMessageFor(field) }}</span>
                                 </p>
                             </div>
                         </Card>
                     </template>
-                    <div v-if="step === 3" class="border-border bg-card rounded-2xl border shadow-sm">
-                        <div class="border-border border-b px-4 py-3">
-                            <h2 class="text-foreground text-sm font-semibold">Periksa kembali data kamu</h2>
+                    <div v-if="step === 3" class="rounded-2xl border border-border bg-card shadow-sm">
+                        <div class="border-b border-border px-4 py-3">
+                            <h2 class="text-sm font-semibold text-foreground">Periksa kembali data kamu</h2>
                         </div>
-                        <dl class="divide-border divide-y px-4">
+                        <dl class="divide-y divide-border px-4">
                             <div
                                 v-for="row in reviewRows"
                                 :key="row.label"
                                 class="flex items-start justify-between gap-4 py-2.5"
                             >
-                                <dt class="text-muted-foreground text-xs">{{ row.label }}</dt>
-                                <dd class="text-foreground max-w-[60%] truncate text-right text-xs font-medium">
+                                <dt class="text-xs text-muted-foreground">{{ row.label }}</dt>
+                                <dd class="max-w-[60%] truncate text-right text-xs font-medium text-foreground">
                                     {{ row.value }}
                                 </dd>
                             </div>
@@ -442,11 +442,7 @@ const periodName = computed((): string => {
                             :disabled="isSubmitting || ctx.answerForm.processing"
                             @click="submitStep"
                         >
-                            {{
-                                isSubmitting || ctx.answerForm.processing
-                                    ? 'Mengirim…'
-                                    : 'Kirim Pendaftaran'
-                            }}
+                            {{ isSubmitting || ctx.answerForm.processing ? 'Mengirim…' : 'Kirim Pendaftaran' }}
                         </Button>
                     </div>
                 </div>

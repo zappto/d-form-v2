@@ -1,118 +1,123 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'
-import TiptapRichHtml from '@/components/modules/dashboard/events/TiptapRichHtml.vue'
-import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect'
-import { CalendarDays, MapPin } from 'lucide-vue-next'
-import { Skeleton } from '@/components/ui/skeleton'
-import { statusColorMap } from '@/lib/dummyData'
-import { formatDisplayDate, formatDisplayDateTime } from '@/lib/format'
-import { routes } from '@/lib/routes'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { computed, onMounted } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
+import TiptapRichHtml from '@/components/modules/dashboard/events/TiptapRichHtml.vue';
+import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect';
+import { CalendarDays, MapPin } from 'lucide-vue-next';
+import { Skeleton } from '@/components/ui/skeleton';
+import { statusColorMap } from '@/lib/dummyData';
+import { formatDisplayDate, formatDisplayDateTime } from '@/lib/format';
+import { routes } from '@/lib/routes';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 interface BundleParticipant {
-    invited_email: string
-    display_name: string
-    review_status: 'pending' | 'accepted' | 'rejected'
-    registration_code: string | null
-    qr_base64: string | null
+    invited_email: string;
+    display_name: string;
+    review_status: 'pending' | 'accepted' | 'rejected';
+    registration_code: string | null;
+    qr_base64: string | null;
 }
 
 interface RegistrationSummary {
-    review_status: 'pending' | 'accepted' | 'rejected'
-    submitted_at: string
-    reviewed_at: string | null
-    registration_code: string | null
-    registration_role: 'leader' | 'member' | null
-    answers_summary: Record<string, string>
-    qr_base64: string | null
+    review_status: 'pending' | 'accepted' | 'rejected';
+    submitted_at: string;
+    reviewed_at: string | null;
+    registration_code: string | null;
+    registration_role: 'leader' | 'member' | null;
+    answers_summary: Record<string, string>;
+    qr_base64: string | null;
 }
 
 const props = defineProps<{
-    event: IEvent | undefined
+    event: IEvent | undefined;
     form: {
-        id: string
-        title: string
-        registration_mode: 'single' | 'bundle' | 'team' | null
-        success_content?: string | null
-    } | null
-    registration: RegistrationSummary | undefined
-    bundle_participants?: BundleParticipant[]
-}>()
+        id: string;
+        title: string;
+        registration_mode: 'single' | 'bundle' | 'team' | null;
+        success_content?: string | null;
+    } | null;
+    registration: RegistrationSummary | undefined;
+    bundle_participants?: BundleParticipant[];
+}>();
 
-const bundleParticipants = computed(() => props.bundle_participants ?? [])
+const bundleParticipants = computed(() => props.bundle_participants ?? []);
 
 const successContent = computed(() => {
-    const html = props.form?.success_content
-    if (!html || !html.trim() || html.trim() === '<p></p>') return null
-    return html
-})
+    const html = props.form?.success_content;
+    if (!html || !html.trim() || html.trim() === '<p></p>') return null;
+    return html;
+});
 
 const isBundleLeader = computed(() => {
-    const registration = props.registration
-    if (!registration) return false
-    return props.form?.registration_mode === 'bundle' && registration.registration_role === 'leader'
-})
+    const registration = props.registration;
+    if (!registration) return false;
+    return props.form?.registration_mode === 'bundle' && registration.registration_role === 'leader';
+});
 
 const participantStatusLabels: Record<BundleParticipant['review_status'], string> = {
     pending: 'Awaiting review',
     accepted: 'Accepted',
     rejected: 'Not accepted',
-}
+};
 
 const statusLabels: Record<RegistrationSummary['review_status'], string> = {
     pending: 'Awaiting review',
     accepted: 'Accepted',
     rejected: 'Not accepted',
-}
+};
 
 const participationLabel = computed(() => {
-    const registration = props.registration
-    if (!registration) return null
-    const mode = props.form?.registration_mode
-    const role = registration.registration_role
+    const registration = props.registration;
+    if (!registration) return null;
+    const mode = props.form?.registration_mode;
+    const role = registration.registration_role;
     if (mode === 'bundle') {
-        if (role === 'leader') return 'Ketua / pendaftar utama (bundle)'
-        if (role === 'member') return 'Peserta bundle'
-        return 'Bundle'
+        if (role === 'leader') return 'Ketua / pendaftar utama (bundle)';
+        if (role === 'member') return 'Peserta bundle';
+        return 'Bundle';
     }
     if (mode === 'team') {
-        if (role === 'leader') return 'Ketua tim'
-        if (role === 'member') return 'Anggota tim'
-        return 'Tim'
+        if (role === 'leader') return 'Ketua tim';
+        if (role === 'member') return 'Anggota tim';
+        return 'Tim';
     }
-    if (role === 'leader') return 'Pendaftar utama'
-    if (role === 'member') return 'Peserta'
-    return null
-})
+    if (role === 'leader') return 'Pendaftar utama';
+    if (role === 'member') return 'Peserta';
+    return null;
+});
 
 onMounted(() => {
     setTopbar({
         title: props.form?.title ?? props.event?.title ?? 'Registration',
         subtitle: `Registration — ${props.event?.title ?? ''}`,
-    })
-})
+    });
+});
 
 function isFileLink(value: string): boolean {
-    return /^https?:\/\//i.test(value) || value.startsWith('/storage/')
+    return /^https?:\/\//i.test(value) || value.startsWith('/storage/');
 }
 
 function isImageFileUrl(value: string): boolean {
-    const path = (value.split('?')[0] ?? '').toLowerCase()
-    return /\.(jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(path)
+    const path = (value.split('?')[0] ?? '').toLowerCase();
+    return /\.(jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(path);
 }
 </script>
 
 <template>
     <Head :title="props.event ? `Registration — ${props.event.title}` : 'Registration'" />
 
-    <div v-if="!props.event || !props.registration" class="flex flex-col gap-6" aria-busy="true" aria-label="Memuat pendaftaran">
+    <div
+        v-if="!props.event || !props.registration"
+        class="flex flex-col gap-6"
+        aria-busy="true"
+        aria-label="Memuat pendaftaran"
+    >
         <div class="flex flex-wrap items-center gap-2">
             <Skeleton class="h-6 w-40 rounded-full" />
         </div>
@@ -142,7 +147,11 @@ function isImageFileUrl(value: string): boolean {
                 <Skeleton class="h-4 w-32" />
             </div>
             <div class="space-y-3 px-4 pb-4 sm:px-6">
-                <div v-for="n in 5" :key="`jawaban-${n}`" class="rounded-lg border border-border/60 bg-muted/15 px-3 py-2">
+                <div
+                    v-for="n in 5"
+                    :key="`jawaban-${n}`"
+                    class="rounded-lg border border-border/60 bg-muted/15 px-3 py-2"
+                >
                     <Skeleton class="h-2.5 w-20" />
                     <Skeleton class="mt-1.5 h-4 w-3/4" />
                 </div>
@@ -165,7 +174,11 @@ function isImageFileUrl(value: string): boolean {
                 <Skeleton class="h-4 w-44" />
             </div>
             <div class="space-y-4 px-4 pb-4 sm:px-6">
-                <div v-for="n in 2" :key="`peserta-${n}`" class="rounded-lg border border-border/60 bg-muted/15 px-3 py-3">
+                <div
+                    v-for="n in 2"
+                    :key="`peserta-${n}`"
+                    class="rounded-lg border border-border/60 bg-muted/15 px-3 py-3"
+                >
                     <div class="flex flex-wrap items-start justify-between gap-2">
                         <div class="min-w-0 space-y-1.5">
                             <Skeleton class="h-4 w-32" />
@@ -199,7 +212,7 @@ function isImageFileUrl(value: string): boolean {
             <div class="border-t border-border px-4 py-4 sm:px-6">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                        <p class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Status</p>
+                        <p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">Status</p>
                         <Badge
                             variant="secondary"
                             class="mt-1 text-[11px] capitalize"
@@ -211,11 +224,15 @@ function isImageFileUrl(value: string): boolean {
                     <div class="text-right text-xs text-muted-foreground">
                         <p>
                             Submitted
-                            <span class="font-medium text-foreground">{{ formatDisplayDateTime(props.registration.submitted_at) }}</span>
+                            <span class="font-medium text-foreground">{{
+                                formatDisplayDateTime(props.registration.submitted_at)
+                            }}</span>
                         </p>
                         <p v-if="props.registration.reviewed_at" class="mt-1">
                             Updated
-                            <span class="font-medium text-foreground">{{ formatDisplayDateTime(props.registration.reviewed_at) }}</span>
+                            <span class="font-medium text-foreground">{{
+                                formatDisplayDateTime(props.registration.reviewed_at)
+                            }}</span>
                         </p>
                     </div>
                 </div>
@@ -242,7 +259,7 @@ function isImageFileUrl(value: string): boolean {
                     :key="label"
                     class="rounded-lg border border-border/60 bg-muted/15 px-3 py-2"
                 >
-                    <p class="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{{ label }}</p>
+                    <p class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{{ label }}</p>
                     <template v-if="isFileLink(value)">
                         <div class="mt-2 space-y-2">
                             <a
@@ -306,10 +323,7 @@ function isImageFileUrl(value: string): boolean {
             </CardContent>
         </Card>
 
-        <Card
-            v-if="isBundleLeader && bundleParticipants.length > 0"
-            class="rounded-xl border shadow-xs"
-        >
+        <Card v-if="isBundleLeader && bundleParticipants.length > 0" class="rounded-xl border shadow-xs">
             <CardHeader class="pb-3">
                 <CardTitle class="text-sm font-medium">Bundle participants</CardTitle>
             </CardHeader>
@@ -335,7 +349,7 @@ function isImageFileUrl(value: string): boolean {
 
                     <div
                         v-if="participant.review_status === 'accepted' && participant.qr_base64"
-                        class="border-success/30 bg-success/5 mt-4 flex flex-col items-center gap-3 rounded-xl border p-4 sm:flex-row sm:items-start"
+                        class="mt-4 flex flex-col items-center gap-3 rounded-xl border border-success/30 bg-success/5 p-4 sm:flex-row sm:items-start"
                     >
                         <img
                             :src="`data:image/png;base64,${participant.qr_base64}`"
@@ -360,10 +374,7 @@ function isImageFileUrl(value: string): boolean {
                         </div>
                     </div>
 
-                    <p
-                        v-else-if="participant.review_status === 'pending'"
-                        class="mt-3 text-xs text-muted-foreground"
-                    >
+                    <p v-else-if="participant.review_status === 'pending'" class="mt-3 text-xs text-muted-foreground">
                         Check-in QR appears here after this participant is accepted.
                     </p>
                 </div>

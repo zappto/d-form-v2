@@ -91,10 +91,12 @@ const semesterOptions: SearchableSelectOption[] = [
 ];
 
 const divisionOptions = computed<SearchableSelectOption[]>(() =>
-    (props.divisions ?? []).map((division: DivisionOption): SearchableSelectOption => ({
-        value: division.id,
-        label: division.name,
-    }))
+    (props.divisions ?? []).map(
+        (division: DivisionOption): SearchableSelectOption => ({
+            value: division.id,
+            label: division.name,
+        })
+    )
 );
 
 const secondaryDivisionOptions = computed<SearchableSelectOption[]>(() => [
@@ -130,7 +132,7 @@ function onInstagramFollowChange(event: Event) {
 }
 
 function submit(): void {
-    if (form.processing) return
+    if (form.processing) return;
     form.clearErrors('semester', 'primary_division_id', 'secondary_division_id');
     let firstEmpty: string | null = null;
     if (form.semester === '') {
@@ -305,293 +307,292 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
             </div>
         </div>
         <template v-else>
-        <div class="mb-6 space-y-3">
-            <div class="flex flex-col items-center gap-1">
-                <h1 class="text-xl font-bold tracking-tight">Perbarui pendaftaran</h1>
-                <p class="text-muted-foreground text-sm">Perbaiki data sesuai instruksi tim.</p>
+            <div class="mb-6 space-y-3">
+                <div class="flex flex-col items-center gap-1">
+                    <h1 class="text-xl font-bold tracking-tight">Perbarui pendaftaran</h1>
+                    <p class="text-sm text-muted-foreground">Perbaiki data sesuai instruksi tim.</p>
+                </div>
             </div>
-        </div>
 
-        <form class="fade-up space-y-4" @submit.prevent="submit">
-            <p v-if="applicationError" class="text-destructive text-sm">
-                {{ applicationError }}
-            </p>
+            <form class="fade-up space-y-4" @submit.prevent="submit">
+                <p v-if="applicationError" class="text-sm text-destructive">
+                    {{ applicationError }}
+                </p>
 
-            <!-- Data diri -->
-            <Card class="border-border/70 rounded-2xl">
-                <CardHeader class="pb-4">
-                    <CardTitle class="text-base">Data diri</CardTitle>
-                    <p class="text-muted-foreground text-sm">Nama, kontak, dan email yang bisa dihubungi.</p>
-                </CardHeader>
-                <CardContent class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-2 sm:col-span-2">
-                        <Label for="full_name">Nama lengkap</Label>
-                        <Input id="full_name" v-model="form.full_name" required />
-                        <p v-if="form.errors.full_name" class="text-destructive text-xs">{{ form.errors.full_name }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <Label for="nim">NIM</Label>
-                        <Input id="nim" v-model="form.nim" required />
-                        <p v-if="form.errors.nim" class="text-destructive text-xs">{{ form.errors.nim }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <Label for="phone">Telepon</Label>
-                        <Input id="phone" v-model="form.phone" required />
-                        <p v-if="form.errors.phone" class="text-destructive text-xs">{{ form.errors.phone }}</p>
-                    </div>
-
-                    <div class="space-y-2 sm:col-span-2">
-                        <Label for="instagram_username">Instagram</Label>
-                        <Input id="instagram_username" v-model="form.instagram_username" required />
-                        <p v-if="form.errors.instagram_username" class="text-destructive text-xs">
-                            {{ form.errors.instagram_username }}
-                        </p>
-                    </div>
-
-                    <div class="space-y-2 sm:col-span-2">
-                        <Label for="personal_email">Email pribadi</Label>
-                        <Input id="personal_email" v-model="form.personal_email" type="email" required />
-                        <p v-if="form.errors.personal_email" class="text-destructive text-xs">
-                            {{ form.errors.personal_email }}
-                        </p>
-                    </div>
-
-                    <div class="space-y-2 sm:col-span-2">
-                        <Label for="student_email">Email kampus</Label>
-                        <Input id="student_email" v-model="form.student_email" type="email" required />
-                        <p v-if="form.errors.student_email" class="text-destructive text-xs">
-                            {{ form.errors.student_email }}
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <!-- Akademik & divisi -->
-            <Card class="border-border/70 rounded-2xl">
-                <CardHeader class="pb-4">
-                    <CardTitle class="text-base">Akademik &amp; divisi</CardTitle>
-                    <p class="text-muted-foreground text-sm">Semester dan pilihan divisimu.</p>
-                </CardHeader>
-                <CardContent class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-2">
-                        <Label for="semester">Semester</Label>
-                        <SearchableSelect
-                            id="semester"
-                            v-model="form.semester"
-                            :options="semesterOptions"
-                            placeholder="Pilih semester"
-                            aria-label="Semester"
-                            :required="true"
-                            :invalid="form.errors.semester !== undefined"
-                        />
-                        <p v-if="form.errors.semester" class="text-destructive text-xs">{{ form.errors.semester }}</p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <Label for="primary_division_id">Divisi utama</Label>
-                        <SearchableSelect
-                            id="primary_division_id"
-                            v-model="form.primary_division_id"
-                            :options="divisionOptions"
-                            placeholder="Pilih divisi"
-                            aria-label="Divisi utama"
-                            :required="true"
-                            :invalid="form.errors.primary_division_id !== undefined"
-                        />
-                        <p v-if="form.errors.primary_division_id" class="text-destructive text-xs">
-                            {{ form.errors.primary_division_id }}
-                        </p>
-                    </div>
-
-                    <div class="space-y-2 sm:col-span-2">
-                        <Label for="secondary_division_id">Divisi cadangan</Label>
-                        <SearchableSelect
-                            id="secondary_division_id"
-                            v-model="form.secondary_division_id"
-                            :options="secondaryDivisionOptions"
-                            placeholder="Pilih divisi cadangan"
-                            aria-label="Divisi cadangan"
-                            :invalid="form.errors.secondary_division_id !== undefined"
-                        />
-                        <p v-if="form.errors.secondary_division_id" class="text-destructive text-xs">
-                            {{ form.errors.secondary_division_id }}
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <!-- Berkas -->
-            <Card class="border-border/70 rounded-2xl">
-                <CardHeader class="pb-4">
-                    <CardTitle class="text-base">Berkas</CardTitle>
-                    <p class="text-muted-foreground text-sm">
-                        CV, portfolio, bukti follow Instagram, dan tautan twibbon.
-                    </p>
-                </CardHeader>
-                <CardContent class="space-y-5">
-                    <div class="space-y-2">
-                        <Label for="cv">CV (PDF)</Label>
-                        <Input id="cv" type="file" accept="application/pdf" @change="onCvChange" />
-                        <p class="text-muted-foreground text-xs">{{ cvHint }}</p>
-                        <p v-if="form.errors.cv" class="text-destructive text-xs">{{ form.errors.cv }}</p>
-                    </div>
-
-                    <Separator />
-
-                    <div class="space-y-3">
-                        <Label id="portfolio-type-label">Portfolio (opsional)</Label>
-                        <div
-                            class="border-border/70 bg-muted/50 grid grid-cols-3 gap-1 rounded-lg border p-1"
-                            role="radiogroup"
-                            aria-labelledby="portfolio-type-label"
-                        >
-                            <button
-                                type="button"
-                                role="radio"
-                                ref="portfolioNoneRadio"
-                                :tabindex="form.portfolio_type === 'none' ? 0 : -1"
-                                :aria-checked="form.portfolio_type === 'none'"
-                                :class="[
-                                    'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                                    form.portfolio_type === 'none'
-                                        ? 'bg-background text-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground',
-                                ]"
-                                @click="form.portfolio_type = 'none'"
-                                @keydown="onPortfolioTypeKeydown"
-                            >
-                                Tidak ada
-                            </button>
-                            <button
-                                type="button"
-                                role="radio"
-                                ref="portfolioUrlRadio"
-                                :tabindex="form.portfolio_type === 'url' ? 0 : -1"
-                                :aria-checked="form.portfolio_type === 'url'"
-                                :class="[
-                                    'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                                    form.portfolio_type === 'url'
-                                        ? 'bg-background text-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground',
-                                ]"
-                                @click="form.portfolio_type = 'url'"
-                                @keydown="onPortfolioTypeKeydown"
-                            >
-                                URL
-                            </button>
-                            <button
-                                type="button"
-                                role="radio"
-                                ref="portfolioFileRadio"
-                                :tabindex="form.portfolio_type === 'file' ? 0 : -1"
-                                :aria-checked="form.portfolio_type === 'file'"
-                                :class="[
-                                    'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                                    form.portfolio_type === 'file'
-                                        ? 'bg-background text-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:text-foreground',
-                                ]"
-                                @click="form.portfolio_type = 'file'"
-                                @keydown="onPortfolioTypeKeydown"
-                            >
-                                File PDF
-                            </button>
-                        </div>
-                        <p v-if="form.errors.portfolio_type" class="text-destructive text-xs">
-                            {{ form.errors.portfolio_type }}
-                        </p>
-                        <Input
-                            v-if="form.portfolio_type === 'url'"
-                            v-model="form.portfolio_url"
-                            placeholder="https://..."
-                            aria-label="URL portfolio"
-                        />
-                        <div v-else-if="form.portfolio_type === 'file'" class="space-y-1">
-                            <Input
-                                id="portfolio_file"
-                                type="file"
-                                accept="application/pdf"
-                                aria-label="File portfolio (opsional)"
-                                @change="onPortfolioFileChange"
-                            />
-                            <p class="text-muted-foreground text-xs">
-                                Opsional.
-                                <span v-if="application.portfolio_original_name">
-                                    File saat ini: {{ application.portfolio_original_name }}
-                                </span>
+                <!-- Data diri -->
+                <Card class="rounded-2xl border-border/70">
+                    <CardHeader class="pb-4">
+                        <CardTitle class="text-base">Data diri</CardTitle>
+                        <p class="text-sm text-muted-foreground">Nama, kontak, dan email yang bisa dihubungi.</p>
+                    </CardHeader>
+                    <CardContent class="grid gap-4 sm:grid-cols-2">
+                        <div class="space-y-2 sm:col-span-2">
+                            <Label for="full_name">Nama lengkap</Label>
+                            <Input id="full_name" v-model="form.full_name" required />
+                            <p v-if="form.errors.full_name" class="text-xs text-destructive">
+                                {{ form.errors.full_name }}
                             </p>
                         </div>
-                        <p v-if="form.errors.portfolio_url" class="text-destructive text-xs">
-                            {{ form.errors.portfolio_url }}
-                        </p>
-                        <p v-if="form.errors.portfolio_file" class="text-destructive text-xs">
-                            {{ form.errors.portfolio_file }}
-                        </p>
-                    </div>
 
-                    <Separator />
+                        <div class="space-y-2">
+                            <Label for="nim">NIM</Label>
+                            <Input id="nim" v-model="form.nim" required />
+                            <p v-if="form.errors.nim" class="text-xs text-destructive">{{ form.errors.nim }}</p>
+                        </div>
 
-                    <div class="space-y-2">
-                        <Label for="instagram_follow_proof">Bukti Follow Instagram</Label>
-                        <Input
-                            id="instagram_follow_proof"
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
-                            @change="onInstagramFollowChange"
-                        />
-                        <p class="text-muted-foreground text-xs">{{ instagramFollowHint }}</p>
-                        <p v-if="form.errors.instagram_follow_proof" class="text-destructive text-xs">
-                            {{ form.errors.instagram_follow_proof }}
+                        <div class="space-y-2">
+                            <Label for="phone">Telepon</Label>
+                            <Input id="phone" v-model="form.phone" required />
+                            <p v-if="form.errors.phone" class="text-xs text-destructive">{{ form.errors.phone }}</p>
+                        </div>
+
+                        <div class="space-y-2 sm:col-span-2">
+                            <Label for="instagram_username">Instagram</Label>
+                            <Input id="instagram_username" v-model="form.instagram_username" required />
+                            <p v-if="form.errors.instagram_username" class="text-xs text-destructive">
+                                {{ form.errors.instagram_username }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2 sm:col-span-2">
+                            <Label for="personal_email">Email pribadi</Label>
+                            <Input id="personal_email" v-model="form.personal_email" type="email" required />
+                            <p v-if="form.errors.personal_email" class="text-xs text-destructive">
+                                {{ form.errors.personal_email }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2 sm:col-span-2">
+                            <Label for="student_email">Email kampus</Label>
+                            <Input id="student_email" v-model="form.student_email" type="email" required />
+                            <p v-if="form.errors.student_email" class="text-xs text-destructive">
+                                {{ form.errors.student_email }}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Akademik & divisi -->
+                <Card class="rounded-2xl border-border/70">
+                    <CardHeader class="pb-4">
+                        <CardTitle class="text-base">Akademik &amp; divisi</CardTitle>
+                        <p class="text-sm text-muted-foreground">Semester dan pilihan divisimu.</p>
+                    </CardHeader>
+                    <CardContent class="grid gap-4 sm:grid-cols-2">
+                        <div class="space-y-2">
+                            <Label for="semester">Semester</Label>
+                            <SearchableSelect
+                                id="semester"
+                                v-model="form.semester"
+                                :options="semesterOptions"
+                                placeholder="Pilih semester"
+                                aria-label="Semester"
+                                :required="true"
+                                :invalid="form.errors.semester !== undefined"
+                            />
+                            <p v-if="form.errors.semester" class="text-xs text-destructive">
+                                {{ form.errors.semester }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <Label for="primary_division_id">Divisi utama</Label>
+                            <SearchableSelect
+                                id="primary_division_id"
+                                v-model="form.primary_division_id"
+                                :options="divisionOptions"
+                                placeholder="Pilih divisi"
+                                aria-label="Divisi utama"
+                                :required="true"
+                                :invalid="form.errors.primary_division_id !== undefined"
+                            />
+                            <p v-if="form.errors.primary_division_id" class="text-xs text-destructive">
+                                {{ form.errors.primary_division_id }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2 sm:col-span-2">
+                            <Label for="secondary_division_id">Divisi cadangan</Label>
+                            <SearchableSelect
+                                id="secondary_division_id"
+                                v-model="form.secondary_division_id"
+                                :options="secondaryDivisionOptions"
+                                placeholder="Pilih divisi cadangan"
+                                aria-label="Divisi cadangan"
+                                :invalid="form.errors.secondary_division_id !== undefined"
+                            />
+                            <p v-if="form.errors.secondary_division_id" class="text-xs text-destructive">
+                                {{ form.errors.secondary_division_id }}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Berkas -->
+                <Card class="rounded-2xl border-border/70">
+                    <CardHeader class="pb-4">
+                        <CardTitle class="text-base">Berkas</CardTitle>
+                        <p class="text-sm text-muted-foreground">
+                            CV, portfolio, bukti follow Instagram, dan tautan twibbon.
                         </p>
-                    </div>
+                    </CardHeader>
+                    <CardContent class="space-y-5">
+                        <div class="space-y-2">
+                            <Label for="cv">CV (PDF)</Label>
+                            <Input id="cv" type="file" accept="application/pdf" @change="onCvChange" />
+                            <p class="text-xs text-muted-foreground">{{ cvHint }}</p>
+                            <p v-if="form.errors.cv" class="text-xs text-destructive">{{ form.errors.cv }}</p>
+                        </div>
 
-                    <div class="space-y-2">
-                        <Label for="twibbon_url">Link Bukti Twibbon</Label>
-                        <Input
-                            id="twibbon_url"
-                            v-model="form.twibbon_url"
-                            type="url"
-                            placeholder="https://..."
-                            required
-                        />
-                        <p class="text-muted-foreground text-xs">
-                            Twibbon dapat diakses di
-                            <a
-                                href="https://www.fotomomen.studio/oprec-doscom26"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-primary underline-offset-4 hover:underline"
+                        <Separator />
+
+                        <div class="space-y-3">
+                            <Label id="portfolio-type-label">Portfolio (opsional)</Label>
+                            <div
+                                class="grid grid-cols-3 gap-1 rounded-lg border border-border/70 bg-muted/50 p-1"
+                                role="radiogroup"
+                                aria-labelledby="portfolio-type-label"
                             >
-                                https://www.fotomomen.studio/oprec-doscom26
-                            </a>
-                        </p>
-                        <p v-if="form.errors.twibbon_url" class="text-destructive text-xs">
-                            {{ form.errors.twibbon_url }}
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
+                                <button
+                                    type="button"
+                                    role="radio"
+                                    ref="portfolioNoneRadio"
+                                    :tabindex="form.portfolio_type === 'none' ? 0 : -1"
+                                    :aria-checked="form.portfolio_type === 'none'"
+                                    :class="[
+                                        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                                        form.portfolio_type === 'none'
+                                            ? 'bg-background text-foreground shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground',
+                                    ]"
+                                    @click="form.portfolio_type = 'none'"
+                                    @keydown="onPortfolioTypeKeydown"
+                                >
+                                    Tidak ada
+                                </button>
+                                <button
+                                    type="button"
+                                    role="radio"
+                                    ref="portfolioUrlRadio"
+                                    :tabindex="form.portfolio_type === 'url' ? 0 : -1"
+                                    :aria-checked="form.portfolio_type === 'url'"
+                                    :class="[
+                                        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                                        form.portfolio_type === 'url'
+                                            ? 'bg-background text-foreground shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground',
+                                    ]"
+                                    @click="form.portfolio_type = 'url'"
+                                    @keydown="onPortfolioTypeKeydown"
+                                >
+                                    URL
+                                </button>
+                                <button
+                                    type="button"
+                                    role="radio"
+                                    ref="portfolioFileRadio"
+                                    :tabindex="form.portfolio_type === 'file' ? 0 : -1"
+                                    :aria-checked="form.portfolio_type === 'file'"
+                                    :class="[
+                                        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                                        form.portfolio_type === 'file'
+                                            ? 'bg-background text-foreground shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground',
+                                    ]"
+                                    @click="form.portfolio_type = 'file'"
+                                    @keydown="onPortfolioTypeKeydown"
+                                >
+                                    File PDF
+                                </button>
+                            </div>
+                            <p v-if="form.errors.portfolio_type" class="text-xs text-destructive">
+                                {{ form.errors.portfolio_type }}
+                            </p>
+                            <Input
+                                v-if="form.portfolio_type === 'url'"
+                                v-model="form.portfolio_url"
+                                placeholder="https://..."
+                                aria-label="URL portfolio"
+                            />
+                            <div v-else-if="form.portfolio_type === 'file'" class="space-y-1">
+                                <Input
+                                    id="portfolio_file"
+                                    type="file"
+                                    accept="application/pdf"
+                                    aria-label="File portfolio (opsional)"
+                                    @change="onPortfolioFileChange"
+                                />
+                                <p class="text-xs text-muted-foreground">
+                                    Opsional.
+                                    <span v-if="application.portfolio_original_name">
+                                        File saat ini: {{ application.portfolio_original_name }}
+                                    </span>
+                                </p>
+                            </div>
+                            <p v-if="form.errors.portfolio_url" class="text-xs text-destructive">
+                                {{ form.errors.portfolio_url }}
+                            </p>
+                            <p v-if="form.errors.portfolio_file" class="text-xs text-destructive">
+                                {{ form.errors.portfolio_file }}
+                            </p>
+                        </div>
 
-            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
-                <Button
-                    type="submit"
-                    :disabled="form.processing"
-                    :aria-busy="form.processing"
-                    class="sm:min-w-44"
-                >
-                    <CometSpinner v-if="form.processing" :size="16" />
-                    {{ form.processing ? 'Menyimpan...' : 'Simpan perubahan' }}
-                </Button>
-                <Button as-child variant="outline">
-                    <Link :href="dashboardUrl">Batal</Link>
-                </Button>
-            </div>
-        </form>
+                        <Separator />
+
+                        <div class="space-y-2">
+                            <Label for="instagram_follow_proof">Bukti Follow Instagram</Label>
+                            <Input
+                                id="instagram_follow_proof"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                                @change="onInstagramFollowChange"
+                            />
+                            <p class="text-xs text-muted-foreground">{{ instagramFollowHint }}</p>
+                            <p v-if="form.errors.instagram_follow_proof" class="text-xs text-destructive">
+                                {{ form.errors.instagram_follow_proof }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <Label for="twibbon_url">Link Bukti Twibbon</Label>
+                            <Input
+                                id="twibbon_url"
+                                v-model="form.twibbon_url"
+                                type="url"
+                                placeholder="https://..."
+                                required
+                            />
+                            <p class="text-xs text-muted-foreground">
+                                Twibbon dapat diakses di
+                                <a
+                                    href="https://www.fotomomen.studio/oprec-doscom26"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="text-primary underline-offset-4 hover:underline"
+                                >
+                                    https://www.fotomomen.studio/oprec-doscom26
+                                </a>
+                            </p>
+                            <p v-if="form.errors.twibbon_url" class="text-xs text-destructive">
+                                {{ form.errors.twibbon_url }}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+                    <Button type="submit" :disabled="form.processing" :aria-busy="form.processing" class="sm:min-w-44">
+                        <CometSpinner v-if="form.processing" :size="16" />
+                        {{ form.processing ? 'Menyimpan...' : 'Simpan perubahan' }}
+                    </Button>
+                    <Button as-child variant="outline">
+                        <Link :href="dashboardUrl">Batal</Link>
+                    </Button>
+                </div>
+            </form>
         </template>
 
-        <p class="text-muted-foreground mt-4 text-center text-xs">
+        <p class="mt-4 text-center text-xs text-muted-foreground">
             <Link :href="routes.recruitment.landing" class="underline-offset-2 hover:underline">
                 Info OpenRecruitment
             </Link>

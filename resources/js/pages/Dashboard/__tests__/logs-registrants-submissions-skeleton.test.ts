@@ -1,13 +1,13 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { nextTick } from 'vue'
-import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils'
-import ActivityLogsIndex from '../Recruitment/ActivityLogs/Index.vue'
-import RegistrantsPage from '../Events/Registrants.vue'
-import FormsShow from '../Events/Forms/Show.vue'
-import FormAnswerDetailSheet from '@/components/modules/dashboard/FormAnswerDetailSheet.vue'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { nextTick } from 'vue';
+import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
+import ActivityLogsIndex from '../Recruitment/ActivityLogs/Index.vue';
+import RegistrantsPage from '../Events/Registrants.vue';
+import FormsShow from '../Events/Forms/Show.vue';
+import FormAnswerDetailSheet from '@/components/modules/dashboard/FormAnswerDetailSheet.vue';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
-config.global.renderStubDefaultSlot = true
+config.global.renderStubDefaultSlot = true;
 
 /**
  * Spec §3.5, M2 Task 3 (pola Task 1): skeleton GET memakai `Skeleton.vue`
@@ -26,10 +26,10 @@ const { routerGetMock, routerReloadMock, routerVisitMock, putMock } = vi.hoisted
     routerReloadMock: vi.fn(),
     routerVisitMock: vi.fn(),
     putMock: vi.fn(),
-}))
+}));
 
 vi.mock('@inertiajs/vue3', async () => {
-    const { reactive } = await import('vue')
+    const { reactive } = await import('vue');
     return {
         Head: { template: '<div style="display:none"></div>' },
         Link: { props: ['href'], template: '<a :href="href"><slot /></a>' },
@@ -45,7 +45,7 @@ vi.mock('@inertiajs/vue3', async () => {
             url: 'http://localhost/dashboard/events/ev-1/forms/fo-1?tab=jawaban',
         }),
         useForm: (initial: Record<string, unknown>) => {
-            const errors = reactive<Record<string, string>>({})
+            const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
                 errors,
@@ -55,14 +55,14 @@ vi.mock('@inertiajs/vue3', async () => {
                 transform: () => ({ put: putMock }),
                 reset: vi.fn(),
                 clearErrors: vi.fn(),
-            })
-            return state
+            });
+            return state;
         },
-    }
-})
+    };
+});
 
-vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }))
-vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<slot />' } }))
+vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
+vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     default: {
@@ -70,7 +70,7 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
         template:
             '<div data-testid="empty-state"><p>{{ title }}</p><p v-if="description">{{ description }}</p><slot /></div>',
     },
-}))
+}));
 
 vi.mock('@/lib/error-message', () => ({
     getFieldError: () => undefined,
@@ -80,33 +80,33 @@ vi.mock('@/lib/error-message', () => ({
     showErrorToast: vi.fn(),
     showHttpErrorToast: vi.fn(),
     showFlashToast: vi.fn(),
-}))
+}));
 
 vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}))
+}));
 
 vi.mock('axios', () => ({
     default: { post: vi.fn(), patch: vi.fn(), isAxiosError: () => false },
-}))
+}));
 
 interface AsyncOptions {
-    preserveState?: boolean
-    preserveScroll?: boolean
-    replace?: boolean
-    only?: string[]
-    onStart?: () => void
-    onSuccess?: () => void
-    onFinish?: () => void
+    preserveState?: boolean;
+    preserveScroll?: boolean;
+    replace?: boolean;
+    only?: string[];
+    onStart?: () => void;
+    onSuccess?: () => void;
+    onFinish?: () => void;
 }
 
 function lastOptions(mock: { mock: { calls: unknown[][] } }): AsyncOptions {
-    expect(mock).toHaveBeenCalled()
-    const args = mock.mock.calls[0] as unknown[]
+    expect(mock).toHaveBeenCalled();
+    const args = mock.mock.calls[0] as unknown[];
     // get(url, data, options) → [2]; visit(url, options) → [1]; reload(options) → [0].
-    const options = (args[2] ?? args[1] ?? args[0]) as AsyncOptions | undefined
-    expect(options).toBeDefined()
-    return options as AsyncOptions
+    const options = (args[2] ?? args[1] ?? args[0]) as AsyncOptions | undefined;
+    expect(options).toBeDefined();
+    return options as AsyncOptions;
 }
 
 function demoLog(id: string, action: string): LogRowFixture {
@@ -122,21 +122,21 @@ function demoLog(id: string, action: string): LogRowFixture {
             full_name: 'Budi Santoso',
         },
         created_at: '2026-01-01T10:00:00+07:00',
-    }
+    };
 }
 
 interface LogRowFixture {
-    id: string
-    action: string
-    actor_type: string
-    actor: { id: string; name: string } | null
+    id: string;
+    action: string;
+    actor_type: string;
+    actor: { id: string; name: string } | null;
     application: {
-        id: string
-        recruitment_period_id: string | null
-        registration_number: string
-        full_name: string
-    } | null
-    created_at: string | null
+        id: string;
+        recruitment_period_id: string | null;
+        registration_number: string;
+        full_name: string;
+    } | null;
+    created_at: string | null;
 }
 
 function mountLogs(data: LogRowFixture[]): VueWrapper<InstanceType<typeof ActivityLogsIndex>> {
@@ -146,7 +146,7 @@ function mountLogs(data: LogRowFixture[]): VueWrapper<InstanceType<typeof Activi
             periodOptions: [{ id: 'per-1', name: 'Gelombang 1' }],
             query: { period_id: null, action: null },
         },
-    })
+    });
 }
 
 function demoEvent(): IEvent {
@@ -172,7 +172,7 @@ function demoEvent(): IEvent {
         deleted_at: null,
         created_at: '2026-09-01',
         updated_at: '2026-09-01',
-    }
+    };
 }
 
 function demoRegistrant(id: string, name: string): IRegistrant {
@@ -187,12 +187,10 @@ function demoRegistrant(id: string, name: string): IRegistrant {
         answers: {},
         registration_code: `REG-${id}`,
         reviewed_at: null,
-    }
+    };
 }
 
-function mountRegistrants(
-    registrants: IRegistrant[] | undefined,
-): VueWrapper<InstanceType<typeof RegistrantsPage>> {
+function mountRegistrants(registrants: IRegistrant[] | undefined): VueWrapper<InstanceType<typeof RegistrantsPage>> {
     return mount(RegistrantsPage, {
         props: {
             event: demoEvent(),
@@ -218,7 +216,7 @@ function mountRegistrants(
                 SearchableSelect: true,
             },
         },
-    })
+    });
 }
 
 function demoForm(): IForm {
@@ -231,7 +229,7 @@ function demoForm(): IForm {
         event_id: 'ev-1',
         banner_url: null,
         banner_caption: null,
-    }
+    };
 }
 
 function demoSubmission(id: string, name: string): IFormSubmission {
@@ -242,7 +240,7 @@ function demoSubmission(id: string, name: string): IFormSubmission {
         submitted_at: '2026-01-01T10:00:00+07:00',
         review_status: 'pending',
         reviewed_at: null,
-    }
+    };
 }
 
 function mountFormsShow(submissions: IFormSubmission[]): VueWrapper<InstanceType<typeof FormsShow>> {
@@ -280,23 +278,21 @@ function mountFormsShow(submissions: IFormSubmission[]): VueWrapper<InstanceType
                 TabsTrigger: true,
             },
         },
-    })
+    });
 }
 
 function reviewButton(wrapper: VueWrapper, label: string): DOMWrapper<HTMLButtonElement> {
-    const found = wrapper
-        .findAll('button')
-        .find((b) => b.attributes('aria-label') === label)
-    if (!found) throw new Error(`tombol "${label}" tidak ditemukan`)
-    return found as DOMWrapper<HTMLButtonElement>
+    const found = wrapper.findAll('button').find((b) => b.attributes('aria-label') === label);
+    if (!found) throw new Error(`tombol "${label}" tidak ditemukan`);
+    return found as DOMWrapper<HTMLButtonElement>;
 }
 
 /** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
-type TFormAnswerDetailSheetProps = InstanceType<typeof FormAnswerDetailSheet>['$props']
+type TFormAnswerDetailSheetProps = InstanceType<typeof FormAnswerDetailSheet>['$props'];
 
 function mountSheet(
     submission: IFormSubmission | null,
-    loading?: boolean,
+    loading?: boolean
 ): VueWrapper<InstanceType<typeof FormAnswerDetailSheet>> {
     const props: TFormAnswerDetailSheetProps = {
         open: true,
@@ -307,7 +303,7 @@ function mountSheet(
         humanizeKey: (key: string): string => key,
         isSubmissionReviewing: (): boolean => false,
         loading,
-    }
+    };
     return mount(FormAnswerDetailSheet, {
         props,
         global: {
@@ -323,287 +319,281 @@ function mountSheet(
                 FormFieldAnswerDisplay: true,
             },
         },
-    })
+    });
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-    routerGetMock.mockReset()
-    routerReloadMock.mockReset()
-    routerVisitMock.mockReset()
-    putMock.mockReset()
+    vi.clearAllMocks();
+    routerGetMock.mockReset();
+    routerReloadMock.mockReset();
+    routerVisitMock.mockReset();
+    putMock.mockReset();
     const hangGet = (...args: unknown[]): undefined => {
-        const options = args[2] as AsyncOptions | undefined
-        options?.onStart?.()
-        return undefined
-    }
+        const options = args[2] as AsyncOptions | undefined;
+        options?.onStart?.();
+        return undefined;
+    };
     const hangVisitReload = (...args: unknown[]): undefined => {
         // visit(url, options) → [1]; reload(options) → [0].
-        const options = (args[1] ?? args[0]) as AsyncOptions | undefined
-        options?.onStart?.()
-        return undefined
-    }
-    routerGetMock.mockImplementation(hangGet)
-    routerReloadMock.mockImplementation(hangVisitReload)
-    routerVisitMock.mockImplementation(hangVisitReload)
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }))
-})
+        const options = (args[1] ?? args[0]) as AsyncOptions | undefined;
+        options?.onStart?.();
+        return undefined;
+    };
+    routerGetMock.mockImplementation(hangGet);
+    routerReloadMock.mockImplementation(hangVisitReload);
+    routerVisitMock.mockImplementation(hangVisitReload);
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }));
+});
 
 afterEach(() => {
-    vi.unstubAllGlobals()
-})
+    vi.unstubAllGlobals();
+});
 
 describe('ActivityLogs skeleton (M2 Task 3)', () => {
     it('ada data + idle → baris fade-up, tanpa skeleton', async () => {
-        const wrapper = mountLogs([demoLog('l-1', 'screening.pass')])
+        const wrapper = mountLogs([demoLog('l-1', 'screening.pass')]);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('screening.pass')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('screening.pass');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('ganti filter → 8 skeleton baris + konten hidden + filter visible', async () => {
-        const wrapper = mountLogs([demoLog('l-1', 'screening.pass')])
+        const wrapper = mountLogs([demoLog('l-1', 'screening.pass')]);
         try {
-            await wrapper.find('select').setValue('per-1')
-            await nextTick()
+            await wrapper.find('select').setValue('per-1');
+            await nextTick();
 
-            expect(routerGetMock).toHaveBeenCalledTimes(1)
+            expect(routerGetMock).toHaveBeenCalledTimes(1);
 
-            const region = wrapper.find('[aria-busy="true"]')
-            expect(region.exists()).toBe(true)
-            expect(region.attributes('aria-label')).toMatch(/memuat/i)
+            const region = wrapper.find('[aria-busy="true"]');
+            expect(region.exists()).toBe(true);
+            expect(region.attributes('aria-label')).toMatch(/memuat/i);
 
-            const rows = wrapper.findAll('.log-row-skeleton')
-            expect(rows).toHaveLength(8)
+            const rows = wrapper.findAll('.log-row-skeleton');
+            expect(rows).toHaveLength(8);
             for (const row of rows) {
-                expect(row.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
+                expect(row.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
             }
 
-            expect(wrapper.text()).not.toContain('screening.pass')
+            expect(wrapper.text()).not.toContain('screening.pass');
 
             // Kartu filter tetap terlihat.
-            expect(wrapper.find('select').exists()).toBe(true)
-            expect(wrapper.find('input[type="search"]').exists()).toBe(true)
+            expect(wrapper.find('select').exists()).toBe(true);
+            expect(wrapper.find('input[type="search"]').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('navigasi selesai → skeleton hilang + baris fade-up kembali', async () => {
-        const wrapper = mountLogs([demoLog('l-1', 'screening.pass')])
+        const wrapper = mountLogs([demoLog('l-1', 'screening.pass')]);
         try {
-            await wrapper.find('select').setValue('per-1')
-            await nextTick()
-            expect(wrapper.findAll('.log-row-skeleton')).toHaveLength(8)
+            await wrapper.find('select').setValue('per-1');
+            await nextTick();
+            expect(wrapper.findAll('.log-row-skeleton')).toHaveLength(8);
 
-            lastOptions(routerGetMock).onFinish?.()
-            await nextTick()
+            lastOptions(routerGetMock).onFinish?.();
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('screening.pass')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('screening.pass');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('logs kosong + idle → empty text, tanpa skeleton/request', async () => {
-        const wrapper = mountLogs([])
+        const wrapper = mountLogs([]);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Tidak ada activity log.')
-            expect(routerGetMock).not.toHaveBeenCalled()
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Tidak ada activity log.');
+            expect(routerGetMock).not.toHaveBeenCalled();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Registrants skeleton (M2 Task 3)', () => {
     it('registrants undefined → thead + 10×5 skeleton + pager, tanpa empty state', async () => {
-        const wrapper = mountRegistrants(undefined)
+        const wrapper = mountRegistrants(undefined);
         try {
-            await nextTick()
+            await nextTick();
 
             // thead asli tetap (5 kolom).
-            const head = wrapper.find('thead')
-            expect(head.exists()).toBe(true)
-            expect(head.findAll('th')).toHaveLength(5)
+            const head = wrapper.find('thead');
+            expect(head.exists()).toBe(true);
+            expect(head.findAll('th')).toHaveLength(5);
 
-            const rows = wrapper.findAll('.reg-row-skeleton')
-            expect(rows).toHaveLength(10)
-            let cells = 0
+            const rows = wrapper.findAll('.reg-row-skeleton');
+            expect(rows).toHaveLength(10);
+            let cells = 0;
             for (const row of rows) {
                 // 5 kolom cermin thead, tiap sel minimal 1 skeleton.
-                expect(row.findAll('td')).toHaveLength(5)
-                const found = row.findAll('[data-slot="skeleton"]').length
-                expect(found).toBeGreaterThanOrEqual(5)
-                cells += found
+                expect(row.findAll('td')).toHaveLength(5);
+                const found = row.findAll('[data-slot="skeleton"]').length;
+                expect(found).toBeGreaterThanOrEqual(5);
+                cells += found;
             }
-            expect(cells).toBeGreaterThanOrEqual(50)
+            expect(cells).toBeGreaterThanOrEqual(50);
 
-            expect(wrapper.find('.reg-pager-skeleton').exists()).toBe(true)
+            expect(wrapper.find('.reg-pager-skeleton').exists()).toBe(true);
 
             // Ringkasan + toolbar tetap; empty state tidak tampil.
-            expect(wrapper.text()).toContain('Ringkasan cepat')
-            expect(wrapper.text()).toContain('Filter dan pencarian')
-            expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
-            expect(routerGetMock).not.toHaveBeenCalled()
+            expect(wrapper.text()).toContain('Ringkasan cepat');
+            expect(wrapper.text()).toContain('Filter dan pencarian');
+            expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false);
+            expect(routerGetMock).not.toHaveBeenCalled();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('registrants terisi → tabel fade-up, tanpa skeleton', async () => {
-        const wrapper = mountRegistrants([
-            demoRegistrant('r-1', 'Budi Santoso'),
-            demoRegistrant('r-2', 'Siti Aminah'),
-        ])
+        const wrapper = mountRegistrants([demoRegistrant('r-1', 'Budi Santoso'), demoRegistrant('r-2', 'Siti Aminah')]);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Budi Santoso')
-            expect(wrapper.text()).toContain('Siti Aminah')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Budi Santoso');
+            expect(wrapper.text()).toContain('Siti Aminah');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('filter lokal (ketikan search) → tanpa skeleton, tanpa request', async () => {
-        const wrapper = mountRegistrants([
-            demoRegistrant('r-1', 'Budi Santoso'),
-            demoRegistrant('r-2', 'Siti Aminah'),
-        ])
+        const wrapper = mountRegistrants([demoRegistrant('r-1', 'Budi Santoso'), demoRegistrant('r-2', 'Siti Aminah')]);
         try {
-            await wrapper.find('#registrants-search').setValue('budi')
-            await nextTick()
+            await wrapper.find('#registrants-search').setValue('budi');
+            await nextTick();
 
             // Filter jalan lokal: 1 baris cocok, skeleton tak pernah muncul.
-            expect(wrapper.text()).toContain('Budi Santoso')
-            expect(wrapper.text()).not.toContain('Siti Aminah')
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(routerGetMock).not.toHaveBeenCalled()
+            expect(wrapper.text()).toContain('Budi Santoso');
+            expect(wrapper.text()).not.toContain('Siti Aminah');
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(routerGetMock).not.toHaveBeenCalled();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Forms/Show jawaban skeleton (M2 Task 3)', () => {
     it('ada data + idle → tabel fade-up, tanpa skeleton', async () => {
-        const wrapper = mountFormsShow([demoSubmission('s-1', 'Budi Santoso')])
+        const wrapper = mountFormsShow([demoSubmission('s-1', 'Budi Santoso')]);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Budi Santoso')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Budi Santoso');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
             // Header tab + autosave tetap.
-            expect(wrapper.text()).toContain('Jawaban')
+            expect(wrapper.text()).toContain('Jawaban');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('review → reload submissions → 10 skeleton baris + konten hidden + tab visible', async () => {
-        const wrapper = mountFormsShow([demoSubmission('s-1', 'Budi Santoso')])
+        const wrapper = mountFormsShow([demoSubmission('s-1', 'Budi Santoso')]);
         try {
-            await reviewButton(wrapper, 'Terima jawaban dari Budi Santoso').trigger('click')
-            await new Promise((resolve) => setTimeout(resolve, 0))
-            await nextTick()
+            await reviewButton(wrapper, 'Terima jawaban dari Budi Santoso').trigger('click');
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await nextTick();
 
-            expect(routerReloadMock).toHaveBeenCalledTimes(1)
+            expect(routerReloadMock).toHaveBeenCalledTimes(1);
             expect((routerReloadMock.mock.calls[0] as unknown[])[0]).toEqual(
-                expect.objectContaining({ only: ['submissions'] }),
-            )
+                expect.objectContaining({ only: ['submissions'] })
+            );
 
-            const region = wrapper.find('[aria-busy="true"]')
-            expect(region.exists()).toBe(true)
-            expect(region.attributes('aria-label')).toMatch(/memuat/i)
+            const region = wrapper.find('[aria-busy="true"]');
+            expect(region.exists()).toBe(true);
+            expect(region.attributes('aria-label')).toMatch(/memuat/i);
 
-            expect(wrapper.findAll('.jawaban-row-skeleton')).toHaveLength(10)
-            expect(wrapper.find('.jawaban-pager-skeleton').exists()).toBe(true)
-            expect(wrapper.text()).not.toContain('Budi Santoso')
+            expect(wrapper.findAll('.jawaban-row-skeleton')).toHaveLength(10);
+            expect(wrapper.find('.jawaban-pager-skeleton').exists()).toBe(true);
+            expect(wrapper.text()).not.toContain('Budi Santoso');
 
             // Tab + autosave tidak ikut hilang.
-            expect(wrapper.text()).toContain('Jawaban')
+            expect(wrapper.text()).toContain('Jawaban');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('reload selesai → skeleton hilang + tabel fade-up kembali', async () => {
-        const wrapper = mountFormsShow([demoSubmission('s-1', 'Budi Santoso')])
+        const wrapper = mountFormsShow([demoSubmission('s-1', 'Budi Santoso')]);
         try {
-            await reviewButton(wrapper, 'Terima jawaban dari Budi Santoso').trigger('click')
-            await new Promise((resolve) => setTimeout(resolve, 0))
-            await nextTick()
-            expect(wrapper.findAll('.jawaban-row-skeleton')).toHaveLength(10)
+            await reviewButton(wrapper, 'Terima jawaban dari Budi Santoso').trigger('click');
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            await nextTick();
+            expect(wrapper.findAll('.jawaban-row-skeleton')).toHaveLength(10);
 
-            const options = lastOptions(routerReloadMock)
-            options.onSuccess?.()
-            options.onFinish?.()
-            await nextTick()
+            const options = lastOptions(routerReloadMock);
+            options.onSuccess?.();
+            options.onFinish?.();
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Budi Santoso')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Budi Santoso');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('submissions kosong + idle → empty jawaban, tanpa skeleton', async () => {
-        const wrapper = mountFormsShow([])
+        const wrapper = mountFormsShow([]);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Belum ada jawaban')
-            expect(routerReloadMock).not.toHaveBeenCalled()
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Belum ada jawaban');
+            expect(routerReloadMock).not.toHaveBeenCalled();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('FormAnswerDetailSheet skeleton (M2 Task 3)', () => {
     it('loading → header + 5 field + footer 2 tombol skeleton, tanpa konten', async () => {
-        const wrapper = mountSheet(demoSubmission('s-1', 'Budi Santoso'), true)
+        const wrapper = mountSheet(demoSubmission('s-1', 'Budi Santoso'), true);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('.sheet-field-skeleton')).toHaveLength(5)
-            expect(wrapper.findAll('.sheet-action-skeleton')).toHaveLength(2)
-            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
-            expect(wrapper.text()).not.toContain('Budi Santoso')
-            expect(wrapper.text()).not.toContain('Terima')
+            expect(wrapper.findAll('.sheet-field-skeleton')).toHaveLength(5);
+            expect(wrapper.findAll('.sheet-action-skeleton')).toHaveLength(2);
+            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
+            expect(wrapper.text()).not.toContain('Budi Santoso');
+            expect(wrapper.text()).not.toContain('Terima');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('siap → konten + 2 tombol review, tanpa skeleton', async () => {
-        const wrapper = mountSheet(demoSubmission('s-1', 'Budi Santoso'))
+        const wrapper = mountSheet(demoSubmission('s-1', 'Budi Santoso'));
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Budi Santoso')
-            expect(wrapper.text()).toContain('Terima')
-            expect(wrapper.text()).toContain('Tolak')
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Budi Santoso');
+            expect(wrapper.text()).toContain('Terima');
+            expect(wrapper.text()).toContain('Tolak');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});

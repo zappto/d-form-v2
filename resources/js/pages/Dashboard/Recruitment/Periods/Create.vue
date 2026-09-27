@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { Head, useForm } from '@inertiajs/vue3'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { Button } from '@/components/ui/button'
-import { CometSpinner } from '@/components/ui/comet'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
-import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker'
-import { routes } from '@/lib/routes'
-import { cn } from '@/lib/utils'
-import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
-import { handleInertiaFormErrors } from '@/lib/error-message'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
-import { BannerPickerField } from '@/components/core/field'
+import { onMounted } from 'vue';
+import { Head, useForm } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { Button } from '@/components/ui/button';
+import { CometSpinner } from '@/components/ui/comet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker';
+import { routes } from '@/lib/routes';
+import { cn } from '@/lib/utils';
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
+import { handleInertiaFormErrors } from '@/lib/error-message';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
+import { BannerPickerField } from '@/components/core/field';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 const form = useForm({
     name: '',
@@ -26,22 +26,22 @@ const form = useForm({
     interview_ends_at: '',
     finalization_deadline_at: '',
     banner: null as File | null,
-})
+});
 
 onMounted(() => {
-    setTopbar({ title: 'Periode baru', subtitle: 'Open Recruitment' })
-})
+    setTopbar({ title: 'Periode baru', subtitle: 'Open Recruitment' });
+});
 
 function submit(): void {
-    if (form.processing) return
+    if (form.processing) return;
     // Tanpa toast sukses manual: RecruitmentPeriodController::store memakai
     // Inertia::flash('toast') yang sudah ditampilkan global oleh usePageFlashToast.
     form.post(routes.admin.recruitment.periods.store, {
         forceFormData: true,
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal membuat periode' })
+            handleInertiaFormErrors(errors, { title: 'Gagal membuat periode' });
         },
-    })
+    });
 }
 </script>
 
@@ -51,10 +51,10 @@ function submit(): void {
     <div class="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="min-w-0">
-                <h1 class="font-display text-foreground text-2xl font-semibold tracking-tight sm:text-3xl">
+                <h1 class="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                     Periode baru
                 </h1>
-                <p class="text-muted-foreground mt-1.5 text-base">Open Recruitment</p>
+                <p class="mt-1.5 text-base text-muted-foreground">Open Recruitment</p>
             </div>
             <Button
                 type="submit"
@@ -74,7 +74,7 @@ function submit(): void {
                     <div class="space-y-2">
                         <Label for="name">Nama periode</Label>
                         <Input id="name" v-model="form.name" placeholder="Open Recruitment 2026" required />
-                        <p v-if="form.errors.name" class="text-destructive text-xs">{{ form.errors.name }}</p>
+                        <p v-if="form.errors.name" class="text-xs text-destructive">{{ form.errors.name }}</p>
                     </div>
 
                     <div class="space-y-2">
@@ -83,16 +83,14 @@ function submit(): void {
                             id="description"
                             v-model="form.description"
                             rows="3"
-                            class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                     </div>
 
                     <div class="space-y-2">
                         <div>
                             <Label for="banner">Banner</Label>
-                            <p class="text-muted-foreground mt-1 text-xs">
-                                Opsional — disarankan 16:9, maks 5 MB
-                            </p>
+                            <p class="mt-1 text-xs text-muted-foreground">Opsional — disarankan 16:9, maks 5 MB</p>
                         </div>
 
                         <BannerPickerField
@@ -131,7 +129,7 @@ function submit(): void {
                                 :aria-invalid="!!form.errors.interview_starts_at"
                                 :class="cn('bg-white', fieldInvalidClass(!!form.errors.interview_starts_at))"
                             />
-                            <p v-if="form.errors.interview_starts_at" class="text-destructive text-xs">
+                            <p v-if="form.errors.interview_starts_at" class="text-xs text-destructive">
                                 {{ form.errors.interview_starts_at }}
                             </p>
                         </div>
@@ -144,7 +142,7 @@ function submit(): void {
                                 :aria-invalid="!!form.errors.interview_ends_at"
                                 :class="cn('bg-white', fieldInvalidClass(!!form.errors.interview_ends_at))"
                             />
-                            <p v-if="form.errors.interview_ends_at" class="text-destructive text-xs">
+                            <p v-if="form.errors.interview_ends_at" class="text-xs text-destructive">
                                 {{ form.errors.interview_ends_at }}
                             </p>
                         </div>
@@ -157,7 +155,7 @@ function submit(): void {
                                 :aria-invalid="!!form.errors.finalization_deadline_at"
                                 :class="cn('bg-white', fieldInvalidClass(!!form.errors.finalization_deadline_at))"
                             />
-                            <p v-if="form.errors.finalization_deadline_at" class="text-destructive text-xs">
+                            <p v-if="form.errors.finalization_deadline_at" class="text-xs text-destructive">
                                 {{ form.errors.finalization_deadline_at }}
                             </p>
                         </div>

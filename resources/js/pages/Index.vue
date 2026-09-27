@@ -41,11 +41,7 @@ const jsonLd = computed<Record<string, unknown>[]>(() => {
 
 <template>
     <LandingLayout>
-        <SeoHead
-            title="Kelola acara & formulir pendaftaran"
-            :canonical-path="routes.home"
-            :json-ld="jsonLd"
-        />
+        <SeoHead title="Kelola acara & formulir pendaftaran" :canonical-path="routes.home" :json-ld="jsonLd" />
         <HomeHero />
         <HomeSteps />
         <HomeFeatures />

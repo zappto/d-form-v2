@@ -1,40 +1,42 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { FileText, ChevronRight, Lock, AlertCircle } from 'lucide-vue-next'
-import type { FormAccessStatus } from '@/types/form'
-import { routes } from '@/lib/routes'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { onMounted } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { FileText, ChevronRight, Lock, AlertCircle } from 'lucide-vue-next';
+import type { FormAccessStatus } from '@/types/form';
+import { routes } from '@/lib/routes';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 const props = defineProps<{
-    event: IEvent | undefined
-    forms: Array<{
-        id: string
-        title: string
-        description: string | null
-        fill_url: string
-        access_status: FormAccessStatus
-        access_message: string
-        can_start: boolean
-    }> | undefined
-}>()
+    event: IEvent | undefined;
+    forms:
+        | Array<{
+              id: string;
+              title: string;
+              description: string | null;
+              fill_url: string;
+              access_status: FormAccessStatus;
+              access_message: string;
+              can_start: boolean;
+          }>
+        | undefined;
+}>();
 
 onMounted(() => {
-    setTopbar({ title: props.event?.title ?? 'Pilih formulir', subtitle: 'Pilih formulir pendaftaran' })
-})
+    setTopbar({ title: props.event?.title ?? 'Pilih formulir', subtitle: 'Pilih formulir pendaftaran' });
+});
 
 function statusBadgeVariant(s: FormAccessStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
-    if (s === 'allowed') return 'default'
-    if (s === 'already_submitted') return 'secondary'
-    if (s === 'event_form_already_chosen') return 'outline'
-    return 'outline'
+    if (s === 'allowed') return 'default';
+    if (s === 'already_submitted') return 'secondary';
+    if (s === 'event_form_already_chosen') return 'outline';
+    return 'outline';
 }
 
 function statusLabel(s: FormAccessStatus): string {
@@ -50,8 +52,8 @@ function statusLabel(s: FormAccessStatus): string {
         unsupported_registration_mode: 'Tidak didukung',
         pending_team_confirmation: 'Menunggu konfirmasi tim',
         invitation_closed: 'Undangan tidak aktif',
-    }
-    return map[s] ?? s
+    };
+    return map[s] ?? s;
 }
 </script>
 
@@ -60,16 +62,16 @@ function statusLabel(s: FormAccessStatus): string {
 
     <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 sm:gap-8 xl:max-w-7xl">
         <div
-            class="flex w-full gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground/90 dark:bg-primary/10 sm:p-5"
+            class="flex w-full gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground/90 sm:p-5 dark:bg-primary/10"
             role="status"
         >
             <AlertCircle class="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
             <div class="min-w-0 flex-1 space-y-1">
-                <p class="flex flex-wrap items-center gap-2 font-semibold leading-snug">
+                <p class="flex flex-wrap items-center gap-2 leading-snug font-semibold">
                     Anda hanya bisa mengirim satu formulir pendaftaran untuk acara ini.
                     <Badge variant="outline" class="text-[10px]">1 form pendaftaran / peserta</Badge>
                 </p>
-                <p class="text-muted-foreground leading-relaxed">
+                <p class="leading-relaxed text-muted-foreground">
                     Baca judul dan deskripsi tiap form, lalu mulai mengisi yang paling sesuai. Setelah terkirim, form
                     pendaftaran lain akan terkunci. Form tambahan (mis. feedback) tetap bisa diisi setelah pendaftaran
                     diterima.
@@ -77,7 +79,12 @@ function statusLabel(s: FormAccessStatus): string {
             </div>
         </div>
 
-        <ul v-if="!props.event || !props.forms" class="flex w-full flex-col gap-4" aria-busy="true" aria-label="Memuat formulir">
+        <ul
+            v-if="!props.event || !props.forms"
+            class="flex w-full flex-col gap-4"
+            aria-busy="true"
+            aria-label="Memuat formulir"
+        >
             <li v-for="n in 3" :key="`form-${n}`" class="form-card-skeleton w-full">
                 <div class="w-full overflow-hidden rounded-2xl border border-border/80 shadow-sm">
                     <div class="space-y-2 pb-2 sm:space-y-3 sm:pb-3">
@@ -136,28 +143,31 @@ function statusLabel(s: FormAccessStatus): string {
                                     as-child
                                     class="w-full sm:w-auto"
                                 >
-                                    <Link :href="routes.member.event.registration(props.event.slug)" class="justify-center">
+                                    <Link
+                                        :href="routes.member.event.registration(props.event.slug)"
+                                        class="justify-center"
+                                    >
                                         Lihat pendaftaran
                                     </Link>
                                 </Button>
                                 <div
                                     v-else
-                                    class="text-muted-foreground flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed bg-muted/30 px-3 py-2.5 text-xs font-medium sm:w-auto sm:justify-end sm:border-0 sm:bg-transparent sm:py-0"
+                                    class="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed bg-muted/30 px-3 py-2.5 text-xs font-medium text-muted-foreground sm:w-auto sm:justify-end sm:border-0 sm:bg-transparent sm:py-0"
                                 >
                                     <Lock class="size-3.5 shrink-0" aria-hidden="true" />
                                     Tidak dapat dipilih
                                 </div>
                             </div>
                         </div>
-                        <CardDescription
-                            v-if="form.description?.trim()"
-                            class="text-pretty text-sm leading-relaxed"
-                        >
+                        <CardDescription v-if="form.description?.trim()" class="text-sm leading-relaxed text-pretty">
                             {{ form.description }}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent v-if="!form.can_start && form.access_message" class="border-t bg-muted/20 pt-4 pb-4 sm:px-6">
-                        <p class="text-muted-foreground text-xs leading-relaxed sm:text-sm">
+                    <CardContent
+                        v-if="!form.can_start && form.access_message"
+                        class="border-t bg-muted/20 pt-4 pb-4 sm:px-6"
+                    >
+                        <p class="text-xs leading-relaxed text-muted-foreground sm:text-sm">
                             {{ form.access_message }}
                         </p>
                     </CardContent>

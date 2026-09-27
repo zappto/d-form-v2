@@ -1,17 +1,17 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
-import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils'
-import MyInterviewsShow from '../MyInterviews/Show.vue'
-import InterviewSessionsShow from '../InterviewSessions/Show.vue'
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { nextTick } from 'vue';
+import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
+import MyInterviewsShow from '../MyInterviews/Show.vue';
+import InterviewSessionsShow from '../InterviewSessions/Show.vue';
 
 /** Tipe detail diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
-type DetailPayload = NonNullable<InstanceType<typeof MyInterviewsShow>['$props']['detail']>
+type DetailPayload = NonNullable<InstanceType<typeof MyInterviewsShow>['$props']['detail']>;
 
 /** Tipe sesi interview diturunkan dari props komponen. */
-type SessionDetail = NonNullable<InstanceType<typeof InterviewSessionsShow>['$props']['session']>
+type SessionDetail = NonNullable<InstanceType<typeof InterviewSessionsShow>['$props']['session']>;
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
-config.global.renderStubDefaultSlot = true
+config.global.renderStubDefaultSlot = true;
 
 /**
  * Spec §3.5/§7.2, M2 Task 9 (pola Task 1): skeleton missing-props detail —
@@ -23,7 +23,7 @@ config.global.renderStubDefaultSlot = true
  */
 
 vi.mock('@inertiajs/vue3', async () => {
-    const { reactive } = await import('vue')
+    const { reactive } = await import('vue');
     return {
         Head: { template: '<div style="display:none"></div>' },
         Link: { props: ['href'], template: '<a :href="href"><slot /></a>' },
@@ -42,7 +42,7 @@ vi.mock('@inertiajs/vue3', async () => {
             url: '/dashboard/recruitment',
         }),
         useForm: (initial: Record<string, unknown>) => {
-            const errors = reactive<Record<string, string>>({})
+            const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
                 errors,
@@ -50,24 +50,24 @@ vi.mock('@inertiajs/vue3', async () => {
                 post: vi.fn(),
                 reset: vi.fn(),
                 clearErrors: vi.fn(),
-            })
-            return state
+            });
+            return state;
         },
-    }
-})
+    };
+});
 
-vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }))
+vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/lib/error-message', () => ({
     handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
     showErrorToast: vi.fn(),
     showFlashToast: vi.fn(),
-}))
+}));
 
 vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}))
+}));
 
 function demoDetail(): DetailPayload {
     return {
@@ -118,12 +118,10 @@ function demoDetail(): DetailPayload {
             is_locked: false,
             can_edit: true,
         },
-    }
+    };
 }
 
-function mountMyInterviews(
-    detail: DetailPayload | undefined,
-): VueWrapper<InstanceType<typeof MyInterviewsShow>> {
+function mountMyInterviews(detail: DetailPayload | undefined): VueWrapper<InstanceType<typeof MyInterviewsShow>> {
     const props: InstanceType<typeof MyInterviewsShow>['$props'] = {
         detail,
         evaluateUrl: '/dashboard/recruitment/my-interviews/ap-1/evaluate',
@@ -132,7 +130,7 @@ function mountMyInterviews(
             { value: 'not_recommended', label: 'Tidak direkomendasikan' },
         ],
         flashMessage: null,
-    }
+    };
     return mount(MyInterviewsShow, {
         props,
         global: {
@@ -147,7 +145,7 @@ function mountMyInterviews(
                 SessionQueueDrawer: true,
             },
         },
-    })
+    });
 }
 
 function demoSession(): SessionDetail {
@@ -179,20 +177,18 @@ function demoSession(): SessionDetail {
                 interviewer: null,
             },
         ],
-    }
+    };
 }
 
 function mountInterviewSessions(
-    session: SessionDetail | undefined,
+    session: SessionDetail | undefined
 ): VueWrapper<InstanceType<typeof InterviewSessionsShow>> {
     const props: InstanceType<typeof InterviewSessionsShow>['$props'] = {
         session,
         eligibleApplicants: [],
         interviewerOptions: [],
-        otherSessions: [
-            { id: 'ses-2', session_date: '2026-10-02', starts_at: '13:00', division: null },
-        ],
-    }
+        otherSessions: [{ id: 'ses-2', session_date: '2026-10-02', starts_at: '13:00', division: null }],
+    };
     return mount(InterviewSessionsShow, {
         props,
         global: {
@@ -210,91 +206,89 @@ function mountInterviewSessions(
                 TooltipTrigger: true,
             },
         },
-    })
+    });
 }
 
 function actionButton(wrapper: VueWrapper, label: string): DOMWrapper<HTMLButtonElement> {
-    const found = wrapper
-        .findAll('button')
-        .find((b) => b.text().includes(label))
-    if (!found) throw new Error(`tombol "${label}" tidak ditemukan`)
-    return found as DOMWrapper<HTMLButtonElement>
+    const found = wrapper.findAll('button').find((b) => b.text().includes(label));
+    if (!found) throw new Error(`tombol "${label}" tidak ditemukan`);
+    return found as DOMWrapper<HTMLButtonElement>;
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-})
+    vi.clearAllMocks();
+});
 
 describe('MyInterviews/Show detail skeleton (M2 Task 9)', () => {
     it('props lengkap → konten fade-up + tombol M1 utuh, tanpa skeleton', async () => {
-        const wrapper = mountMyInterviews(demoDetail())
+        const wrapper = mountMyInterviews(demoDetail());
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Budi Santoso')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Budi Santoso');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
 
             // M1 Task 8: tombol submit penilaian tak disentuh dan tetap hadir.
-            const submit = actionButton(wrapper, 'Simpan penilaian')
-            expect(submit.attributes('aria-busy')).toBe('false')
+            const submit = actionButton(wrapper, 'Simpan penilaian');
+            expect(submit.attributes('aria-busy')).toBe('false');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('detail belum ada → skeleton semua zona, tanpa crash', async () => {
-        const wrapper = mountMyInterviews(undefined)
+        const wrapper = mountMyInterviews(undefined);
         try {
-            await nextTick()
+            await nextTick();
 
-            const regions = wrapper.findAll('[aria-busy="true"]')
-            expect(regions.length).toBeGreaterThan(0)
+            const regions = wrapper.findAll('[aria-busy="true"]');
+            expect(regions.length).toBeGreaterThan(0);
             for (const region of regions) {
-                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i)
+                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i);
             }
 
-            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
-            expect(wrapper.text()).not.toContain('Budi Santoso')
+            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
+            expect(wrapper.text()).not.toContain('Budi Santoso');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('InterviewSessions/Show detail skeleton (M2 Task 9)', () => {
     it('props lengkap → konten fade-up + tombol Pindah M1 utuh, tanpa skeleton', async () => {
-        const wrapper = mountInterviewSessions(demoSession())
+        const wrapper = mountInterviewSessions(demoSession());
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Informasi sesi')
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Informasi sesi');
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
 
             // M1 Task 4: tombol reschedule tak disentuh dan tetap hadir.
-            const reschedule = actionButton(wrapper, 'Pindah')
-            expect(reschedule.attributes('aria-busy')).toBe('false')
+            const reschedule = actionButton(wrapper, 'Pindah');
+            expect(reschedule.attributes('aria-busy')).toBe('false');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('session belum ada → skeleton semua zona, tanpa crash', async () => {
-        const wrapper = mountInterviewSessions(undefined)
+        const wrapper = mountInterviewSessions(undefined);
         try {
-            await nextTick()
+            await nextTick();
 
-            const regions = wrapper.findAll('[aria-busy="true"]')
-            expect(regions.length).toBeGreaterThan(0)
+            const regions = wrapper.findAll('[aria-busy="true"]');
+            expect(regions.length).toBeGreaterThan(0);
             for (const region of regions) {
-                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i)
+                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i);
             }
 
-            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
-            expect(wrapper.text()).not.toContain('Informasi sesi')
+            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
+            expect(wrapper.text()).not.toContain('Informasi sesi');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});

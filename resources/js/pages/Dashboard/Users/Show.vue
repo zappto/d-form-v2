@@ -1,23 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
-import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
-import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import { showErrorToast } from '@/lib/error-message'
-import { routes } from '@/lib/routes'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { computed, onMounted, ref } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { showErrorToast } from '@/lib/error-message';
+import { routes } from '@/lib/routes';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 import {
     ArrowLeft,
     CalendarDays,
@@ -29,89 +22,89 @@ import {
     ScanLine,
     Trash2,
     UserRound,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 interface DetailUser {
-    id: string
-    name: string
-    email: string
-    avatar_url: string | null
-    email_verified_at: string | null
-    created_at: string | null
-    updated_at: string | null
-    deleted_at: string | null
-    roles: string[]
-    has_local_password: boolean
-    oauth: { google: boolean; github: boolean }
+    id: string;
+    name: string;
+    email: string;
+    avatar_url: string | null;
+    email_verified_at: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+    deleted_at: string | null;
+    roles: string[];
+    has_local_password: boolean;
+    oauth: { google: boolean; github: boolean };
 }
 
 interface Stats {
-    events_joined: number
-    registrations_pending: number
-    registrations_accepted: number
-    attendances_as_participant: number
-    events_created: number
-    recruitment_applications: number
-    scans_recorded: number
-    interviews_assigned: number
+    events_joined: number;
+    registrations_pending: number;
+    registrations_accepted: number;
+    attendances_as_participant: number;
+    events_created: number;
+    recruitment_applications: number;
+    scans_recorded: number;
+    interviews_assigned: number;
 }
 
 interface RegistrationRow {
-    form_answer_id: string
-    registration_code: string | null
-    review_status: string | null
-    registration_role: string | null
-    member_confirmation_status: string | null
-    created_at: string | null
-    attended_at: string | null
+    form_answer_id: string;
+    registration_code: string | null;
+    review_status: string | null;
+    registration_role: string | null;
+    member_confirmation_status: string | null;
+    created_at: string | null;
+    attended_at: string | null;
     event: {
-        id: string
-        title: string
-        slug: string
-        start_date: string | null
-        status: string | null
-    } | null
-    form: { id: string; title: string | null } | null
+        id: string;
+        title: string;
+        slug: string;
+        start_date: string | null;
+        status: string | null;
+    } | null;
+    form: { id: string; title: string | null } | null;
 }
 
 interface EventCreatedRow {
-    id: string
-    title: string
-    slug: string
-    status: string | null
-    start_date: string | null
-    created_at: string | null
+    id: string;
+    title: string;
+    slug: string;
+    status: string | null;
+    start_date: string | null;
+    created_at: string | null;
 }
 
 interface RecruitmentAppRow {
-    id: string
-    registration_number: string
-    full_name: string
-    stage: string | null
-    result: string | null
-    submitted_at: string | null
-    match: 'personal_email' | 'student_email'
-    period: { id: string; name: string } | null
-    primary_division: string | null
+    id: string;
+    registration_number: string;
+    full_name: string;
+    stage: string | null;
+    result: string | null;
+    submitted_at: string | null;
+    match: 'personal_email' | 'student_email';
+    period: { id: string; name: string } | null;
+    primary_division: string | null;
 }
 
 interface StaffInfo {
-    interviewer_divisions: Array<{ id: string; name: string | null; code: string | null }>
-    interviews_assigned_count: number
-    scans_recorded_count: number
+    interviewer_divisions: Array<{ id: string; name: string | null; code: string | null }>;
+    interviews_assigned_count: number;
+    scans_recorded_count: number;
 }
 
 const props = defineProps<{
-    user: DetailUser
-    stats: Stats
-    registrations: RegistrationRow[]
-    events_created: EventCreatedRow[]
-    recruitment_applications: RecruitmentAppRow[]
-    staff: StaffInfo
-    permissions: { can_edit: boolean; can_delete: boolean }
-}>()
+    user: DetailUser;
+    stats: Stats;
+    registrations: RegistrationRow[];
+    events_created: EventCreatedRow[];
+    recruitment_applications: RecruitmentAppRow[];
+    staff: StaffInfo;
+    permissions: { can_edit: boolean; can_delete: boolean };
+}>();
 
 const roleLabels: Record<string, string> = {
     'super-admin': 'Super Admin',
@@ -119,67 +112,67 @@ const roleLabels: Record<string, string> = {
     member: 'Member',
     'recruitment-staff': 'Recruitment Staff',
     'recruitment-interviewer': 'Recruitment Interviewer',
-}
+};
 
-const isDeleting = ref(false)
-const showDeleteModal = ref(false)
+const isDeleting = ref(false);
+const showDeleteModal = ref(false);
 
 const hasStaffActivity = computed(
     () =>
         props.staff.interviewer_divisions.length > 0 ||
         props.staff.interviews_assigned_count > 0 ||
         props.staff.scans_recorded_count > 0 ||
-        props.events_created.length > 0,
-)
+        props.events_created.length > 0
+);
 
 onMounted(() => {
-    setTopbar({ title: props.user.name, subtitle: 'Detail pengguna' })
-})
+    setTopbar({ title: props.user.name, subtitle: 'Detail pengguna' });
+});
 
 function formatDate(value: string | null | undefined): string {
-    if (!value) return '—'
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return value
+    if (!value) return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleDateString('id-ID', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
-    })
+    });
 }
 
 function formatDateTime(value: string | null | undefined): string {
-    if (!value) return '—'
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return value
+    if (!value) return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleString('id-ID', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-    })
+    });
 }
 
 function reviewLabel(status: string | null): string {
-    if (!status) return '—'
+    if (!status) return '—';
     const map: Record<string, string> = {
         pending: 'Menunggu',
         accepted: 'Diterima',
         rejected: 'Ditolak',
-    }
-    return map[status] ?? status
+    };
+    return map[status] ?? status;
 }
 
 function confirmDelete(): void {
-    if (isDeleting.value || !props.permissions.can_delete) return
-    isDeleting.value = true
+    if (isDeleting.value || !props.permissions.can_delete) return;
+    isDeleting.value = true;
     router.delete(routes.admin.users.destroy(props.user.id), {
         onError: () => showErrorToast('Gagal menghapus akun.'),
         onFinish: () => {
-            isDeleting.value = false
-            showDeleteModal.value = false
+            isDeleting.value = false;
+            showDeleteModal.value = false;
         },
-    })
+    });
 }
 </script>
 
@@ -196,7 +189,7 @@ function confirmDelete(): void {
                 </Button>
                 <div class="flex min-w-0 items-start gap-3">
                     <div
-                        class="bg-muted text-muted-foreground grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl"
+                        class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-muted text-muted-foreground"
                     >
                         <img
                             v-if="user.avatar_url"
@@ -208,11 +201,11 @@ function confirmDelete(): void {
                     </div>
                     <div class="min-w-0">
                         <h1
-                            class="font-display text-foreground truncate text-2xl font-semibold tracking-tight sm:text-3xl"
+                            class="truncate font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
                         >
                             {{ user.name }}
                         </h1>
-                        <p class="text-muted-foreground mt-1 flex items-center gap-1.5 text-sm">
+                        <p class="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                             <Mail class="size-3.5 shrink-0" aria-hidden="true" />
                             <span class="truncate">{{ user.email }}</span>
                         </p>
@@ -247,44 +240,44 @@ function confirmDelete(): void {
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Card class="rounded-2xl border-border/70">
                 <CardContent class="flex items-center gap-3 p-4">
-                    <span class="bg-muted grid size-10 place-items-center rounded-xl">
+                    <span class="grid size-10 place-items-center rounded-xl bg-muted">
                         <CalendarDays class="size-4" aria-hidden="true" />
                     </span>
                     <div>
-                        <p class="text-muted-foreground text-xs">Event diikuti</p>
+                        <p class="text-xs text-muted-foreground">Event diikuti</p>
                         <p class="text-xl font-semibold tabular-nums">{{ stats.events_joined }}</p>
                     </div>
                 </CardContent>
             </Card>
             <Card class="rounded-2xl border-border/70">
                 <CardContent class="flex items-center gap-3 p-4">
-                    <span class="bg-muted grid size-10 place-items-center rounded-xl">
+                    <span class="grid size-10 place-items-center rounded-xl bg-muted">
                         <CheckCircle2 class="size-4" aria-hidden="true" />
                     </span>
                     <div>
-                        <p class="text-muted-foreground text-xs">Registrasi diterima</p>
+                        <p class="text-xs text-muted-foreground">Registrasi diterima</p>
                         <p class="text-xl font-semibold tabular-nums">{{ stats.registrations_accepted }}</p>
                     </div>
                 </CardContent>
             </Card>
             <Card class="rounded-2xl border-border/70">
                 <CardContent class="flex items-center gap-3 p-4">
-                    <span class="bg-muted grid size-10 place-items-center rounded-xl">
+                    <span class="grid size-10 place-items-center rounded-xl bg-muted">
                         <ClipboardList class="size-4" aria-hidden="true" />
                     </span>
                     <div>
-                        <p class="text-muted-foreground text-xs">Pendaftaran OpRec</p>
+                        <p class="text-xs text-muted-foreground">Pendaftaran OpRec</p>
                         <p class="text-xl font-semibold tabular-nums">{{ stats.recruitment_applications }}</p>
                     </div>
                 </CardContent>
             </Card>
             <Card class="rounded-2xl border-border/70">
                 <CardContent class="flex items-center gap-3 p-4">
-                    <span class="bg-muted grid size-10 place-items-center rounded-xl">
+                    <span class="grid size-10 place-items-center rounded-xl bg-muted">
                         <ScanLine class="size-4" aria-hidden="true" />
                     </span>
                     <div>
-                        <p class="text-muted-foreground text-xs">Scan tercatat</p>
+                        <p class="text-xs text-muted-foreground">Scan tercatat</p>
                         <p class="text-xl font-semibold tabular-nums">{{ stats.scans_recorded }}</p>
                     </div>
                 </CardContent>
@@ -310,7 +303,7 @@ function confirmDelete(): void {
                         <span>{{ user.oauth.google ? 'Terhubung' : '—' }}</span>
                     </div>
                     <div class="flex justify-between gap-3">
-                        <span class="text-muted-foreground flex items-center gap-1">
+                        <span class="flex items-center gap-1 text-muted-foreground">
                             <Github class="size-3.5" aria-hidden="true" />
                             GitHub
                         </span>
@@ -359,12 +352,14 @@ function confirmDelete(): void {
                                                     <Link
                                                         v-if="row.event"
                                                         :href="routes.admin.events.show(row.event.id)"
-                                                        class="text-foreground hover:underline font-medium"
+                                                        class="font-medium text-foreground hover:underline"
                                                     >
                                                         {{ row.event.title }}
                                                     </Link>
-                                                    <span v-else class="text-muted-foreground">Event tidak tersedia</span>
-                                                    <p class="text-muted-foreground mt-0.5 text-xs">
+                                                    <span v-else class="text-muted-foreground"
+                                                        >Event tidak tersedia</span
+                                                    >
+                                                    <p class="mt-0.5 text-xs text-muted-foreground">
                                                         {{ row.form?.title || 'Form' }}
                                                         <span v-if="row.event?.start_date">
                                                             · {{ formatDate(row.event.start_date) }}
@@ -416,7 +411,7 @@ function confirmDelete(): void {
                                             <TableCell>
                                                 <div>
                                                     <p class="font-medium">{{ app.registration_number }}</p>
-                                                    <p class="text-muted-foreground text-xs">
+                                                    <p class="text-xs text-muted-foreground">
                                                         {{ app.full_name }}
                                                         <span v-if="app.primary_division">
                                                             · {{ app.primary_division }}
@@ -442,7 +437,7 @@ function confirmDelete(): void {
                                     </TableBody>
                                 </Table>
                             </div>
-                            <p class="text-muted-foreground mt-3 text-xs">
+                            <p class="mt-3 text-xs text-muted-foreground">
                                 Dicocokkan lewat email akun (personal/student email pada formulir OpRec).
                             </p>
                         </template>
@@ -462,17 +457,17 @@ function confirmDelete(): void {
                     <CardContent class="space-y-4">
                         <div class="grid gap-3 sm:grid-cols-3">
                             <div class="rounded-xl border border-border/60 p-3">
-                                <p class="text-muted-foreground text-xs">Event dibuat</p>
+                                <p class="text-xs text-muted-foreground">Event dibuat</p>
                                 <p class="text-lg font-semibold tabular-nums">{{ stats.events_created }}</p>
                             </div>
                             <div class="rounded-xl border border-border/60 p-3">
-                                <p class="text-muted-foreground text-xs">Interview ditugaskan</p>
+                                <p class="text-xs text-muted-foreground">Interview ditugaskan</p>
                                 <p class="text-lg font-semibold tabular-nums">
                                     {{ staff.interviews_assigned_count }}
                                 </p>
                             </div>
                             <div class="rounded-xl border border-border/60 p-3">
-                                <p class="text-muted-foreground text-xs">Scan sebagai operator</p>
+                                <p class="text-xs text-muted-foreground">Scan sebagai operator</p>
                                 <p class="text-lg font-semibold tabular-nums">{{ staff.scans_recorded_count }}</p>
                             </div>
                         </div>
@@ -501,11 +496,11 @@ function confirmDelete(): void {
                                 >
                                     <Link
                                         :href="routes.admin.events.show(event.id)"
-                                        class="hover:underline font-medium"
+                                        class="font-medium hover:underline"
                                     >
                                         {{ event.title }}
                                     </Link>
-                                    <span class="text-muted-foreground text-xs">
+                                    <span class="text-xs text-muted-foreground">
                                         {{ event.status }} · {{ formatDate(event.start_date) }}
                                     </span>
                                 </li>
@@ -526,7 +521,11 @@ function confirmDelete(): void {
             :loading="isDeleting"
             @confirm="confirmDelete"
             @cancel="showDeleteModal = false"
-            @update:open="(v: boolean) => { showDeleteModal = v }"
+            @update:open="
+                (v: boolean) => {
+                    showDeleteModal = v;
+                }
+            "
         />
     </div>
 </template>

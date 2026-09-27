@@ -34,7 +34,7 @@ onMounted(() => {
                     <Skeleton class="h-10 w-32" />
                 </div>
 
-                <div class="grid mb-5 gap-5 lg:grid-cols-12 lg:items-stretch">
+                <div class="mb-5 grid gap-5 lg:grid-cols-12 lg:items-stretch">
                     <div class="edit-fields-skeleton flex flex-col gap-6 lg:col-span-7">
                         <div v-for="n in 4" :key="`field-${n}`" class="flex flex-col gap-5">
                             <div class="flex flex-col gap-2">

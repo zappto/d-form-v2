@@ -1,13 +1,13 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
-import { config, mount, type VueWrapper } from '@vue/test-utils'
-import QrScanSidebar from '@/components/modules/dashboard/QrScanSidebar.vue'
-import DashboardIndex from '../Index.vue'
-import EventsShow from '../Events/Show.vue'
-import type { ScanResult } from '@/lib/qrScanUi'
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { nextTick } from 'vue';
+import { config, mount, type VueWrapper } from '@vue/test-utils';
+import QrScanSidebar from '@/components/modules/dashboard/QrScanSidebar.vue';
+import DashboardIndex from '../Index.vue';
+import EventsShow from '../Events/Show.vue';
+import type { ScanResult } from '@/lib/qrScanUi';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
-config.global.renderStubDefaultSlot = true
+config.global.renderStubDefaultSlot = true;
 
 /**
  * Spec §3.5, M2 Task 6 (pola Task 1): skeleton GET —
@@ -21,10 +21,10 @@ config.global.renderStubDefaultSlot = true
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: { template: '<div style="display:none"></div>' },
-}))
+}));
 
-vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }))
-vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<slot />' } }))
+vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
+vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     default: {
@@ -32,7 +32,7 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
         template:
             '<div data-testid="empty-state"><p>{{ title }}</p><p v-if="description">{{ description }}</p><slot /></div>',
     },
-}))
+}));
 
 // Kalender Admin Dashboard kini konsumen data nyata (Mx-D); assert props tanpa
 // memuat dependency berat (Dialog/Card/dummyData).
@@ -42,7 +42,7 @@ vi.mock('@/components/modules/dashboard/EventCalendar.vue', () => ({
         props: { events: { type: Array, default: () => [] } },
         template: '<div data-testid="event-calendar" :data-count="events.length" />',
     },
-}))
+}));
 
 function demoScanResult(): ScanResult {
     return {
@@ -54,12 +54,12 @@ function demoScanResult(): ScanResult {
         eventKind: 'event',
         eventTitle: 'Acara',
         queueNumber: null,
-    }
+    };
 }
 
 function mountSidebar(
     scanResult: ScanResult | null,
-    scanBusy: boolean,
+    scanBusy: boolean
 ): VueWrapper<InstanceType<typeof QrScanSidebar>> {
     return mount(QrScanSidebar, {
         props: {
@@ -80,20 +80,18 @@ function mountSidebar(
                 Input: true,
             },
         },
-    })
+    });
 }
 
 /** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
-type TDashboardProps = InstanceType<typeof DashboardIndex>['$props']
-type TDashboardStats = NonNullable<TDashboardProps['stats']>
+type TDashboardProps = InstanceType<typeof DashboardIndex>['$props'];
+type TDashboardStats = NonNullable<TDashboardProps['stats']>;
 
 function demoStats(): TDashboardStats {
-    return { totalEvents: 5, activeEvents: 3, totalRegistrants: 120, completionRate: 60 }
+    return { totalEvents: 5, activeEvents: 3, totalRegistrants: 120, completionRate: 60 };
 }
 
-function mountDashboardIndex(
-    props: Partial<TDashboardProps>,
-): VueWrapper<InstanceType<typeof DashboardIndex>> {
+function mountDashboardIndex(props: Partial<TDashboardProps>): VueWrapper<InstanceType<typeof DashboardIndex>> {
     return mount(DashboardIndex, {
         props: {
             recentEvents: props.recentEvents,
@@ -109,18 +107,25 @@ function mountDashboardIndex(
                 CategoryChart: true,
             },
         },
-    })
+    });
 }
 
 function fullDashboardProps(): TDashboardProps {
     return {
         recentEvents: [],
         calendarEvents: [
-            { id: 'ev-1', title: 'Acara', start_date: '2026-10-01', end_date: null, category: 'rkt', href: '/admin/events/ev-1' },
+            {
+                id: 'ev-1',
+                title: 'Acara',
+                start_date: '2026-10-01',
+                end_date: null,
+                category: 'rkt',
+                href: '/admin/events/ev-1',
+            },
         ],
         stats: demoStats(),
         adminCharts: { registrationTrend: [], categoryBreakdown: [] },
-    }
+    };
 }
 
 function demoIEvent(): IEvent {
@@ -146,15 +151,13 @@ function demoIEvent(): IEvent {
         deleted_at: null,
         created_at: '2026-09-01',
         updated_at: '2026-09-01',
-    }
+    };
 }
 
 /** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
-type TEventsShowProps = InstanceType<typeof EventsShow>['$props']
+type TEventsShowProps = InstanceType<typeof EventsShow>['$props'];
 
-function mountEventsShow(
-    props: TEventsShowProps,
-): VueWrapper<InstanceType<typeof EventsShow>> {
+function mountEventsShow(props: TEventsShowProps): VueWrapper<InstanceType<typeof EventsShow>> {
     return mount(EventsShow, {
         props,
         global: {
@@ -168,160 +171,160 @@ function mountEventsShow(
                 TooltipProvider: true,
             },
         },
-    })
+    });
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-})
+    vi.clearAllMocks();
+});
 
 describe('QrScanSidebar panel hasil (M2 Task 6)', () => {
     it('idle tanpa hasil → pesan kosong, tanpa skeleton', async () => {
-        const wrapper = mountSidebar(null, false)
+        const wrapper = mountSidebar(null, false);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Belum ada scan')
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Belum ada scan');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('sibuk → skeleton hasil + hasil basi hidden + kartu manual visible', async () => {
-        const wrapper = mountSidebar(demoScanResult(), true)
+        const wrapper = mountSidebar(demoScanResult(), true);
         try {
-            await nextTick()
+            await nextTick();
 
-            const region = wrapper.find('[aria-busy="true"]')
-            expect(region.exists()).toBe(true)
-            expect(region.attributes('aria-label')).toMatch(/memuat/i)
+            const region = wrapper.find('[aria-busy="true"]');
+            expect(region.exists()).toBe(true);
+            expect(region.attributes('aria-label')).toMatch(/memuat/i);
 
-            expect(wrapper.find('.scan-result-skeleton').exists()).toBe(true)
-            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
+            expect(wrapper.find('.scan-result-skeleton').exists()).toBe(true);
+            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
 
             // Hasil basi disembunyikan selama sibuk.
-            expect(wrapper.text()).not.toContain('Budi Santoso')
-            expect(wrapper.text()).not.toContain('Belum ada scan')
+            expect(wrapper.text()).not.toContain('Budi Santoso');
+            expect(wrapper.text()).not.toContain('Belum ada scan');
 
             // Kartu input manual tidak ikut skeleton.
-            expect(wrapper.text()).toContain('Input Manual')
+            expect(wrapper.text()).toContain('Input Manual');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('selesai → hasil tampil, skeleton hilang', async () => {
-        const wrapper = mountSidebar(demoScanResult(), false)
+        const wrapper = mountSidebar(demoScanResult(), false);
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.text()).toContain('Budi Santoso')
-            expect(wrapper.find('[aria-busy="true"]').exists()).toBe(false)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.text()).toContain('Budi Santoso');
+            expect(wrapper.find('[aria-busy="true"]').exists()).toBe(false);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Dashboard/Index skeleton (M2 Task 6)', () => {
     it('props lengkap → konten fade-up, tanpa skeleton', async () => {
-        const wrapper = mountDashboardIndex(fullDashboardProps())
+        const wrapper = mountDashboardIndex(fullDashboardProps());
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
-            expect(wrapper.text()).toContain('Metrik utama')
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
+            expect(wrapper.text()).toContain('Metrik utama');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('props belum ada → skeleton 4 stat + recent + 2 chart, kalender tetap', async () => {
-        const wrapper = mountDashboardIndex({})
+        const wrapper = mountDashboardIndex({});
         try {
-            await nextTick()
+            await nextTick();
 
-            const regions = wrapper.findAll('[aria-busy="true"]')
-            expect(regions.length).toBeGreaterThan(0)
+            const regions = wrapper.findAll('[aria-busy="true"]');
+            expect(regions.length).toBeGreaterThan(0);
             for (const region of regions) {
-                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i)
+                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i);
             }
 
-            expect(wrapper.findAll('.kpi-skeleton')).toHaveLength(4)
-            expect(wrapper.find('.recent-skeleton').exists()).toBe(true)
-            expect(wrapper.findAll('.chart-skeleton')).toHaveLength(2)
+            expect(wrapper.findAll('.kpi-skeleton')).toHaveLength(4);
+            expect(wrapper.find('.recent-skeleton').exists()).toBe(true);
+            expect(wrapper.findAll('.chart-skeleton')).toHaveLength(2);
 
             // Kalender data nyata selalu tampil; section duplikat 'Linimasa acara' dihapus (Mx-D).
-            expect(wrapper.text()).toContain('Aktivitas & kalender')
-            expect(wrapper.find('[data-testid="event-calendar"]').exists()).toBe(true)
-            expect(wrapper.text()).not.toContain('Linimasa acara')
-            expect(wrapper.find('[data-testid="mini-calendar"]').exists()).toBe(false)
+            expect(wrapper.text()).toContain('Aktivitas & kalender');
+            expect(wrapper.find('[data-testid="event-calendar"]').exists()).toBe(true);
+            expect(wrapper.text()).not.toContain('Linimasa acara');
+            expect(wrapper.find('[data-testid="mini-calendar"]').exists()).toBe(false);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('kalender memakai calendarEvents & kalender dummy tidak dirender (Mx-D)', async () => {
-        const wrapper = mountDashboardIndex(fullDashboardProps())
+        const wrapper = mountDashboardIndex(fullDashboardProps());
         try {
-            await nextTick()
+            await nextTick();
 
-            const calendar = wrapper.find('[data-testid="event-calendar"]')
-            expect(calendar.exists()).toBe(true)
-            expect(calendar.attributes('data-count')).toBe('1')
-            expect(wrapper.find('[data-testid="mini-calendar"]').exists()).toBe(false)
-            expect(wrapper.text()).not.toContain('Linimasa acara')
+            const calendar = wrapper.find('[data-testid="event-calendar"]');
+            expect(calendar.exists()).toBe(true);
+            expect(calendar.attributes('data-count')).toBe('1');
+            expect(wrapper.find('[data-testid="mini-calendar"]').exists()).toBe(false);
+            expect(wrapper.text()).not.toContain('Linimasa acara');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('adminCharts null → chart hidden tanpa skeleton', async () => {
-        const wrapper = mountDashboardIndex({ ...fullDashboardProps(), adminCharts: null })
+        const wrapper = mountDashboardIndex({ ...fullDashboardProps(), adminCharts: null });
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('.chart-skeleton')).toHaveLength(0)
-            expect(wrapper.text()).not.toContain('Analitik singkat')
+            expect(wrapper.findAll('.chart-skeleton')).toHaveLength(0);
+            expect(wrapper.text()).not.toContain('Analitik singkat');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});
 
 describe('Events/Show skeleton (M2 Task 6)', () => {
     it('props lengkap → konten fade-up, tanpa skeleton, modal M1 utuh', async () => {
-        const wrapper = mountEventsShow({ event: demoIEvent(), forms: [] })
+        const wrapper = mountEventsShow({ event: demoIEvent(), forms: [] });
         try {
-            await nextTick()
+            await nextTick();
 
-            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0)
-            expect(wrapper.find('.fade-up').exists()).toBe(true)
+            expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
+            expect(wrapper.find('.fade-up').exists()).toBe(true);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('event belum ada → skeleton hero + 3 kartu kiri + aside', async () => {
-        const wrapper = mountEventsShow({ event: undefined, forms: undefined })
+        const wrapper = mountEventsShow({ event: undefined, forms: undefined });
         try {
-            await nextTick()
+            await nextTick();
 
-            const regions = wrapper.findAll('[aria-busy="true"]')
-            expect(regions.length).toBeGreaterThan(0)
+            const regions = wrapper.findAll('[aria-busy="true"]');
+            expect(regions.length).toBeGreaterThan(0);
             for (const region of regions) {
-                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i)
+                expect(String(region.attributes('aria-label'))).toMatch(/memuat/i);
             }
 
-            expect(wrapper.find('.hero-skeleton').exists()).toBe(true)
-            expect(wrapper.findAll('.detail-card-skeleton')).toHaveLength(3)
-            expect(wrapper.find('.aside-skeleton').exists()).toBe(true)
-            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
+            expect(wrapper.find('.hero-skeleton').exists()).toBe(true);
+            expect(wrapper.findAll('.detail-card-skeleton')).toHaveLength(3);
+            expect(wrapper.find('.aside-skeleton').exists()).toBe(true);
+            expect(wrapper.findAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});

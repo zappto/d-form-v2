@@ -15,9 +15,9 @@ import useAuth from '@/hooks/useAuth';
 import { Eye, EyeOff, Save, UploadCloud } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
 
-const DASHBOARD_PROFILE_UPDATE_URL = routes.dashboard.profile
-const DASHBOARD_PROFILE_AVATAR_URL = routes.dashboard.profileAvatar
-const DASHBOARD_PROFILE_PASSWORD_URL = routes.dashboard.profilePassword
+const DASHBOARD_PROFILE_UPDATE_URL = routes.dashboard.profile;
+const DASHBOARD_PROFILE_AVATAR_URL = routes.dashboard.profileAvatar;
+const DASHBOARD_PROFILE_PASSWORD_URL = routes.dashboard.profilePassword;
 
 defineOptions({ layout: DashboardLayout });
 
@@ -296,7 +296,7 @@ function saveAllChanges(): void {
     <Head title="Profil" />
 
     <div class="mx-auto w-full max-w-5xl">
-        <Card class="border-border/70 bg-card overflow-hidden rounded-2xl py-0 shadow-xs">
+        <Card class="overflow-hidden rounded-2xl border-border/70 bg-card py-0 shadow-xs">
             <CardContent class="p-0">
                 <input
                     ref="avatarFileInputRef"
@@ -310,7 +310,7 @@ function saveAllChanges(): void {
 
                 <div v-if="!profileReady" aria-busy="true" aria-label="Memuat profil">
                     <section class="bg-muted/20 p-5 sm:p-8">
-                        <div class="border-border/70 mb-6 border-b pb-4">
+                        <div class="mb-6 border-b border-border/70 pb-4">
                             <Skeleton class="h-3 w-40" />
                             <Skeleton class="mt-2 h-6 w-56" />
                             <Skeleton class="mt-1.5 h-4 w-72" />
@@ -344,8 +344,8 @@ function saveAllChanges(): void {
                         </div>
                     </section>
 
-                    <section class="border-border/70 bg-card border-t p-5 sm:p-8">
-                        <div class="border-border/70 mb-6 border-b pb-4">
+                    <section class="border-t border-border/70 bg-card p-5 sm:p-8">
+                        <div class="mb-6 border-b border-border/70 pb-4">
                             <Skeleton class="h-3 w-32" />
                             <Skeleton class="mt-2 h-6 w-48" />
                             <Skeleton class="mt-1.5 h-4 w-80 max-w-full" />
@@ -369,7 +369,7 @@ function saveAllChanges(): void {
                         </div>
                     </section>
 
-                    <section class="border-border/70 bg-muted/20 border-t p-5 sm:p-6">
+                    <section class="border-t border-border/70 bg-muted/20 p-5 sm:p-6">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <Skeleton class="h-4 w-64 max-w-full" />
                             <Skeleton class="h-12 w-full sm:w-44" />
@@ -377,243 +377,271 @@ function saveAllChanges(): void {
                     </section>
                 </div>
                 <template v-else>
-                <section class="fade-up bg-muted/20 p-5 sm:p-8">
-                    <div class="border-border/70 mb-6 border-b pb-4">
-                        <p class="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">
-                            Pengaturan Profil
-                        </p>
-                        <h1 class="text-foreground mt-1 text-xl font-semibold tracking-[-0.02em]">Informasi Dasar</h1>
-                        <p class="text-muted-foreground mt-1 text-sm">
-                            Kelola identitas tampilan dan email akun Anda.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
-                        <UserAvatarFallback
-                            :src="avatarDisplaySrc"
-                            :seed="userAvatarSeed(user)"
-                            avatar-class="size-20 rounded-full border border-border"
-                            fallback-round-class="rounded-full"
-                        />
-
-                        <div class="min-w-0 flex-1">
-                            <h1 class="text-foreground text-lg font-semibold">Foto Profil</h1>
-                            <div class="mt-3 flex flex-wrap items-center gap-3">
-                                <Button
-                                    type="button"
-                                    class="h-10 px-4 shadow-sm"
-                                    :disabled="isProcessing"
-                                    @click="openAvatarPicker"
-                                >
-                                    <UploadCloud class="size-4" />
-                                    Unggah Foto
-                                </Button>
-                                <Button
-                                    v-if="avatarHasChanges"
-                                    type="button"
-                                    variant="outline"
-                                    class="h-10 px-4"
-                                    :disabled="isProcessing"
-                                    @click="clearPendingAvatar"
-                                >
-                                    Batal
-                                </Button>
-                                <Button
-                                    v-else
-                                    type="button"
-                                    variant="outline"
-                                    class="h-10 px-4"
-                                    :disabled="isProcessing || !user?.avatar || pendingAvatarRemoval"
-                                    @click="markAvatarForRemoval"
-                                >
-                                    Hapus
-                                </Button>
-                            </div>
-                            <p class="text-muted-foreground mt-3 text-sm">
-                                {{
-                                    pendingFile
-                                        ? 'Foto baru sudah dipilih. Klik Simpan Perubahan di bawah untuk mengunggahnya.'
-                                        : pendingAvatarRemoval
-                                          ? 'Foto profil akan dihapus setelah Anda menyimpan perubahan.'
-                                          : 'Mendukung PNG, JPEG, dan GIF di bawah 5MB'
-                                }}
+                    <section class="fade-up bg-muted/20 p-5 sm:p-8">
+                        <div class="mb-6 border-b border-border/70 pb-4">
+                            <p class="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                                Pengaturan Profil
                             </p>
-                            <p v-if="getFieldError(avatarUploadForm.errors, 'avatar')" class="text-destructive mt-2 text-sm">
-                                {{ getFieldError(avatarUploadForm.errors, 'avatar') }}
+                            <h1 class="mt-1 text-xl font-semibold tracking-[-0.02em] text-foreground">
+                                Informasi Dasar
+                            </h1>
+                            <p class="mt-1 text-sm text-muted-foreground">
+                                Kelola identitas tampilan dan email akun Anda.
                             </p>
                         </div>
-                    </div>
-                </section>
 
-                <section class="fade-up bg-muted/20 px-5 pb-7 sm:px-8">
-                    <form class="grid gap-6" @submit.prevent="saveAllChanges">
-                        <div class="grid gap-5 md:grid-cols-2">
-                            <div class="grid gap-2">
-                                <Label for="profile-name" class="text-sm font-semibold">Nama Lengkap</Label>
-                                <Input
-                                    id="profile-name"
-                                    v-model="profileForm.name"
-                                    maxlength="150"
-                                    autocomplete="name"
-                                    placeholder="Nama Anda"
-                                    class="h-12 rounded-xl"
-                                    :aria-invalid="Boolean(profileForm.errors.name)"
-                                />
-                                <p v-if="getFieldError(profileForm.errors, 'name')" role="alert" class="text-destructive text-sm">
-                                    {{ getFieldError(profileForm.errors, 'name') }}
-                                </p>
-                            </div>
-                            <div class="grid gap-2">
-                                <Label for="profile-email" class="text-sm font-semibold">Email</Label>
-                                <Input
-                                    id="profile-email"
-                                    v-model="profileForm.email"
-                                    type="email"
-                                    autocomplete="email"
-                                    placeholder="nama@email.com"
-                                    class="h-12 rounded-xl"
-                                    :aria-invalid="Boolean(profileForm.errors.email)"
-                                />
-                                <p v-if="getFieldError(profileForm.errors, 'email')" role="alert" class="text-destructive text-sm">
-                                    {{ getFieldError(profileForm.errors, 'email') }}
-                                </p>
-                            </div>
-                        </div>
+                        <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
+                            <UserAvatarFallback
+                                :src="avatarDisplaySrc"
+                                :seed="userAvatarSeed(user)"
+                                avatar-class="size-20 rounded-full border border-border"
+                                fallback-round-class="rounded-full"
+                            />
 
-                    </form>
-                </section>
-
-                <section class="fade-up border-border/70 bg-card border-t p-5 sm:p-8">
-                    <div class="border-border/70 mb-6 border-b pb-4">
-                        <p class="text-muted-foreground text-xs font-semibold tracking-[0.16em] uppercase">Keamanan</p>
-                        <h2 class="text-foreground mt-1 text-xl font-semibold tracking-[-0.02em]">Kata Sandi & Akses</h2>
-                        <p class="text-muted-foreground mt-1 text-sm">
-                            {{
-                                hasLocalPassword
-                                    ? 'Masuk menggunakan kata sandi tanpa perlu kode login sementara.'
-                                    : 'Tambahkan kata sandi agar Anda bisa masuk menggunakan email dan kata sandi.'
-                            }}
-                        </p>
-                    </div>
-
-                    <form class="grid gap-5" @submit.prevent="saveAllChanges">
-                        <div class="grid gap-5">
-                            <div v-if="hasLocalPassword" class="grid gap-2">
-                                <Label for="current_password" class="text-sm font-semibold">Kata Sandi Saat Ini</Label>
-                                <div class="relative">
-                                    <Input
-                                        id="current_password"
-                                        v-model="passwordForm.current_password"
-                                        :type="showCurrentPassword ? 'text' : 'password'"
-                                        placeholder="Kata sandi saat ini"
-                                        autocomplete="current-password"
-                                        class="h-12 rounded-xl pr-11"
-                                        :aria-invalid="Boolean(passwordForm.errors.current_password)"
-                                    />
-                                    <button
+                            <div class="min-w-0 flex-1">
+                                <h1 class="text-lg font-semibold text-foreground">Foto Profil</h1>
+                                <div class="mt-3 flex flex-wrap items-center gap-3">
+                                    <Button
                                         type="button"
-                                        class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center transition focus-visible:ring-2 focus-visible:outline-none"
-                                        :aria-label="
-                                            showCurrentPassword ? 'Sembunyikan kata sandi saat ini' : 'Tampilkan kata sandi saat ini'
-                                        "
-                                        @click="showCurrentPassword = !showCurrentPassword"
+                                        class="h-10 px-4 shadow-sm"
+                                        :disabled="isProcessing"
+                                        @click="openAvatarPicker"
                                     >
-                                        <EyeOff v-if="showCurrentPassword" class="size-4" />
-                                        <Eye v-else class="size-4" />
-                                    </button>
+                                        <UploadCloud class="size-4" />
+                                        Unggah Foto
+                                    </Button>
+                                    <Button
+                                        v-if="avatarHasChanges"
+                                        type="button"
+                                        variant="outline"
+                                        class="h-10 px-4"
+                                        :disabled="isProcessing"
+                                        @click="clearPendingAvatar"
+                                    >
+                                        Batal
+                                    </Button>
+                                    <Button
+                                        v-else
+                                        type="button"
+                                        variant="outline"
+                                        class="h-10 px-4"
+                                        :disabled="isProcessing || !user?.avatar || pendingAvatarRemoval"
+                                        @click="markAvatarForRemoval"
+                                    >
+                                        Hapus
+                                    </Button>
                                 </div>
+                                <p class="mt-3 text-sm text-muted-foreground">
+                                    {{
+                                        pendingFile
+                                            ? 'Foto baru sudah dipilih. Klik Simpan Perubahan di bawah untuk mengunggahnya.'
+                                            : pendingAvatarRemoval
+                                              ? 'Foto profil akan dihapus setelah Anda menyimpan perubahan.'
+                                              : 'Mendukung PNG, JPEG, dan GIF di bawah 5MB'
+                                    }}
+                                </p>
                                 <p
-                                    v-if="getFieldError(passwordForm.errors, 'current_password')"
-                                    role="alert"
-                                    class="text-destructive text-sm"
+                                    v-if="getFieldError(avatarUploadForm.errors, 'avatar')"
+                                    class="mt-2 text-sm text-destructive"
                                 >
-                                    {{ getFieldError(passwordForm.errors, 'current_password') }}
+                                    {{ getFieldError(avatarUploadForm.errors, 'avatar') }}
                                 </p>
                             </div>
+                        </div>
+                    </section>
 
+                    <section class="fade-up bg-muted/20 px-5 pb-7 sm:px-8">
+                        <form class="grid gap-6" @submit.prevent="saveAllChanges">
                             <div class="grid gap-5 md:grid-cols-2">
                                 <div class="grid gap-2">
-                                    <Label for="new_password" class="text-sm font-semibold">
-                                        {{ hasLocalPassword ? 'Kata Sandi Baru' : 'Kata Sandi' }}
-                                    </Label>
+                                    <Label for="profile-name" class="text-sm font-semibold">Nama Lengkap</Label>
+                                    <Input
+                                        id="profile-name"
+                                        v-model="profileForm.name"
+                                        maxlength="150"
+                                        autocomplete="name"
+                                        placeholder="Nama Anda"
+                                        class="h-12 rounded-xl"
+                                        :aria-invalid="Boolean(profileForm.errors.name)"
+                                    />
+                                    <p
+                                        v-if="getFieldError(profileForm.errors, 'name')"
+                                        role="alert"
+                                        class="text-sm text-destructive"
+                                    >
+                                        {{ getFieldError(profileForm.errors, 'name') }}
+                                    </p>
+                                </div>
+                                <div class="grid gap-2">
+                                    <Label for="profile-email" class="text-sm font-semibold">Email</Label>
+                                    <Input
+                                        id="profile-email"
+                                        v-model="profileForm.email"
+                                        type="email"
+                                        autocomplete="email"
+                                        placeholder="nama@email.com"
+                                        class="h-12 rounded-xl"
+                                        :aria-invalid="Boolean(profileForm.errors.email)"
+                                    />
+                                    <p
+                                        v-if="getFieldError(profileForm.errors, 'email')"
+                                        role="alert"
+                                        class="text-sm text-destructive"
+                                    >
+                                        {{ getFieldError(profileForm.errors, 'email') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="fade-up border-t border-border/70 bg-card p-5 sm:p-8">
+                        <div class="mb-6 border-b border-border/70 pb-4">
+                            <p class="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+                                Keamanan
+                            </p>
+                            <h2 class="mt-1 text-xl font-semibold tracking-[-0.02em] text-foreground">
+                                Kata Sandi & Akses
+                            </h2>
+                            <p class="mt-1 text-sm text-muted-foreground">
+                                {{
+                                    hasLocalPassword
+                                        ? 'Masuk menggunakan kata sandi tanpa perlu kode login sementara.'
+                                        : 'Tambahkan kata sandi agar Anda bisa masuk menggunakan email dan kata sandi.'
+                                }}
+                            </p>
+                        </div>
+
+                        <form class="grid gap-5" @submit.prevent="saveAllChanges">
+                            <div class="grid gap-5">
+                                <div v-if="hasLocalPassword" class="grid gap-2">
+                                    <Label for="current_password" class="text-sm font-semibold"
+                                        >Kata Sandi Saat Ini</Label
+                                    >
                                     <div class="relative">
                                         <Input
-                                            id="new_password"
-                                            v-model="passwordForm.password"
-                                            :type="showNewPassword ? 'text' : 'password'"
-                                            placeholder="Minimal 8 karakter"
-                                            autocomplete="new-password"
+                                            id="current_password"
+                                            v-model="passwordForm.current_password"
+                                            :type="showCurrentPassword ? 'text' : 'password'"
+                                            placeholder="Kata sandi saat ini"
+                                            autocomplete="current-password"
                                             class="h-12 rounded-xl pr-11"
-                                            :aria-invalid="Boolean(passwordForm.errors.password)"
+                                            :aria-invalid="Boolean(passwordForm.errors.current_password)"
                                         />
                                         <button
                                             type="button"
-                                            class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center transition focus-visible:ring-2 focus-visible:outline-none"
-                                            :aria-label="showNewPassword ? 'Sembunyikan kata sandi baru' : 'Tampilkan kata sandi baru'"
-                                            @click="showNewPassword = !showNewPassword"
+                                            class="absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                            :aria-label="
+                                                showCurrentPassword
+                                                    ? 'Sembunyikan kata sandi saat ini'
+                                                    : 'Tampilkan kata sandi saat ini'
+                                            "
+                                            @click="showCurrentPassword = !showCurrentPassword"
                                         >
-                                            <EyeOff v-if="showNewPassword" class="size-4" />
+                                            <EyeOff v-if="showCurrentPassword" class="size-4" />
                                             <Eye v-else class="size-4" />
                                         </button>
                                     </div>
                                     <p
-                                        v-if="getFieldError(passwordForm.errors, 'password')"
+                                        v-if="getFieldError(passwordForm.errors, 'current_password')"
                                         role="alert"
-                                        class="text-destructive text-sm"
+                                        class="text-sm text-destructive"
                                     >
-                                        {{ getFieldError(passwordForm.errors, 'password') }}
+                                        {{ getFieldError(passwordForm.errors, 'current_password') }}
                                     </p>
                                 </div>
 
-                                <div class="grid gap-2">
-                                    <Label for="confirm_password" class="text-sm font-semibold">Konfirmasi Kata Sandi</Label>
-                                    <div class="relative">
-                                        <Input
-                                            id="confirm_password"
-                                            v-model="passwordForm.password_confirmation"
-                                            :type="showConfirmPassword ? 'text' : 'password'"
-                                            placeholder="Ulangi kata sandi"
-                                            autocomplete="new-password"
-                                            class="h-12 rounded-xl pr-11"
-                                        />
-                                        <button
-                                            type="button"
-                                            class="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center transition focus-visible:ring-2 focus-visible:outline-none"
-                                            :aria-label="
-                                                showConfirmPassword ? 'Sembunyikan konfirmasi kata sandi' : 'Tampilkan konfirmasi kata sandi'
-                                            "
-                                            @click="showConfirmPassword = !showConfirmPassword"
+                                <div class="grid gap-5 md:grid-cols-2">
+                                    <div class="grid gap-2">
+                                        <Label for="new_password" class="text-sm font-semibold">
+                                            {{ hasLocalPassword ? 'Kata Sandi Baru' : 'Kata Sandi' }}
+                                        </Label>
+                                        <div class="relative">
+                                            <Input
+                                                id="new_password"
+                                                v-model="passwordForm.password"
+                                                :type="showNewPassword ? 'text' : 'password'"
+                                                placeholder="Minimal 8 karakter"
+                                                autocomplete="new-password"
+                                                class="h-12 rounded-xl pr-11"
+                                                :aria-invalid="Boolean(passwordForm.errors.password)"
+                                            />
+                                            <button
+                                                type="button"
+                                                class="absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                                :aria-label="
+                                                    showNewPassword
+                                                        ? 'Sembunyikan kata sandi baru'
+                                                        : 'Tampilkan kata sandi baru'
+                                                "
+                                                @click="showNewPassword = !showNewPassword"
+                                            >
+                                                <EyeOff v-if="showNewPassword" class="size-4" />
+                                                <Eye v-else class="size-4" />
+                                            </button>
+                                        </div>
+                                        <p
+                                            v-if="getFieldError(passwordForm.errors, 'password')"
+                                            role="alert"
+                                            class="text-sm text-destructive"
                                         >
-                                            <EyeOff v-if="showConfirmPassword" class="size-4" />
-                                            <Eye v-else class="size-4" />
-                                        </button>
+                                            {{ getFieldError(passwordForm.errors, 'password') }}
+                                        </p>
+                                    </div>
+
+                                    <div class="grid gap-2">
+                                        <Label for="confirm_password" class="text-sm font-semibold"
+                                            >Konfirmasi Kata Sandi</Label
+                                        >
+                                        <div class="relative">
+                                            <Input
+                                                id="confirm_password"
+                                                v-model="passwordForm.password_confirmation"
+                                                :type="showConfirmPassword ? 'text' : 'password'"
+                                                placeholder="Ulangi kata sandi"
+                                                autocomplete="new-password"
+                                                class="h-12 rounded-xl pr-11"
+                                            />
+                                            <button
+                                                type="button"
+                                                class="absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 items-center justify-center text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                                :aria-label="
+                                                    showConfirmPassword
+                                                        ? 'Sembunyikan konfirmasi kata sandi'
+                                                        : 'Tampilkan konfirmasi kata sandi'
+                                                "
+                                                @click="showConfirmPassword = !showConfirmPassword"
+                                            >
+                                                <EyeOff v-if="showConfirmPassword" class="size-4" />
+                                                <Eye v-else class="size-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </section>
+                        </form>
+                    </section>
 
-                <section class="fade-up border-border/70 bg-muted/20 border-t p-5 sm:p-6">
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <p class="text-muted-foreground text-sm">
-                            {{
-                                hasPendingChanges
-                                    ? 'Ada perubahan yang belum disimpan. Periksa kembali, lalu simpan sekali.'
-                                    : 'Tidak ada perubahan yang belum disimpan.'
-                            }}
-                        </p>
-                        <Button
-                            type="button"
-                            class="h-12 px-6"
-                            :disabled="!hasPendingChanges || isProcessing"
-                            @click="saveAllChanges"
-                        >
-                            <Save class="size-4" />
-                            Simpan Perubahan
-                        </Button>
-                    </div>
-                </section>
+                    <section class="fade-up border-t border-border/70 bg-muted/20 p-5 sm:p-6">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <p class="text-sm text-muted-foreground">
+                                {{
+                                    hasPendingChanges
+                                        ? 'Ada perubahan yang belum disimpan. Periksa kembali, lalu simpan sekali.'
+                                        : 'Tidak ada perubahan yang belum disimpan.'
+                                }}
+                            </p>
+                            <Button
+                                type="button"
+                                class="h-12 px-6"
+                                :disabled="!hasPendingChanges || isProcessing"
+                                @click="saveAllChanges"
+                            >
+                                <Save class="size-4" />
+                                Simpan Perubahan
+                            </Button>
+                        </div>
+                    </section>
                 </template>
             </CardContent>
         </Card>

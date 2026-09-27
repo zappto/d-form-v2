@@ -1,72 +1,72 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
-import { handleInertiaFormErrors } from '@/lib/error-message'
-import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
-import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
-import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Plus, FileText, Pencil, Trash2, Inbox, CalendarClock, Users } from 'lucide-vue-next'
-import { formatDisplayDateTime } from '@/lib/format'
-import FormSubmissionsController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormSubmissionsController'
-import { routes } from '@/lib/routes'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { ref, onMounted } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { handleInertiaFormErrors } from '@/lib/error-message';
+import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
+import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Plus, FileText, Pencil, Trash2, Inbox, CalendarClock, Users } from 'lucide-vue-next';
+import { formatDisplayDateTime } from '@/lib/format';
+import FormSubmissionsController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormSubmissionsController';
+import { routes } from '@/lib/routes';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 
-defineOptions({ layout: DashboardFocusLayout })
+defineOptions({ layout: DashboardFocusLayout });
 
 const props = defineProps<{
-    event: { id: string; title: string } | undefined
-    forms: IForm[] | undefined
-}>()
+    event: { id: string; title: string } | undefined;
+    forms: IForm[] | undefined;
+}>();
 
 onMounted(() => {
-    setTopbar({ title: props.event?.title ?? 'Formulir', subtitle: 'Kelola formulir pendaftaran' })
-})
+    setTopbar({ title: props.event?.title ?? 'Formulir', subtitle: 'Kelola formulir pendaftaran' });
+});
 
-const showDeleteModal = ref(false)
-const deleteTarget = ref<IForm | null>(null)
-const isDeleting = ref(false)
+const showDeleteModal = ref(false);
+const deleteTarget = ref<IForm | null>(null);
+const isDeleting = ref(false);
 
 function startDelete(form: IForm) {
-    deleteTarget.value = form
-    showDeleteModal.value = true
+    deleteTarget.value = form;
+    showDeleteModal.value = true;
 }
 
 function cancelDelete() {
-    if (isDeleting.value) return
-    showDeleteModal.value = false
+    if (isDeleting.value) return;
+    showDeleteModal.value = false;
 }
 
 function confirmDelete() {
-    const event = props.event
-    if (!event || !deleteTarget.value || isDeleting.value) return
-    const id = deleteTarget.value.id
-    isDeleting.value = true
+    const event = props.event;
+    if (!event || !deleteTarget.value || isDeleting.value) return;
+    const id = deleteTarget.value.id;
+    isDeleting.value = true;
     router.delete(routes.admin.events.forms.destroy(event.id, id), {
         preserveScroll: true,
         onSuccess: () => {
             // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
             // dari flash `toast` server (messages.event.delete.success).
-            showDeleteModal.value = false
-            deleteTarget.value = null
+            showDeleteModal.value = false;
+            deleteTarget.value = null;
         },
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal menghapus form' })
+            handleInertiaFormErrors(errors, { title: 'Gagal menghapus form' });
         },
         onFinish: () => {
-            isDeleting.value = false
+            isDeleting.value = false;
         },
-    })
+    });
 }
 
 /** URL halaman pengiriman form; `'#'` hanya saat event belum termuat (tidak pernah dirender). */
 function submissionsHref(formId: string): string {
-    const event = props.event
-    if (!event) return '#'
-    return FormSubmissionsController.url({ event: event.id, form: formId })
+    const event = props.event;
+    if (!event) return '#';
+    return FormSubmissionsController.url({ event: event.id, form: formId });
 }
 </script>
 
@@ -75,7 +75,7 @@ function submissionsHref(formId: string): string {
 
     <div class="flex min-w-0 flex-col gap-5 sm:gap-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <p class="text-muted-foreground text-sm">
+            <p class="text-sm text-muted-foreground">
                 {{ (forms ?? []).length }} formulir untuk {{ event?.title ?? '' }}
             </p>
             <Button as-child class="h-10 w-full md:h-9 md:w-auto">
@@ -89,8 +89,17 @@ function submissionsHref(formId: string): string {
             </Button>
         </div>
 
-        <div v-if="!event || !forms" class="grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3" aria-busy="true" aria-label="Memuat formulir">
-            <div v-for="n in 4" :key="`form-${n}`" class="form-card-skeleton group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+        <div
+            v-if="!event || !forms"
+            class="grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3"
+            aria-busy="true"
+            aria-label="Memuat formulir"
+        >
+            <div
+                v-for="n in 4"
+                :key="`form-${n}`"
+                class="form-card-skeleton group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm"
+            >
                 <div class="flex h-full flex-col p-0">
                     <div class="flex min-w-0 flex-1 items-start gap-3 p-4 sm:p-5">
                         <Skeleton class="size-10 shrink-0 rounded-full" />
@@ -132,7 +141,7 @@ function submissionsHref(formId: string): string {
                         </div>
 
                         <div class="min-w-0 flex-1">
-                            <h3 class="line-clamp-2 text-sm font-semibold leading-snug tracking-tight text-foreground">
+                            <h3 class="line-clamp-2 text-sm leading-snug font-semibold tracking-tight text-foreground">
                                 {{ form.title }}
                             </h3>
                             <p
@@ -146,10 +155,7 @@ function submissionsHref(formId: string): string {
                             </p>
 
                             <div class="mt-3 flex flex-wrap gap-1.5">
-                                <Badge
-                                    variant="outline"
-                                    class="px-2 text-[10px] font-medium"
-                                >
+                                <Badge variant="outline" class="px-2 text-[10px] font-medium">
                                     {{
                                         form.purpose === 'other' || form.metadata?.purpose === 'other'
                                             ? 'Lainnya'
@@ -265,6 +271,10 @@ function submissionsHref(formId: string): string {
         :loading="isDeleting"
         @confirm="confirmDelete"
         @cancel="cancelDelete"
-        @update:open="(v) => { if (!isDeleting) showDeleteModal = v }"
+        @update:open="
+            (v) => {
+                if (!isDeleting) showDeleteModal = v;
+            }
+        "
     />
 </template>

@@ -71,12 +71,7 @@ onMounted(() => {
                     :icon="Users"
                     color="success"
                 />
-                <KpiCard
-                    label="Tingkat isi kuota"
-                    :value="completionRate + '%'"
-                    :icon="TrendingUp"
-                    color="primary"
-                />
+                <KpiCard label="Tingkat isi kuota" :value="completionRate + '%'" :icon="TrendingUp" color="primary" />
             </div>
         </section>
 
@@ -122,11 +117,7 @@ onMounted(() => {
 
         <section v-if="adminCharts === undefined" class="space-y-4">
             <h2 class="font-display text-base font-bold tracking-tight text-foreground">Analitik singkat</h2>
-            <div
-                class="grid gap-5 lg:grid-cols-2"
-                aria-busy="true"
-                aria-label="Memuat analitik"
-            >
+            <div class="grid gap-5 lg:grid-cols-2" aria-busy="true" aria-label="Memuat analitik">
                 <div v-for="n in 2" :key="`chart-${n}`" class="chart-skeleton rounded-2xl border border-border/70">
                     <div class="border-b border-border/50 px-5 py-4">
                         <Skeleton class="h-5 w-40" />

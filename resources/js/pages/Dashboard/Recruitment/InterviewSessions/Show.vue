@@ -1,113 +1,112 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { Head, Link, router, useForm } from '@inertiajs/vue3'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue'
-import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
-import { CometSpinner } from '@/components/ui/comet'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
-import { routes } from '@/lib/routes'
-import { initialsOf } from '@/lib/format'
-import { showErrorToast, showFlashToast } from '@/lib/error-message'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
-import useAuth from '@/hooks/useAuth'
-import { usePage } from '@inertiajs/vue3'
-import { ListOrdered, Plus } from 'lucide-vue-next'
+import { computed, onMounted, ref, watch } from 'vue';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
+import { CometSpinner } from '@/components/ui/comet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import { routes } from '@/lib/routes';
+import { initialsOf } from '@/lib/format';
+import { showErrorToast, showFlashToast } from '@/lib/error-message';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
+import useAuth from '@/hooks/useAuth';
+import { usePage } from '@inertiajs/vue3';
+import { ListOrdered, Plus } from 'lucide-vue-next';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 interface InterviewRow {
-    id: string
-    scheduled_at: string | null
-    location: string
-    room: string
-    status: string
-    status_label: string
+    id: string;
+    scheduled_at: string | null;
+    location: string;
+    room: string;
+    status: string;
+    status_label: string;
     application: {
-        id: string
-        full_name: string
-        registration_number: string
-    } | null
-    interviewer: { id: string; name: string } | null
+        id: string;
+        full_name: string;
+        registration_number: string;
+    } | null;
+    interviewer: { id: string; name: string } | null;
 }
 
 interface SessionDetail {
-    id: string
-    session_date: string
-    starts_at: string
-    ends_at: string
-    location: string
-    room: string
-    notes: string | null
-    is_active: boolean
-    interviews_count: number
-    period: { id: string; name: string } | null
-    division: { id: string; name: string; code: string } | null
-    interviews: InterviewRow[]
+    id: string;
+    session_date: string;
+    starts_at: string;
+    ends_at: string;
+    location: string;
+    room: string;
+    notes: string | null;
+    is_active: boolean;
+    interviews_count: number;
+    period: { id: string; name: string } | null;
+    division: { id: string; name: string; code: string } | null;
+    interviews: InterviewRow[];
 }
 
 interface ApplicantOption {
-    id: string
-    full_name: string
-    registration_number: string
-    nim: string
+    id: string;
+    full_name: string;
+    registration_number: string;
+    nim: string;
 }
 
 const props = defineProps<{
-    session: SessionDetail | undefined
-    eligibleApplicants: ApplicantOption[]
-    interviewerOptions: { id: string; name: string }[]
-    otherSessions: { id: string; session_date: string; starts_at: string; division: { name: string } | null }[]
-}>()
+    session: SessionDetail | undefined;
+    eligibleApplicants: ApplicantOption[];
+    interviewerOptions: { id: string; name: string }[];
+    otherSessions: { id: string; session_date: string; starts_at: string; division: { name: string } | null }[];
+}>();
 
-const selectedApplicants = ref<string[]>([])
+const selectedApplicants = ref<string[]>([]);
 
 const scheduleForm = useForm({
     application_ids: [] as string[],
-})
+});
 
-const reassignValues = ref<Record<string, string>>({})
-const reassignErrors = ref<Record<string, string>>({})
-const reassignProcessing = ref<Record<string, boolean>>({})
+const reassignValues = ref<Record<string, string>>({});
+const reassignErrors = ref<Record<string, string>>({});
+const reassignProcessing = ref<Record<string, boolean>>({});
 
-const rescheduleSessionId = ref<Record<string, string>>({})
-const reschedulingId = ref<string | null>(null)
+const rescheduleSessionId = ref<Record<string, string>>({});
+const reschedulingId = ref<string | null>(null);
 
-const page = usePage()
-const user = useAuth(page.props)
-const canViewQueue = computed(() => user.value?.can_view_recruitment_queue === true)
+const page = usePage();
+const user = useAuth(page.props);
+const canViewQueue = computed(() => user.value?.can_view_recruitment_queue === true);
 
 onMounted(() => {
     setTopbar({
         title: 'Detail sesi interview',
         subtitle: props.session?.division?.name ?? '',
-    })
-})
+    });
+});
 
 const allSelected = computed({
     get: () =>
-        props.eligibleApplicants.length > 0 &&
-        selectedApplicants.value.length === props.eligibleApplicants.length,
+        props.eligibleApplicants.length > 0 && selectedApplicants.value.length === props.eligibleApplicants.length,
     set: (value: boolean) => {
-        selectedApplicants.value = value ? props.eligibleApplicants.map((a) => a.id) : []
+        selectedApplicants.value = value ? props.eligibleApplicants.map((a) => a.id) : [];
     },
-})
+});
 
 function scheduleSelected() {
-    const currentSession = props.session
-    if (!currentSession) return
-    scheduleForm.application_ids = selectedApplicants.value
+    const currentSession = props.session;
+    if (!currentSession) return;
+    scheduleForm.application_ids = selectedApplicants.value;
     scheduleForm.post(routes.admin.recruitment.interviewSessions.schedule(currentSession.id), {
         preserveScroll: true,
         onSuccess: () => {
-            selectedApplicants.value = []
-            scheduleForm.reset()
+            selectedApplicants.value = [];
+            scheduleForm.reset();
         },
-    })
+    });
 }
 
 function reassignOptionsFor(currentInterviewerId: string | null): SearchableSelectOption[] {
@@ -116,120 +115,124 @@ function reassignOptionsFor(currentInterviewerId: string | null): SearchableSele
         label: opt.name,
         initials: initialsOf(opt.name),
         disabled: currentInterviewerId !== null && opt.id === currentInterviewerId,
-    }))
+    }));
 }
 
 function isReassignUnchanged(interviewId: string, currentInterviewerId: string | null): boolean {
-    const next: string = reassignValues.value[interviewId] ?? ''
-    if (next.length === 0) return true
-    if (currentInterviewerId !== null && next === currentInterviewerId) return true
-    return false
+    const next: string = reassignValues.value[interviewId] ?? '';
+    if (next.length === 0) return true;
+    if (currentInterviewerId !== null && next === currentInterviewerId) return true;
+    return false;
 }
 
 function canSubmitReassign(interviewId: string, currentInterviewerId: string | null): boolean {
-    if (reassignProcessing.value[interviewId] === true) return false
-    return !isReassignUnchanged(interviewId, currentInterviewerId)
+    if (reassignProcessing.value[interviewId] === true) return false;
+    return !isReassignUnchanged(interviewId, currentInterviewerId);
 }
 
 function reassignInterview(interviewId: string, currentInterviewerId: string | null): void {
-    const next: string = reassignValues.value[interviewId] ?? ''
-    if (next.length === 0 || reassignProcessing.value[interviewId] === true) return
-    if (currentInterviewerId !== null && next === currentInterviewerId) return
-    reassignProcessing.value[interviewId] = true
-    reassignErrors.value[interviewId] = ''
+    const next: string = reassignValues.value[interviewId] ?? '';
+    if (next.length === 0 || reassignProcessing.value[interviewId] === true) return;
+    if (currentInterviewerId !== null && next === currentInterviewerId) return;
+    reassignProcessing.value[interviewId] = true;
+    reassignErrors.value[interviewId] = '';
     router.post(
         routes.admin.recruitment.interviews.reassign(interviewId),
         { interviewer_id: next },
         {
             preserveScroll: true,
             onSuccess: () => {
-                reassignValues.value[interviewId] = ''
-                reassignErrors.value[interviewId] = ''
+                reassignValues.value[interviewId] = '';
+                reassignErrors.value[interviewId] = '';
             },
             onError: (errors: Record<string, string>) => {
-                const message: string = errors.interviewer_id ?? errors.interviewerId ?? ''
-                reassignErrors.value[interviewId] =
-                    message.length > 0 ? message : 'Gagal menyimpan. Coba lagi.'
+                const message: string = errors.interviewer_id ?? errors.interviewerId ?? '';
+                reassignErrors.value[interviewId] = message.length > 0 ? message : 'Gagal menyimpan. Coba lagi.';
             },
             onFinish: () => {
-                reassignProcessing.value[interviewId] = false
+                reassignProcessing.value[interviewId] = false;
             },
-        },
-    )
+        }
+    );
 }
 
-const isCreateSheetOpen = ref<boolean>(false)
-const createTargetInterviewId = ref<string | null>(null)
-const awaitingCreatedInterviewer = ref<boolean>(false)
-const knownInterviewerIds = ref<Set<string>>(new Set())
+const isCreateSheetOpen = ref<boolean>(false);
+const createTargetInterviewId = ref<string | null>(null);
+const awaitingCreatedInterviewer = ref<boolean>(false);
+const knownInterviewerIds = ref<Set<string>>(new Set());
 
 function openCreateSheetFor(interviewId: string): void {
-    createTargetInterviewId.value = interviewId
-    knownInterviewerIds.value = new Set(props.interviewerOptions.map((o) => o.id))
-    isCreateSheetOpen.value = true
+    createTargetInterviewId.value = interviewId;
+    knownInterviewerIds.value = new Set(props.interviewerOptions.map((o) => o.id));
+    isCreateSheetOpen.value = true;
 }
 
 function closeCreateSheet(): void {
-    isCreateSheetOpen.value = false
+    isCreateSheetOpen.value = false;
     if (!awaitingCreatedInterviewer.value) {
-        createTargetInterviewId.value = null
+        createTargetInterviewId.value = null;
     }
 }
 
 function adoptNewInterviewer(): void {
-    const target: string | null = createTargetInterviewId.value
-    if (target === null || !awaitingCreatedInterviewer.value) return
+    const target: string | null = createTargetInterviewId.value;
+    if (target === null || !awaitingCreatedInterviewer.value) return;
     const fresh: { id: string; name: string } | undefined = props.interviewerOptions.find(
-        (o) => !knownInterviewerIds.value.has(o.id),
-    )
-    if (!fresh) return
-    reassignValues.value[target] = fresh.id
-    reassignErrors.value[target] = ''
-    awaitingCreatedInterviewer.value = false
-    createTargetInterviewId.value = null
+        (o) => !knownInterviewerIds.value.has(o.id)
+    );
+    if (!fresh) return;
+    reassignValues.value[target] = fresh.id;
+    reassignErrors.value[target] = '';
+    awaitingCreatedInterviewer.value = false;
+    createTargetInterviewId.value = null;
 }
 
 function onInterviewerCreated(): void {
-    awaitingCreatedInterviewer.value = true
-    adoptNewInterviewer()
+    awaitingCreatedInterviewer.value = true;
+    adoptNewInterviewer();
 }
 
 watch(
     () => props.interviewerOptions,
     () => {
-        adoptNewInterviewer()
-    },
-)
+        adoptNewInterviewer();
+    }
+);
 
 function rescheduleInterview(interviewId: string): void {
-    const sessionId: string = rescheduleSessionId.value[interviewId] ?? ''
-    if (sessionId === '' || reschedulingId.value !== null) return
+    const sessionId: string = rescheduleSessionId.value[interviewId] ?? '';
+    if (sessionId === '' || reschedulingId.value !== null) return;
 
-    reschedulingId.value = interviewId
+    reschedulingId.value = interviewId;
     router.post(
         routes.admin.recruitment.interviews.reschedule(interviewId),
         { recruitment_interview_session_id: sessionId },
         {
             preserveScroll: true,
             onSuccess: () => {
-                rescheduleSessionId.value[interviewId] = ''
-                showFlashToast({ type: 'success', message: 'Jadwal interview diperbarui.' })
+                rescheduleSessionId.value[interviewId] = '';
+                showFlashToast({ type: 'success', message: 'Jadwal interview diperbarui.' });
             },
             onError: () => {
-                showErrorToast('Gagal memindahkan jadwal interview. Coba lagi.')
+                showErrorToast('Gagal memindahkan jadwal interview. Coba lagi.');
             },
             onFinish: () => {
-                reschedulingId.value = null
+                reschedulingId.value = null;
             },
-        },
-    )
+        }
+    );
 }
 </script>
 
 <template>
     <Head title="Detail Sesi Interview" />
 
-    <div v-if="!session" class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10" aria-busy="true" aria-label="Memuat detail sesi">
+    <div
+        v-if="!session"
+        class="flex w-full max-w-full min-w-0 flex-col gap-6 pt-0 pb-8 sm:gap-8 sm:pb-10"
+        aria-busy="true"
+        aria-label="Memuat detail sesi"
+    >
         <div class="flex flex-wrap items-center justify-end gap-3">
             <Skeleton class="h-9 w-36" />
         </div>
@@ -246,7 +249,11 @@ function rescheduleInterview(interviewId: string): void {
             <Skeleton class="h-5 w-44" />
             <div class="mt-4 space-y-2">
                 <Skeleton class="h-4 w-40" />
-                <div v-for="n in 3" :key="`calon-${n}`" class="flex items-center gap-3 rounded-lg border border-border/70 p-3">
+                <div
+                    v-for="n in 3"
+                    :key="`calon-${n}`"
+                    class="flex items-center gap-3 rounded-lg border border-border/70 p-3"
+                >
                     <Skeleton class="size-4 shrink-0 rounded" />
                     <div class="space-y-1.5">
                         <Skeleton class="h-4 w-40" />
@@ -318,13 +325,16 @@ function rescheduleInterview(interviewId: string): void {
                         <input v-model="selectedApplicants" type="checkbox" :value="applicant.id" />
                         <div>
                             <p class="font-medium">{{ applicant.full_name }}</p>
-                            <p class="text-muted-foreground font-mono text-xs">
+                            <p class="font-mono text-xs text-muted-foreground">
                                 {{ applicant.registration_number }} · {{ applicant.nim }}
                             </p>
                         </div>
                     </label>
                 </div>
-                <Button :disabled="selectedApplicants.length === 0 || scheduleForm.processing" @click="scheduleSelected">
+                <Button
+                    :disabled="selectedApplicants.length === 0 || scheduleForm.processing"
+                    @click="scheduleSelected"
+                >
                     Jadwalkan terpilih
                 </Button>
             </CardContent>
@@ -335,18 +345,14 @@ function rescheduleInterview(interviewId: string): void {
                 <CardTitle class="text-base">Daftar terjadwal</CardTitle>
             </CardHeader>
             <CardContent class="space-y-4">
-                <div
-                    v-for="interview in session.interviews"
-                    :key="interview.id"
-                    class="rounded-xl border p-4"
-                >
+                <div v-for="interview in session.interviews" :key="interview.id" class="rounded-xl border p-4">
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div>
                             <p class="font-medium">{{ interview.application?.full_name ?? '—' }}</p>
-                            <p class="text-muted-foreground font-mono text-xs">
+                            <p class="font-mono text-xs text-muted-foreground">
                                 {{ interview.application?.registration_number }}
                             </p>
-                            <p class="text-muted-foreground mt-1 text-sm">
+                            <p class="mt-1 text-sm text-muted-foreground">
                                 Interviewer: {{ interview.interviewer?.name ?? '—' }} · {{ interview.status_label }}
                             </p>
                         </div>
@@ -365,7 +371,11 @@ function rescheduleInterview(interviewId: string): void {
                                         search-placeholder="Cari interviewer…"
                                         class="h-9 text-[13px]"
                                         :aria-invalid="reassignErrors[interview.id] ? true : undefined"
-                                        @update:model-value="(v: string) => { reassignValues[interview.id] = v }"
+                                        @update:model-value="
+                                            (v: string) => {
+                                                reassignValues[interview.id] = v;
+                                            }
+                                        "
                                         @create="openCreateSheetFor(interview.id)"
                                     >
                                         <template #action>
@@ -397,14 +407,10 @@ function rescheduleInterview(interviewId: string): void {
                             <div class="flex items-start gap-2">
                                 <select
                                     v-model="rescheduleSessionId[interview.id]"
-                                    class="border-input bg-background h-9 min-w-0 flex-1 rounded-md border px-3 text-sm"
+                                    class="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm"
                                 >
                                     <option value="" disabled>Pilih sesi</option>
-                                    <option
-                                        v-for="other in otherSessions"
-                                        :key="other.id"
-                                        :value="other.id"
-                                    >
+                                    <option v-for="other in otherSessions" :key="other.id" :value="other.id">
                                         {{ other.session_date }} {{ other.starts_at }}
                                         <template v-if="other.division"> · {{ other.division.name }}</template>
                                     </option>

@@ -1,66 +1,65 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { Head } from '@inertiajs/vue3'
-import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
-import KpiCard from '@/components/modules/dashboard/KpiCard.vue'
-import KpiCardSkeleton from '@/components/modules/dashboard/KpiCardSkeleton.vue'
-import EventReportingFocusPanel from '@/components/modules/dashboard/EventReportingFocusPanel.vue'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Skeleton } from '@/components/ui/skeleton'
-import { BarChart3, ClipboardList, ScanLine, Download } from 'lucide-vue-next'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { computed, onMounted } from 'vue';
+import { Head } from '@inertiajs/vue3';
+import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
+import KpiCard from '@/components/modules/dashboard/KpiCard.vue';
+import KpiCardSkeleton from '@/components/modules/dashboard/KpiCardSkeleton.vue';
+import EventReportingFocusPanel from '@/components/modules/dashboard/EventReportingFocusPanel.vue';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import { BarChart3, ClipboardList, ScanLine, Download } from 'lucide-vue-next';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
 
-defineOptions({ layout: DashboardFocusLayout })
+defineOptions({ layout: DashboardFocusLayout });
 
 const props = defineProps<{
     globalSummary:
         | {
-              total_events: number
-              total_submissions: number
-              total_attendance_records: number
+              total_events: number;
+              total_submissions: number;
+              total_attendance_records: number;
           }
-        | undefined
-    event: IEvent | undefined
-    exports: { registrations: string; attendance: string } | undefined
+        | undefined;
+    event: IEvent | undefined;
+    exports: { registrations: string; attendance: string } | undefined;
     eventReporting:
         | {
               summary: {
-                  submission_count: number
-                  attended_count: number
-                  attendance_rate_percent: number | null
-                  registered_count: number
-                  quota: number | null
-              }
+                  submission_count: number;
+                  attended_count: number;
+                  attendance_rate_percent: number | null;
+                  registered_count: number;
+                  quota: number | null;
+              };
               attendanceLog: {
                   data: {
-                      id: string
-                      scanned_at: string
-                      form_answer_id: string
-                      attendee: { name: string; email: string } | null
-                      scanned_by: { name: string; email: string } | null
-                  }[]
-                  current_page: number
-                  last_page: number
-                  per_page: number
-                  total: number
-                  links?: { url: string | null; label: string; active: boolean }[]
-              }
+                      id: string;
+                      scanned_at: string;
+                      form_answer_id: string;
+                      attendee: { name: string; email: string } | null;
+                      scanned_by: { name: string; email: string } | null;
+                  }[];
+                  current_page: number;
+                  last_page: number;
+                  per_page: number;
+                  total: number;
+                  links?: { url: string | null; label: string; active: boolean }[];
+              };
           }
-        | undefined
-}>()
+        | undefined;
+}>();
 
 /** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */
-const summaryReady = computed<boolean>(() => props.globalSummary !== undefined)
+const summaryReady = computed<boolean>(() => props.globalSummary !== undefined);
 const focusReady = computed<boolean>(
-    () => props.event !== undefined && props.exports !== undefined && props.eventReporting !== undefined,
-)
+    () => props.event !== undefined && props.exports !== undefined && props.eventReporting !== undefined
+);
 
 onMounted(() => {
-    setTopbar({ title: 'Laporan', subtitle: 'Unduhan CSV & ringkasan acara' })
-})
-
+    setTopbar({ title: 'Laporan', subtitle: 'Unduhan CSV & ringkasan acara' });
+});
 </script>
 
 <template>
@@ -77,8 +76,18 @@ onMounted(() => {
         </div>
         <div v-else class="fade-up grid gap-4 sm:grid-cols-3">
             <KpiCard label="Events" :value="globalSummary?.total_events ?? 0" :icon="BarChart3" color="primary" />
-            <KpiCard label="All submissions" :value="globalSummary?.total_submissions ?? 0" :icon="ClipboardList" color="warning" />
-            <KpiCard label="Attendance records" :value="globalSummary?.total_attendance_records ?? 0" :icon="ScanLine" color="success" />
+            <KpiCard
+                label="All submissions"
+                :value="globalSummary?.total_submissions ?? 0"
+                :icon="ClipboardList"
+                color="warning"
+            />
+            <KpiCard
+                label="Attendance records"
+                :value="globalSummary?.total_attendance_records ?? 0"
+                :icon="ScanLine"
+                color="success"
+            />
         </div>
 
         <Card class="rounded-xl border shadow-xs">
@@ -90,7 +99,9 @@ onMounted(() => {
             </CardHeader>
             <CardContent class="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div class="flex min-w-[220px] flex-1 flex-col gap-1.5">
-                    <Label for="laporan-event-title" class="text-xs font-semibold uppercase text-muted-foreground">Event</Label>
+                    <Label for="laporan-event-title" class="text-xs font-semibold text-muted-foreground uppercase"
+                        >Event</Label
+                    >
                     <p
                         v-if="event"
                         id="laporan-event-title"
@@ -107,9 +118,7 @@ onMounted(() => {
                         </a>
                     </Button>
                     <Button variant="outline" size="sm" as-child class="">
-                        <a :href="exports?.attendance ?? '#'">
-                            <Download class="mr-1.5 size-4" />Attendance CSV
-                        </a>
+                        <a :href="exports?.attendance ?? '#'"> <Download class="mr-1.5 size-4" />Attendance CSV </a>
                     </Button>
                 </div>
             </CardContent>
@@ -128,14 +137,16 @@ onMounted(() => {
                 </div>
             </div>
             <div class="rounded-xl border shadow-xs">
-                <div class="pb-3 pt-4 px-4">
+                <div class="px-4 pt-4 pb-3">
                     <Skeleton class="h-4 w-40" />
                     <Skeleton class="mt-1.5 h-3 w-2/3" />
                 </div>
                 <div class="overflow-x-auto px-0">
                     <table class="w-full min-w-[640px] text-sm">
                         <thead>
-                            <tr class="border-b border-border text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            <tr
+                                class="border-b border-border text-left text-[11px] font-semibold tracking-wide text-muted-foreground uppercase"
+                            >
                                 <th class="px-4 py-3">Scanned at</th>
                                 <th class="px-4 py-3">Attendee</th>
                                 <th class="px-4 py-3">Submission</th>
@@ -179,9 +190,19 @@ onMounted(() => {
             v-else
             class="fade-up"
             :event-title="event?.title ?? ''"
-            :summary="eventReporting?.summary ?? { submission_count: 0, attended_count: 0, attendance_rate_percent: null, registered_count: 0, quota: null }"
+            :summary="
+                eventReporting?.summary ?? {
+                    submission_count: 0,
+                    attended_count: 0,
+                    attendance_rate_percent: null,
+                    registered_count: 0,
+                    quota: null,
+                }
+            "
             :export-urls="exports ?? { registrations: '#', attendance: '#' }"
-            :attendance-log="eventReporting?.attendanceLog ?? { data: [], current_page: 1, last_page: 1, per_page: 10, total: 0 }"
+            :attendance-log="
+                eventReporting?.attendanceLog ?? { data: [], current_page: 1, last_page: 1, per_page: 10, total: 0 }
+            "
             :show-export-toolbar="false"
         />
     </div>

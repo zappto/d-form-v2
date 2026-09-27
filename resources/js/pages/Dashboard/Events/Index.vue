@@ -116,8 +116,12 @@ function applyFilters() {
         preserveState: true,
         preserveScroll: true,
         only: ['events', 'query'],
-        onStart: () => { isLoadingEvents.value = true; },
-        onFinish: () => { isLoadingEvents.value = false; },
+        onStart: () => {
+            isLoadingEvents.value = true;
+        },
+        onFinish: () => {
+            isLoadingEvents.value = false;
+        },
     });
 }
 
@@ -128,8 +132,12 @@ function goToPage(page: number) {
         preserveState: true,
         preserveScroll: true,
         only: ['events', 'query'],
-        onStart: () => { isLoadingEvents.value = true; },
-        onFinish: () => { isLoadingEvents.value = false; },
+        onStart: () => {
+            isLoadingEvents.value = true;
+        },
+        onFinish: () => {
+            isLoadingEvents.value = false;
+        },
     });
 }
 
@@ -229,7 +237,11 @@ function handleDeleteConfirm(): void {
             :loading="isDeleting"
             @confirm="handleDeleteConfirm"
             @cancel="cancelDelete"
-            @update:open="(v) => { if (!isDeleting) deleteDialogOpen = v }"
+            @update:open="
+                (v) => {
+                    if (!isDeleting) deleteDialogOpen = v;
+                }
+            "
         />
 
         <EmptyState
@@ -241,15 +253,15 @@ function handleDeleteConfirm(): void {
 
         <Card
             v-if="lastPage > 1"
-            class="border-border/70 flex flex-col gap-3 rounded-2xl border px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5"
+            class="flex flex-col gap-3 rounded-2xl border border-border/70 px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5"
         >
-            <p class="text-muted-foreground text-center text-sm sm:text-left">
+            <p class="text-center text-sm text-muted-foreground sm:text-left">
                 Halaman
-                <span class="text-foreground font-medium tabular-nums">{{ currentPage }}</span>
+                <span class="font-medium text-foreground tabular-nums">{{ currentPage }}</span>
                 /
                 <span class="tabular-nums">{{ lastPage }}</span>
                 — total
-                <span class="text-foreground font-medium tabular-nums">{{ totalEvents }}</span>
+                <span class="font-medium text-foreground tabular-nums">{{ totalEvents }}</span>
                 acara
             </p>
             <div class="flex flex-wrap items-center justify-center gap-2">

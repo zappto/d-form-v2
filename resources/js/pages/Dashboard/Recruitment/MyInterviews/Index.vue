@@ -12,114 +12,109 @@ FIRST VIEWPORT: Panel sesi hari ini, satu panel filter (search + selects + count
 FORM: Approach A Filter Bar Command Center (spec 2026-09-18-my-interviews-redesign-design).
 -->
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Head, Link, router, usePage } from '@inertiajs/vue3'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import DataPagination from '@/components/modules/dashboard/DataPagination.vue'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
-import { routes } from '@/lib/routes'
-import { padQueueNumber } from '@/lib/format'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
-import useAuth from '@/hooks/useAuth'
-import {
-    ClipboardCheck,
-    ListOrdered,
-    RotateCcw,
-    Search,
-} from 'lucide-vue-next'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import { routes } from '@/lib/routes';
+import { padQueueNumber } from '@/lib/format';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
+import useAuth from '@/hooks/useAuth';
+import { ClipboardCheck, ListOrdered, RotateCcw, Search } from 'lucide-vue-next';
 
-defineOptions({ layout: DashboardLayout })
+defineOptions({ layout: DashboardLayout });
 
 interface InterviewRow {
-    interview_id: string
-    scheduled_at: string | null
-    status_label: string
-    location: string
-    room: string
-    queue_number: number | null
-    needs_evaluation: boolean
-    has_evaluation: boolean
-    evaluation_locked: boolean
+    interview_id: string;
+    scheduled_at: string | null;
+    status_label: string;
+    location: string;
+    room: string;
+    queue_number: number | null;
+    needs_evaluation: boolean;
+    has_evaluation: boolean;
+    evaluation_locked: boolean;
     application: {
-        id: string
-        full_name: string
-        nim?: string | null
-        registration_number: string
-        primary_division: string | null
-    } | null
+        id: string;
+        full_name: string;
+        nim?: string | null;
+        registration_number: string;
+        primary_division: string | null;
+    } | null;
     session: {
-        id: string
-        session_date: string
-        division: string | null
-    } | null
+        id: string;
+        session_date: string;
+        division: string | null;
+    } | null;
 }
 
 interface TodaySession {
-    id: string
-    session_date: string
-    starts_at: string
-    ends_at: string
-    location: string
-    room: string
-    my_interviews_count: number
-    division: { name: string } | null
+    id: string;
+    session_date: string;
+    starts_at: string;
+    ends_at: string;
+    location: string;
+    room: string;
+    my_interviews_count: number;
+    division: { name: string } | null;
 }
 
 interface NextAction {
-    title: string
-    description: string
-    application_id: string
-    full_name: string
-    registration_number: string
-    session_id: string | null
+    title: string;
+    description: string;
+    application_id: string;
+    full_name: string;
+    registration_number: string;
+    session_id: string | null;
 }
 
 interface MyInterviewsQuery {
-    queue?: string
-    q?: string
-    division_id?: string
-    session_id?: string
-    eval?: string
-    sort?: string
+    queue?: string;
+    q?: string;
+    division_id?: string;
+    session_id?: string;
+    eval?: string;
+    sort?: string;
 }
 
 interface FilterOption {
-    value: string
-    label: string
+    value: string;
+    label: string;
 }
 
 type InterviewFilterParams = {
-    q?: string
-    division_id?: string
-    session_id?: string
-    eval?: string
-    sort?: string
-    queue?: string
-    page?: number
-}
+    q?: string;
+    division_id?: string;
+    session_id?: string;
+    eval?: string;
+    sort?: string;
+    queue?: string;
+    page?: number;
+};
 
-type InterviewGroupKey = 'urgent' | 'today' | 'upcoming' | 'done'
+type InterviewGroupKey = 'urgent' | 'today' | 'upcoming' | 'done';
 
 interface InterviewGroup {
-    key: InterviewGroupKey
-    title: string
-    hint: string
-    rows: InterviewRow[]
+    key: InterviewGroupKey;
+    title: string;
+    hint: string;
+    rows: InterviewRow[];
 }
 
 interface StatusBadge {
-    label: string
-    variant: 'default' | 'secondary' | 'outline'
+    label: string;
+    variant: 'default' | 'secondary' | 'outline';
 }
 
 interface QueuePermission {
-    can_view_recruitment_queue?: boolean
+    can_view_recruitment_queue?: boolean;
 }
 
 const QUEUE_TABS: { key: string; label: string }[] = [
@@ -127,81 +122,81 @@ const QUEUE_TABS: { key: string; label: string }[] = [
     { key: 'pending', label: 'Perlu dinilai' },
     { key: 'today', label: 'Hari ini' },
     { key: 'done', label: 'Selesai' },
-]
+];
 
 const EVAL_OPTIONS: FilterOption[] = [
     { value: '', label: 'Semua status' },
     { value: 'pending', label: 'Perlu dinilai' },
     { value: 'done', label: 'Sudah dinilai' },
     { value: 'locked', label: 'Terkunci' },
-]
+];
 
 const SORT_OPTIONS: FilterOption[] = [
     { value: '', label: 'Jadwal terdekat' },
     { value: 'pending_first', label: 'Belum dinilai dulu' },
     { value: 'queue', label: 'No. antrean' },
     { value: 'name', label: 'Nama A–Z' },
-]
+];
 
-const SEARCH_DEBOUNCE_MS = 300
-const FALLBACK_PER_PAGE = 20
+const SEARCH_DEBOUNCE_MS = 300;
+const FALLBACK_PER_PAGE = 20;
 
 const props = withDefaults(
     defineProps<{
         interviews: {
-            data: InterviewRow[]
-            current_page: number
-            last_page: number
-            total: number
-            per_page?: number
-            from?: number | null
-            to?: number | null
-        }
-        query: MyInterviewsQuery
-        queue_counts: Record<string, number>
-        today_sessions: TodaySession[]
-        next_action: NextAction | null
-        division_options?: FilterOption[]
-        session_options?: FilterOption[]
+            data: InterviewRow[];
+            current_page: number;
+            last_page: number;
+            total: number;
+            per_page?: number;
+            from?: number | null;
+            to?: number | null;
+        };
+        query: MyInterviewsQuery;
+        queue_counts: Record<string, number>;
+        today_sessions: TodaySession[];
+        next_action: NextAction | null;
+        division_options?: FilterOption[];
+        session_options?: FilterOption[];
     }>(),
     {
         division_options: (): FilterOption[] => [],
         session_options: (): FilterOption[] => [],
-    },
-)
+    }
+);
 
-const page = usePage()
-const authUser = useAuth(page.props)
+const page = usePage();
+const authUser = useAuth(page.props);
 
 const canViewQueue = computed<boolean>((): boolean => {
-    const candidate: QueuePermission | null = authUser.value
-    return candidate?.can_view_recruitment_queue === true
-})
+    const candidate: QueuePermission | null = authUser.value;
+    return candidate?.can_view_recruitment_queue === true;
+});
 
-const searchInput = ref<string>(props.query.q ?? '')
-const divisionId = ref<string>(props.query.division_id ?? '')
-const sessionId = ref<string>(props.query.session_id ?? '')
-const evalFilter = ref<string>(props.query.eval ?? '')
-const sortKey = ref<string>(props.query.sort ?? '')
-const queueTab = ref<string>(props.query.queue ?? '')
-const isNavigating = ref<boolean>(false)
+const searchInput = ref<string>(props.query.q ?? '');
+const divisionId = ref<string>(props.query.division_id ?? '');
+const sessionId = ref<string>(props.query.session_id ?? '');
+const evalFilter = ref<string>(props.query.eval ?? '');
+const sortKey = ref<string>(props.query.sort ?? '');
+const queueTab = ref<string>(props.query.queue ?? '');
+const isNavigating = ref<boolean>(false);
 
-let searchTimer: ReturnType<typeof setTimeout> | null = null
-let skipFilterRun = false
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+let skipFilterRun = false;
 
 function clearSearchTimer(): void {
     if (searchTimer !== null) {
-        clearTimeout(searchTimer)
-        searchTimer = null
+        clearTimeout(searchTimer);
+        searchTimer = null;
     }
 }
 
 function resetSkipFilterRun(): void {
-    skipFilterRun = false
+    skipFilterRun = false;
 }
 
 function refsMatchQuery(): boolean {
-    const current: MyInterviewsQuery = props.query
+    const current: MyInterviewsQuery = props.query;
     return (
         searchInput.value === (current.q ?? '') &&
         divisionId.value === (current.division_id ?? '') &&
@@ -209,7 +204,7 @@ function refsMatchQuery(): boolean {
         evalFilter.value === (current.eval ?? '') &&
         sortKey.value === (current.sort ?? '') &&
         queueTab.value === (current.queue ?? '')
-    )
+    );
 }
 
 function baseParams(pageNumber: number): InterviewFilterParams {
@@ -221,15 +216,15 @@ function baseParams(pageNumber: number): InterviewFilterParams {
         sort: sortKey.value || undefined,
         queue: queueTab.value || undefined,
         page: pageNumber > 1 ? pageNumber : undefined,
-    }
+    };
 }
 
 function handleFilterStart(): void {
-    isNavigating.value = true
+    isNavigating.value = true;
 }
 
 function handleFilterFinish(): void {
-    isNavigating.value = false
+    isNavigating.value = false;
 }
 
 function applyFilters(pageNumber: number = 1): void {
@@ -239,51 +234,51 @@ function applyFilters(pageNumber: number = 1): void {
         replace: false,
         onStart: handleFilterStart,
         onFinish: handleFilterFinish,
-    })
+    });
 }
 
-type FilterTuple = [string, string, string, string, string, string]
+type FilterTuple = [string, string, string, string, string, string];
 
 function handleFilterChange(next: FilterTuple, prev: FilterTuple): void {
     if (skipFilterRun && refsMatchQuery()) {
-        skipFilterRun = false
-        return
+        skipFilterRun = false;
+        return;
     }
-    skipFilterRun = false
-    clearSearchTimer()
-    const searchChanged: boolean = next[0] !== prev[0]
+    skipFilterRun = false;
+    clearSearchTimer();
+    const searchChanged: boolean = next[0] !== prev[0];
     if (searchChanged) {
         searchTimer = setTimeout((): void => {
-            applyFilters(1)
-        }, SEARCH_DEBOUNCE_MS)
-        return
+            applyFilters(1);
+        }, SEARCH_DEBOUNCE_MS);
+        return;
     }
-    applyFilters(1)
+    applyFilters(1);
 }
 
-watch([searchInput, divisionId, sessionId, evalFilter, sortKey, queueTab], handleFilterChange)
+watch([searchInput, divisionId, sessionId, evalFilter, sortKey, queueTab], handleFilterChange);
 
 function syncRefsFromQuery(next: MyInterviewsQuery): void {
-    clearSearchTimer()
-    searchInput.value = next.q ?? ''
-    divisionId.value = next.division_id ?? ''
-    sessionId.value = next.session_id ?? ''
-    evalFilter.value = next.eval ?? ''
-    sortKey.value = next.sort ?? ''
-    queueTab.value = next.queue ?? ''
-    skipFilterRun = true
-    void nextTick(resetSkipFilterRun)
+    clearSearchTimer();
+    searchInput.value = next.q ?? '';
+    divisionId.value = next.division_id ?? '';
+    sessionId.value = next.session_id ?? '';
+    evalFilter.value = next.eval ?? '';
+    sortKey.value = next.sort ?? '';
+    queueTab.value = next.queue ?? '';
+    skipFilterRun = true;
+    void nextTick(resetSkipFilterRun);
 }
 
-watch((): MyInterviewsQuery => props.query, syncRefsFromQuery)
+watch((): MyInterviewsQuery => props.query, syncRefsFromQuery);
 
 onBeforeUnmount((): void => {
-    clearSearchTimer()
-})
+    clearSearchTimer();
+});
 
 onMounted((): void => {
-    setTopbar({ title: 'Interview Saya', subtitle: 'Penugasan & penilaian Open Recruitment' })
-})
+    setTopbar({ title: 'Interview Saya', subtitle: 'Penugasan & penilaian Open Recruitment' });
+});
 
 const hasActiveFilters = computed<boolean>((): boolean => {
     return (
@@ -293,170 +288,168 @@ const hasActiveFilters = computed<boolean>((): boolean => {
         evalFilter.value !== '' ||
         sortKey.value !== '' ||
         queueTab.value !== ''
-    )
-})
+    );
+});
 
 function resetFilters(): void {
-    clearSearchTimer()
-    searchInput.value = ''
-    divisionId.value = ''
-    sessionId.value = ''
-    evalFilter.value = ''
-    sortKey.value = ''
-    queueTab.value = ''
+    clearSearchTimer();
+    searchInput.value = '';
+    divisionId.value = '';
+    sessionId.value = '';
+    evalFilter.value = '';
+    sortKey.value = '';
+    queueTab.value = '';
 }
 
 function selectQueue(key: string): void {
-    queueTab.value = key
+    queueTab.value = key;
 }
 
 function showUrl(applicationId: string): string {
-    return routes.admin.recruitment.myInterviews.show(applicationId)
+    return routes.admin.recruitment.myInterviews.show(applicationId);
 }
 
 function queueUrl(sessionIdValue: string): string {
-    return routes.recruitment.queue.show(sessionIdValue)
+    return routes.recruitment.queue.show(sessionIdValue);
 }
 
 function formatInt(value: number): string {
-    return new Intl.NumberFormat('id-ID').format(value)
+    return new Intl.NumberFormat('id-ID').format(value);
 }
 
 function formatSchedule(iso: string | null): string {
-    if (!iso) return 'Jadwal belum ditetapkan'
-    const parsed: Date = new Date(iso)
-    if (Number.isNaN(parsed.getTime())) return 'Jadwal belum ditetapkan'
+    if (!iso) return 'Jadwal belum ditetapkan';
+    const parsed: Date = new Date(iso);
+    if (Number.isNaN(parsed.getTime())) return 'Jadwal belum ditetapkan';
     return parsed.toLocaleString('id-ID', {
         weekday: 'short',
         day: 'numeric',
         month: 'short',
         hour: '2-digit',
         minute: '2-digit',
-    })
+    });
 }
 
 function formatSessionDay(value: string): string {
-    const parsed: Date = new Date(`${value}T00:00:00`)
-    if (Number.isNaN(parsed.getTime())) return value
+    const parsed: Date = new Date(`${value}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return value;
     return parsed.toLocaleDateString('id-ID', {
         weekday: 'short',
         day: 'numeric',
         month: 'short',
-    })
+    });
 }
 
 function sessionFallbackLabel(session: TodaySession): string {
-    const division: string = session.division?.name ?? 'Interview'
-    return `${division} · ${formatSessionDay(session.session_date)} · ${session.starts_at}–${session.ends_at}`
+    const division: string = session.division?.name ?? 'Interview';
+    return `${division} · ${formatSessionDay(session.session_date)} · ${session.starts_at}–${session.ends_at}`;
 }
 
 const divisionOptions = computed<FilterOption[]>((): FilterOption[] => {
     if (props.division_options.length > 0) {
-        return [{ value: '', label: 'Semua divisi' }, ...props.division_options]
+        return [{ value: '', label: 'Semua divisi' }, ...props.division_options];
     }
-    const names: string[] = []
+    const names: string[] = [];
     for (const session of props.today_sessions) {
-        const divisionName: string | undefined = session.division?.name ?? undefined
-        if (divisionName && !names.includes(divisionName)) names.push(divisionName)
+        const divisionName: string | undefined = session.division?.name ?? undefined;
+        if (divisionName && !names.includes(divisionName)) names.push(divisionName);
     }
     for (const row of props.interviews.data) {
-        const primary: string | undefined = row.application?.primary_division ?? undefined
-        if (primary && !names.includes(primary)) names.push(primary)
-        const sessionDivision: string | undefined = row.session?.division ?? undefined
-        if (sessionDivision && !names.includes(sessionDivision)) names.push(sessionDivision)
+        const primary: string | undefined = row.application?.primary_division ?? undefined;
+        if (primary && !names.includes(primary)) names.push(primary);
+        const sessionDivision: string | undefined = row.session?.division ?? undefined;
+        if (sessionDivision && !names.includes(sessionDivision)) names.push(sessionDivision);
     }
-    const fallback: FilterOption[] = names.map(
-        (name: string): FilterOption => ({ value: name, label: name }),
-    )
-    return [{ value: '', label: 'Semua divisi' }, ...fallback]
-})
+    const fallback: FilterOption[] = names.map((name: string): FilterOption => ({ value: name, label: name }));
+    return [{ value: '', label: 'Semua divisi' }, ...fallback];
+});
 
 const sessionOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => {
     if (props.session_options.length > 0) {
-        return [{ value: '', label: 'Semua sesi' }, ...props.session_options]
+        return [{ value: '', label: 'Semua sesi' }, ...props.session_options];
     }
     const fallback: SearchableSelectOption[] = props.today_sessions.map(
         (session: TodaySession): SearchableSelectOption => ({
             value: session.id,
             label: sessionFallbackLabel(session),
-        }),
-    )
-    return [{ value: '', label: 'Semua sesi' }, ...fallback]
-})
+        })
+    );
+    return [{ value: '', label: 'Semua sesi' }, ...fallback];
+});
 
-const evalOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => EVAL_OPTIONS)
-const sortOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => SORT_OPTIONS)
+const evalOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => EVAL_OPTIONS);
+const sortOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => SORT_OPTIONS);
 
 function queueBadgeCount(key: string): number | null {
-    if (key === '') return props.queue_counts.all ?? null
-    const count: number | undefined = props.queue_counts[key]
-    return count !== undefined ? count : null
+    if (key === '') return props.queue_counts.all ?? null;
+    const count: number | undefined = props.queue_counts[key];
+    return count !== undefined ? count : null;
 }
 
-const perPage = computed<number>((): number => props.interviews.per_page ?? FALLBACK_PER_PAGE)
+const perPage = computed<number>((): number => props.interviews.per_page ?? FALLBACK_PER_PAGE);
 
 const rangeStart = computed<number>((): number => {
-    if (props.interviews.from !== undefined && props.interviews.from !== null) return props.interviews.from
-    if (props.interviews.total === 0) return 0
-    return (props.interviews.current_page - 1) * perPage.value + 1
-})
+    if (props.interviews.from !== undefined && props.interviews.from !== null) return props.interviews.from;
+    if (props.interviews.total === 0) return 0;
+    return (props.interviews.current_page - 1) * perPage.value + 1;
+});
 
 const rangeEnd = computed<number>((): number => {
-    if (props.interviews.to !== undefined && props.interviews.to !== null) return props.interviews.to
-    return Math.min(props.interviews.total, props.interviews.current_page * perPage.value)
-})
+    if (props.interviews.to !== undefined && props.interviews.to !== null) return props.interviews.to;
+    return Math.min(props.interviews.total, props.interviews.current_page * perPage.value);
+});
 
-const totalLabel = computed<string>((): string => `${formatInt(props.interviews.total)} hasil`)
+const totalLabel = computed<string>((): string => `${formatInt(props.interviews.total)} hasil`);
 
 const rangeLabel = computed<string>(
     (): string =>
-        `Menampilkan ${formatInt(rangeStart.value)}–${formatInt(rangeEnd.value)} dari ${formatInt(props.interviews.total)}`,
-)
+        `Menampilkan ${formatInt(rangeStart.value)}–${formatInt(rangeEnd.value)} dari ${formatInt(props.interviews.total)}`
+);
 
 function parseSchedule(value: string | null): Date | null {
-    if (!value) return null
-    const parsed: Date = new Date(value)
-    return Number.isNaN(parsed.getTime()) ? null : parsed
+    if (!value) return null;
+    const parsed: Date = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function isSameCalendarDay(a: Date, b: Date): boolean {
-    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
 function startOfCalendarDay(value: Date): Date {
-    const day: Date = new Date(value)
-    day.setHours(0, 0, 0, 0)
-    return day
+    const day: Date = new Date(value);
+    day.setHours(0, 0, 0, 0);
+    return day;
 }
 
 function groupKeyForRow(row: InterviewRow, now: Date): InterviewGroupKey {
-    if (row.evaluation_locked || row.has_evaluation) return 'done'
-    const scheduled: Date | null = parseSchedule(row.scheduled_at)
-    if (scheduled === null) return row.needs_evaluation ? 'urgent' : 'upcoming'
-    if (isSameCalendarDay(scheduled, now)) return row.needs_evaluation ? 'urgent' : 'today'
-    if (scheduled < startOfCalendarDay(now)) return 'urgent'
-    return 'upcoming'
+    if (row.evaluation_locked || row.has_evaluation) return 'done';
+    const scheduled: Date | null = parseSchedule(row.scheduled_at);
+    if (scheduled === null) return row.needs_evaluation ? 'urgent' : 'upcoming';
+    if (isSameCalendarDay(scheduled, now)) return row.needs_evaluation ? 'urgent' : 'today';
+    if (scheduled < startOfCalendarDay(now)) return 'urgent';
+    return 'upcoming';
 }
 
 const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
-    const now: Date = new Date()
+    const now: Date = new Date();
     const buckets: Record<InterviewGroupKey, InterviewRow[]> = {
         urgent: [],
         today: [],
         upcoming: [],
         done: [],
-    }
+    };
     for (const row of props.interviews.data) {
-        buckets[groupKeyForRow(row, now)].push(row)
+        buckets[groupKeyForRow(row, now)].push(row);
     }
-    const groups: InterviewGroup[] = []
+    const groups: InterviewGroup[] = [];
     if (buckets.urgent.length > 0) {
         groups.push({
             key: 'urgent',
             title: 'Mendesak',
             hint: 'Perlu dinilai, jadwalnya hari ini atau belum ada jadwal',
             rows: buckets.urgent,
-        })
+        });
     }
     if (buckets.today.length > 0) {
         groups.push({
@@ -464,7 +457,7 @@ const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
             title: 'Hari ini',
             hint: 'Terjadwal hari ini',
             rows: buckets.today,
-        })
+        });
     }
     if (buckets.upcoming.length > 0) {
         groups.push({
@@ -472,7 +465,7 @@ const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
             title: 'Mendatang',
             hint: 'Jadwal berikutnya',
             rows: buckets.upcoming,
-        })
+        });
     }
     if (buckets.done.length > 0) {
         groups.push({
@@ -480,39 +473,39 @@ const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
             title: 'Selesai',
             hint: 'Sudah dinilai atau terkunci',
             rows: buckets.done,
-        })
+        });
     }
-    return groups
-})
+    return groups;
+});
 
 function statusBadge(row: InterviewRow): StatusBadge {
-    if (row.needs_evaluation) return { label: 'Perlu dinilai', variant: 'default' }
-    if (row.evaluation_locked) return { label: 'Terkunci', variant: 'secondary' }
-    if (row.has_evaluation) return { label: 'Sudah dinilai', variant: 'outline' }
-    return { label: row.status_label, variant: 'outline' }
+    if (row.needs_evaluation) return { label: 'Perlu dinilai', variant: 'default' };
+    if (row.evaluation_locked) return { label: 'Terkunci', variant: 'secondary' };
+    if (row.has_evaluation) return { label: 'Sudah dinilai', variant: 'outline' };
+    return { label: row.status_label, variant: 'outline' };
 }
 
 function actionLabel(row: InterviewRow): string {
-    if (row.needs_evaluation) return 'Nilai'
-    if (row.has_evaluation && !row.evaluation_locked) return 'Ubah'
-    return 'Detail'
+    if (row.needs_evaluation) return 'Nilai';
+    if (row.has_evaluation && !row.evaluation_locked) return 'Ubah';
+    return 'Detail';
 }
 
 /** Label antrean daftar interviewer; null tetap kosong, angka via helper. */
 function queueNumberLabel(value: number | null): string {
-    if (value === null) return ''
-    return `Antrean #${padQueueNumber(value)}`
+    if (value === null) return '';
+    return `Antrean #${padQueueNumber(value)}`;
 }
 
 const emptyTitle = computed<string>((): string =>
-    hasActiveFilters.value ? 'Tidak ada hasil yang cocok' : 'Belum ada peserta regis ulang',
-)
+    hasActiveFilters.value ? 'Tidak ada hasil yang cocok' : 'Belum ada peserta regis ulang'
+);
 
 const emptyDescription = computed<string>((): string =>
     hasActiveFilters.value
         ? 'Coba ubah kata kunci atau atur ulang filter untuk melihat penugasan lain.'
-        : 'Daftar ini hanya memuat peserta yang sudah regis ulang (scan QR) di sesi interviewmu.',
-)
+        : 'Daftar ini hanya memuat peserta yang sudah regis ulang (scan QR) di sesi interviewmu.'
+);
 </script>
 
 <template>
@@ -668,11 +661,7 @@ const emptyDescription = computed<string>((): string =>
                     <Skeleton class="h-5 w-8" />
                 </div>
                 <div class="grid gap-3">
-                    <div
-                        v-for="n in 3"
-                        :key="`baris-${n}`"
-                        class="rounded-2xl border border-border/70 p-4 sm:p-5"
-                    >
+                    <div v-for="n in 3" :key="`baris-${n}`" class="rounded-2xl border border-border/70 p-4 sm:p-5">
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5">
                             <Skeleton class="h-4 w-40" />
                             <Skeleton class="h-5 w-24" />
@@ -735,14 +724,9 @@ const emptyDescription = computed<string>((): string =>
                                         {{ formatSchedule(row.scheduled_at) }}
                                         · {{ row.location }} · {{ row.room }}
                                     </p>
-                                    <p
-                                        v-if="row.queue_number !== null"
-                                        class="mt-0.5 text-xs text-muted-foreground"
-                                    >
+                                    <p v-if="row.queue_number !== null" class="mt-0.5 text-xs text-muted-foreground">
                                         {{ queueNumberLabel(row.queue_number) }}
-                                        <span v-if="row.session">
-                                            · {{ row.session.division ?? 'Interview' }}</span
-                                        >
+                                        <span v-if="row.session"> · {{ row.session.division ?? 'Interview' }}</span>
                                     </p>
                                 </div>
                                 <div class="relative flex shrink-0 flex-wrap gap-2">
@@ -752,12 +736,7 @@ const emptyDescription = computed<string>((): string =>
                                             {{ actionLabel(row) }}
                                         </Link>
                                     </Button>
-                                    <Button
-                                        v-if="row.session && canViewQueue"
-                                        as-child
-                                        size="sm"
-                                        variant="outline"
-                                    >
+                                    <Button v-if="row.session && canViewQueue" as-child size="sm" variant="outline">
                                         <Link :href="queueUrl(row.session.id)">Antrean</Link>
                                     </Button>
                                 </div>
@@ -768,12 +747,7 @@ const emptyDescription = computed<string>((): string =>
             </section>
         </template>
 
-        <EmptyState
-            v-else
-            :title="emptyTitle"
-            :description="emptyDescription"
-            animation-name="emptyData"
-        >
+        <EmptyState v-else :title="emptyTitle" :description="emptyDescription" animation-name="emptyData">
             <Button v-if="hasActiveFilters" variant="outline" size="sm" @click="resetFilters">
                 <RotateCcw class="mr-2 size-4" aria-hidden="true" />
                 Atur ulang filter

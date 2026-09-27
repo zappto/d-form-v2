@@ -1,140 +1,146 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
-import axios from 'axios'
-import LandingLayout from '@/layouts/LandingLayout.vue'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
-import { Megaphone, WifiOff } from 'lucide-vue-next'
-import { padQueueNumber } from '@/lib/format'
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
+import LandingLayout from '@/layouts/LandingLayout.vue';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import { Megaphone, WifiOff } from 'lucide-vue-next';
+import { padQueueNumber } from '@/lib/format';
 
-defineOptions({ layout: LandingLayout })
+defineOptions({ layout: LandingLayout });
 
 interface QueueDisplayEntry {
-    queue_number: number
-    display_name: string
-    division?: string | null
-    room?: string | null
-    status: string
-    status_label?: string | null
-    called_at?: string | null
+    queue_number: number;
+    display_name: string;
+    division?: string | null;
+    room?: string | null;
+    status: string;
+    status_label?: string | null;
+    called_at?: string | null;
 }
 
 interface QueueDisplaySession {
-    name?: string | null
-    division?: string | null
-    room?: string | null
-    time?: string | null
+    name?: string | null;
+    division?: string | null;
+    room?: string | null;
+    time?: string | null;
 }
 
 interface QueueDisplayStats {
-    waiting?: number | null
-    called?: number | null
-    completed?: number | null
-    total?: number | null
+    waiting?: number | null;
+    called?: number | null;
+    completed?: number | null;
+    total?: number | null;
 }
 
 interface QueueDisplaySnapshot {
-    session?: QueueDisplaySession | null
-    entries?: QueueDisplayEntry[] | null
-    current?: QueueDisplayEntry | null
-    next?: QueueDisplayEntry | null
-    stats?: QueueDisplayStats | null
+    session?: QueueDisplaySession | null;
+    entries?: QueueDisplayEntry[] | null;
+    current?: QueueDisplayEntry | null;
+    next?: QueueDisplayEntry | null;
+    stats?: QueueDisplayStats | null;
 }
 
-const POLL_INTERVAL_MS = 15_000
+const POLL_INTERVAL_MS = 15_000;
 
 const props = defineProps<{
-    snapshot: QueueDisplaySnapshot
-    pollUrl?: string | null
-}>()
+    snapshot: QueueDisplaySnapshot;
+    pollUrl?: string | null;
+}>();
 
-const live = ref<QueueDisplaySnapshot>(props.snapshot)
-const loadError = ref<boolean>(false)
-const isOffline = ref<boolean>(false)
-const lastUpdatedAt = ref<Date | null>(null)
+const live = ref<QueueDisplaySnapshot>(props.snapshot);
+const loadError = ref<boolean>(false);
+const isOffline = ref<boolean>(false);
+const lastUpdatedAt = ref<Date | null>(null);
 /** Tick pertama (refresh awal) → skeleton; tick berikut diam. Sekali false, tak pernah true lagi. */
-const isInitialLoading = ref<boolean>(false)
+const isInitialLoading = ref<boolean>(false);
 
-const divisionFilter = ref<string>('')
-const roomFilter = ref<string>('')
-const statusFilter = ref<string>('')
+const divisionFilter = ref<string>('');
+const roomFilter = ref<string>('');
+const statusFilter = ref<string>('');
 
-let pollTimer: ReturnType<typeof setInterval> | null = null
-let isRefreshing = false
+let pollTimer: ReturnType<typeof setInterval> | null = null;
+let isRefreshing = false;
 
 /** Label nomor antrean papan display; kosong menjadi #- mengikuti helper. */
 function queueNumberLabel(value: number | null | undefined): string {
-    return `#${padQueueNumber(value)}`
+    return `#${padQueueNumber(value)}`;
 }
 
 function entryStatusLabel(entry: QueueDisplayEntry): string {
-    return entry.status_label?.trim() || entry.status || '—'
+    return entry.status_label?.trim() || entry.status || '—';
 }
 
-const entries = computed<QueueDisplayEntry[]>(() => live.value.entries ?? [])
+const entries = computed<QueueDisplayEntry[]>(() => live.value.entries ?? []);
 
 function uniqueOptions(values: (string | null | undefined)[], allLabel: string): SearchableSelectOption[] {
-    const seen = new Map<string, string>()
+    const seen = new Map<string, string>();
     for (const raw of values) {
-        const value = (raw ?? '').trim()
-        if (value !== '' && !seen.has(value)) seen.set(value, value)
+        const value = (raw ?? '').trim();
+        if (value !== '' && !seen.has(value)) seen.set(value, value);
     }
-    return [{ value: '', label: allLabel }, ...[...seen.entries()].map(([value, label]) => ({ value, label }))]
+    return [{ value: '', label: allLabel }, ...[...seen.entries()].map(([value, label]) => ({ value, label }))];
 }
 
 const divisionOptions = computed<SearchableSelectOption[]>(() =>
-    uniqueOptions(entries.value.map((e) => e.division), 'Semua divisi'),
-)
+    uniqueOptions(
+        entries.value.map((e) => e.division),
+        'Semua divisi'
+    )
+);
 
 const roomOptions = computed<SearchableSelectOption[]>(() =>
-    uniqueOptions(entries.value.map((e) => e.room), 'Semua ruang'),
-)
+    uniqueOptions(
+        entries.value.map((e) => e.room),
+        'Semua ruang'
+    )
+);
 
 const statusOptions = computed<SearchableSelectOption[]>(() => {
-    const seen = new Map<string, string>()
+    const seen = new Map<string, string>();
     for (const entry of entries.value) {
-        const value = (entry.status ?? '').trim()
-        if (value !== '' && !seen.has(value)) seen.set(value, entryStatusLabel(entry))
+        const value = (entry.status ?? '').trim();
+        if (value !== '' && !seen.has(value)) seen.set(value, entryStatusLabel(entry));
     }
-    return [{ value: '', label: 'Semua status' }, ...[...seen.entries()].map(([value, label]) => ({ value, label }))]
-})
+    return [{ value: '', label: 'Semua status' }, ...[...seen.entries()].map(([value, label]) => ({ value, label }))];
+});
 
 const filteredEntries = computed<QueueDisplayEntry[]>(() =>
     entries.value.filter((entry) => {
-        if (divisionFilter.value !== '' && (entry.division ?? '').trim() !== divisionFilter.value) return false
-        if (roomFilter.value !== '' && (entry.room ?? '').trim() !== roomFilter.value) return false
-        if (statusFilter.value !== '' && (entry.status ?? '').trim() !== statusFilter.value) return false
-        return true
-    }),
-)
+        if (divisionFilter.value !== '' && (entry.division ?? '').trim() !== divisionFilter.value) return false;
+        if (roomFilter.value !== '' && (entry.room ?? '').trim() !== roomFilter.value) return false;
+        if (statusFilter.value !== '' && (entry.status ?? '').trim() !== statusFilter.value) return false;
+        return true;
+    })
+);
 
 const lastUpdatedLabel = computed<string>(() => {
-    if (lastUpdatedAt.value === null) return 'Menampilkan data awal'
+    if (lastUpdatedAt.value === null) return 'Menampilkan data awal';
     return `Diperbarui ${lastUpdatedAt.value.toLocaleTimeString('id-ID', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-    })}`
-})
+    })}`;
+});
 
 async function refreshDisplay(): Promise<void> {
-    if (isRefreshing || !props.pollUrl) return
-    isRefreshing = true
+    if (isRefreshing || !props.pollUrl) return;
+    isRefreshing = true;
     try {
         const response = await axios.get<QueueDisplaySnapshot>(props.pollUrl, {
             headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        })
-        live.value = response.data
-        loadError.value = false
-        lastUpdatedAt.value = new Date()
+        });
+        live.value = response.data;
+        loadError.value = false;
+        lastUpdatedAt.value = new Date();
     } catch {
-        loadError.value = true
+        loadError.value = true;
     } finally {
-        isRefreshing = false
-        isInitialLoading.value = false
+        isRefreshing = false;
+        isInitialLoading.value = false;
     }
 }
 
@@ -143,62 +149,60 @@ const hasDisplayData = computed<boolean>(
     () =>
         (live.value.entries?.length ?? 0) > 0 ||
         (live.value.current ?? null) !== null ||
-        (live.value.next ?? null) !== null,
-)
-const showDisplaySkeleton = computed<boolean>(
-    () => isInitialLoading.value && !hasDisplayData.value,
-)
+        (live.value.next ?? null) !== null
+);
+const showDisplaySkeleton = computed<boolean>(() => isInitialLoading.value && !hasDisplayData.value);
 
 function startPolling(): void {
-    if (pollTimer !== null || !props.pollUrl) return
+    if (pollTimer !== null || !props.pollUrl) return;
     pollTimer = setInterval((): void => {
-        void refreshDisplay()
-    }, POLL_INTERVAL_MS)
+        void refreshDisplay();
+    }, POLL_INTERVAL_MS);
 }
 
 function stopPolling(): void {
     if (pollTimer !== null) {
-        clearInterval(pollTimer)
-        pollTimer = null
+        clearInterval(pollTimer);
+        pollTimer = null;
     }
 }
 
 function handleVisibilityChange(): void {
     if (document.hidden) {
-        stopPolling()
-        return
+        stopPolling();
+        return;
     }
-    void refreshDisplay()
-    startPolling()
+    void refreshDisplay();
+    startPolling();
 }
 
 function handleOnline(): void {
-    isOffline.value = false
-    void refreshDisplay()
+    isOffline.value = false;
+    void refreshDisplay();
 }
 
 function handleOffline(): void {
-    isOffline.value = true
+    isOffline.value = true;
 }
 
 onMounted((): void => {
-    isOffline.value = typeof navigator !== 'undefined' ? !navigator.onLine : false
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
+    isOffline.value = typeof navigator !== 'undefined' ? !navigator.onLine : false;
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
     if (props.pollUrl) {
-        isInitialLoading.value = true
-        void refreshDisplay()
+        isInitialLoading.value = true;
+        void refreshDisplay();
     }
-    startPolling()
-})
+    startPolling();
+});
 
 onUnmounted((): void => {
-    stopPolling()
-    document.removeEventListener('visibilitychange', handleVisibilityChange)
-    window.removeEventListener('online', handleOnline)
-    window.removeEventListener('offline', handleOffline)
-})
+    stopPolling();
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('online', handleOnline);
+    window.removeEventListener('offline', handleOffline);
+});
 </script>
 
 <template>
@@ -207,21 +211,27 @@ onUnmounted((): void => {
     <div class="relative">
         <section
             aria-label="Informasi sesi"
-            class="border-border/30 bg-muted/20 border-b pt-28 pb-8 sm:pt-32 sm:pb-10 lg:pb-12"
+            class="border-b border-border/30 bg-muted/20 pt-28 pb-8 sm:pt-32 sm:pb-10 lg:pb-12"
         >
             <div class="mx-auto w-full max-w-5xl px-4 text-center sm:px-6 lg:px-10">
-                <p class="text-primary text-xs font-semibold tracking-[0.2em] uppercase sm:text-sm">
+                <p class="text-xs font-semibold tracking-[0.2em] text-primary uppercase sm:text-sm">
                     OpenRecruitment DOSCOM · Papan antrean
                 </p>
-                <h1 class="font-display text-foreground mt-3 text-2xl font-bold tracking-tight text-balance sm:text-4xl lg:text-5xl">
+                <h1
+                    class="mt-3 font-display text-2xl font-bold tracking-tight text-balance text-foreground sm:text-4xl lg:text-5xl"
+                >
                     <template v-if="!showDisplaySkeleton">
                         {{ live.session?.name?.trim() || 'Antrean interview' }}
                     </template>
                     <Skeleton v-else class="mx-auto h-10 w-2/3 sm:h-12" />
                 </h1>
-                <p class="text-muted-foreground mt-3 text-sm leading-relaxed sm:text-base">
+                <p class="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
                     <template v-if="!showDisplaySkeleton">
-                        {{ [live.session?.time, live.session?.room].filter((v) => (v ?? '').trim() !== '').join(' · ') || '—' }}
+                        {{
+                            [live.session?.time, live.session?.room]
+                                .filter((v) => (v ?? '').trim() !== '')
+                                .join(' · ') || '—'
+                        }}
                     </template>
                     <Skeleton v-else class="mx-auto h-4 w-1/3" />
                 </p>
@@ -247,17 +257,27 @@ onUnmounted((): void => {
             <section aria-label="Sedang dipanggil" class="mb-6 sm:mb-8">
                 <Card class="rounded-2xl border-border/70">
                     <CardContent class="p-6 text-center sm:p-10">
-                        <p class="text-muted-foreground flex items-center justify-center gap-2 text-xs font-semibold tracking-widest uppercase sm:text-sm">
+                        <p
+                            class="flex items-center justify-center gap-2 text-xs font-semibold tracking-widest text-muted-foreground uppercase sm:text-sm"
+                        >
                             <Megaphone class="size-4 sm:size-5" aria-hidden="true" />
                             Sedang dipanggil
                         </p>
-                        <div v-if="showDisplaySkeleton" aria-busy="true" aria-label="Memuat antrean" class="display-hero-skeleton">
+                        <div
+                            v-if="showDisplaySkeleton"
+                            aria-busy="true"
+                            aria-label="Memuat antrean"
+                            class="display-hero-skeleton"
+                        >
                             <Skeleton class="mx-auto mt-4 h-20 w-40 sm:h-24" />
                             <Skeleton class="mx-auto mt-3 h-8 w-2/3 sm:w-1/2" />
                             <Skeleton class="mx-auto mt-2 h-4 w-1/3" />
                         </div>
                         <div v-else-if="live.current" class="fade-up">
-                            <p aria-live="polite" class="mt-4 text-7xl font-bold tabular-nums tracking-tight sm:text-8xl lg:text-9xl">
+                            <p
+                                aria-live="polite"
+                                class="mt-4 text-7xl font-bold tracking-tight tabular-nums sm:text-8xl lg:text-9xl"
+                            >
                                 {{ queueNumberLabel(live.current.queue_number) }}
                             </p>
                             <p class="mt-3 text-2xl font-semibold sm:text-4xl">
@@ -265,21 +285,21 @@ onUnmounted((): void => {
                             </p>
                             <p
                                 v-if="(live.current.division ?? '').trim() !== ''"
-                                class="text-muted-foreground mt-2 text-sm sm:text-base"
+                                class="mt-2 text-sm text-muted-foreground sm:text-base"
                             >
                                 {{ live.current.division }}
                             </p>
                         </div>
-                        <p v-else class="text-muted-foreground mt-6 text-lg sm:text-2xl">
-                            Belum ada yang dipanggil.
-                        </p>
+                        <p v-else class="mt-6 text-lg text-muted-foreground sm:text-2xl">Belum ada yang dipanggil.</p>
                     </CardContent>
                 </Card>
             </section>
 
             <section v-if="showDisplaySkeleton" aria-label="Berikutnya" class="mb-6 sm:mb-8">
                 <Card class="rounded-2xl border-border/70 bg-muted/40">
-                    <CardContent class="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 p-5 text-center sm:p-6">
+                    <CardContent
+                        class="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 p-5 text-center sm:p-6"
+                    >
                         <Skeleton class="h-4 w-24" />
                         <Skeleton class="h-10 w-20" />
                         <Skeleton class="h-7 w-40" />
@@ -289,8 +309,10 @@ onUnmounted((): void => {
 
             <section v-else-if="live.next" aria-label="Berikutnya" class="fade-up mb-6 sm:mb-8">
                 <Card class="rounded-2xl border-border/70 bg-muted/40">
-                    <CardContent class="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 p-5 text-center sm:p-6">
-                        <p class="text-muted-foreground text-xs font-semibold tracking-widest uppercase sm:text-sm">
+                    <CardContent
+                        class="flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 p-5 text-center sm:p-6"
+                    >
+                        <p class="text-xs font-semibold tracking-widest text-muted-foreground uppercase sm:text-sm">
                             Berikutnya
                         </p>
                         <p class="text-3xl font-bold tabular-nums sm:text-5xl">
@@ -333,11 +355,7 @@ onUnmounted((): void => {
 
                 <Card class="rounded-2xl border-border/70">
                     <CardContent class="p-2 sm:p-4">
-                        <div
-                            v-if="showDisplaySkeleton"
-                            aria-busy="true"
-                            aria-label="Memuat daftar antrean"
-                        >
+                        <div v-if="showDisplaySkeleton" aria-busy="true" aria-label="Memuat daftar antrean">
                             <ul class="divide-y divide-border/60">
                                 <li
                                     v-for="n in 6"
@@ -368,7 +386,7 @@ onUnmounted((): void => {
                                     </span>
                                     <span
                                         v-if="(entry.division ?? '').trim() !== ''"
-                                        class="text-muted-foreground block truncate text-xs sm:text-sm"
+                                        class="block truncate text-xs text-muted-foreground sm:text-sm"
                                     >
                                         {{ entry.division }}
                                     </span>
@@ -378,14 +396,14 @@ onUnmounted((): void => {
                                 </Badge>
                             </li>
                         </ul>
-                        <p v-else class="text-muted-foreground px-4 py-8 text-center text-sm sm:text-base">
+                        <p v-else class="px-4 py-8 text-center text-sm text-muted-foreground sm:text-base">
                             Belum ada antrean untuk filter ini.
                         </p>
                     </CardContent>
                 </Card>
             </section>
 
-            <p class="text-muted-foreground mt-6 text-center text-xs sm:text-sm">
+            <p class="mt-6 text-center text-xs text-muted-foreground sm:text-sm">
                 {{ lastUpdatedLabel }} · Memperbarui otomatis setiap 15 detik.
             </p>
         </div>

@@ -1,38 +1,37 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { Head } from '@inertiajs/vue3';
 
 const RICKROLL_EMBED_SRC =
-    'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0&loop=1&playlist=dQw4w9WgXcQ&controls=1&playsinline=1&rel=0&modestbranding=1'
+    'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0&loop=1&playlist=dQw4w9WgXcQ&controls=1&playsinline=1&rel=0&modestbranding=1';
 
-type Phase = 'intro' | 'rickroll'
+type Phase = 'intro' | 'rickroll';
 
-const phase = ref<Phase>('intro')
-let autoTimer: ReturnType<typeof setTimeout> | null = null
+const phase = ref<Phase>('intro');
+let autoTimer: ReturnType<typeof setTimeout> | null = null;
 const prefersReducedMotion =
-    typeof window !== 'undefined' &&
-    window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
 function goRickroll(): void {
-    phase.value = 'rickroll'
+    phase.value = 'rickroll';
     if (autoTimer != null) {
-        clearTimeout(autoTimer)
-        autoTimer = null
+        clearTimeout(autoTimer);
+        autoTimer = null;
     }
 }
 
 onMounted(() => {
     if (prefersReducedMotion) {
-        return
+        return;
     }
-    autoTimer = setTimeout(goRickroll, 8500)
-})
+    autoTimer = setTimeout(goRickroll, 8500);
+});
 
 onBeforeUnmount(() => {
     if (autoTimer != null) {
-        clearTimeout(autoTimer)
+        clearTimeout(autoTimer);
     }
-})
+});
 </script>
 
 <template>
@@ -43,7 +42,7 @@ onBeforeUnmount(() => {
     <!-- Intro: celebratory SVG + confetti (no external assets) -->
     <div
         v-show="phase === 'intro'"
-        class="secret-intro text-foreground fixed inset-0 z-[2147483646] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-violet-200 via-fuchsia-100 to-amber-100 dark:from-violet-950 dark:via-fuchsia-950 dark:to-slate-950"
+        class="secret-intro fixed inset-0 z-[2147483646] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-violet-200 via-fuchsia-100 to-amber-100 text-foreground dark:from-violet-950 dark:via-fuchsia-950 dark:to-slate-950"
         role="presentation"
     >
         <p class="sr-only">Animasi pembuka pesta rahasia.</p>
@@ -122,8 +121,24 @@ onBeforeUnmount(() => {
                 <!-- mini cake -->
                 <g transform="translate(118 250)">
                     <g class="cake-bob">
-                        <rect x="0" y="40" width="84" height="28" rx="4" fill="currentColor" class="text-amber-800/80" />
-                        <rect x="8" y="24" width="68" height="20" rx="3" fill="currentColor" class="text-amber-100 dark:text-amber-200/90" />
+                        <rect
+                            x="0"
+                            y="40"
+                            width="84"
+                            height="28"
+                            rx="4"
+                            fill="currentColor"
+                            class="text-amber-800/80"
+                        />
+                        <rect
+                            x="8"
+                            y="24"
+                            width="68"
+                            height="20"
+                            rx="3"
+                            fill="currentColor"
+                            class="text-amber-100 dark:text-amber-200/90"
+                        />
                         <rect x="36" y="12" width="12" height="16" rx="2" fill="currentColor" class="text-rose-400" />
                         <ellipse cx="42" cy="10" rx="4" ry="6" fill="#fbbf24" class="flame" />
                     </g>
@@ -138,33 +153,30 @@ onBeforeUnmount(() => {
             </svg>
 
             <h1
-                class="font-display mt-2 text-balance text-2xl font-bold tracking-tight text-violet-950 dark:text-violet-100 sm:text-3xl"
+                class="mt-2 font-display text-2xl font-bold tracking-tight text-balance text-violet-950 sm:text-3xl dark:text-violet-100"
             >
                 Pesta rahasia 🎈
             </h1>
-            <p class="text-muted-foreground mt-2 max-w-sm text-pretty text-sm sm:text-base">
+            <p class="mt-2 max-w-sm text-sm text-pretty text-muted-foreground sm:text-base">
                 Balon sudah naik, konfeti sudah jatuh… ada kejutan spesial kalau kamu siap.
             </p>
 
             <button
                 type="button"
-                class="bg-background/90 text-foreground ring-border/60 hover:bg-background mt-8 px-7 py-3 text-sm font-semibold shadow-lg ring-1 transition-[box-shadow] dark:ring-white/10"
+                class="mt-8 bg-background/90 px-7 py-3 text-sm font-semibold text-foreground shadow-lg ring-1 ring-border/60 transition-[box-shadow] hover:bg-background dark:ring-white/10"
                 @click="goRickroll"
             >
                 Buka kejutan 🎁
             </button>
-            <p v-if="!prefersReducedMotion" class="text-muted-foreground mt-3 text-xs">
+            <p v-if="!prefersReducedMotion" class="mt-3 text-xs text-muted-foreground">
                 Atau tunggu sebentar — kejutan akan terbuka sendiri.
             </p>
-            <p v-else class="text-muted-foreground mt-3 text-xs">Tekan tombol di atas untuk melanjutkan.</p>
+            <p v-else class="mt-3 text-xs text-muted-foreground">Tekan tombol di atas untuk melanjutkan.</p>
         </div>
     </div>
 
     <!-- Rickroll (same as classic easter egg) -->
-    <div
-        v-show="phase === 'rickroll'"
-        class="fixed inset-0 z-[2147483647] m-0 h-[100dvh] w-full bg-black p-0"
-    >
+    <div v-show="phase === 'rickroll'" class="fixed inset-0 z-[2147483647] m-0 h-[100dvh] w-full bg-black p-0">
         <iframe
             class="absolute inset-0 h-full w-full border-0"
             :src="RICKROLL_EMBED_SRC"
@@ -174,10 +186,10 @@ onBeforeUnmount(() => {
             referrerpolicy="strict-origin-when-cross-origin"
         />
         <div
-            class="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-end px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-16 sm:px-5"
+            class="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-end px-4 pt-16 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-5"
         >
             <p
-                class="pointer-events-auto max-w-[18rem] text-pretty rounded-2xl border border-white/15 bg-black/70 px-4 py-3 text-right text-xs text-white/90 shadow-2xl ring-1 ring-white/5 backdrop-blur-md"
+                class="pointer-events-auto max-w-[18rem] rounded-2xl border border-white/15 bg-black/70 px-4 py-3 text-right text-xs text-pretty text-white/90 shadow-2xl ring-1 ring-white/5 backdrop-blur-md"
                 role="status"
             >
                 Kamu menemukan rute rahasia. Semoga harimu tetap produktif.
