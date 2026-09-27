@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
+import DataPagination from '@/components/modules/dashboard/DataPagination.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -245,32 +246,11 @@ const rangeEnd = computed<number>(() => {
     return Math.min(rangeStart.value + pagedRows.value.length - 1, totalCount.value)
 })
 
-const visiblePages = computed<(number | string)[]>(() => {
-    const current: number = currentPage.value
-    const last: number = lastPage.value
-    if (last <= 7) {
-        return Array.from({ length: last }, (_, index: number) => index + 1)
-    }
-    const pages = new Set<number>([1, last, current])
-    if (current - 1 > 1) pages.add(current - 1)
-    if (current + 1 < last) pages.add(current + 1)
-    const sorted: number[] = [...pages].sort((a: number, b: number) => a - b)
-    const result: (number | string)[] = []
-    let prev = 0
-    for (const page of sorted) {
-        if (prev && page - prev > 1) result.push('…')
-        result.push(page)
-        prev = page
-    }
-    return result
-})
-
 watch([search, divisionId, stage, semester, queue], () => {
     currentPage.value = 1
 })
 
-function goToPage(page: number | string): void {
-    if (typeof page !== 'number') return
+function goToPage(page: number): void {
     currentPage.value = Math.max(1, Math.min(page, lastPage.value))
 }
 
@@ -604,43 +584,13 @@ function submitReject(): void {
                     aria-label="Jumlah per halaman"
                 />
             </div>
-            <nav class="flex flex-wrap items-center gap-1.5" aria-label="Pagination">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    :disabled="currentPage <= 1"
-                    aria-label="Ke halaman sebelumnya"
-                    @click="goToPage(currentPage - 1)"
-                >
-                    Sebelumnya
-                </Button>
-                <template v-for="(item, index) in visiblePages" :key="`${item}-${index}`">
-                    <span v-if="typeof item === 'string'" class="text-muted-foreground px-1" aria-hidden="true">
-                        …
-                    </span>
-                    <Button
-                        v-else
-                        variant="outline"
-                        size="sm"
-                        :disabled="item === currentPage"
-                        :aria-label="`Ke halaman ${item}`"
-                        :aria-current="item === currentPage ? 'page' : undefined"
-                        :class="item === currentPage ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-transparent' : ''"
-                        @click="goToPage(item)"
-                    >
-                        {{ item }}
-                    </Button>
-                </template>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    :disabled="currentPage >= lastPage"
-                    aria-label="Ke halaman berikutnya"
-                    @click="goToPage(currentPage + 1)"
-                >
-                    Berikutnya
-                </Button>
-            </nav>
+            <DataPagination
+                :edges="true"
+                :page="currentPage"
+                :total="totalCount"
+                :per-page="perPage"
+                @update:page="goToPage"
+            />
         </div>
 
         <ConfirmationModal
