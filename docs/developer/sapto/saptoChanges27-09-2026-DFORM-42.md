@@ -13,6 +13,8 @@ Idiom atribut `aria-invalid:*` (mekanisme attribute-driven, berbeda dari idiom b
 
 Token yang dipindahkan **dihapus dari string aslinya** sehingga tidak ada duplikat. F0 (`87ecb1b`) membuat kontrak + test; K (`6be31f6`) memigrasikan kelima primitif. `ui/input-group/InputGroup.vue` **sengaja tidak disentuh** karena prefix selector-nya `has-[[data-slot][aria-invalid=true]]:` tidak bisa berbagi konstanta. Dampak perilaku user: **4 primitif kini mendapat `dark:aria-invalid:border-destructive/70`** (border invalid di dark mode jadi 70%, sebelumnya penuh) — delta kecil yang disetujui sadar dan **belum di-eyeball di browser**.
 
+> **Usang (DFORM-49, 2026-09-27):** varian `dark:aria-invalid:*` pada `ariaInvalidClass` dihapus karena dark mode telah dihilangkan dari aplikasi; token terangnya tetap.
+
 ## Timeline Perubahan
 
 ### 27 September 2026

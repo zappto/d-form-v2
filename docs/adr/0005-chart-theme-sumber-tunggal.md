@@ -47,3 +47,14 @@ Jadikan satu modul sebagai satu-satunya pemilik literal tema chart:
 - Commit: `5fb7bdf` — `feat(chart,DFORM-13): satukan token+tooltip via lib/chartTheme`.
 - Test: `resources/js/lib/__tests__/chartTheme.test.ts`,
   `resources/js/hooks/__tests__/use-chart-theme.test.ts`.
+
+## Amandemen 2026-09-27 — palet gelap dihapus (DFORM-49)
+
+Dark mode dihapus dari aplikasi, jadi jalur gelap ADR ini tidak lagi berlaku:
+
+- `chartThemeTokens()` kini **tanpa parameter** dan selalu mengembalikan palet terang.
+- `IChartThemeTokens` tetap ada sebagai kontrak token; konstanta `CHART_*_DARK` dihapus.
+- `useChartTheme` + `MutationObserver` pada `data-theme` **dihapus**; `data-theme` tidak lagi
+  dibaca kode mana pun.
+- Jaminan yang tetap berlaku: `chartTheme.ts` satu-satunya pemilik literal oklch token chart,
+  dipin byte-identik oleh `lib/__tests__/chartTheme.test.ts`.
