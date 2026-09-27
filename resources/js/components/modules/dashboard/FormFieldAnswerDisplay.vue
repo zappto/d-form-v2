@@ -3,6 +3,7 @@ import { computed, onUnmounted, ref, watch } from 'vue';
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 import { Button } from '@/components/ui/button';
 import { getFormFieldOptionRows, formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions';
+import { isFileUploadTypeName } from '@/lib/formFieldKind';
 import { readFieldMetadata } from '@/lib/formFieldMetadata';
 import { cn } from '@/lib/utils';
 import { Download, FileText, FileImage, ExternalLink, Maximize2, Image as ImageIcon, X } from 'lucide-vue-next';
@@ -111,7 +112,7 @@ const treatsAsFile = computed((): boolean => {
         return true;
     }
     const bt = formFieldBuilderType(props.field);
-    return bt === 'file_upload' || bt === 'image_upload' || bt === 'fileUpload';
+    return isFileUploadTypeName(bt);
 });
 
 const preferImagePreview = computed((): boolean => {

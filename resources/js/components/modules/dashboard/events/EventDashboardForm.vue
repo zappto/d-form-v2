@@ -25,6 +25,7 @@ import {
     update as updateEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { getFieldError } from '@/lib/error-message';
+import { toCategoryList } from '@/lib/eventCategories';
 import { BannerPickerField } from '@/components/core/field';
 import { cn } from '@/lib/utils';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
@@ -75,16 +76,6 @@ const categories = computed(() =>
         : (props.options?.categories ?? defaultCategories)
 );
 
-function toTokenList(v: string | string[]): string[] {
-    if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
-    if (typeof v === 'string')
-        return v
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean);
-    return [];
-}
-
 type TEventFormData = {
     title: string;
     description: string;
@@ -134,8 +125,8 @@ function buildFormPayload(): TEventFormPayload {
         return { ...emptyEventFormData(), _method: 'PUT' as const };
     }
 
-    const initialCategories = toTokenList(event.category);
-    const initialSessions = toTokenList(event.session);
+    const initialCategories = toCategoryList(event.category);
+    const initialSessions = toCategoryList(event.session);
 
     return {
         _method: 'PUT' as const,
@@ -312,8 +303,8 @@ function submitForm(publish: boolean): void {
     if (typeof form.registration_end === 'string') form.registration_end = form.registration_end.trim();
     form.transform((data) => ({
         ...data,
-        category: toTokenList(data.category),
-        session: toTokenList(data.session),
+        category: toCategoryList(data.category),
+        session: toCategoryList(data.session),
     }));
 
     let url: string;

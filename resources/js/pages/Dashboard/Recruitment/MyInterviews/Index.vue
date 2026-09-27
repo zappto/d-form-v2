@@ -24,6 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { routes } from '@/lib/routes';
+import type { IPaginator } from '@/lib/pagination';
 import { padQueueNumber } from '@/lib/format';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
@@ -143,15 +144,7 @@ const FALLBACK_PER_PAGE = 20;
 
 const props = withDefaults(
     defineProps<{
-        interviews: {
-            data: TInterviewRow[];
-            current_page: number;
-            last_page: number;
-            total: number;
-            per_page?: number;
-            from?: number | null;
-            to?: number | null;
-        };
+        interviews: IPaginator<TInterviewRow>;
         query: IMyInterviewsQuery;
         queue_counts: Record<string, number>;
         today_sessions: ITodaySession[];

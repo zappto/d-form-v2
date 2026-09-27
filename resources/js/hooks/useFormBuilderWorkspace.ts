@@ -1,5 +1,6 @@
 import { ref, computed, type Ref } from 'vue';
 import { showErrorToast } from '@/lib/error-message';
+import { hasMeaningfulHtmlText } from '@/lib/htmlText';
 import { resolveBannerPreviewSrc, type ITFormBannerState } from '@/components/modules/builder/formBanner';
 import {
     cloneFormBuilderPalette,
@@ -50,12 +51,7 @@ export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, opt
 
     // Edit form tersimpan: konten sudah ada saat mount → tampilkan zona.
     const initialSuccess = models.successContent?.value ?? '';
-    if (
-        initialSuccess
-            .replace(/<[^>]*>/g, '')
-            .replace(/&nbsp;/gi, ' ')
-            .trim() !== ''
-    ) {
+    if (hasMeaningfulHtmlText(initialSuccess)) {
         showSuccessZone.value = true;
     }
 

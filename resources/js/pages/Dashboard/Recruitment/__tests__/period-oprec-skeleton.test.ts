@@ -206,7 +206,7 @@ function baseShowProps(): Omit<TPeriodsShowProps, 'tab'> {
         stageOptions: [{ value: 'submitted', label: 'Submitted' }],
         semesterOptions: [],
         query: {},
-        sessions: { data: [demoSessionRow()], current_page: 1, last_page: 1, total: 1 },
+        sessions: { data: [demoSessionRow()], current_page: 1, last_page: 1, per_page: 20, total: 1 },
         report: demoReport(),
         assignments: [],
         divisions: [],

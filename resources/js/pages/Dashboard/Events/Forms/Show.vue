@@ -40,6 +40,8 @@ import {
     submissionReviewBadge,
 } from '@/lib/formSubmissionsUi';
 import { parseApiErrorMessage, showErrorToast, showHttpErrorToast } from '@/lib/error-message';
+import { isFileUploadTypeName } from '@/lib/formFieldKind';
+import { sendFormAnswerReview } from '@/lib/inertiaRequest';
 import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAnswerReviewController';
 import FormAnswerDetailSheet from '@/components/modules/dashboard/FormAnswerDetailSheet.vue';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
@@ -303,8 +305,6 @@ const answerKeys = computed(() => {
 });
 
 /** Nilai `type` aktual untuk field berkas/foto: API `fileUpload`, builder `file_upload`/`image_upload`. */
-const FILE_FIELD_TYPE_NAMES: ReadonlySet<string> = new Set(['fileUpload', 'file_upload', 'image_upload']);
-
 function backendFieldBuilderType(field: BackendField): string {
     const metadata: TFormFieldMetadataBag = field.metadata ?? {};
     const builderType = metadata.builderType;
@@ -314,8 +314,8 @@ function backendFieldBuilderType(field: BackendField): string {
 /** True bila field adalah unggahan berkas/foto (banner dikecualikan — bukan jawaban). */
 function isFileBackendField(field: BackendField): boolean {
     if (field.name === 'form_banner' || backendFieldBuilderType(field) === 'banner') return false;
-    if (FILE_FIELD_TYPE_NAMES.has(field.type)) return true;
-    return FILE_FIELD_TYPE_NAMES.has(backendFieldBuilderType(field));
+    if (isFileUploadTypeName(field.type)) return true;
+    return isFileUploadTypeName(backendFieldBuilderType(field));
 }
 
 const fileFieldNames = computed(() => new Set((props.fields ?? []).filter(isFileBackendField).map((f) => f.name)));
@@ -380,11 +380,6 @@ function openSubmissionDetail(submission: IFormSubmission): void {
     isDetailOpen.value = true;
 }
 
-function readXsrfToken(): string | null {
-    const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-    return match?.[1] ? decodeURIComponent(match[1]) : null;
-}
-
 function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSubmission): void {
     if (!formSubmissionReviewIsPending(submission) || isSubmissionReviewing(submission.id)) return;
 
@@ -406,29 +401,20 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
 
     void (async () => {
         try {
-            const token = readXsrfToken();
-            const res = await fetch(url, {
-                method: method.toUpperCase(),
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'X-XSRF-TOKEN': token } : {}),
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({ review_status }),
+            const result = await sendFormAnswerReview({
+                url,
+                method,
+                reviewStatus: review_status,
             });
 
-            // Batas luar `fetch`: body mentah diverifikasi oleh parseApiErrorMessage/showHttpErrorToast.
-            const body: unknown = await res.json().catch(() => ({}));
-
-            if (!res.ok) {
-                showHttpErrorToast(res.status, body, {
-                    409: parseApiErrorMessage(body, 'Jawaban ini sudah pernah direview.'),
-                    422: parseApiErrorMessage(body, 'Status review tidak valid.'),
+            if (!result.ok) {
+                showHttpErrorToast(result.status, result.body, {
+                    409: parseApiErrorMessage(result.body, 'Jawaban ini sudah pernah direview.'),
+                    422: parseApiErrorMessage(result.body, 'Status review tidak valid.'),
                     403: 'Anda tidak punya izin untuk mereview jawaban ini.',
                     404: 'Jawaban tidak ditemukan.',
                 });
-                if (res.status === 409 || res.status === 422) {
+                if (result.status === 409 || result.status === 422) {
                     router.reload({
                         only: ['submissions'],
                         onStart: () => {

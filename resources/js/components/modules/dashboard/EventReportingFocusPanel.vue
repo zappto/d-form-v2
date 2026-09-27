@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import { ClipboardList, ScanLine, Users, Download } from 'lucide-vue-next';
 import { formatSubmissionDateTime } from '@/lib/format';
+import type { IPaginator } from '@/lib/pagination';
 
 const props = withDefaults(
     defineProps<{
@@ -19,20 +20,7 @@ const props = withDefaults(
             quota: number | null;
         };
         exportUrls: { registrations: string; attendance: string };
-        attendanceLog: {
-            data: {
-                id: string;
-                scanned_at: string;
-                form_answer_id: string;
-                attendee: { name: string; email: string } | null;
-                scanned_by: { name: string; email: string } | null;
-            }[];
-            current_page: number;
-            last_page: number;
-            per_page: number;
-            total: number;
-            links?: { url: string | null; label: string; active: boolean }[];
-        };
+        attendanceLog: IPaginator<IAttendanceLogRow>;
         /** When false, parent renders CSV actions elsewhere (e.g. next to an event picker). */
         showExportToolbar?: boolean;
     }>(),

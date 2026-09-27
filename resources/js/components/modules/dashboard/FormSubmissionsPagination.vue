@@ -2,12 +2,7 @@
 import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { submissionPaginationLabel } from '@/lib/formSubmissionsUi';
-
-interface IPaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
+import type { IPaginationLink } from '@/lib/pagination';
 
 withDefaults(
     defineProps<{

@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin } from 'lucide-vue-next';
 import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData';
 import { formatDisplayDate } from '@/lib/format';
-import { parseEventCategories } from '@/lib/eventShowUi';
+import { toCategoryList } from '@/lib/eventCategories';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 import { EVENT_HERO_BANNER_ASPECT } from '@/lib/eventBannerAspect';
 
@@ -58,7 +58,7 @@ defineProps<{
                             {{ statusPill.label }}
                         </span>
                         <Badge
-                            v-for="cat in parseEventCategories(event.category)"
+                            v-for="cat in toCategoryList(event.category)"
                             :key="cat"
                             class="border-0 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm"
                             :style="{ backgroundColor: categoryColorMap[cat] ?? '#6B7280' }"

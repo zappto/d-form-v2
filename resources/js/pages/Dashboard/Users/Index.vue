@@ -11,6 +11,7 @@ import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { showErrorToast } from '@/lib/error-message';
+import type { IPaginator } from '@/lib/pagination';
 import { routes } from '@/lib/routes';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
@@ -39,16 +40,8 @@ interface IUsersQuery {
     per_page?: number;
 }
 
-interface IUsersPaginator {
-    data: IManagedUser[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-}
-
 const props = defineProps<{
-    users: IUsersPaginator;
+    users: IPaginator<IManagedUser>;
     roleOptions: IRoleOption[];
     query: IUsersQuery;
 }>();

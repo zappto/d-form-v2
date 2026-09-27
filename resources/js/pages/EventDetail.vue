@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummyData';
 import { formatCountNumber, formatDisplayDate } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
-import { stripHtmlToText } from '@/utils/stripHtml';
+import { stripHtmlToText } from '@/lib/htmlText';
 import { routes } from '@/lib/routes';
 import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect';
 import { eventStatusUi } from '@/lib/eventShowUi';

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BarChart3, ClipboardList, ScanLine, Download } from 'lucide-vue-next';
+import type { IPaginator } from '@/lib/pagination';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardFocusLayout });
@@ -33,20 +34,7 @@ const props = defineProps<{
                   registered_count: number;
                   quota: number | null;
               };
-              attendanceLog: {
-                  data: {
-                      id: string;
-                      scanned_at: string;
-                      form_answer_id: string;
-                      attendee: { name: string; email: string } | null;
-                      scanned_by: { name: string; email: string } | null;
-                  }[];
-                  current_page: number;
-                  last_page: number;
-                  per_page: number;
-                  total: number;
-                  links?: { url: string | null; label: string; active: boolean }[];
-              };
+              attendanceLog: IPaginator<IAttendanceLogRow>;
           }
         | undefined;
 }>();

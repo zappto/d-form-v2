@@ -9,6 +9,7 @@ import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import { showErrorToast } from '@/lib/error-message';
+import type { IPaginator } from '@/lib/pagination';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,14 +70,6 @@ interface IPeriodRow {
     can_delete?: boolean;
 }
 
-interface IPeriodPaginator {
-    data: IPeriodRow[];
-    current_page: number;
-    last_page: number;
-    total: number;
-    per_page?: number;
-}
-
 const props = withDefaults(
     defineProps<{
         summary: {
@@ -88,7 +81,7 @@ const props = withDefaults(
             action_queues?: IActionQueue[];
             today_sessions?: ITodaySession[];
         };
-        periods?: IPeriodPaginator | null;
+        periods?: IPaginator<IPeriodRow> | null;
         query?: { search?: string; status?: string };
         statusOptions?: { value: string; label: string }[];
         divisions?: TIDashboardDivision[];

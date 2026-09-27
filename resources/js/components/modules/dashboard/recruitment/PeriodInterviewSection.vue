@@ -9,6 +9,7 @@ import InterviewSessionCreateSheet, {
     type TInterviewDivisionChoice,
 } from '@/components/modules/dashboard/recruitment/InterviewSessionCreateSheet.vue';
 import { routes } from '@/lib/routes';
+import type { IPaginator } from '@/lib/pagination';
 
 interface ISessionRow {
     id: string;
@@ -23,15 +24,8 @@ interface ISessionRow {
     division: { id: string; name: string; code: string } | null;
 }
 
-interface ISessionPaginator {
-    data: ISessionRow[];
-    current_page: number;
-    last_page: number;
-    total: number;
-}
-
 defineProps<{
-    sessions: ISessionPaginator | null;
+    sessions: IPaginator<ISessionRow> | null;
     periodId: string;
     divisionOptions: TInterviewDivisionChoice[];
     loading?: boolean;

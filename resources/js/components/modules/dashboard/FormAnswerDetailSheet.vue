@@ -9,7 +9,7 @@ import FormFieldAnswerDisplay from '@/components/modules/dashboard/FormFieldAnsw
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
 import { formSubmissionReviewIsPending, submissionReviewBadge } from '@/lib/formSubmissionsUi';
-import { formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions';
+import { isFileUploadField } from '@/lib/formFieldKind';
 import { userAvatarSeed } from '@/lib/userAvatarFallback';
 
 const open = defineModel<boolean>('open', { required: true });
@@ -32,17 +32,8 @@ function fieldForKey(key: string): IFormField | null {
     return props.fields.find((field) => field.name === key) ?? null;
 }
 
-/** True bila field adalah unggahan berkas/foto (banner dikecualikan — bukan jawaban). */
-function isFileAnswerField(field: IFormField | null): boolean {
-    if (!field) return false;
-    const builderType = formFieldBuilderType(field);
-    if (builderType === 'banner' || field.name === 'form_banner') return false;
-    if (formFieldApiType(field) === 'fileUpload') return true;
-    return builderType === 'file_upload' || builderType === 'image_upload' || builderType === 'fileUpload';
-}
-
-const fileAnswerKeys = computed(() => props.answerKeys.filter((key) => isFileAnswerField(fieldForKey(key))));
-const textAnswerKeys = computed(() => props.answerKeys.filter((key) => !isFileAnswerField(fieldForKey(key))));
+const fileAnswerKeys = computed(() => props.answerKeys.filter((key) => isFileUploadField(fieldForKey(key))));
+const textAnswerKeys = computed(() => props.answerKeys.filter((key) => !isFileUploadField(fieldForKey(key))));
 
 /** Seksi jawaban di drawer: teks dulu, lalu "Berkas / Foto" agar lampiran mudah ditemukan. */
 const answerSections = computed(() => {

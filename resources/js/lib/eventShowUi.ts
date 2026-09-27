@@ -1,14 +1,3 @@
-/** Parse kategori acara dari array atau string ber-koma menjadi daftar string; dipakai di halaman detail acara. */
-export function parseEventCategories(raw: string | string[] | null): string[] {
-    if (Array.isArray(raw)) return raw.map((s) => String(s).trim()).filter(Boolean);
-    if (typeof raw === 'string')
-        return raw
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean);
-    return [];
-}
-
 export interface IEventStatusUi {
     label: string;
     tone: string;

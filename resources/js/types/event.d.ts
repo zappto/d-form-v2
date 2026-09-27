@@ -166,6 +166,15 @@ declare global {
         group_review_status: 'pending' | 'partial' | 'accepted' | 'rejected';
         submitted_at: string;
     }
+
+    /** Satu baris log kehadiran pada laporan acara; dipaginasi lewat `IPaginator`. */
+    interface IAttendanceLogRow {
+        id: string;
+        scanned_at: string;
+        form_answer_id: string;
+        attendee: { name: string; email: string } | null;
+        scanned_by: { name: string; email: string } | null;
+    }
 }
 
 export {};

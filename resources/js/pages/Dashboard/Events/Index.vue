@@ -17,6 +17,7 @@ import {
     destroy as destroyEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { routes } from '@/lib/routes';
+import type { IPaginator } from '@/lib/pagination';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
 
@@ -30,18 +31,8 @@ onMounted(() => {
     setTopbar({ title: 'Acara', subtitle: 'Kelola acara & pendaftaran' });
 });
 
-interface IPaginator {
-    data: IEvent[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    from: number | null;
-    to: number | null;
-}
-
 const props = defineProps<{
-    events: IPaginator;
+    events: IPaginator<IEvent>;
     filterOptions: {
         categories: { value: string; label: string }[];
         sessions: { value: string; label: string }[];

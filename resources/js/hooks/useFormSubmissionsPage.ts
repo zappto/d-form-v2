@@ -3,48 +3,20 @@ import { router } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { parseApiErrorMessage, showErrorToast, showHttpErrorToast } from '@/lib/error-message';
 import { answerPreview, formatSubmissionDate, humanizeSubmissionKey, submissionFileUrl } from '@/lib/formSubmissionsUi';
+import { sendFormAnswerReview } from '@/lib/inertiaRequest';
+import type { IPaginator } from '@/lib/pagination';
 import type { TFormFillAnswerValue } from '@/types/form';
 import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAnswerReviewController';
 
-interface IPaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
+/** Halaman submission (atau grup bundle) dari server. */
+type TSubmissionPaginator = IPaginator<IFormSubmission>;
+type TBundleGroupPaginator = IPaginator<IBundleSubmissionGroup>;
 
-interface ISubmissionPaginator {
-    data?: IFormSubmission[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    links?: IPaginationLink[];
-}
-
-interface IBundleGroupPaginator {
-    data?: IBundleSubmissionGroup[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    links?: IPaginationLink[];
-}
-
-function readXsrfToken(): string | null {
-    const m = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-    return m?.[1] ? decodeURIComponent(m[1]) : null;
-}
-
-/** True bila body respons review berupa objek JSON (batas eksternal `res.json()`). */
-function isSubmissionReviewBody(value: unknown): value is { message?: string } {
-    return typeof value === 'object' && value !== null;
-}
-
-function submissionRows(paginator: ISubmissionPaginator | undefined): IFormSubmission[] {
+function submissionRows(paginator: TSubmissionPaginator | undefined): IFormSubmission[] {
     return paginator?.data ?? [];
 }
 
-function bundleGroupRows(paginator: IBundleGroupPaginator | undefined): IBundleSubmissionGroup[] {
+function bundleGroupRows(paginator: TBundleGroupPaginator | undefined): IBundleSubmissionGroup[] {
     return paginator?.data ?? [];
 }
 
@@ -53,8 +25,8 @@ export function useFormSubmissionsPage(props: {
     event: { id: string; title: string };
     form: { id: string; title: string; registration_mode?: 'single' | 'bundle' | 'team' };
     fields?: IFormField[];
-    submissions?: ISubmissionPaginator;
-    bundleGroups?: IBundleGroupPaginator;
+    submissions?: TSubmissionPaginator;
+    bundleGroups?: TBundleGroupPaginator;
 }) {
     const formFields = computed(() => props.fields ?? []);
     const selectedSubmission = ref<IFormSubmission | null>(null);
@@ -183,30 +155,20 @@ export function useFormSubmissionsPage(props: {
 
         void (async () => {
             try {
-                const token = readXsrfToken();
-                const res = await fetch(url, {
-                    method: method.toUpperCase(),
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        ...(token ? { 'X-XSRF-TOKEN': token } : {}),
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ review_status }),
+                const result = await sendFormAnswerReview({
+                    url,
+                    method,
+                    reviewStatus: review_status,
                 });
 
-                // Body respons HTTP (batas eksternal `res.json()`); `unknown` disempitkan predikat objek.
-                const rawBody: unknown = await res.json().catch(() => ({}));
-                const body = isSubmissionReviewBody(rawBody) ? rawBody : undefined;
-
-                if (!res.ok) {
-                    showHttpErrorToast(res.status, body, {
-                        409: parseApiErrorMessage(body, 'Submission ini sudah pernah direview.'),
-                        422: parseApiErrorMessage(body, 'Status review tidak valid.'),
+                if (!result.ok) {
+                    showHttpErrorToast(result.status, result.body, {
+                        409: parseApiErrorMessage(result.body, 'Submission ini sudah pernah direview.'),
+                        422: parseApiErrorMessage(result.body, 'Status review tidak valid.'),
                         403: 'Anda tidak punya izin untuk mereview submission ini.',
                         404: 'Submission tidak ditemukan.',
                     });
-                    if (res.status === 409 || res.status === 422) {
+                    if (result.status === 409 || result.status === 422) {
                         router.reload({
                             only: props.form.registration_mode === 'bundle' ? ['bundleGroups'] : ['submissions'],
                         });

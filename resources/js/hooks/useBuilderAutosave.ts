@@ -25,6 +25,7 @@ import {
     type ITPendingOptionImageFile,
 } from '@/components/modules/builder/optionImage';
 import { mergeSentHeader, stripBlankRequiredKeys } from '@/lib/autosaveHeader';
+import { readXsrfToken } from '@/lib/inertiaRequest';
 import { toFormMetadataPayload, type IFormRegistrationMetadata } from '@/types/form';
 import type { BackendField, BuilderField } from '@/types/form-builder';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
@@ -224,14 +225,6 @@ function applyUploadResults(request: IUploadResultRequest): void {
     } else if (request.optionFiles.length > 0) {
         discardPendingOptionImageFiles(request.state.fields);
     }
-}
-
-/** Baca XSRF-TOKEN untuk CSRF beacon (Laravel cek input `_token`). */
-function readXsrfToken(): string | null {
-    // Nama cookie XSRF-TOKEN stabil milik Laravel; literal sekali pakai.
-    const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-    const encoded = match?.[1];
-    return encoded ? decodeURIComponent(encoded) : null;
 }
 
 /** Ekstrak pipeline autosave builder menjadi hook shared (pemilik tunggal save/guard/beacon). */

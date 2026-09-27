@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { BarChart3, CalendarClock, Plus, Trash2, UserCheck, Users } from 'lucide-vue-next';
 import { showErrorToast, showFlashToast } from '@/lib/error-message';
+import type { IPaginator } from '@/lib/pagination';
 import { routes } from '@/lib/routes';
 import type { TPeriodStatusValue } from '@/lib/recruitmentPeriodPhase';
 import {
@@ -69,13 +70,6 @@ interface ISessionRow {
     interviews_count: number;
     period: { id: string; name: string } | null;
     division: { id: string; name: string; code: string } | null;
-}
-
-interface ISessionPaginator {
-    data: ISessionRow[];
-    current_page: number;
-    last_page: number;
-    total: number;
 }
 
 interface IReportPayload {
@@ -135,7 +129,7 @@ const props = withDefaults(
             per_page?: number | string;
         };
         tab: string;
-        sessions?: ISessionPaginator | null;
+        sessions?: IPaginator<ISessionRow> | null;
         interview_division_options?: { id: string; name: string; code: string }[];
         report?: IReportPayload | null;
         applicant_detail?: IApplicationDetail | null;

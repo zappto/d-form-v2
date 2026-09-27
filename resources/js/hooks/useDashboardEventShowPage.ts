@@ -8,7 +8,7 @@ import {
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { sessionLabelMap } from '@/lib/dummyData';
 import { formatDisplayDate, formatDisplayDateTime, formatRupiahPrice } from '@/lib/format';
-import { parseEventCategories } from '@/lib/eventShowUi';
+import { toCategoryList } from '@/lib/eventCategories';
 import { Banknote, CalendarDays, Clock, MapPin } from 'lucide-vue-next';
 
 /** Data turunan (kuota, status, progres) dan aksi arsip/pulihkan/publish halaman detail event dashboard. */
@@ -58,7 +58,7 @@ export function useDashboardEventShowPage(event: IEvent, forms: { id: string; ti
         {
             title: 'Session',
             value:
-                parseEventCategories(event.session)
+                toCategoryList(event.session)
                     .map((s) => sessionLabelMap[s] ?? s)
                     .join(', ') || '—',
             icon: Clock,
@@ -158,7 +158,6 @@ export function useDashboardEventShowPage(event: IEvent, forms: { id: string; ti
         progressTone,
         statusPill,
         metaBlocks,
-        parseEventCategories,
         formatDate: formatDisplayDate,
         formatDateTime: formatDisplayDateTime,
         handleDelete,
