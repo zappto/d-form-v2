@@ -7,7 +7,7 @@ Lanjutan dari [`saptoChanges27-09-2026-DFORM-40.md`](./saptoChanges27-09-2026-DF
 DFORM-40 sudah menurunkan 278 error tipe ke 0, tetapi **tidak ada satu pun gate** yang menjalankannya: `package.json` tidak punya script `typecheck` dan CI hanya punya `code_formatting.yml` (Pint + Prettier, tanpa job frontend). Ticket ini memasang gate-nya:
 
 1. **Script + dependency**: `"typecheck": "vue-tsc --noEmit"`, dan `vue-tsc` **di-pin exact `3.3.11`** sebagai devDependency — sebelumnya `vue-tsc` **sama sekali bukan dependency**; semua pemanggilan `npx vue-tsc` sepanjang sesi menarik versi transient dari registry.
-2. **Workflow CI** `.github/workflows/frontend_typecheck.yml` (`npm ci` + `npm run typecheck`, pada push/PR ke `dev`/`temp`).
+2. **Workflow CI** `.github/workflows/frontend_typecheck.yml` (`npm ci` + `npm run typecheck`, pada push/PR ke `main`, `dev`, `temp`).
 3. **Temuan akar di tengah jalan**: `tsconfig.json` memuat `"ignoreDeprecations": "6.0"`, yang **hanya valid di TypeScript ≥ 6**, sementara `package.json` mem-pin `typescript ^5.9.3`. Jadi config tipe repo **ditolak toolchain-nya sendiri** (`error TS5103`), dan tak ada yang tahu karena tak ada gate. Baris itu dihapus → `vue-tsc --noEmit` **exit 0, 0 error, tanpa peringatan deprecation** di TS 5.9.3.
 
 ## Timeline Perubahan
@@ -31,7 +31,7 @@ Sumber waktu/SHA: `git log --pretty='%h|%ad'`.
 
 #### `133dfa2` chore(ci,DFORM-41): gate typecheck (vue-tsc 3.3.11) + script npm + workflow CI
 
-- Apa: `package.json` — tambah script `"typecheck": "vue-tsc --noEmit"` dan devDependency `"vue-tsc": "3.3.11"` (**pin exact**). `package-lock.json` +95/−4 (pohon `vue-tsc`: `@volar/language-core|source-map|typescript`, `@vue/language-core`, `alien-signals`, `muggle-string`). Workflow baru `.github/workflows/frontend_typecheck.yml` (33 baris): job `typecheck`, `actions/checkout@v4` → `actions/setup-node@v4` (Node 20, `cache: npm`) → `npm ci` → `npm run typecheck`, dipicu `push`/`pull_request` ke `dev`/`temp` (paritas dengan `code_formatting.yml`).
+- Apa: `package.json` — tambah script `"typecheck": "vue-tsc --noEmit"` dan devDependency `"vue-tsc": "3.3.11"` (**pin exact**). `package-lock.json` +95/−4 (pohon `vue-tsc`: `@volar/language-core|source-map|typescript`, `@vue/language-core`, `alien-signals`, `muggle-string`). Workflow baru `.github/workflows/frontend_typecheck.yml` (33 baris): job `typecheck`, `actions/checkout@v4` → `actions/setup-node@v4` (Node 20, `cache: npm`) → `npm ci` → `npm run typecheck`, dipicu `push`/`pull_request`; saat commit ini cakupan branch-nya `dev`/`temp` (paritas dengan `code_formatting.yml`), lalu diperluas ke `main`, `dev`, `temp` oleh `8c5a01b` (dicatat di doc DFORM-44).
 - Kenapa **pin exact**, bukan `^`: output type-checker harus reproducible antara mesin lokal dan CI; rentang caret bisa memunculkan error baru tanpa perubahan kode dan memblokir PR tiba-tiba.
 - Kenapa workflow **terpisah**, bukan menambah step ke `code_formatting.yml`: workflow lama bertema formatting (Pint/Prettier, keduanya `continue-on-error: true`); gate tipe justru **harus** mem-fail build.
 - Jira: DFORM-41.
