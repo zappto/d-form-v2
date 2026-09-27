@@ -5,5 +5,6 @@
     "trailingComma": "es5",
     "printWidth": 120,
 
-    "plugins": ["prettier-plugin-blade", "prettier-plugin-tailwindcss"]
+    "plugins": ["prettier-plugin-blade", "prettier-plugin-tailwindcss"],
+    "tailwindStylesheet": "./resources/css/app.css"
 }
