@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { MapPin, Users, ArrowRight } from 'lucide-vue-next'
 import { routes } from '@/lib/routes'
 import { eventCardBannerContainerClass } from '@/lib/eventBannerAspect'
+import { eventStatusUi } from '@/lib/eventShowUi'
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'
 
 const props = defineProps<{
@@ -23,20 +24,6 @@ onMounted(() => {
 })
 
 const featured = computed(() => props.events.slice(0, 3))
-
-const statusLabel = (s: string) => {
-    if (s === 'open') return 'Pendaftaran Dibuka'
-    if (s === 'full') return 'Kuota Penuh'
-    if (s === 'closed') return 'Ditutup'
-    return 'Segera Dibuka'
-}
-
-const statusVariant = (s: string) =>
-    s === 'open'
-        ? 'border-green-500/20 bg-green-500/10 text-green-600'
-        : s === 'full'
-          ? 'border-amber-500/20 bg-amber-500/10 text-amber-600'
-          : 'border-border bg-muted text-muted-foreground'
 </script>
 
 <template>
@@ -77,9 +64,9 @@ const statusVariant = (s: string) =>
                         </div>
                         <Badge
                             variant="outline"
-                            :class="['absolute top-3 right-3 z-[1] text-[10px] backdrop-blur-sm', statusVariant(ev.registration_status)]"
+                            :class="['absolute top-3 right-3 z-[1] text-[10px] backdrop-blur-sm', eventStatusUi(ev.registration_status).tone]"
                         >
-                            {{ statusLabel(ev.registration_status) }}
+                            {{ eventStatusUi(ev.registration_status).label }}
                         </Badge>
                     </div>
 

@@ -20,6 +20,7 @@ import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vu
 import TiptapRichHtml from '@/components/modules/dashboard/events/TiptapRichHtml.vue';
 import { routes } from '@/lib/routes';
 import { EVENT_HERO_BANNER_ASPECT } from '@/lib/eventBannerAspect';
+import { eventStatusUi } from '@/lib/eventShowUi';
 import type { FormAccessStatus } from '@/types/form';
 
 defineOptions({ layout: DashboardLayout });
@@ -78,13 +79,6 @@ const event = computed<IEvent>(() => props.event ?? EMPTY_EVENT_FALLBACK);
 const isRegistered = computed(() => props.isRegistered);
 const registrationStatus = computed(() => props.registrationStatus);
 const participantForms = computed(() => props.participantForms ?? []);
-
-const registrationStatusLabel: Record<IEvent['registration_status'], string> = {
-    not_yet_open: 'Segera dibuka',
-    open: 'Pendaftaran buka',
-    closed: 'Ditutup',
-    full: 'Penuh',
-};
 
 const myRegistrationLabel: Record<NonNullable<typeof props.registrationStatus>, string> = {
     pending: 'Menunggu kajian',
@@ -261,7 +255,7 @@ const quotaPercent = computed(() => {
                             Diundang · menunggu Anda
                         </Badge>
                         <Badge variant="secondary" class="text-[10px] font-semibold capitalize">
-                            {{ registrationStatusLabel[event.registration_status] }}
+                            {{ eventStatusUi(event.registration_status).label }}
                         </Badge>
                     </div>
                     <div class="max-w-xl space-y-4">

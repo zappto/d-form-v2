@@ -25,6 +25,8 @@ declare global {
         pending_team_invitation_url?: string | null
     }
 
+    type TEventRegistrationStatus = IEvent['registration_status']
+
     /** Entri kalender dashboard (bentuk ringkas event: tanggal + tujuan href). */
     interface ICalendarEvent {
         id: string | number

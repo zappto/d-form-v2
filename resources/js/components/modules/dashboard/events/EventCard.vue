@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { CalendarDays, MapPin, Users, MoreVertical, SquarePen, Download, FileStack, Trash2 } from 'lucide-vue-next';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 import { categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
+import { eventStatusUi } from '@/lib/eventShowUi';
 import { formatDisplayDate, formatRupiahPrice } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -32,28 +33,6 @@ function eventTokenList(v: unknown): string[] {
             .map((s) => s.trim())
             .filter(Boolean);
     return [];
-}
-
-function registrationUi(ev: IEvent): { label: string; badgeClass: string } {
-    switch (ev.registration_status) {
-        case 'open':
-            return {
-                label: 'Buka',
-                badgeClass: 'border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-            };
-        case 'full':
-            return {
-                label: 'Penuh',
-                badgeClass: 'border-rose-500/25 bg-rose-500/10 text-rose-700 dark:text-rose-400',
-            };
-        case 'closed':
-            return { label: 'Tutup', badgeClass: 'border-border bg-muted/60 text-muted-foreground' };
-        default:
-            return {
-                label: 'Segera',
-                badgeClass: 'border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-400',
-            };
-    }
 }
 
 function formatPriceIdr(price: number): string {
@@ -234,10 +213,10 @@ useEventListener('keydown', (e) => {
                         variant="outline"
                         :class="[
                             'shrink-0 px-2.5 py-1 text-xs font-medium whitespace-nowrap',
- registrationUi(event).badgeClass,
+ eventStatusUi(event.registration_status).tone,
  ]"
                     >
-                        {{ registrationUi(event).label }}
+                        {{ eventStatusUi(event.registration_status).label }}
                     </Badge>
                 </div>
 

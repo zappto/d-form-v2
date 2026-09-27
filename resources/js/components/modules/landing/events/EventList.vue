@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { MapPin, Calendar, Users, Search, ArrowRight } from 'lucide-vue-next'
 import { routes } from '@/lib/routes'
 import { eventListThumbnailContainerClass } from '@/lib/eventBannerAspect'
+import { eventStatusUi } from '@/lib/eventShowUi'
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'
 
 const props = defineProps<{
@@ -33,20 +34,6 @@ const filtered = computed(() => {
             ev.location?.toLowerCase().includes(q),
     )
 })
-
-const statusLabel = (s: string) => {
-    if (s === 'open') return 'Dibuka'
-    if (s === 'full') return 'Penuh'
-    if (s === 'closed') return 'Ditutup'
-    return 'Segera'
-}
-
-const statusVariant = (s: string) =>
-    s === 'open'
-        ? 'border-green-500/20 bg-green-500/10 text-green-600'
-        : s === 'full'
-          ? 'border-amber-500/20 bg-amber-500/10 text-amber-600'
-          : 'border-border bg-muted text-muted-foreground'
 
 const formatDate = (d: string) => {
     try {
@@ -108,9 +95,9 @@ const formatDate = (d: string) => {
                                 </h3>
                                 <Badge
                                     variant="outline"
-                                    :class="['shrink-0 text-[10px]', statusVariant(ev.registration_status)]"
+                                    :class="['shrink-0 text-[10px]', eventStatusUi(ev.registration_status).tone]"
                                 >
-                                    {{ statusLabel(ev.registration_status) }}
+                                    {{ eventStatusUi(ev.registration_status).label }}
                                 </Badge>
                             </div>
 

@@ -12,6 +12,7 @@ import { stripHtmlToText } from '@/utils/stripHtml';
 import type { SharedSeoProps } from '@/types/seo';
 import { routes } from '@/lib/routes';
 import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect';
+import { eventStatusUi } from '@/lib/eventShowUi';
 
 const props = defineProps<{
     event: IEvent | undefined;
@@ -121,21 +122,6 @@ const capacityPercent = computed<number>(() => {
     if (event.value.quota <= 0) return 0;
     return Math.round((event.value.registered_count / event.value.quota) * 100);
 });
-
-const registrationBadgeLabel = computed<string>(() => {
-    const s = event.value.registration_status;
-    if (s === 'open') return 'Open';
-    if (s === 'full') return 'Full';
-    if (s === 'closed') return 'Closed';
-    if (s === 'not_yet_open') return 'Coming Soon';
-    return 'Registration';
-});
-
-const registrationTone = computed<string>(() =>
-    event.value.registration_status === 'open'
-        ? 'bg-success/10 text-success border-success/20'
-        : 'bg-warning/10 text-warning border-warning/20'
-);
 
 const highlights: string[] = [
     'Expert-led sessions',
@@ -247,20 +233,20 @@ const highlights: string[] = [
                                     <span
                                         :class="[
  'rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]',
- registrationTone,
+ eventStatusUi(event.registration_status).tone,
  ]"
                                     >
-                                        {{ registrationBadgeLabel }}
+                                        {{ eventStatusUi(event.registration_status).label }}
                                     </span>
                                 </div>
 
                                 <span
                                     :class="[
  'mb-3 inline-flex w-fit rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] lg:hidden',
- registrationTone,
+ eventStatusUi(event.registration_status).tone,
  ]"
                                 >
-                                    {{ registrationBadgeLabel }}
+                                    {{ eventStatusUi(event.registration_status).label }}
                                 </span>
 
                                 <h1
