@@ -3,7 +3,6 @@ import type { HTMLAttributes } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import { initialsOf } from '@/lib/format'
 import { Check, ChevronDown, Plus, Search } from 'lucide-vue-next'
 
 defineOptions({ inheritAttrs: false })
@@ -13,6 +12,7 @@ export type SearchableSelectOption = {
     label: string
     sublabel?: string
     initials?: string
+    imageSrc?: string
     disabled?: boolean
 }
 
@@ -25,6 +25,8 @@ const props = withDefaults(
         searchPlaceholder?: string
         emptyText?: string
         disabled?: boolean
+        required?: boolean
+        invalid?: boolean
         class?: HTMLAttributes['class']
     }>(),
     {
@@ -32,6 +34,8 @@ const props = withDefaults(
         searchPlaceholder: 'Cari…',
         emptyText: 'Tidak ada hasil',
         disabled: false,
+        required: false,
+        invalid: false,
     },
 )
 
@@ -66,8 +70,8 @@ const popoverContentClass = cn(
 
 function optionInitials(opt: SearchableSelectOption): string {
     const custom: string | undefined = opt.initials?.trim()
-    if (custom && custom.length > 0) return custom.toUpperCase().slice(0, 2)
-    return initialsOf(opt.label)
+    if (custom === undefined || custom.length === 0) return ''
+    return custom.toUpperCase().slice(0, 2)
 }
 
 const normalizedQuery = computed<string>(() => query.value.trim().toLowerCase())
@@ -91,6 +95,10 @@ const selectedOption = computed<SearchableSelectOption | undefined>(() =>
 
 const displayLabel = computed<string>(() => selectedOption.value?.label ?? '')
 const showPlaceholder = computed<boolean>(() => displayLabel.value.length === 0)
+const selectedInitials = computed<string>(() =>
+    selectedOption.value === undefined ? '' : optionInitials(selectedOption.value),
+)
+const selectedImageSrc = computed<string>(() => selectedOption.value?.imageSrc ?? '')
 
 const contentStyle = computed<{ width: string; minWidth: string } | undefined>(() =>
     contentWidthPx.value !== null
@@ -194,17 +202,28 @@ const listboxId = computed<string>(() => `${props.id ?? 'searchable-select'}-lis
                 :aria-expanded="open"
                 aria-haspopup="listbox"
                 :aria-controls="listboxId"
+                :required="required || undefined"
+                :aria-required="required || undefined"
+                :aria-invalid="invalid || undefined"
                 v-bind="$attrs"
             >
                 <span v-if="showPlaceholder" class="line-clamp-1 min-w-0 flex-1 text-left text-muted-foreground">
                     {{ placeholder }}
                 </span>
                 <span v-else class="flex min-w-0 flex-1 items-center gap-2 text-left">
+                    <img
+                        v-if="selectedImageSrc"
+                        :src="selectedImageSrc"
+                        alt=""
+                        loading="lazy"
+                        class="size-6 shrink-0 rounded-full object-cover"
+                    />
                     <span
+                        v-else-if="selectedInitials"
                         aria-hidden="true"
                         class="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold tracking-wide text-muted-foreground"
                     >
-                        {{ optionInitials(selectedOption as SearchableSelectOption) }}
+                        {{ selectedInitials }}
                     </span>
                     <span class="line-clamp-1 min-w-0 flex-1 text-foreground">{{ displayLabel }}</span>
                 </span>
@@ -253,7 +272,15 @@ const listboxId = computed<string>(() => `${props.id ?? 'searchable-select'}-lis
                         @click="choose(opt)"
                         @mouseenter="opt.disabled === true ? undefined : (highlightedValue = opt.value)"
                     >
+                        <img
+                            v-if="opt.imageSrc"
+                            :src="opt.imageSrc"
+                            alt=""
+                            loading="lazy"
+                            class="size-7 shrink-0 rounded-full object-cover"
+                        />
                         <span
+                            v-else-if="optionInitials(opt)"
                             aria-hidden="true"
                             class="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tracking-wide text-muted-foreground"
                         >
