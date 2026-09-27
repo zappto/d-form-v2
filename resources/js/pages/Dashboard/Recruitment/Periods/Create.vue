@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { Button } from '@/components/ui/button'
@@ -12,8 +12,7 @@ import { routes } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 import { handleInertiaFormErrors } from '@/lib/error-message'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
-import { useBannerFilePicker } from '@/hooks/useBannerFilePicker'
-import { ImageUp, X } from 'lucide-vue-next'
+import { BannerPickerField } from '@/components/core/field'
 
 defineOptions({ layout: DashboardLayout })
 
@@ -28,36 +27,12 @@ const form = useForm({
     banner: null as File | null,
 })
 
-const bannerInput = ref<HTMLInputElement | null>(null)
-const bannerPicker = useBannerFilePicker({ initialUrl: null })
-const bannerPreview = bannerPicker.bannerPreview
-const isDragging = bannerPicker.isDragging
-
 const dateErrorClass =
     'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10'
 
 onMounted(() => {
     setTopbar({ title: 'Periode baru', subtitle: 'Open Recruitment' })
 })
-
-function openBannerPicker(): void {
-    bannerPicker.openPicker(bannerInput.value)
-}
-
-function handleBannerChange(event: Event): void {
-    bannerPicker.handleInputChange(event)
-    form.banner = bannerPicker.bannerFile.value
-}
-
-function handleBannerDrop(event: DragEvent): void {
-    bannerPicker.handleDrop(event)
-    form.banner = bannerPicker.bannerFile.value
-}
-
-function removeBanner(): void {
-    bannerPicker.clearSelection()
-    form.banner = null
-}
 
 function submit(): void {
     if (form.processing) return
@@ -115,85 +90,18 @@ function submit(): void {
                     </div>
 
                     <div class="space-y-2">
-                        <div class="flex flex-wrap items-start justify-between gap-2">
-                            <div>
-                                <Label for="banner">Banner</Label>
-                                <p class="text-muted-foreground mt-1 text-xs">
-                                    Opsional — disarankan 16:9, maks 10MB
-                                </p>
-                            </div>
-                            <div v-if="bannerPreview" class="flex items-center gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    class="h-9 text-xs"
-                                    @click="openBannerPicker"
-                                >
-                                    Ganti
-                                </Button>
-                                <Button
-                                    type="button"
-                                    radius="icon"
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    class="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                    aria-label="Hapus banner"
-                                    @click="removeBanner"
-                                >
-                                    <X class="size-4" />
-                                </Button>
-                            </div>
+                        <div>
+                            <Label for="banner">Banner</Label>
+                            <p class="text-muted-foreground mt-1 text-xs">
+                                Opsional — disarankan 16:9, maks 5 MB
+                            </p>
                         </div>
 
-                        <div
-                            :class="
-                                cn(
-                                    'border-border bg-muted/25 overflow-hidden rounded-xl border-2 transition-colors',
-                                    isDragging && 'border-primary/60 bg-primary/5',
-                                )
-                            "
-                        >
-                            <div class="relative aspect-video w-full">
-                                <img
-                                    v-if="bannerPreview"
-                                    :src="bannerPreview"
-                                    alt="Pratinjau banner"
-                                    class="absolute inset-0 size-full object-cover"
-                                />
-                                <div
-                                    v-else
-                                    class="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-2.5 px-6 text-center"
-                                    @dragover.prevent="isDragging = true"
-                                    @dragleave="isDragging = false"
-                                    @drop.prevent="handleBannerDrop"
-                                    @click="openBannerPicker"
-                                >
-                                    <span
-                                        class="bg-muted text-muted-foreground grid size-12 place-items-center rounded-full"
-                                    >
-                                        <ImageUp class="size-5.5 stroke-[1.75]" aria-hidden="true" />
-                                    </span>
-                                    <div>
-                                        <p class="text-sm font-medium">Unggah banner</p>
-                                        <p class="text-muted-foreground mt-0.5 text-xs">
-                                            Klik untuk memilih, atau seret gambar ke sini
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p v-if="form.errors.banner" class="text-destructive text-xs">
-                            {{ form.errors.banner }}
-                        </p>
-                        <input
-                            id="banner"
-                            ref="bannerInput"
-                            type="file"
-                            accept="image/*"
-                            class="hidden"
-                            @change="handleBannerChange"
+                        <BannerPickerField
+                            variant="plain"
+                            v-model:file="form.banner"
+                            :invalid="!!form.errors.banner"
+                            :error="form.errors.banner"
                         />
                     </div>
 

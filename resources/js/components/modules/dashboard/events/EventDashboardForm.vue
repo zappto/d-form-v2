@@ -10,11 +10,9 @@ import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue
 import EventMultiValuePicker from '@/components/modules/dashboard/events/EventMultiValuePicker.vue';
 import {
     FileText,
-    ImageUp,
     MapPin,
     MapPinned,
     PanelsTopLeft,
-    X,
     Save,
     Send,
     CalendarRange,
@@ -27,7 +25,7 @@ import {
     update as updateEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { getFieldError } from '@/lib/error-message';
-import { useBannerFilePicker } from '@/hooks/useBannerFilePicker';
+import { BannerPickerField } from '@/components/core/field';
 import { cn } from '@/lib/utils';
 import {
     formatIntegerId,
@@ -161,14 +159,6 @@ function buildFormPayload():
 
 const form = useForm(buildFormPayload());
 
-const bannerEmptyTitle = computed(() =>
-    props.variant === 'create' ? 'Unggah atau seret gambar ke sini' : 'Unggah banner baru'
-);
-
-const bannerEmptyHint = computed(() =>
-    props.variant === 'create' ? 'PNG, JPG, WebP - maks. 10MB' : 'PNG, JPG, WebP - maks. 10MB'
-);
-
 const classificationDescription = computed(() =>
     props.variant === 'create'
         ? 'Sesi (divisi) dan kategori dipakai untuk filter di dashboard. Bisa lebih dari satu.'
@@ -249,13 +239,9 @@ const pageSubtitle = computed(() =>
         : 'Perbarui detail event kamu — simpan perubahan atau terbitkan kembali.'
 );
 
-const bannerPicker = useBannerFilePicker({
-    initialUrl: props.variant === 'edit' && props.event?.banner_url ? props.event.banner_url : null,
-});
-
-const bannerPreview = bannerPicker.bannerPreview;
-
-const isDragging = bannerPicker.isDragging;
+const initialBannerUrl = computed<string | null>(() =>
+    props.variant === 'edit' && props.event?.banner_url ? props.event.banner_url : null
+);
 
 const quotaDisplay = ref(form.quota > 0 ? formatIntegerId(form.quota) : '');
 
@@ -321,21 +307,6 @@ function onPriceBlur(): void {
 function commitQuotaPriceFromFields(): void {
     form.quota = parseQuotaInput(quotaDisplay.value);
     form.price = parsePriceInput(priceDisplay.value);
-}
-
-function handleBannerChange(e: Event): void {
-    bannerPicker.handleInputChange(e);
-    form.banner = bannerPicker.bannerFile.value;
-}
-
-function handleDrop(e: DragEvent): void {
-    bannerPicker.handleDrop(e);
-    form.banner = bannerPicker.bannerFile.value;
-}
-
-function removeBanner(): void {
-    bannerPicker.clearSelection();
-    form.banner = null;
 }
 
 function submitForm(publish: boolean): void {
@@ -554,81 +525,17 @@ defineExpose({ submitForm, validateRequired, form })
                                     <span v-if="isRequired('banner')" class="text-destructive">*</span>
                                 </Label>
                                 <p class="text-muted-foreground mt-1 text-xs">
-                                    Rasio 16:7 — PNG, JPG, atau WebP maks. 10MB.
+                                    Rasio 16:7 — PNG, JPG, atau GIF maks. 5 MB.
                                 </p>
-                            </div>
-                            <div v-if="bannerPreview" class="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    class="h-9 text-xs"
-                                    type="button"
-                                    @click="($refs.bannerInput as HTMLInputElement)?.click()"
-                                >
-                                    Ganti
-                                </Button>
-                                <Button
-                                    radius="icon"
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    class="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                    type="button"
-                                    aria-label="Hapus banner"
-                                    @click="removeBanner"
-                                >
-                                    <X class="size-4" />
-                                </Button>
                             </div>
                         </div>
 
-                        <div
-                            :class="[
-                                'border-border bg-muted/25 overflow-hidden rounded-xl border-2 transition-colors',
-                                isDragging ? 'border-primary/60 bg-primary/5' : '',
-                                fieldError('banner') ? 'border-destructive/70 bg-red-50 dark:bg-red-500/10' : '',
-                                isFieldShaking('banner') ? 'animate-shake' : '',
-                            ]"
-                        >
-                            <div class="relative aspect-[16/7] w-full">
-                                <template v-if="bannerPreview">
-                                    <img
-                                        :src="bannerPreview"
-                                        alt="Pratinjau banner"
-                                        class="absolute inset-0 size-full object-cover"
-                                    />
-                                </template>
-                                <div
-                                    v-else
-                                    class="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-2.5 px-6 text-center transition-colors"
-                                    @dragover.prevent="isDragging = true"
-                                    @dragleave="isDragging = false"
-                                    @drop.prevent="handleDrop"
-                                    @click="($refs.bannerInput as HTMLInputElement)?.click()"
-                                >
-                                    <span
-                                        class="bg-muted text-muted-foreground grid size-12 place-items-center rounded-full"
-                                    >
-                                        <ImageUp class="size-5.5 stroke-[1.75]" aria-hidden="true" />
-                                    </span>
-                                    <div>
-                                        <p class="text-sm font-medium">{{ bannerEmptyTitle }}</p>
-                                        <p class="text-muted-foreground mt-0.5 text-xs">{{ bannerEmptyHint }}</p>
-                                    </div>
-                                    <p class="text-muted-foreground text-[11px]">
-                                        Klik untuk memilih, atau seret gambar ke sini
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <p v-if="fieldError('banner')" class="text-destructive text-xs">
-                            {{ fieldError('banner') }}
-                        </p>
-                        <input
-                            ref="bannerInput"
-                            type="file"
-                            accept="image/*"
-                            class="hidden"
-                            @change="handleBannerChange"
+                        <BannerPickerField
+                            variant="plain"
+                            v-model:file="form.banner"
+                            :initial-url="initialBannerUrl"
+                            :invalid="!!fieldError('banner')"
+                            :error="fieldError('banner')"
                         />
                     </div>
 
