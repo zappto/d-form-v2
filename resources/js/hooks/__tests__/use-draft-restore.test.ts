@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { computed, defineComponent, h, ref } from 'vue';
 import { mount } from '@vue/test-utils';
-import { buildValuesDraftSnapshot, useDraftRestore } from '../useDraftRestore';
+import { buildValuesDraftSnapshot, useDraftRestore, type IDraftValuesSnapshot } from '../useDraftRestore';
+import type { TFormFillAnswerMap } from '@/types/form';
 
 const KEY = 'dform:test-restore';
 
@@ -13,15 +14,15 @@ beforeEach(() => {
 function mountRestoreHost(args: {
     snapshot: () => string;
     storageKey: string;
-    restoreIntoForm: (draft: unknown) => void;
+    restoreIntoForm: (draft: IDraftValuesSnapshot) => void;
 }) {
-    const applied = ref<unknown>(null);
+    const applied = ref<IDraftValuesSnapshot | null>(null);
     const host = defineComponent({
         setup() {
             const draft = useDraftRestore({
                 snapshot: args.snapshot,
                 storageKey: args.storageKey,
-                restoreIntoForm: (parsed: unknown) => {
+                restoreIntoForm: (parsed: IDraftValuesSnapshot) => {
                     applied.value = parsed;
                     args.restoreIntoForm(parsed);
                 },
@@ -41,11 +42,11 @@ function mountRestoreHost(args: {
 
 describe('useDraftRestore', () => {
     it('restore toleran: key hilang/korup tidak memanggil apply; valid menuangkan ke form', () => {
-        const seen: unknown[] = [];
+        const seen: IDraftValuesSnapshot[] = [];
         const first = mountRestoreHost({
             snapshot: () => '{}',
             storageKey: KEY,
-            restoreIntoForm: (parsed: unknown) => {
+            restoreIntoForm: (parsed: IDraftValuesSnapshot) => {
                 seen.push(parsed);
             },
         });
@@ -56,7 +57,7 @@ describe('useDraftRestore', () => {
         const second = mountRestoreHost({
             snapshot: () => '{}',
             storageKey: KEY,
-            restoreIntoForm: (parsed: unknown) => {
+            restoreIntoForm: (parsed: IDraftValuesSnapshot) => {
                 seen.push(parsed);
             },
         });
@@ -64,16 +65,13 @@ describe('useDraftRestore', () => {
         second.wrapper.unmount();
 
         window.localStorage.setItem(KEY, JSON.stringify({ values: { full_name: 'Ayu' } }));
-        const form = ref<Record<string, unknown>>({ full_name: '' });
+        const form = ref<TFormFillAnswerMap>({ full_name: '' });
         const third = mountRestoreHost({
             snapshot: () => JSON.stringify({ values: form.value }),
             storageKey: KEY,
-            restoreIntoForm: (parsed: unknown) => {
-                const values = (parsed as { values?: unknown }).values;
-                if (typeof values === 'object' && values !== null) {
-                    const name = (values as Record<string, unknown>).full_name;
-                    if (typeof name === 'string') form.value.full_name = name;
-                }
+            restoreIntoForm: (parsed: IDraftValuesSnapshot) => {
+                const name = parsed.values.full_name;
+                if (typeof name === 'string') form.value.full_name = name;
             },
         });
         expect(form.value.full_name).toBe('Ayu');
@@ -128,7 +126,7 @@ describe('useDraftRestore', () => {
             },
         });
         const wrapper = mount(host);
-        const exposed = (wrapper.vm as unknown as { draft: { clear: () => void; status: { value: string } } }).draft;
+        const exposed = wrapper.vm.draft;
         expect(window.localStorage.getItem(KEY)).not.toBeNull();
         exposed.clear();
         expect(window.localStorage.getItem(KEY)).toBeNull();
@@ -145,7 +143,7 @@ describe('useDraftRestore', () => {
             post: () => {},
             cv: new File(['isi'], 'cv.pdf'),
         };
-        const parsed = JSON.parse(buildValuesDraftSnapshot(form)) as { values: Record<string, unknown> };
+        const parsed: IDraftValuesSnapshot = JSON.parse(buildValuesDraftSnapshot(form));
         expect(parsed.values.full_name).toBe('Ayu');
         expect(parsed.values).not.toHaveProperty('isDirty');
         expect(parsed.values).not.toHaveProperty('errors');

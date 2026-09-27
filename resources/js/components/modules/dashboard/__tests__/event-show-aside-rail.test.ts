@@ -18,7 +18,9 @@ config.global.renderStubDefaultSlot = true;
  * toast.success TIDAK dipanggil. Gagal → handleInertiaFormErrors + modal tetap buka.
  */
 
-const { routerDeleteMock } = vi.hoisted(() => ({ routerDeleteMock: vi.fn() }));
+const { routerDeleteMock } = vi.hoisted(() => ({
+    routerDeleteMock: vi.fn<(url: string, options?: IRouterMutationOptions) => void>(),
+}));
 
 vi.mock('@inertiajs/vue3', () => ({
     Link: { props: ['href'], template: '<a :href="href"><slot /></a>' },
@@ -114,9 +116,8 @@ beforeEach(() => {
     vi.clearAllMocks();
     lastOptions = undefined;
     routerDeleteMock.mockReset();
-    routerDeleteMock.mockImplementation((...args: unknown[]) => {
-        lastOptions = args[1] as IRouterMutationOptions | undefined;
-        return undefined;
+    routerDeleteMock.mockImplementation((url, options) => {
+        lastOptions = options;
     });
 });
 
@@ -127,7 +128,7 @@ describe('EventShowAsideRail hapus form (Task 8 parked #1)', () => {
             await confirmDelete(wrapper);
 
             expect(routerDeleteMock).toHaveBeenCalledTimes(1);
-            const url = routerDeleteMock.mock.calls[0]?.[0] as string;
+            const url = routerDeleteMock.mock.calls[0]?.[0];
             expect(url).toContain('ev-1');
             expect(url).toContain('fo-1');
             expect(deleteModal(wrapper).props('loading')).toBe(true);

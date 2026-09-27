@@ -15,8 +15,8 @@ import { toast } from 'vue-sonner';
  */
 
 const { routerDeleteMock, routerPostMock } = vi.hoisted(() => ({
-    routerDeleteMock: vi.fn(),
-    routerPostMock: vi.fn(),
+    routerDeleteMock: vi.fn<(url: string, options?: IRouterMutationOptions) => void>(),
+    routerPostMock: vi.fn<(url: string, data: Record<string, string>, options?: IRouterMutationOptions) => void>(),
 }));
 
 vi.mock('@inertiajs/vue3', () => ({
@@ -81,13 +81,11 @@ beforeEach(() => {
     lastPostOptions = undefined;
     routerDeleteMock.mockReset();
     routerPostMock.mockReset();
-    routerDeleteMock.mockImplementation((...args: unknown[]) => {
-        lastDeleteOptions = args[1] as IRouterMutationOptions | undefined;
-        return undefined;
+    routerDeleteMock.mockImplementation((url, options) => {
+        lastDeleteOptions = options;
     });
-    routerPostMock.mockImplementation((...args: unknown[]) => {
-        lastPostOptions = args[2] as IRouterMutationOptions | undefined;
-        return undefined;
+    routerPostMock.mockImplementation((url, data, options) => {
+        lastPostOptions = options;
     });
 });
 

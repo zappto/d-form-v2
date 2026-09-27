@@ -19,8 +19,8 @@ config.global.renderStubDefaultSlot = true;
  */
 
 const { formHolder, postMock } = vi.hoisted(() => ({
-    formHolder: { state: null as Record<string, unknown> | null },
-    postMock: vi.fn(),
+    formHolder: { state: null as { processing: boolean } | null },
+    postMock: vi.fn<(url: string, options?: InertiaMutationOptions) => void>(),
 }));
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -44,7 +44,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 },
             },
         }),
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
@@ -56,7 +56,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 }),
                 clearErrors: vi.fn(),
             });
-            formHolder.state = state as unknown as Record<string, unknown>;
+            formHolder.state = state;
             return state;
         },
     };
@@ -178,12 +178,11 @@ beforeEach(() => {
     lastUrl = undefined;
     lastOptions = undefined;
     postMock.mockReset();
-    postMock.mockImplementation((...args: unknown[]) => {
-        lastUrl = args[0] as string;
-        lastOptions = args[1] as InertiaMutationOptions | undefined;
+    postMock.mockImplementation((url, options) => {
+        lastUrl = url;
+        lastOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
-        return undefined;
     });
 });
 

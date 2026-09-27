@@ -27,9 +27,9 @@ config.global.renderStubDefaultSlot = true;
  */
 
 const { routerPostMock, formPostMock, formHolder } = vi.hoisted(() => ({
-    routerPostMock: vi.fn(),
-    formPostMock: vi.fn(),
-    formHolder: { state: null as Record<string, unknown> | null },
+    routerPostMock: vi.fn<(url: string, data: Record<string, string>, options?: IRouterMutationOptions) => void>(),
+    formPostMock: vi.fn<(url: string, options?: IRouterMutationOptions) => void>(),
+    formHolder: { state: null as { processing: boolean } | null },
 }));
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -42,7 +42,7 @@ vi.mock('@inertiajs/vue3', async () => {
             reload: vi.fn(),
             visit: vi.fn(),
         },
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
@@ -54,7 +54,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 }),
                 clearErrors: vi.fn(),
             });
-            formHolder.state = state as unknown as Record<string, unknown>;
+            formHolder.state = state;
             return state;
         },
     };
@@ -169,15 +169,13 @@ beforeEach(() => {
     lastFormOptions = undefined;
     routerPostMock.mockReset();
     formPostMock.mockReset();
-    routerPostMock.mockImplementation((...args: unknown[]) => {
-        lastRouterOptions = args[2] as IRouterMutationOptions | undefined;
-        return undefined;
+    routerPostMock.mockImplementation((url, data, options) => {
+        lastRouterOptions = options;
     });
-    formPostMock.mockImplementation((...args: unknown[]) => {
-        lastFormOptions = args[1] as IRouterMutationOptions | undefined;
+    formPostMock.mockImplementation((url, options) => {
+        lastFormOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
-        return undefined;
     });
 });
 
@@ -204,7 +202,7 @@ describe('PeriodApplicantSection pass (Task 7)', () => {
             await nextTick();
 
             expect(routerPostMock).toHaveBeenCalledTimes(1);
-            const url = routerPostMock.mock.calls[0]?.[0] as string;
+            const url = routerPostMock.mock.calls[0]?.[0];
             expect(url).toContain('ap-1');
 
             expect(passModal(wrapper).props('loading')).toBe(true);
@@ -304,7 +302,7 @@ describe('PeriodApplicantSection reject (Task 7)', () => {
             await nextTick();
 
             expect(formPostMock).toHaveBeenCalledTimes(1);
-            const url = formPostMock.mock.calls[0]?.[0] as string;
+            const url = formPostMock.mock.calls[0]?.[0];
             expect(url).toContain('ap-1');
 
             const btn = rejectSubmitButton(wrapper);

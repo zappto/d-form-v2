@@ -17,15 +17,25 @@ config.global.renderStubDefaultSlot = true;
  * gagal → handleInertiaFormErrors + sheet tetap buka; submit ganda → satu request.
  */
 
+/** Bentuk form interviewer (selaras useForm di komponen) + flag processing milik Inertia. */
+interface IInterviewerFormState {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    recruitment_division_id: string;
+    processing: boolean;
+}
+
 const { formHolder, postMock } = vi.hoisted(() => ({
-    formHolder: { state: null as Record<string, unknown> | null },
-    postMock: vi.fn(),
+    formHolder: { state: null as IInterviewerFormState | null },
+    postMock: vi.fn<(url: string, options?: InertiaMutationOptions) => void>(),
 }));
 
 vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
     return {
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: (initial: IInterviewerFormState) => {
             const state = reactive({
                 ...initial,
                 errors: {},
@@ -34,7 +44,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 reset: vi.fn(),
                 clearErrors: vi.fn(),
             });
-            formHolder.state = state as unknown as Record<string, unknown>;
+            formHolder.state = state;
             return state;
         },
     };
@@ -83,7 +93,7 @@ function mountSheet(): VueWrapper {
                 SearchableSelect: true,
             },
         },
-    }) as unknown as VueWrapper;
+    });
 }
 
 async function fillValid(): Promise<void> {
@@ -111,11 +121,10 @@ beforeEach(() => {
     vi.clearAllMocks();
     lastOptions = undefined;
     postMock.mockReset();
-    postMock.mockImplementation((...args: unknown[]) => {
-        lastOptions = args[1] as InertiaMutationOptions | undefined;
+    postMock.mockImplementation((url, options) => {
+        lastOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
-        return undefined;
     });
 });
 

@@ -21,7 +21,9 @@ config.global.renderStubDefaultSlot = true;
  * - Forms/Show jawaban: terverifikasi via suite Task 3 (tidak disentuh).
  */
 
-const { routerGetMock } = vi.hoisted(() => ({ routerGetMock: vi.fn() }));
+const { routerGetMock } = vi.hoisted(() => ({
+    routerGetMock: vi.fn<(url: string, data?: Record<string, string>, options?: IRouterGetOptions) => void>(),
+}));
 
 vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
@@ -51,7 +53,7 @@ vi.mock('@inertiajs/vue3', async () => {
             },
             url: '/dashboard/recruitment/periods/per-1',
         }),
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
@@ -84,7 +86,7 @@ interface IRouterGetOptions {
 
 function lastGetOptions(): IRouterGetOptions {
     expect(routerGetMock).toHaveBeenCalled();
-    const options = routerGetMock.mock.calls[0]?.[2] as IRouterGetOptions | undefined;
+    const options = routerGetMock.mock.calls[0]?.[2];
     expect(options).toBeDefined();
     return options as IRouterGetOptions;
 }
@@ -227,10 +229,8 @@ beforeEach(() => {
     routerGetMock.mockReset();
     // Cerminkan Inertia: onStart jalan saat visit berangkat; onFinish hanya
     // bila test memicunya eksplisit (navigasi "menggantung").
-    routerGetMock.mockImplementation((...args: unknown[]) => {
-        const options = args[2] as IRouterGetOptions | undefined;
+    routerGetMock.mockImplementation((url, data, options) => {
         options?.onStart?.();
-        return undefined;
     });
 });
 

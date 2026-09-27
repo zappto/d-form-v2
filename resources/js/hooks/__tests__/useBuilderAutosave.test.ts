@@ -3,7 +3,7 @@ import { useBuilderAutosave } from '../useBuilderAutosave';
 import type { IBuilderAutosaveResult, IBuilderAutosaveState } from '../useBuilderAutosave';
 import { defaultFormBannerState } from '@/components/modules/builder/formBanner';
 import { emptyFormRegistrationMetadata } from '@/types/form';
-import type { BuilderField } from '@/types/form-builder';
+import type { BackendField, BuilderField } from '@/types/form-builder';
 
 const { axiosPostMock, axiosPatchMock } = vi.hoisted(() => ({
     axiosPostMock: vi.fn(),
@@ -19,6 +19,13 @@ vi.mock('axios', () => ({
 
 const FIELDS_URL = '/forms/fields';
 const AUTOSAVE_URL = '/forms/autosave';
+
+/** Payload JSON beacon unload: fields + deleted_ids + token CSRF opsional. */
+interface IBeaconPayload {
+    fields: BackendField[];
+    deleted_ids: string[];
+    _token?: string;
+}
 
 /** Satu field kanvas teks minimal untuk skenario dirty-subset. */
 function textCanvasField(fieldId: string, order?: number): BuilderField {
@@ -83,9 +90,9 @@ function lastJsonPostBody(): { fields: Array<{ id: string }>; deleted_ids: strin
 }
 
 /** Beacon mengirim Blob JSON; baca kembali sebagai objek untuk asersi. */
-async function lastBeaconJson(beaconMock: ReturnType<typeof vi.fn>): Promise<Record<string, unknown>> {
+async function lastBeaconJson(beaconMock: ReturnType<typeof vi.fn>): Promise<IBeaconPayload> {
     const blob: Blob = beaconMock.mock.calls[0][1];
-    const payload: Record<string, unknown> = JSON.parse(await blob.text());
+    const payload: IBeaconPayload = JSON.parse(await blob.text());
     return payload;
 }
 
@@ -187,7 +194,7 @@ describe('useBuilderAutosave upload banner', () => {
         axiosPostMock.mockResolvedValueOnce({ data: { banner_url: 'banners/baru.jpg' } });
         const sent = await bed.hook.save('snapshot');
         expect(sent).toBe(true);
-        const posted: unknown = axiosPostMock.mock.calls[0][1];
+        const posted: FormData = axiosPostMock.mock.calls[0][1];
         expect(posted).toBeInstanceOf(FormData);
         if (!(posted instanceof FormData)) throw new Error('POST banner harus multipart FormData');
         expect(posted.get('banner_file')).toBeInstanceOf(File);

@@ -7,7 +7,7 @@ vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
     return {
         usePage: () => ({ props: {} }),
-        useForm: (initial: Record<string, unknown>) =>
+        useForm: <T extends object>(initial: T) =>
             reactive({
                 ...initial,
                 errors: {},

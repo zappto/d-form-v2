@@ -17,15 +17,29 @@ config.global.renderStubDefaultSlot = true;
  * gagal → handleInertiaFormErrors + sheet tetap buka; submit ganda → satu request.
  */
 
+/** Bentuk form sesi interview (selaras useForm di komponen) + flag processing milik Inertia. */
+interface IInterviewSessionFormState {
+    recruitment_period_id: string;
+    recruitment_division_id: string;
+    session_date: string;
+    starts_at: string;
+    ends_at: string;
+    location: string;
+    room: string;
+    notes: string;
+    is_active: boolean;
+    processing: boolean;
+}
+
 const { formHolder, postMock } = vi.hoisted(() => ({
-    formHolder: { state: null as Record<string, unknown> | null },
-    postMock: vi.fn(),
+    formHolder: { state: null as IInterviewSessionFormState | null },
+    postMock: vi.fn<(url: string, options?: InertiaMutationOptions) => void>(),
 }));
 
 vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
     return {
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: (initial: IInterviewSessionFormState) => {
             const state = reactive({
                 ...initial,
                 errors: {},
@@ -34,7 +48,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 reset: vi.fn(),
                 clearErrors: vi.fn(),
             });
-            formHolder.state = state as unknown as Record<string, unknown>;
+            formHolder.state = state;
             return state;
         },
     };
@@ -85,7 +99,7 @@ function mountSheet(): VueWrapper {
                 TimeAmPmInput: true,
             },
         },
-    }) as unknown as VueWrapper;
+    });
 }
 
 async function fillValid(): Promise<void> {
@@ -114,11 +128,10 @@ beforeEach(() => {
     vi.clearAllMocks();
     lastOptions = undefined;
     postMock.mockReset();
-    postMock.mockImplementation((...args: unknown[]) => {
-        lastOptions = args[1] as InertiaMutationOptions | undefined;
+    postMock.mockImplementation((url, options) => {
+        lastOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
-        return undefined;
     });
 });
 

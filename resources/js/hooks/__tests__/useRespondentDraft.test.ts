@@ -46,7 +46,7 @@ describe('useRespondentDraft', () => {
 
     it('clear: hapus key + reset lastSavedAt + status idle', async () => {
         const text = ref('{"values":{"a":"1"}}');
-        const draft = useRespondentDraft<{ values: unknown }>(() => text.value, KEY);
+        const draft = useRespondentDraft<{ values: Record<string, string> }>(() => text.value, KEY);
 
         draft.schedule();
         expect(window.localStorage.getItem(KEY)).not.toBeNull();
@@ -60,7 +60,7 @@ describe('useRespondentDraft', () => {
 
     it('compat: key lama oprec-apply-draft-v1 format {step, values} terbaca', () => {
         window.localStorage.setItem(LEGACY_KEY, JSON.stringify({ step: 2, values: { full_name: 'Ayu', nim: 'A11' } }));
-        const draft = useRespondentDraft<{ step?: unknown; values?: unknown }>(
+        const draft = useRespondentDraft<{ step?: number; values?: Record<string, string> }>(
             () => JSON.stringify({ step: 1, values: {} }),
             LEGACY_KEY
         );
@@ -72,7 +72,7 @@ describe('useRespondentDraft', () => {
     });
 
     it('flush tanpa error walau save no-op (async () => false)', async () => {
-        const draft = useRespondentDraft<unknown>(() => '{"values":{}}', KEY);
+        const draft = useRespondentDraft<{ values: Record<string, string> }>(() => '{"values":{}}', KEY);
         draft.schedule();
         await expect(draft.flush()).resolves.toBeUndefined();
         // Draft lokal tetap tersimpan walau remote no-op.

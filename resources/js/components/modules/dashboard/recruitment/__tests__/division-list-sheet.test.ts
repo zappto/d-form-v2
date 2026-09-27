@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
-import DivisionListSheet from '../DivisionListSheet.vue';
+import DivisionListSheet, { type TIDashboardDivision } from '../DivisionListSheet.vue';
 import { handleInertiaFormErrors } from '@/lib/error-message';
 import { toast } from 'vue-sonner';
 
@@ -16,7 +16,10 @@ config.global.renderStubDefaultSlot = true;
  * gagal → handleInertiaFormErrors + tetap mode edit; simpan ganda → satu request.
  */
 
-const { routerPutMock } = vi.hoisted(() => ({ routerPutMock: vi.fn() }));
+const { routerPutMock } = vi.hoisted(() => ({
+    routerPutMock:
+        vi.fn<(url: string, data: Record<string, string | boolean>, options?: InertiaMutationOptions) => void>(),
+}));
 
 vi.mock('@inertiajs/vue3', () => ({
     router: {
@@ -48,14 +51,14 @@ interface InertiaMutationOptions {
 }
 
 function lastPutOptions(): InertiaMutationOptions {
-    const calls = routerPutMock.mock.calls as unknown[][];
+    const calls = routerPutMock.mock.calls;
     expect(routerPutMock).toHaveBeenCalled();
-    const options = calls[calls.length - 1]?.[2] as InertiaMutationOptions | undefined;
+    const options = calls[calls.length - 1]?.[2];
     expect(options).toBeDefined();
     return options as InertiaMutationOptions;
 }
 
-const demoDivision = {
+const demoDivision: TIDashboardDivision = {
     id: 'div-1',
     code: 'DV',
     name: 'Divisi A',
@@ -77,7 +80,7 @@ function mountSheet(): VueWrapper {
                 SheetDescription: true,
             },
         },
-    }) as unknown as VueWrapper;
+    });
 }
 
 async function openEdit(wrapper: VueWrapper): Promise<void> {

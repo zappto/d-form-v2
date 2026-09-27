@@ -6,7 +6,7 @@ import { mount } from '@vue/test-utils';
 import { useQrFeed, type IQrFeedControls } from '../useQrFeed';
 
 /** Bangun respons axios penuh dari payload agar pengetikan mock tetap ketat. */
-function axiosOk(data: unknown): AxiosResponse {
+function axiosOk<TData>(data: TData): AxiosResponse<TData> {
     return {
         data,
         status: 200,

@@ -18,7 +18,15 @@ config.global.renderStubDefaultSlot = true;
  * tidak disentuh — dikunci suite queue-actions.
  */
 
-const { axiosGetMock } = vi.hoisted(() => ({ axiosGetMock: vi.fn() }));
+/** Snapshot papan display diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type TQueueDisplaySnapshot = InstanceType<typeof QueueDisplay>['$props']['snapshot'];
+
+/** Payload poll axios: snapshot antrean operator atau papan display, dibungkus `data`. */
+type TQueuePollPayload = { data: IQueueSnapshot | TQueueDisplaySnapshot };
+
+const { axiosGetMock } = vi.hoisted(() => ({
+    axiosGetMock: vi.fn<(url: string, config?: Record<string, string>) => Promise<TQueuePollPayload>>(),
+}));
 
 vi.mock('axios', () => ({
     default: {
@@ -71,8 +79,8 @@ function mountHarness(initial: IQueueSnapshot): VueWrapper<InstanceType<typeof Q
     });
 }
 
-function harnessApi(wrapper: VueWrapper): IQueueApi {
-    return wrapper.vm as unknown as IQueueApi;
+function harnessApi(wrapper: VueWrapper<InstanceType<typeof QueueHarness>>): IQueueApi {
+    return wrapper.vm;
 }
 
 function demoEntry(id: string, queueNumber: number, status: string, name: string): IQueueEntryRow {
@@ -114,19 +122,19 @@ async function flushPromises(): Promise<void> {
     await nextTick();
 }
 
-let resolveGet: ((value: unknown) => void) | null = null;
+let resolveGet: ((value: TQueuePollPayload) => void) | null = null;
 
 function mockGetDeferred(): void {
     resolveGet = null;
     axiosGetMock.mockImplementationOnce(
         () =>
-            new Promise((resolve) => {
-                resolveGet = resolve as (value: unknown) => void;
+            new Promise<TQueuePollPayload>((resolve) => {
+                resolveGet = resolve;
             })
     );
 }
 
-function resolveGetWith(data: unknown): Promise<void> {
+function resolveGetWith(data: IQueueSnapshot | TQueueDisplaySnapshot): Promise<void> {
     resolveGet?.({ data });
     resolveGet = null;
     return flushPromises();
@@ -154,7 +162,7 @@ function mountQueueShow(queue: IQueueSnapshot): VueWrapper<InstanceType<typeof Q
     });
 }
 
-function mountDisplay(snapshot: Record<string, unknown>): VueWrapper<InstanceType<typeof QueueDisplay>> {
+function mountDisplay(snapshot: TQueueDisplaySnapshot): VueWrapper<InstanceType<typeof QueueDisplay>> {
     return mount(QueueDisplay, {
         props: { snapshot, pollUrl: '/display/poll' },
         global: {
@@ -166,7 +174,7 @@ function mountDisplay(snapshot: Record<string, unknown>): VueWrapper<InstanceTyp
     });
 }
 
-function demoDisplaySnapshot(): Record<string, unknown> {
+function demoDisplaySnapshot(): TQueueDisplaySnapshot {
     return {
         session: { name: 'Sesi Pagi', division: 'Divisi A', room: 'Ruang 1', time: '09:00–12:00' },
         entries: [

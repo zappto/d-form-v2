@@ -14,17 +14,32 @@ config.global.renderStubDefaultSlot = true;
  * klik ganda → satu request.
  */
 
+/** Bentuk respons aksi antrean: axios membungkus payload antrean + pesan sebagai `data`. */
+interface IQueueActionResponse {
+    data: { queue: IQueueSnapshot; message: string };
+}
+
 const { axiosPostMock, axiosGetMock } = vi.hoisted(() => ({
-    axiosPostMock: vi.fn(),
-    axiosGetMock: vi.fn(),
+    axiosPostMock:
+        vi.fn<
+            (
+                url: string,
+                data?: Record<string, string>,
+                config?: { headers: Record<string, string> }
+            ) => Promise<IQueueActionResponse>
+        >(),
+    axiosGetMock:
+        vi.fn<(url: string, config?: { headers: Record<string, string> }) => Promise<{ data: IQueueSnapshot }>>(),
 }));
 
 vi.mock('axios', () => ({
     default: {
         post: axiosPostMock,
         get: axiosGetMock,
+        // `unknown` dipertahankan: mock ini meniru signature publik axios.isAxiosError(payload?)
+        // yang memang menerima nilai apa pun; isinya disempitkan lewat bentuk konkret di bawah.
         isAxiosError: (error: unknown): boolean =>
-            typeof error === 'object' && error !== null && (error as Record<string, unknown>).isAxiosError === true,
+            typeof error === 'object' && error !== null && (error as { isAxiosError?: boolean }).isAxiosError === true,
     },
 }));
 
@@ -115,7 +130,7 @@ function mountShow(): VueWrapper {
             completeUrlTemplate: '/queue/entries/__ENTRY__/complete',
             canManage: true,
         },
-    }) as unknown as VueWrapper;
+    });
 }
 
 function findButton(wrapper: VueWrapper, label: string): DOMWrapper<HTMLButtonElement> {
@@ -133,14 +148,14 @@ async function flushPromises(): Promise<void> {
     await nextTick();
 }
 
-let resolvePost: ((value: unknown) => void) | null = null;
+let resolvePost: ((value: IQueueActionResponse) => void) | null = null;
 
 function mockPostDeferred(): void {
     resolvePost = null;
     axiosPostMock.mockImplementationOnce(
         () =>
-            new Promise((resolve) => {
-                resolvePost = resolve as (value: unknown) => void;
+            new Promise<IQueueActionResponse>((resolve) => {
+                resolvePost = resolve;
             })
     );
 }

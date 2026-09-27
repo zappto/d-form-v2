@@ -24,8 +24,8 @@ config.global.renderStubDefaultSlot = true;
  */
 
 const { formHolder, postMock } = vi.hoisted(() => ({
-    formHolder: { state: null as Record<string, unknown> | null },
-    postMock: vi.fn(),
+    formHolder: { state: null as { processing: boolean; errors: Record<string, string> } | null },
+    postMock: vi.fn<(url: string, options?: InertiaMutationOptions) => void>(),
 }));
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -36,7 +36,7 @@ vi.mock('@inertiajs/vue3', async () => {
             props: { auth: { user: { can_view_recruitment_queue: false } } },
             url: '/dashboard/recruitment/my-interviews/ap-1',
         }),
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
@@ -46,7 +46,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 reset: vi.fn(),
                 clearErrors: vi.fn(),
             });
-            formHolder.state = state as unknown as Record<string, unknown>;
+            formHolder.state = state;
             return state;
         },
     };
@@ -180,11 +180,10 @@ beforeEach(() => {
     vi.clearAllMocks();
     lastOptions = undefined;
     postMock.mockReset();
-    postMock.mockImplementation((...args: unknown[]) => {
-        lastOptions = args[1] as InertiaMutationOptions | undefined;
+    postMock.mockImplementation((url, options) => {
+        lastOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
-        return undefined;
     });
 });
 
@@ -196,7 +195,7 @@ function finishProcessing(): void {
 /** Cerminkan perilaku Inertia asli: error-bag mengisi form.errors sebelum onError. */
 function fireError(errors: Record<string, string>): void {
     const state = formHolder.state;
-    const bag = (state?.errors ?? {}) as Record<string, string>;
+    const bag = state?.errors ?? {};
     for (const key of Object.keys(bag)) delete bag[key];
     Object.assign(bag, errors);
     lastPostOptions().onError?.(errors);

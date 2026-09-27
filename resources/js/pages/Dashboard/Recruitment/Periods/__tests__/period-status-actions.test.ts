@@ -13,7 +13,9 @@ config.global.renderStubDefaultSlot = true;
  * sukses → showFlashToast; gagal → showErrorToast + tombol pulih.
  */
 
-const { routerPostMock } = vi.hoisted(() => ({ routerPostMock: vi.fn() }));
+const { routerPostMock } = vi.hoisted(() => ({
+    routerPostMock: vi.fn<(url: string, data: Record<string, string>, options?: IRouterMutationOptions) => void>(),
+}));
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: { template: '<div style="display:none"></div>' },
@@ -57,9 +59,9 @@ interface IRouterMutationOptions {
 }
 
 function lastPostOptions(): IRouterMutationOptions {
-    const calls = routerPostMock.mock.calls as unknown[][];
+    const calls = routerPostMock.mock.calls;
     expect(routerPostMock).toHaveBeenCalled();
-    const options = calls[calls.length - 1]?.[2] as IRouterMutationOptions | undefined;
+    const options = calls[calls.length - 1]?.[2];
     expect(options).toBeDefined();
     return options as IRouterMutationOptions;
 }
@@ -117,7 +119,7 @@ function mountShow(status: 'draft' | 'open'): VueWrapper {
             tab: 'peserta',
         },
         global: { stubs: CHILD_STUBS },
-    }) as unknown as VueWrapper;
+    });
 }
 
 function statusButton(wrapper: VueWrapper, action: 'Buka' | 'Tutup'): ReturnType<VueWrapper['find']> {

@@ -41,7 +41,7 @@ vi.mock('@inertiajs/vue3', async () => {
             },
             url: '/dashboard/recruitment',
         }),
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
