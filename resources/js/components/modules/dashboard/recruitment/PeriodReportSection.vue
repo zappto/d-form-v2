@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { routes } from '@/lib/routes';
 import { Download, Funnel, GraduationCap, Users } from 'lucide-vue-next';
 
-interface ReportPayload {
+interface IReportPayload {
     period: { id: string; name: string } | null;
     funnel: { stage: string; label: string; count: number }[];
     by_division: { division: string; count: number }[];
@@ -18,7 +18,7 @@ interface ReportPayload {
 
 const props = defineProps<{
     periodId: string;
-    report: ReportPayload | null;
+    report: IReportPayload | null;
     loading?: boolean;
 }>();
 

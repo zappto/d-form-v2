@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 
 /** Mirrors canvas builder field shape used by Show/Create with unknown metadata values. */
-export interface FormPreviewField {
+export interface IFormPreviewField {
     id: string;
     type: string;
     label: string;
@@ -32,7 +32,7 @@ const props = defineProps<{
     description?: string;
     formBannerUrl?: string;
     formBannerCaption?: string;
-    fields?: FormPreviewField[];
+    fields?: IFormPreviewField[];
 }>();
 
 const emit = defineEmits<{ close: [] }>();
@@ -64,17 +64,17 @@ watch(
     }
 );
 
-function metaString(field: FormPreviewField, key: string): string {
+function metaString(field: IFormPreviewField, key: string): string {
     const v = field.metadata?.[key];
     return typeof v === 'string' ? v : '';
 }
 
-function metaNumber(field: FormPreviewField, key: string, fallback: number): number {
+function metaNumber(field: IFormPreviewField, key: string, fallback: number): number {
     const v = field.metadata?.[key];
     return typeof v === 'number' && !Number.isNaN(v) ? v : fallback;
 }
 
-function optionEntries(field: FormPreviewField): IFieldOptionEntry[] {
+function optionEntries(field: IFormPreviewField): IFieldOptionEntry[] {
     const raw = field.options;
     if (!Array.isArray(raw)) return [];
     return raw.map((opt) => {
@@ -83,7 +83,7 @@ function optionEntries(field: FormPreviewField): IFieldOptionEntry[] {
     });
 }
 
-function dropdownOptions(field: FormPreviewField): SearchableSelectOption[] {
+function dropdownOptions(field: IFormPreviewField): SearchableSelectOption[] {
     return optionEntries(field).map((opt, oi) => ({
         value: String(opt.id || `option-${oi}`),
         label: optionLabel(opt),
@@ -102,7 +102,7 @@ function optKey(opt: IFieldOptionEntry, i: number): string {
     return `${opt.id || i}`;
 }
 
-function ratingStars(field: FormPreviewField): number[] {
+function ratingStars(field: IFormPreviewField): number[] {
     const n = Math.min(Math.max(metaNumber(field, 'maxStars', 5), 1), 10);
     return Array.from({ length: n }, (_, i) => i + 1);
 }

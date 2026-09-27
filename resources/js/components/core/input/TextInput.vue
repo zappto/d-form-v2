@@ -2,14 +2,14 @@
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { UserIcon } from 'lucide-vue-next';
 
-type TProps = {
+type ITProps = {
     type: 'text' | 'tel' | 'number';
     id: string;
     icon?: boolean;
     focus?: boolean;
 };
 
-const { type, id, icon = false, focus = false } = defineProps<TProps>();
+const { type, id, icon = false, focus = false } = defineProps<ITProps>();
 </script>
 
 <template>

@@ -3,7 +3,7 @@ import { computed, reactive, ref } from 'vue';
 import FormPreviewDialog from '@/components/modules/builder/FormPreviewDialog.vue';
 import { Button } from '@/components/ui/button';
 import { CometSpinner } from '@/components/ui/comet';
-import type { TFormBannerState } from '@/components/modules/builder/formBanner';
+import type { ITFormBannerState } from '@/components/modules/builder/formBanner';
 import { FORM_VISIBILITY_OPTIONS } from '@/components/modules/builder/formBuilderPalette';
 import type { BuilderField } from '@/types/form-builder';
 import type { IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
@@ -50,7 +50,7 @@ const formDescription = defineModel<string>('formDescription', { required: true 
 const successContent = defineModel<string>('successContent', { required: true });
 const closedAt = defineModel<string>('closedAt', { required: true });
 const visibleFor = defineModel<string[]>('visibleFor', { required: true });
-const banner = defineModel<TFormBannerState>('banner', { required: true });
+const banner = defineModel<ITFormBannerState>('banner', { required: true });
 const formFields = defineModel<BuilderField[]>('formFields', { required: true });
 const formMetadata = defineModel<IFormRegistrationMetadata>('formMetadata', { required: true });
 

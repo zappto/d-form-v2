@@ -1,6 +1,6 @@
 import type { BackendField } from '@/types/form-builder';
 
-export interface DirtyFieldsDiff {
+export interface IDirtyFieldsDiff {
     dirty: BackendField[];
     deletedIds: string[];
     hasChanges: boolean;
@@ -20,7 +20,7 @@ export function snapshotBackendFields(rows: BackendField[]): BackendField[] {
  * Baris kotor = id baru ATAU serialisasi berubah (termasuk `order`).
  * Id snapshot yang tak ada lagi di current = dihapus eksplisit.
  */
-export function diffBackendFields(current: BackendField[], lastSent: BackendField[] | null): DirtyFieldsDiff {
+export function diffBackendFields(current: BackendField[], lastSent: BackendField[] | null): IDirtyFieldsDiff {
     if (lastSent === null) {
         return { dirty: [...current], deletedIds: [], hasChanges: true };
     }

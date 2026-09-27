@@ -19,13 +19,13 @@ onMounted(() => {
     if (el) obs.observe(el);
 });
 
-interface Advantage {
+interface IAdvantage {
     icon: Component;
     title: string;
     desc: string;
 }
 
-const advantages: Advantage[] = [
+const advantages: IAdvantage[] = [
     {
         icon: TrendingUp,
         title: 'Data terstruktur & terukur',

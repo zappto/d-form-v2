@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { BannerPickerField } from '@/components/core/field';
-import type { TFormBannerState } from './formBanner';
+import type { ITFormBannerState } from './formBanner';
 import { normalizeBannerSrc } from './formBanner';
 
-const banner = defineModel<TFormBannerState>('banner', { required: true });
+const banner = defineModel<ITFormBannerState>('banner', { required: true });
 
 /** `frame` = kartu mandiri (border + shadow sendiri); `plain` = panel di dalam section induk */
 const props = withDefaults(

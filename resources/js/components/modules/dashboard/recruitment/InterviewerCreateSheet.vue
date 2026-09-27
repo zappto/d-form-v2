@@ -46,13 +46,13 @@ const form = useForm({
 const showPassword = ref<boolean>(false);
 const showPasswordConfirmation = ref<boolean>(false);
 
-type InterviewerRoutes = {
+type TInterviewerRoutes = {
     assign: string;
     unassign: (id: string) => string;
     store?: string;
 };
 
-const interviewerRoutes = computed<InterviewerRoutes>(() => routes.admin.recruitment.interviewers);
+const interviewerRoutes = computed<TInterviewerRoutes>(() => routes.admin.recruitment.interviewers);
 
 /** Selaras dengan kontrak backend lane paralel; fallback dipakai sampai helper store mendarat. */
 const storeUrl = computed<string>(() => interviewerRoutes.value.store ?? '/admin/recruitment/interviewers');

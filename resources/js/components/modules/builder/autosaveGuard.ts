@@ -1,7 +1,7 @@
 import type { BackendField, BuilderField } from '@/types/form-builder';
-import { diffBackendFields, type DirtyFieldsDiff } from '@/components/modules/builder/dirtyFields';
+import { diffBackendFields, type IDirtyFieldsDiff } from '@/components/modules/builder/dirtyFields';
 import { toBackendFields } from '@/components/modules/builder/fieldMapping';
-import { prependFormBannerToBackendPayload, type TFormBannerState } from '@/components/modules/builder/formBanner';
+import { prependFormBannerToBackendPayload, type ITFormBannerState } from '@/components/modules/builder/formBanner';
 
 /**
  * Guard hydrate anti-timpa (Fase 1-B): lewati hydrate bila draft id SAMA dan
@@ -24,7 +24,7 @@ export function shouldSkipHydrate(args: {
     return args.currentSnapshot !== args.lastCleanSnapshot;
 }
 
-export interface UnloadBeaconPayload {
+export interface IUnloadBeaconPayload {
     fields: BackendField[];
     deleted_ids: string[];
 }
@@ -36,12 +36,12 @@ export interface UnloadBeaconPayload {
  */
 export function buildUnloadPayload(args: {
     canvasFields: BuilderField[];
-    banner: TFormBannerState;
+    banner: ITFormBannerState;
     lastSent: BackendField[] | null;
-}): UnloadBeaconPayload | null {
+}): IUnloadBeaconPayload | null {
     const merged = prependFormBannerToBackendPayload(args.canvasFields, args.banner);
     const backend = toBackendFields(merged, args.lastSent);
-    const diff: DirtyFieldsDiff = diffBackendFields(backend, args.lastSent);
+    const diff: IDirtyFieldsDiff = diffBackendFields(backend, args.lastSent);
     if (backend.length === 0 && diff.deletedIds.length === 0) return null;
     if (!diff.hasChanges) return null;
     return { fields: backend, deleted_ids: diff.deletedIds };

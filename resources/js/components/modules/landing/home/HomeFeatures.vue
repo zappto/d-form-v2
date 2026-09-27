@@ -13,14 +13,14 @@ import {
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
 
-interface Feature {
+interface IFeature {
     title: string;
     desc: string;
     icon: Component;
     accent?: boolean;
 }
 
-const features: Feature[] = [
+const features: IFeature[] = [
     {
         title: 'Visual Form Builder',
         desc: 'Rancang formulir secara visual dengan drag & drop. Tambahkan teks, dropdown, checkbox, radio, dan lainnya — tanpa menulis satu baris kode pun.',

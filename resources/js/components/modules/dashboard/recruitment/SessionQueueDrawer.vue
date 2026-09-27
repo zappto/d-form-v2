@@ -61,13 +61,13 @@ const waitingEntries = computed<IQueueEntryRow[]>((): IQueueEntryRow[] =>
         .sort((a: IQueueEntryRow, b: IQueueEntryRow): number => a.queue_number - b.queue_number)
 );
 
-interface StatItem {
+interface IStatItem {
     key: string;
     label: string;
     value: number;
 }
 
-const statItems = computed<StatItem[]>((): StatItem[] => [
+const statItems = computed<IStatItem[]>((): IStatItem[] => [
     { key: 'waiting', label: 'Menunggu', value: queue.value.stats.waiting },
     { key: 'called', label: 'Berlangsung', value: queue.value.stats.called },
     { key: 'completed', label: 'Selesai', value: queue.value.stats.completed },

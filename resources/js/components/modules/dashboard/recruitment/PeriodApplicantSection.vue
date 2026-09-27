@@ -253,12 +253,12 @@ function goToPage(page: number): void {
     currentPage.value = Math.max(1, Math.min(page, lastPage.value));
 }
 
-interface RejectReasonOption {
+interface IRejectReasonOption {
     value: string;
     label: string;
 }
 
-const REJECT_REASONS: RejectReasonOption[] = [
+const REJECT_REASONS: IRejectReasonOption[] = [
     { value: 'incomplete_data', label: 'Data tidak lengkap' },
     { value: 'invalid_data', label: 'Data tidak valid' },
     { value: 'document_mismatch', label: 'Dokumen tidak sesuai' },

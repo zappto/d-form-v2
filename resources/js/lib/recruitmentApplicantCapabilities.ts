@@ -1,4 +1,4 @@
-import type { ApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
+import type { IApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
 
 type TRecruitmentAuthUser = {
     roles?: string[];
@@ -7,7 +7,7 @@ type TRecruitmentAuthUser = {
 };
 
 /** Tentukan boleh-tidaknya kirim ulang tautan tracking pelamar; dipakai menyembunyikan tombol resend di detail pelamar. */
-export function applicantAllowsTrackingResend(application: ApplicationDetail): boolean {
+export function applicantAllowsTrackingResend(application: IApplicationDetail): boolean {
     if (application.can_resend_tracking === true) {
         return true;
     }

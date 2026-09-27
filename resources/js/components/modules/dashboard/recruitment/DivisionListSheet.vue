@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { routes } from '@/lib/routes';
 import { handleInertiaFormErrors } from '@/lib/error-message';
 
-export interface DashboardDivision {
+export interface IDashboardDivision {
     id: string;
     code: string;
     name: string;
@@ -22,7 +22,7 @@ export interface DashboardDivision {
 
 const props = defineProps<{
     open: boolean;
-    divisions: DashboardDivision[];
+    divisions: IDashboardDivision[];
 }>();
 
 const emit = defineEmits<{ close: [] }>();
@@ -49,7 +49,7 @@ watch(
     }
 );
 
-function startEdit(division: DashboardDivision): void {
+function startEdit(division: IDashboardDivision): void {
     editingId.value = division.id;
     editName.value = division.name;
     editIsActive.value = division.is_active;
@@ -60,7 +60,7 @@ function cancelEdit(): void {
     isSaving.value = false;
 }
 
-function saveDivision(division: DashboardDivision): void {
+function saveDivision(division: IDashboardDivision): void {
     if (isSaving.value || editName.value.trim() === '') return;
     isSaving.value = true;
     router.put(

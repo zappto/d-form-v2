@@ -37,10 +37,10 @@ import {
     sanitizeQuotaTyping,
 } from '@/lib/indonesianNumericInput';
 
-export type EventDashboardFormVariant = 'create' | 'edit';
+export type TEventDashboardFormVariant = 'create' | 'edit';
 
 const props = defineProps<{
-    variant: EventDashboardFormVariant;
+    variant: TEventDashboardFormVariant;
     /** Edit: wajib. Create: tidak dipakai. */
     event?: IEvent;
     /** Create: opsional (fallback default). Edit: wajib dari halaman. */

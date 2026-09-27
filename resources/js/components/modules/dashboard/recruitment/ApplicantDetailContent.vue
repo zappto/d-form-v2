@@ -35,11 +35,11 @@ import {
     XCircle,
 } from 'lucide-vue-next';
 
-type FinalAction = 'accept' | 'reject' | null;
+type TFinalAction = 'accept' | 'reject' | null;
 
-type ScreeningAction = 'revision' | 'reject' | null;
+type TScreeningAction = 'revision' | 'reject' | null;
 
-interface ScreeningRow {
+interface IScreeningRow {
     id: string;
     decision: string;
     decision_label: string;
@@ -50,7 +50,7 @@ interface ScreeningRow {
     actor: { id: string; name: string } | null;
 }
 
-interface ActivityRow {
+interface IActivityRow {
     id: string;
     action: string;
     old_values: Record<string, unknown> | null;
@@ -59,7 +59,7 @@ interface ActivityRow {
     actor: { id: string; name: string } | null;
 }
 
-interface CorrectionRow {
+interface ICorrectionRow {
     id: string;
     status: string;
     status_label: string;
@@ -70,7 +70,7 @@ interface CorrectionRow {
     reviewer: { id: string; name: string } | null;
 }
 
-interface EvaluationDetail {
+interface IEvaluationDetail {
     speaking_score: number;
     technical_score: number;
     attitude_score: number;
@@ -82,7 +82,7 @@ interface EvaluationDetail {
     evaluator: { id: string; name: string } | null;
 }
 
-interface FinalDecisionDetail {
+interface IFinalDecisionDetail {
     membership_type: string | null;
     membership_type_label: string | null;
     final_division: { id: string; name: string; code: string } | null;
@@ -92,7 +92,7 @@ interface FinalDecisionDetail {
     decider: { id: string; name: string } | null;
 }
 
-export interface ApplicationDetail {
+export interface IApplicationDetail {
     id: string;
     registration_number: string;
     full_name: string;
@@ -129,11 +129,11 @@ export interface ApplicationDetail {
         has_portfolio_file: boolean;
         has_instagram_follow_file: boolean;
     } | null;
-    screenings: ScreeningRow[];
-    activity_logs: ActivityRow[];
-    correction_requests: CorrectionRow[];
-    evaluation: EvaluationDetail | null;
-    final_decision: FinalDecisionDetail | null;
+    screenings: IScreeningRow[];
+    activity_logs: IActivityRow[];
+    correction_requests: ICorrectionRow[];
+    evaluation: IEvaluationDetail | null;
+    final_decision: IFinalDecisionDetail | null;
     can_screen: boolean;
     can_verify: boolean;
     can_decide_final: boolean;
@@ -142,7 +142,7 @@ export interface ApplicationDetail {
 
 const props = withDefaults(
     defineProps<{
-        application: ApplicationDetail;
+        application: IApplicationDetail;
         screeningReasonOptions?: { value: string; label: string }[];
         divisionOptions?: { id: string; name: string; code: string }[];
         membershipTypeOptions?: { value: string; label: string }[];
@@ -183,13 +183,13 @@ const correctionReviewForm = useForm({
 const reviewingCorrectionId = ref<string | null>(null);
 
 const screeningModalOpen = ref(false);
-const screeningAction = ref<ScreeningAction>(null);
+const screeningAction = ref<TScreeningAction>(null);
 
 const confirmOpen = ref(false);
 const confirmAction = ref<'verify' | 'pass' | 'reject' | 'resend_tracking' | null>(null);
 
 const finalModalOpen = ref(false);
-const finalAction = ref<FinalAction>(null);
+const finalAction = ref<TFinalAction>(null);
 
 const screeningForm = useForm({
     reason: '',
@@ -219,7 +219,7 @@ const finalRejectForm = useForm({
     public_message: '',
 });
 
-function openScreeningModal(action: ScreeningAction) {
+function openScreeningModal(action: TScreeningAction) {
     screeningAction.value = action;
     screeningForm.reset();
     screeningForm.clearErrors();
@@ -333,7 +333,7 @@ const confirmConsequence = computed(() => {
     return '';
 });
 
-function openFinalModal(action: FinalAction) {
+function openFinalModal(action: TFinalAction) {
     finalAction.value = action;
     finalAcceptForm.reset();
     finalRejectForm.reset();

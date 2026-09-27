@@ -2,7 +2,7 @@
 import { Label } from '@/components/ui/label';
 import { TextInput, EmailInput, PasswordInput } from '@/components/core/input';
 
-type TProps = {
+type ITProps = {
     label: string;
     error?: string;
     type: 'name' | 'email' | 'password';
@@ -10,7 +10,7 @@ type TProps = {
     focus: boolean;
 };
 
-const { error } = defineProps<TProps>();
+const { error } = defineProps<ITProps>();
 </script>
 
 <template>

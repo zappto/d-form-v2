@@ -2,14 +2,14 @@
 import { ref, onMounted } from 'vue';
 import { Check, X, Minus } from 'lucide-vue-next';
 
-interface Row {
+interface IRow {
     feature: string;
     desc: string;
     dform: 'yes' | 'no' | 'partial';
     manual: 'yes' | 'no' | 'partial';
 }
 
-const rows: Row[] = [
+const rows: IRow[] = [
     { feature: 'Form Builder Visual', desc: 'Rancang formulir dengan drag & drop', dform: 'yes', manual: 'no' },
     { feature: 'Dasbor Real-time', desc: 'Pantau data pendaftar secara langsung', dform: 'yes', manual: 'no' },
     { feature: 'Multi-Acara', desc: 'Kelola banyak acara dari satu akun', dform: 'yes', manual: 'no' },

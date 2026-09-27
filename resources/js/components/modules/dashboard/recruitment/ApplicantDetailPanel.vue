@@ -5,7 +5,7 @@ import { SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import ApplicantDetailContent, { type ApplicationDetail } from './ApplicantDetailContent.vue';
+import ApplicantDetailContent, { type IApplicationDetail } from './ApplicantDetailContent.vue';
 import FormSheet from './FormSheet.vue';
 import { applicantAllowsTrackingResend, userAllowsTrackingResend } from '@/lib/recruitmentApplicantCapabilities';
 import useAuth from '@/hooks/useAuth';
@@ -13,7 +13,7 @@ import { CheckCircle2, Mail, Trophy, XCircle } from 'lucide-vue-next';
 
 const props = withDefaults(
     defineProps<{
-        application: ApplicationDetail | null;
+        application: IApplicationDetail | null;
         loading: boolean;
         reasonOptions?: { value: string; label: string }[];
         divisionOptions?: { id: string; name: string; code: string }[];

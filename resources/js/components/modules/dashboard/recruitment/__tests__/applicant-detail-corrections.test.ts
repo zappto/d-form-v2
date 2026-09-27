@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
-import ApplicantDetailContent, { type ApplicationDetail } from '../ApplicantDetailContent.vue';
+import ApplicantDetailContent, { type IApplicationDetail } from '../ApplicantDetailContent.vue';
 import { showErrorToast, showFlashToast } from '@/lib/error-message';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
@@ -89,7 +89,7 @@ function lastPostCall(): { url: string; options: InertiaMutationOptions } {
     return { url: lastUrl as string, options: lastOptions as InertiaMutationOptions };
 }
 
-function demoApplication(): ApplicationDetail {
+function demoApplication(): IApplicationDetail {
     return {
         id: 'ap-1',
         registration_number: 'OPREC-2026-00001',

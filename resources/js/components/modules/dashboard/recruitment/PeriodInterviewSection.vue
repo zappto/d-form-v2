@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import InterviewSessionCreateSheet, {
-    type InterviewDivisionChoice,
+    type TInterviewDivisionChoice,
 } from '@/components/modules/dashboard/recruitment/InterviewSessionCreateSheet.vue';
 import { routes } from '@/lib/routes';
 
-interface SessionRow {
+interface ISessionRow {
     id: string;
     session_date: string;
     starts_at: string;
@@ -23,17 +23,17 @@ interface SessionRow {
     division: { id: string; name: string; code: string } | null;
 }
 
-interface SessionPaginator {
-    data: SessionRow[];
+interface ISessionPaginator {
+    data: ISessionRow[];
     current_page: number;
     last_page: number;
     total: number;
 }
 
 defineProps<{
-    sessions: SessionPaginator | null;
+    sessions: ISessionPaginator | null;
     periodId: string;
-    divisionOptions: InterviewDivisionChoice[];
+    divisionOptions: TInterviewDivisionChoice[];
     loading?: boolean;
 }>();
 

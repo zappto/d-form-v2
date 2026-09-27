@@ -3,14 +3,14 @@ import { computed } from 'vue';
 import { Label } from '@/components/ui/label';
 import ComboboxTagInput from '@/components/modules/dashboard/events/ComboboxTagInput.vue';
 
-export interface MultiValueOption {
+export interface IMultiValueOption {
     value: string;
     label: string;
 }
 
 const props = withDefaults(
     defineProps<{
-        options: MultiValueOption[];
+        options: IMultiValueOption[];
         label: string;
         description?: string;
         error?: string;

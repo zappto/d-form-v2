@@ -5,7 +5,7 @@ import type { TLottieName } from '@/lib/lotties';
 import { CalendarPlus, PenTool, Rocket } from 'lucide-vue-next';
 import type { Component } from 'vue';
 
-interface Step {
+interface IStep {
     num: string;
     title: string;
     desc: string;
@@ -14,7 +14,7 @@ interface Step {
     icon: Component;
 }
 
-const steps: Step[] = [
+const steps: IStep[] = [
     {
         num: '01',
         title: 'Buat acara baru',

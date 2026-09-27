@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import DivisionListSheet, {
-    type DashboardDivision,
+    type IDashboardDivision,
 } from '@/components/modules/dashboard/recruitment/DivisionListSheet.vue';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
@@ -91,7 +91,7 @@ const props = withDefaults(
         periods?: PeriodPaginator | null;
         query?: { search?: string; status?: string };
         statusOptions?: { value: string; label: string }[];
-        divisions?: DashboardDivision[];
+        divisions?: IDashboardDivision[];
     }>(),
     { periods: null, query: () => ({}), statusOptions: () => [], divisions: () => [] }
 );
@@ -110,7 +110,7 @@ const periodCurrentPage = computed<number>(() => props.periods?.current_page ?? 
 const periodLastPage = computed<number>(() => props.periods?.last_page ?? 1);
 const periodTotal = computed<number>(() => props.periods?.total ?? 0);
 
-const divisionRows = computed<DashboardDivision[]>(() => props.divisions ?? []);
+const divisionRows = computed<IDashboardDivision[]>(() => props.divisions ?? []);
 const divisionDrawerOpen = ref<boolean>(false);
 
 function openDivisionDrawer(): void {

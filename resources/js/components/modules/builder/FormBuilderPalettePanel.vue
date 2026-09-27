@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { SplitDateTimeField } from '@/components/ui/date-picker';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { ChevronRight, ChevronDown, Search, Settings2 } from 'lucide-vue-next';
-import type { TFormBuilderPaletteCategory } from '@/components/modules/builder/formBuilderPalette';
+import type { ITFormBuilderPaletteCategory } from '@/components/modules/builder/formBuilderPalette';
 import type { IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
 
 const searchQuery = defineModel<string>('searchQuery', { required: true });
@@ -16,7 +16,7 @@ const formMetadata = defineModel<IFormRegistrationMetadata>('formMetadata', { re
 
 const props = withDefaults(
     defineProps<{
-        categories: TFormBuilderPaletteCategory[];
+        categories: ITFormBuilderPaletteCategory[];
         openCategoryName: string | null;
         formSettingsOpen: boolean;
         fieldErrors: Partial<Record<'closed_at' | 'visible_for', string>>;
@@ -29,7 +29,7 @@ const props = withDefaults(
 );
 
 defineEmits<{
-    toggleCategory: [cat: TFormBuilderPaletteCategory];
+    toggleCategory: [cat: ITFormBuilderPaletteCategory];
     toggleFormSettings: [];
     toggleVisibility: [value: string, checked: boolean];
 }>();

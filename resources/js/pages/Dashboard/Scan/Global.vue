@@ -6,8 +6,8 @@ import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
 import QrScanScannerCard from '@/components/modules/dashboard/QrScanScannerCard.vue';
 import QrScanSidebar from '@/components/modules/dashboard/QrScanSidebar.vue';
 import ScanExportDialog, {
-    type ScanExportFormat,
-    type ScanExportTarget,
+    type TScanExportFormat,
+    type TScanExportTarget,
 } from '@/components/modules/dashboard/ScanExportDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -59,7 +59,7 @@ const heroEmptyMessage = computed<string>(() =>
 );
 
 const exportDialogOpen = ref(false);
-const exportFormat = ref<ScanExportFormat>('xlsx');
+const exportFormat = ref<TScanExportFormat>('xlsx');
 const isExporting = ref(false);
 
 function triggerBrowserDownload(url: string): void {
@@ -73,7 +73,7 @@ function triggerBrowserDownload(url: string): void {
     window.setTimeout(() => link.remove(), 1500);
 }
 
-function downloadScanExports(targets: ScanExportTarget[], format: ScanExportFormat): void {
+function downloadScanExports(targets: TScanExportTarget[], format: TScanExportFormat): void {
     if (targets.length === 0) {
         return;
     }
@@ -102,7 +102,7 @@ function downloadScanExports(targets: ScanExportTarget[], format: ScanExportForm
     });
 }
 
-function requestScanExport(format: ScanExportFormat): void {
+function requestScanExport(format: TScanExportFormat): void {
     const selected = s.selectedTargetOption;
     if (selected !== null) {
         downloadScanExports([selected], format);
@@ -114,7 +114,7 @@ function requestScanExport(format: ScanExportFormat): void {
     exportDialogOpen.value = true;
 }
 
-function confirmScanExport(targets: ScanExportTarget[]): void {
+function confirmScanExport(targets: TScanExportTarget[]): void {
     downloadScanExports(targets, exportFormat.value);
 }
 

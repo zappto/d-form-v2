@@ -7,9 +7,9 @@ import { parseEventCategories } from '@/lib/eventShowUi';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 import { EVENT_HERO_BANNER_ASPECT } from '@/lib/eventBannerAspect';
 
-type StatusPill = { label: string; classes: string };
+type TStatusPill = { label: string; classes: string };
 
-type MetaBlock = {
+type TMetaBlock = {
     title: string;
     value: string;
     icon: object;
@@ -17,8 +17,8 @@ type MetaBlock = {
 
 defineProps<{
     event: IEvent;
-    statusPill: StatusPill;
-    metaBlocks: MetaBlock[];
+    statusPill: TStatusPill;
+    metaBlocks: TMetaBlock[];
     cardShadow: string;
 }>();
 </script>

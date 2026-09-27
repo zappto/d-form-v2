@@ -16,7 +16,7 @@ import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import { routes } from '@/lib/routes';
 import { handleInertiaFormErrors } from '@/lib/error-message';
 
-export interface InterviewDivisionChoice {
+export interface TInterviewDivisionChoice {
     id: string;
     name: string;
     code: string;
@@ -25,7 +25,7 @@ export interface InterviewDivisionChoice {
 const props = defineProps<{
     open: boolean;
     periodId: string;
-    divisions: InterviewDivisionChoice[];
+    divisions: TInterviewDivisionChoice[];
 }>();
 
 const emit = defineEmits<{ close: [] }>();

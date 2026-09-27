@@ -12,7 +12,7 @@ import { Send } from 'lucide-vue-next';
 import type { TFormFillPageContext } from '@/hooks/useFormFillPage';
 import { routes } from '@/lib/routes';
 
-type FormSegment = { type: 'linear'; fields: IFormField[] } | { type: 'bundleGroup'; fields: IFormField[] };
+type TFormSegment = { type: 'linear'; fields: IFormField[] } | { type: 'bundleGroup'; fields: IFormField[] };
 
 const props = defineProps<{
     fields: IFormField[];
@@ -24,9 +24,9 @@ const emit = defineEmits<{
     submit: [];
 }>();
 
-const formSegments = computed((): FormSegment[] => {
+const formSegments = computed((): TFormSegment[] => {
     const list = props.fields;
-    const out: FormSegment[] = [];
+    const out: TFormSegment[] = [];
     let i = 0;
     while (i < list.length) {
         if (props.ctx.isBundleDuplicatableField(list[i])) {

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { Check } from 'lucide-vue-next';
 
-interface Step {
+interface IStep {
     key: string;
     label: string;
 }
 
 defineProps<{
-    steps: Step[];
+    steps: IStep[];
     activeIndex: number;
 }>();
 </script>

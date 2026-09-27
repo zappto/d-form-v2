@@ -51,14 +51,14 @@ const HEADER_TOKENS: string[] = [
 
 const FOOTER_TOKENS: string[] = ['border-border/70', 'shrink-0', 'border-t', 'p-4'];
 
-interface SheetProps {
+interface ISheetProps {
     open?: boolean;
     title?: string;
     description?: string;
     size?: TFormSheetSize;
 }
 
-function mountSheet(props: SheetProps = {}, slots: Record<string, string> = {}) {
+function mountSheet(props: ISheetProps = {}, slots: Record<string, string> = {}) {
     return mount(FormSheet, { props, slots, attachTo: document.body });
 }
 

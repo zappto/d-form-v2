@@ -10,7 +10,7 @@ import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import PeriodInterviewSection from '@/components/modules/dashboard/recruitment/PeriodInterviewSection.vue';
 import PeriodReportSection from '@/components/modules/dashboard/recruitment/PeriodReportSection.vue';
 import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/ApplicantDetailPanel.vue';
-import { type ApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
+import { type IApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue';
 import { CometSpinner } from '@/components/ui/comet';
@@ -58,7 +58,7 @@ interface Period {
     applications_count: number;
 }
 
-interface SessionRow {
+interface ISessionRow {
     id: string;
     session_date: string;
     starts_at: string;
@@ -71,14 +71,14 @@ interface SessionRow {
     division: { id: string; name: string; code: string } | null;
 }
 
-interface SessionPaginator {
-    data: SessionRow[];
+interface ISessionPaginator {
+    data: ISessionRow[];
     current_page: number;
     last_page: number;
     total: number;
 }
 
-interface ReportPayload {
+interface IReportPayload {
     period: { id: string; name: string } | null;
     funnel: { stage: string; label: string; count: number }[];
     by_division: { division: string; count: number }[];
@@ -135,10 +135,10 @@ const props = withDefaults(
             per_page?: number | string;
         };
         tab: string;
-        sessions?: SessionPaginator | null;
+        sessions?: ISessionPaginator | null;
         interview_division_options?: { id: string; name: string; code: string }[];
-        report?: ReportPayload | null;
-        applicant_detail?: ApplicationDetail | null;
+        report?: IReportPayload | null;
+        applicant_detail?: IApplicationDetail | null;
         divisions?: InterviewerDivision[];
         assignments?: InterviewerAssignment[];
         interviewerCandidates?: InterviewerCandidate[];
@@ -394,9 +394,9 @@ const isLoadingApplicants = ref<boolean>(false);
  */
 const isLoadingTab = ref<boolean>(false);
 
-const selectedApplication = ref<ApplicationDetail | null>(null);
+const selectedApplication = ref<IApplicationDetail | null>(null);
 const detailLoading = ref<boolean>(false);
-const detailCache = new Map<string, ApplicationDetail>();
+const detailCache = new Map<string, IApplicationDetail>();
 
 function detailUrl(id: string): string {
     return `${routes.admin.recruitment.periods.show(props.period.id)}/applications/${id}`;
@@ -404,14 +404,14 @@ function detailUrl(id: string): string {
 
 async function selectApplicant(id: string): Promise<void> {
     if (selectedApplication.value?.id === id) return;
-    const cached: ApplicationDetail | undefined = detailCache.get(id);
+    const cached: IApplicationDetail | undefined = detailCache.get(id);
     if (cached && 'can_resend_tracking' in cached) {
         selectedApplication.value = cached;
         return;
     }
     detailLoading.value = true;
     try {
-        const { data } = await axios.get<{ application: ApplicationDetail }>(detailUrl(id), {
+        const { data } = await axios.get<{ application: IApplicationDetail }>(detailUrl(id), {
             headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         });
         detailCache.set(id, data.application);
@@ -1002,13 +1002,16 @@ function closePeriod(): void {
                                 </section>
                             </div>
                         </TooltipProvider>
-                        <div v-else class="px-4 py-8">
-                            <EmptyState
-                                variant="inline"
-                                title="Belum ada interviewer yang ditugaskan."
-                                description="Pilih interviewer dan divisi di atas untuk menugaskan."
-                            />
-                        </div>
+                        <EmptyState
+                            v-else
+                            variant="dashed"
+                            title="Belum ada interviewer yang ditugaskan."
+                            description="Pilih interviewer dan divisi di atas untuk menugaskan."
+                        >
+                            <template #icon>
+                                <UserCheck />
+                            </template>
+                        </EmptyState>
                     </CardContent>
                 </Card>
 

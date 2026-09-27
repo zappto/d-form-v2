@@ -15,29 +15,29 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FileSpreadsheet, FileText } from 'lucide-vue-next';
 
-export type ScanExportTarget = {
+export type TScanExportTarget = {
     id: string;
     label: string;
     kind: 'event' | 'oprec';
 };
 
-export type ScanExportFormat = 'csv' | 'xlsx';
+export type TScanExportFormat = 'csv' | 'xlsx';
 
 const props = defineProps<{
     open: boolean;
-    options: ScanExportTarget[];
-    format: ScanExportFormat;
+    options: TScanExportTarget[];
+    format: TScanExportFormat;
 }>();
 
 const emit = defineEmits<{
     'update:open': [value: boolean];
-    confirm: [targets: ScanExportTarget[]];
+    confirm: [targets: TScanExportTarget[]];
 }>();
 
 const query = ref('');
 const selectedIds = ref<string[]>([]);
 
-const filteredOptions = computed<ScanExportTarget[]>(() => {
+const filteredOptions = computed<TScanExportTarget[]>(() => {
     const needle = query.value.trim().toLowerCase();
     if (needle.length === 0) {
         return props.options;

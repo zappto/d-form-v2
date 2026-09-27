@@ -18,14 +18,14 @@ import {
 import type { BuilderField } from '@/types/form-builder';
 import FormBuilderBannerBlock from './FormBuilderBannerBlock.vue';
 import FormSuccessMessageCard from './FormSuccessMessageCard.vue';
-import type { TFormBannerState } from './formBanner';
+import type { ITFormBannerState } from './formBanner';
 
 const PAGE_SIZE = 5;
 
 const formTitle = defineModel<string>('formTitle', { required: true });
 const formDescription = defineModel<string>('formDescription', { required: true });
 const successContent = defineModel<string>('successContent', { required: true });
-const banner = defineModel<TFormBannerState>('banner', { required: true });
+const banner = defineModel<ITFormBannerState>('banner', { required: true });
 
 const props = defineProps<{
     hideOnMobileSettings: boolean;

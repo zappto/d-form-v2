@@ -3,7 +3,7 @@ import { ref, computed, watch, nextTick, useId } from 'vue';
 import { X, ChevronDown, Plus } from 'lucide-vue-next';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 
-export interface TagSuggestion {
+export interface ITagSuggestion {
     value: string;
     label: string;
 }
@@ -11,7 +11,7 @@ export interface TagSuggestion {
 const props = withDefaults(
     defineProps<{
         modelValue?: string;
-        suggestions?: TagSuggestion[];
+        suggestions?: ITagSuggestion[];
         maxTags?: number;
         allowCustom?: boolean;
         placeholder?: string;
@@ -102,7 +102,7 @@ function syncTags(newTags: string[]) {
     emit('update:modelValue', newTags.join(','));
 }
 
-function suggestionMatchingQuery(): TagSuggestion | undefined {
+function suggestionMatchingQuery(): ITagSuggestion | undefined {
     const q = query.value.trim();
     if (!q) return undefined;
     const lower = q.toLowerCase();

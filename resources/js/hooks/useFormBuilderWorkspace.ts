@@ -1,10 +1,10 @@
 import { ref, computed, type Ref } from 'vue';
 import { showErrorToast } from '@/lib/error-message';
-import { resolveBannerPreviewSrc, type TFormBannerState } from '@/components/modules/builder/formBanner';
+import { resolveBannerPreviewSrc, type ITFormBannerState } from '@/components/modules/builder/formBanner';
 import {
     cloneFormBuilderPalette,
-    type TFormBuilderPaletteCategory,
-    type TFormBuilderPaletteField,
+    type ITFormBuilderPaletteCategory,
+    type ITFormBuilderPaletteField,
 } from '@/components/modules/builder/formBuilderPalette';
 import { createFormBuilderField } from '@/components/modules/builder/formBuilderFieldFactory';
 import type { BuilderField } from '@/types/form-builder';
@@ -22,14 +22,14 @@ export interface IFormBuilderWorkspaceModels {
     formDescription: Ref<string>;
     closedAt: Ref<string>;
     visibleFor: Ref<string[]>;
-    banner: Ref<TFormBannerState>;
+    banner: Ref<ITFormBannerState>;
     formFields: Ref<BuilderField[]>;
     successContent?: Ref<string>;
 }
 
 /** Kategori palette terbuka. `null` = semua tertutup (single-expand). */
 export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, options: { onSave: () => void }) {
-    const categories = ref<TFormBuilderPaletteCategory[]>(cloneFormBuilderPalette());
+    const categories = ref<ITFormBuilderPaletteCategory[]>(cloneFormBuilderPalette());
 
     /** Single-expand: simpan nama kategori yang terbuka (default semua tertutup). */
     const openCategoryName = ref<string | null>(null);
@@ -96,7 +96,7 @@ export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, opt
 
     const isReadyToSave = computed<boolean>(() => validationIssues.value.length === 0);
 
-    function patchBanner(v: TFormBannerState): void {
+    function patchBanner(v: ITFormBannerState): void {
         Object.assign(models.banner.value, v);
     }
 
@@ -105,7 +105,7 @@ export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, opt
         if (models.successContent) models.successContent.value = '';
     }
 
-    function addField(template: TFormBuilderPaletteField, openEditorAfter = false): void {
+    function addField(template: ITFormBuilderPaletteField, openEditorAfter = false): void {
         // Item palette "Pesan setelah submit" = trigger zona konfirmasi, bukan BuilderField.
         if (template.type === 'confirmation') {
             showSuccessZone.value = true;
@@ -188,7 +188,7 @@ export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, opt
         else models.visibleFor.value = models.visibleFor.value.filter((v) => v !== value);
     }
 
-    function toggleCategory(cat: TFormBuilderPaletteCategory): void {
+    function toggleCategory(cat: ITFormBuilderPaletteCategory): void {
         openCategoryName.value = openCategoryName.value === cat.name ? null : cat.name;
         // Sinkronkan isOpen agar cocok dengan state yang dipakai item kartu.
         for (const c of categories.value) {

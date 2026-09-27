@@ -54,9 +54,9 @@ function createPerSlotTrailingDebounce(
     };
 }
 
-type CheckStatus = 'idle' | 'loading' | 'found' | 'valid' | 'not_found' | 'invalid' | 'error';
+type TCheckStatus = 'idle' | 'loading' | 'found' | 'valid' | 'not_found' | 'invalid' | 'error';
 
-interface FoundUser {
+interface IFoundUser {
     name: string;
     email: string;
     created_at: string;
@@ -67,11 +67,11 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
-const currentUserEmail = computed(() => (page.props as TProps).auth?.user?.email?.trim().toLowerCase() ?? '');
+const currentUserEmail = computed(() => (page.props as ITProps).auth?.user?.email?.trim().toLowerCase() ?? '');
 
 const expandedBySlot = ref<Record<number, boolean>>({});
-const statusBySlot = ref<Record<number, CheckStatus>>({});
-const foundUserBySlot = ref<Record<number, FoundUser | undefined>>({});
+const statusBySlot = ref<Record<number, TCheckStatus>>({});
+const foundUserBySlot = ref<Record<number, IFoundUser | undefined>>({});
 const helperBySlot = ref<Record<number, string>>({});
 
 /** Debounced email verification — waits `DEBOUNCE_MS` after the last keystroke per slot. */
@@ -137,7 +137,7 @@ function validEmailFormat(s: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
 }
 
-function setCheckState(slot: number, status: CheckStatus, found?: FoundUser, helper?: string) {
+function setCheckState(slot: number, status: TCheckStatus, found?: IFoundUser, helper?: string) {
     statusBySlot.value = { ...statusBySlot.value, [slot]: status };
     if (arguments.length >= 3) {
         foundUserBySlot.value = { ...foundUserBySlot.value, [slot]: found };
@@ -183,7 +183,7 @@ async function runEmailCheck(slot: number) {
         const body = (await res.json()) as {
             exists?: boolean;
             message?: string;
-            data?: FoundUser;
+            data?: IFoundUser;
         };
 
         if (controller.signal.aborted) {
@@ -261,7 +261,7 @@ function onEmailInput(slot: number, v: string | number) {
     scheduleCheck(slot);
 }
 
-function statusFor(slot: number): CheckStatus {
+function statusFor(slot: number): TCheckStatus {
     return statusBySlot.value[slot] ?? 'idle';
 }
 

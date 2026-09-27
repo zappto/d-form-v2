@@ -4,7 +4,7 @@ import { config, mount, type VueWrapper } from '@vue/test-utils';
 import PeriodsShow from '../Periods/Show.vue';
 import { Tabs } from '@/components/ui/tabs';
 import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/ApplicantDetailPanel.vue';
-import type { ApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
+import type { IApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
 
 /** Tipe baris aplikan diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
 type ApplicationRow = NonNullable<InstanceType<typeof PeriodsShow>['$props']['applications']>[number];
@@ -167,7 +167,7 @@ async function gotoInterview(wrapper: VueWrapper): Promise<void> {
     await nextTick();
 }
 
-function demoApplication(): ApplicationDetail {
+function demoApplication(): IApplicationDetail {
     return {
         id: 'ap-1',
         registration_number: 'OPREC-2026-00001',
@@ -202,7 +202,7 @@ function demoApplication(): ApplicationDetail {
 }
 
 function mountPanel(
-    application: ApplicationDetail | null,
+    application: IApplicationDetail | null,
     loading: boolean
 ): VueWrapper<InstanceType<typeof ApplicantDetailPanel>> {
     return mount(ApplicantDetailPanel, {
