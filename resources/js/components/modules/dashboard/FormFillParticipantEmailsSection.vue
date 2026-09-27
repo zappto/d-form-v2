@@ -259,7 +259,11 @@ function statusFor(slot: number): TCheckStatus {
     return statusBySlot.value[slot] ?? 'idle';
 }
 
-function shortDate(iso: string): string {
+/** Format tanggal pendek untuk kartu user ditemukan; ISO kosong/tak ada jatuh ke string kosong, bukan melempar. */
+function shortDate(iso: string | undefined): string {
+    if (!iso) {
+        return '';
+    }
     try {
         return formatDisplayDate(iso);
     } catch {
@@ -497,7 +501,7 @@ onBeforeUnmount(() => {
                                                 Name
                                             </dt>
                                             <dd class="mt-0.5 truncate leading-snug font-semibold text-foreground">
-                                                {{ foundUserBySlot[slot]!.name }}
+                                                {{ foundUserBySlot[slot]?.name }}
                                             </dd>
                                         </div>
                                         <div>
@@ -507,7 +511,7 @@ onBeforeUnmount(() => {
                                                 Email
                                             </dt>
                                             <dd class="mt-0.5 text-xs leading-relaxed break-all text-muted-foreground">
-                                                {{ foundUserBySlot[slot]!.email }}
+                                                {{ foundUserBySlot[slot]?.email }}
                                             </dd>
                                         </div>
                                         <div>
@@ -517,7 +521,7 @@ onBeforeUnmount(() => {
                                                 Member since
                                             </dt>
                                             <dd class="mt-0.5 text-xs text-foreground">
-                                                {{ shortDate(foundUserBySlot[slot]!.created_at) }}
+                                                {{ shortDate(foundUserBySlot[slot]?.created_at) }}
                                             </dd>
                                         </div>
                                     </dl>
