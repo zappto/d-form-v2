@@ -33,6 +33,17 @@ export function formatCountNumber(count: number): string {
     return new Intl.NumberFormat('id-ID').format(count);
 }
 
+/** Tooltip chart id-ID plus satuan call-site; satuan tetap argumen agar copy tak tercampur. */
+export function formatChartCount(count: number, unit: string): string {
+    return `${count.toLocaleString('id-ID')} ${unit}`;
+}
+
+/** Tick sumbu chart id-ID; non-angka dikembalikan utuh seperti callback lama. */
+export function chartTickCallback(tickValue: number | string): string {
+    if (typeof tickValue === 'number') return tickValue.toLocaleString('id-ID');
+    return tickValue;
+}
+
 /** Format angka harga Rupiah tanpa prefix/fallback; prefix `Rp` + fallback milik call-site. */
 export function formatRupiahPrice(amount: number): string {
     return Number(amount).toLocaleString('id-ID');

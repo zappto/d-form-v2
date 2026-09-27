@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
     formatBytes,
+    formatChartCount,
+    chartTickCallback,
     formatCountNumber,
     formatDisplayDate,
     formatDisplayDateTime,
@@ -86,6 +88,22 @@ describe('formatRupiahPrice', () => {
         expect(formatRupiahPrice(50000)).not.toContain('Rp');
         expect(formatRupiahPrice(50000)).not.toContain('Free');
         expect(formatRupiahPrice(50000)).not.toContain('Gratis');
+    });
+});
+
+describe('formatChartCount', () => {
+    it('angka id-ID plus satuan call-site; satuan tetap argumen agar copy tak tercampur', () => {
+        expect(formatChartCount(1234567, 'pengajuan')).toBe(`${(1234567).toLocaleString('id-ID')} pengajuan`);
+        expect(formatChartCount(2500, 'acara')).toBe(`${(2500).toLocaleString('id-ID')} acara`);
+        expect(formatChartCount(0, 'pengajuan')).toBe('0 pengajuan');
+    });
+});
+
+describe('chartTickCallback', () => {
+    it('angka diformat id-ID; non-angka dikembalikan utuh', () => {
+        expect(chartTickCallback(1234567)).toBe((1234567).toLocaleString('id-ID'));
+        expect(chartTickCallback(0)).toBe('0');
+        expect(chartTickCallback('Q1')).toBe('Q1');
     });
 });
 

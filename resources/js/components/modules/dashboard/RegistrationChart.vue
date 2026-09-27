@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useChartTheme } from '@/hooks/useChartTheme';
+import { chartTickCallback, formatChartCount } from '@/lib/format';
 import { Line } from 'vue-chartjs';
 import {
     Chart as ChartJS,
@@ -23,17 +25,7 @@ const props = withDefaults(
     { points: () => [] },
 );
 
-const isDark = ref(false);
-
-onMounted(() => {
-    const sync = () => {
-        isDark.value = document.documentElement.getAttribute('data-theme') === 'dark';
-    };
-    sync();
-    const mo = new MutationObserver(sync);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    onUnmounted(() => mo.disconnect());
-});
+const { isDark } = useChartTheme();
 
 const total = computed(() => props.points.reduce((s, d) => s + d.count, 0));
 
@@ -87,7 +79,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
                     },
                     label(ctx) {
                         const n = ctx.parsed.y ?? 0;
-                        return `${n.toLocaleString('id-ID')} pengajuan`;
+                        return formatChartCount(n, 'pengajuan');
                     },
                 },
             },
@@ -111,7 +103,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
                     font: { size: 11, family: 'Poppins, sans-serif' },
                     color: tick,
                     precision: 0,
-                    callback: (v) => (typeof v === 'number' ? v.toLocaleString('id-ID') : v),
+                    callback: chartTickCallback,
                 },
             },
         },
