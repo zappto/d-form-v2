@@ -1,6 +1,7 @@
 import { CalendarDate, parseDate } from '@internationalized/date'
 import type { DateValue } from 'reka-ui'
 
+/** Pad angka menjadi dua digit string; dipakai menyusun format tanggal/waktu. */
 export function pad2(n: number): string {
     return String(n).padStart(2, '0')
 }
@@ -25,6 +26,7 @@ export function formatIdDateTimeLabel(iso: string): string {
     return t ? `${base}, ${t.replace(':', '.')}` : base
 }
 
+/** Ubah string tanggal menjadi CalendarDate bila valid; dipakai binding nilai DatePicker. */
 export function modelValueToCalendarDate(value: string): CalendarDate | undefined {
     if (!value || value.length < 10) return undefined
     try {
@@ -34,6 +36,7 @@ export function modelValueToCalendarDate(value: string): CalendarDate | undefine
     }
 }
 
+/** Format nilai DatePicker menjadi string YYYY-MM-DD; dipakai saat menyimpan nilai tanggal. */
 export function calendarDateToYmd(value: DateValue | undefined): string {
     if (!value || !('year' in value) || !('month' in value) || !('day' in value)) return ''
     const d = value as CalendarDate
@@ -48,6 +51,7 @@ export function splitLocalDateTime(value: string): { date: CalendarDate | undefi
     return { date: modelValueToCalendarDate(datePart), time }
 }
 
+/** Gabungkan tanggal dan jam HH:mm menjadi string YYYY-MM-DDTHH:mm; dipakai pada field datetime. */
 export function combineLocalDateTime(date: CalendarDate | undefined, timeHHmm: string): string {
     if (!date) return ''
     const t = timeHHmm && timeHHmm.length >= 5 ? timeHHmm.slice(0, 5) : '00:00'

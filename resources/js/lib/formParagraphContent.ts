@@ -18,10 +18,12 @@ const URL_REGEX = /(?:https?:\/\/|www\.|(?:youtu\.be|youtube\.com)\/)[^\s<>"']+/
 
 const TRAILING_URL_PUNCTUATION = /[.,;:!?)\]}>]$/
 
+/** Escape karakter HTML pada teks mentah; dipakai sebelum menyisipkan konten paragraf ke HTML. */
 export function escapeHtml(text: string): string {
     return text.replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char] ?? char)
 }
 
+/** Tambahkan skema https:// pada URL yang belum berskema; dipakai saat membuat tautan dari teks paragraf. */
 export function normalizeLinkHref(url: string): string {
     if (/^https?:\/\//i.test(url)) return url
     return `https://${url}`
@@ -50,6 +52,7 @@ function linkifyEscapedLine(line: string): string {
     })
 }
 
+/** Ubah teks paragraf polos menjadi HTML aman (baris baru + tautan terdeteksi); dipakai merender konten paragraf field form. */
 export function formatParagraphContentToHtml(raw: string): string {
     const normalized = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
     if (!normalized.trim()) return ''

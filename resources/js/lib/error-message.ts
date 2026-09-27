@@ -161,6 +161,7 @@ const LARAVEL_ID_RULES: LaravelRulePattern[] = [
     { test: /^:.+ wajib diisi\.?$/i, build: (l) => `${l} wajib diisi.` },
 ]
 
+/** Seragamkan nilai error (string/array/null) menjadi string bersih; dipakai sebelum menerjemahkan pesan. */
 export function normalizeErrorText(value: string | string[] | undefined | null): string {
     if (value == null) return ''
     if (Array.isArray(value)) return normalizeErrorText(value[0])
@@ -181,6 +182,7 @@ function fieldNameFromKey(key: string): string {
     return key.split('.')[0] ?? key
 }
 
+/** Ubah key error menjadi label field yang ramah manusia; dipakai saat menampilkan pesan validasi. */
 export function humanizeFieldKey(key: string, ctx?: ErrorMessageContext): string {
     if (STATIC_FIELD_LABELS[key]) return STATIC_FIELD_LABELS[key]
 
@@ -200,6 +202,7 @@ export function humanizeFieldKey(key: string, ctx?: ErrorMessageContext): string
     return resolveFieldLabel(fieldNameFromKey(key), ctx)
 }
 
+/** Cari label field dari label statis/peta/metadata, lalu fallback nama ber-title-case; dipakai humanizer pesan. */
 export function resolveFieldLabel(name: string, ctx?: ErrorMessageContext): string {
     if (STATIC_FIELD_LABELS[name]) return STATIC_FIELD_LABELS[name]
     if (ctx?.fieldLabels?.[name]) return ctx.fieldLabels[name]
@@ -246,6 +249,7 @@ function translateLaravelMessage(message: string, label: string): string {
     return injectFieldLabel(message, label, label)
 }
 
+/** Terjemahkan pesan validasi backend ke Bahasa Indonesia; dipakai sebelum menampilkan error ke pengguna. */
 export function humanizeErrorMessage(
     raw: string | string[] | undefined,
     fieldKey?: string,
@@ -265,6 +269,7 @@ export function humanizeErrorMessage(
     return message
 }
 
+/** Ambil dan humanisasi pesan error satu field; dipakai binding error per field form. */
 export function getFieldError(
     errors: ValidationErrors,
     key: string,
@@ -275,6 +280,7 @@ export function getFieldError(
     return humanizeErrorMessage(message, key, ctx)
 }
 
+/** Ubah seluruh error validasi menjadi daftar baris berlabel siap tampil; dipakai saat merangkum validasi. */
 export function parseValidationErrors(
     errors: ValidationErrors,
     ctx?: ErrorMessageContext,
@@ -288,6 +294,7 @@ export function parseValidationErrors(
         })
 }
 
+/** Tampilkan toast validasi — ringkas untuk satu error, daftar untuk banyak error; dipakai setelah submit gagal validasi. */
 export function showValidationErrorToast(
     errors: ValidationErrors,
     ctx?: ErrorMessageContext & { title?: string },
@@ -317,6 +324,7 @@ export function showValidationErrorToast(
     })
 }
 
+/** Jembatan error Inertia ke toast validasi; dipakai di callback onError useForm. */
 export function handleInertiaFormErrors(
     errors: ValidationErrors,
     ctx?: ErrorMessageContext & { title?: string },
@@ -324,6 +332,7 @@ export function handleInertiaFormErrors(
     showValidationErrorToast(errors, ctx)
 }
 
+/** Ambil pesan error pertama dari body respons API dengan fallback; dipakai saat menangani respons HTTP gagal. */
 export function parseApiErrorMessage(body: unknown, fallback = 'Terjadi kesalahan. Coba lagi.'): string {
     if (!body || typeof body !== 'object') return fallback
 
@@ -345,6 +354,7 @@ export function parseApiErrorMessage(body: unknown, fallback = 'Terjadi kesalaha
     return fallback
 }
 
+/** Tampilkan toast untuk status HTTP gagal, pesan body diprioritaskan di atas peta bawaan; dipakai di penangan error HTTP. */
 export function showHttpErrorToast(
     status: number,
     body?: unknown,
@@ -371,6 +381,7 @@ export function showHttpErrorToast(
     toast.error(defaults[status] ?? `Permintaan gagal (kode ${status}).`)
 }
 
+/** Tampilkan toast error generik dengan opsi judul/deskripsi/durasi; dipakai untuk pesan error non-validasi. */
 export function showErrorToast(
     message: string,
     options?: { title?: string; description?: string; duration?: number },
@@ -391,6 +402,7 @@ export function showErrorToast(
     })
 }
 
+/** Tampilkan toast dari flash message session (sukses atau gagal); dipakai setelah redirect Inertia. */
 export function showFlashToast(flash: { type?: string; message?: string } | null | undefined): void {
     if (!flash?.message) return
 
@@ -408,6 +420,7 @@ export function showEventValidationToast(errors: ValidationErrors): void {
     showValidationErrorToast(errors, { title: 'Validasi gagal' })
 }
 
+/** Bangun peta nama field ke label untuk humanisasi error; dipakai halaman yang butuh label field cepat. */
 export function buildFieldLabelMap(fields: IFormField[]): Record<string, string> {
     const map: Record<string, string> = {}
     for (const field of fields) {

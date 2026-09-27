@@ -35,6 +35,7 @@ export interface ScanResult {
     queueNumber: number | null
 }
 
+/** Ambil kode kandidat dari teks hasil scan (JSON atau teks polos); dipakai saat memproses QR masuk. */
 export function extractQrCandidate(decodedText: string): string {
     const raw = decodedText.trim()
     if (!raw.startsWith('{') || !raw.endsWith('}')) {
@@ -56,6 +57,7 @@ export function extractQrCandidate(decodedText: string): string {
     return raw
 }
 
+/** Bentuk entri riwayat scan dari hasil scan; dipakai untuk menambah baris riwayat scan. */
 export function createScanHistoryEntry(result: ScanResult): ScanEntry {
     return {
         id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -110,6 +112,7 @@ function readQueueNumber(record: Record<string, unknown>, key: string): number |
     return typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
+/** Cek bentuk payload feed scan global; dipakai sebagai guard sebelum mem-parse feed. */
 export function isGlobalScanFeedPayload(payload: unknown): boolean {
     if (!isRecord(payload)) {
         return false
@@ -118,6 +121,7 @@ export function isGlobalScanFeedPayload(payload: unknown): boolean {
     return Array.isArray(payload.rows)
 }
 
+/** Parse baris feed scan global menjadi daftar terketik sambil melewati baris rusak; dipakai saat memuat feed scan. */
 export function parseGlobalScanFeedRows(payload: unknown): GlobalScanFeedRow[] {
     if (!isRecord(payload)) {
         return []
@@ -148,6 +152,7 @@ export function parseGlobalScanFeedRows(payload: unknown): GlobalScanFeedRow[] {
     return rows
 }
 
+/** Ambil cursor pagination dari payload feed scan global; dipakai untuk memuat halaman feed berikutnya. */
 export function parseGlobalScanCursor(payload: unknown): string {
     if (!isRecord(payload)) {
         return ''
@@ -156,6 +161,7 @@ export function parseGlobalScanCursor(payload: unknown): string {
     return readString(payload, 'cursor')
 }
 
+/** Bunyikan beep (dan getar) sesuai status scan; dipakai sebagai umpan balik setelah scan QR. */
 export function playScanBeep(status: ScanStatus): void {
     try {
         const ctx = new AudioContext()

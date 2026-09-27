@@ -1,15 +1,18 @@
 import { formatSubmissionDateTime } from './format';
 
+/** Format tanggal-waktu submission ke tampilan id-ID; dipakai di tabel/detail submission. */
 export function formatSubmissionDate(value: string): string {
     return formatSubmissionDateTime(value);
 }
 
+/** Ubah key jawaban menjadi label dari peta field, fallback nama ber-spasi; dipakai saat menampilkan jawaban. */
 export function humanizeSubmissionKey(fieldLabelMap: Record<string, string>, value: string): string {
     return fieldLabelMap[value] || value.replace(/^field_/, '').replace(/_/g, ' ');
 }
 
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 
+/** Buat pratinjau singkat nilai jawaban untuk daftar; dipakai di ringkasan jawaban submission. */
 export function answerPreview(value: unknown): string {
     if (Array.isArray(value)) return value.map(String).join(', ');
     if (typeof value === 'string') return value;
@@ -18,6 +21,7 @@ export function answerPreview(value: unknown): string {
     return 'Jawaban terstruktur';
 }
 
+/** Resolve URL berkas jawaban submission atau null bila kosong; dipakai untuk tautan unduh lampiran. */
 export function submissionFileUrl(value: unknown): string | null {
     if (typeof value !== 'string') {
         return null;
@@ -29,6 +33,7 @@ export function submissionFileUrl(value: unknown): string | null {
     return normalizeBannerSrc(t);
 }
 
+/** Terjemahkan label pagination bawaan (Previous/Next) ke Bahasa Indonesia; dipakai di kontrol pagination submission. */
 export function submissionPaginationLabel(value: string): string {
     return value
         .replace('&laquo;', 'Sebelumnya')

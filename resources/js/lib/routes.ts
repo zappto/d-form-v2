@@ -196,10 +196,12 @@ export const routes = {
     },
 } as const;
 
+/** Ambil path URL tanpa query string; dipakai membandingkan rute aktif. */
 export function pathWithoutQuery(url: string): string {
     return url.split('?')[0] ?? '';
 }
 
+/** Cek apakah href sidebar cocok dengan URL aktif (termasuk aturan khusus sub-rute); dipakai menandai menu aktif. */
 export function isSidebarNavActive(href: string, currentUrl: string): boolean {
     const path = pathWithoutQuery(currentUrl);
 
@@ -242,6 +244,7 @@ export function isSidebarNavActive(href: string, currentUrl: string): boolean {
     return path.startsWith(href);
 }
 
+/** Tentukan href tujuan tombol kembali navbar saat tidak ada history; dipakai sebagai fallback navigasi mobile. */
 export function resolveNavbarFallbackBackHref(currentUrl: string): string {
     const path = pathWithoutQuery(currentUrl);
 

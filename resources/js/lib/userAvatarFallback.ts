@@ -15,11 +15,13 @@ function hashSeed(seed: string): number {
     return Math.abs(h)
 }
 
+/** Pilih indeks palet fallback avatar secara stabil dari seed; dipakai saat pengguna tanpa foto profil. */
 export function userAvatarFallbackPaletteIndex(seed: string): number {
     if (!seed) return 0
     return hashSeed(seed) % USER_AVATAR_FALLBACK_PALETTE.length
 }
 
+/** Ambil kelas warna background+ikon fallback avatar untuk seed tertentu; dipakai merender avatar tanpa foto. */
 export function userAvatarFallbackClasses(seed: string): { bg: string; icon: string } {
     return USER_AVATAR_FALLBACK_PALETTE[userAvatarFallbackPaletteIndex(seed)]!
 }

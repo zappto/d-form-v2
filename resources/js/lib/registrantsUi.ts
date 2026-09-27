@@ -41,6 +41,7 @@ export const REGISTRANTS_TONE_STYLES: Record<
     },
 }
 
+/** Kelas badge warna untuk status registran; dipakai di tabel/daftar registran. */
 export function registrantStatusBadgeClass(s: IRegistrant['status']): string {
     if (s === 'accepted') return 'bg-success/10 text-success ring-success/15'
     if (s === 'rejected') return 'bg-destructive/10 text-destructive ring-destructive/15'
@@ -54,6 +55,7 @@ export function registrantStatusLabel(s: IRegistrant['status']): string {
     return 'Menunggu'
 }
 
+/** Ubah tanggal menjadi waktu relatif Bahasa Indonesia (mis. "5 menit lalu"); dipakai di daftar registran. */
 export function registrantRelativeTimeId(dateStr: string): string {
     const diff = Date.now() - new Date(dateStr).getTime()
     const minutes = Math.floor(diff / 60000)

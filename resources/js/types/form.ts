@@ -84,6 +84,7 @@ export interface CreateDashboardFormPayload {
     fields: BackendField[]
 }
 
+/** Metadata registrasi form kosong untuk inisialisasi halaman create; dipakai saat form belum dikonfigurasi. */
 export function emptyFormRegistrationMetadata(): FormRegistrationMetadata {
     return {
         purpose: 'registration',
@@ -94,6 +95,7 @@ export function emptyFormRegistrationMetadata(): FormRegistrationMetadata {
     }
 }
 
+/** Parse metadata registrasi dari payload backend menjadi bentuk terketik dengan default aman; dipakai saat memuat form. */
 export function parseFormRegistrationMetadata(raw: unknown): FormRegistrationMetadata {
     const m =
         raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {}

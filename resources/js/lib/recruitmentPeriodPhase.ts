@@ -63,14 +63,17 @@ const STATUS_LABELS: Record<PeriodStatusValue, string> = {
     archived: 'Diarsipkan',
 }
 
+/** Label Bahasa Indonesia untuk satu fase periode; dipakai di badge/status periode. */
 export function phaseLabel(phase: PeriodPhase): string {
     return PHASE_LABELS[phase]
 }
 
+/** Label Bahasa Indonesia untuk satu status periode; dipakai di badge status periode. */
 export function statusLabel(status: PeriodStatusValue): string {
     return STATUS_LABELS[status]
 }
 
+/** Tentukan fase periode aktif dari jadwal registrasi/interview/finalisasi; dipakai untuk menampilkan tahap periode. */
 export function resolvePeriodPhase(input: PeriodPhaseInput, now: Date = new Date()): PeriodPhase {
     if (input.status === 'archived') return 'archived'
     if (input.status === 'draft') return 'draft'
@@ -97,6 +100,7 @@ export function resolvePeriodPhase(input: PeriodPhaseInput, now: Date = new Date
     return 'overdue'
 }
 
+/** Tanggal tenggat untuk satu fase periode (null bila tak ada); dipakai menghitung countdown fase. */
 export function phaseDeadline(phase: PeriodPhase, input: PeriodPhaseInput): Date | null {
     switch (phase) {
         case 'not_open':
@@ -122,6 +126,7 @@ const COUNTDOWN_ACTIONS: Partial<Record<PeriodPhase, string>> = {
     finalization: 'tenggat finalisasi',
 }
 
+/** Teks countdown sisa hari menuju tenggat fase (null bila tidak relevan); dipakai di kartu periode. */
 export function phaseCountdownLabel(phase: PeriodPhase, days: number | null): string | null {
     if (days === null) return null
     const action = COUNTDOWN_ACTIONS[phase]
@@ -129,6 +134,7 @@ export function phaseCountdownLabel(phase: PeriodPhase, days: number | null): st
     return days === 0 ? `${action} hari ini` : `${action} dalam ${days} hari`
 }
 
+/** Hitung selisih hari utuh menuju target (minimal 0); dipakai untuk countdown periode. */
 export function daysRemaining(target: Date | null, now: Date = new Date()): number | null {
     if (!target) return null
     const diff = target.getTime() - now.getTime()

@@ -19,6 +19,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
+/** Ambil metadata field sebagai objek (mendukung JSON string dan array); dipakai sebelum membaca rules/flag field. */
 export function readFieldMetadata(field: IFormField): FormFieldMetadataBag {
     let m: unknown = field.metadata
     if (typeof m === 'string' && m.trim()) {
@@ -30,6 +31,7 @@ export function readFieldMetadata(field: IFormField): FormFieldMetadataBag {
     return isPlainObject(m) ? m : {}
 }
 
+/** Ambil objek rules dari metadata field; dipakai untuk validasi dan render aturan field. */
 export function readFieldRules(field: IFormField): FormFieldRules {
     const raw = readFieldMetadata(field).rules
     return isPlainObject(raw) ? (raw as FormFieldRules) : {}

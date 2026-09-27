@@ -6,6 +6,7 @@ type RecruitmentAuthUser = {
     can_screen_recruitment_applications?: boolean
 }
 
+/** Tentukan boleh-tidaknya kirim ulang tautan tracking pelamar; dipakai menyembunyikan tombol resend di detail pelamar. */
 export function applicantAllowsTrackingResend(application: ApplicationDetail): boolean {
     if (application.can_resend_tracking === true) {
         return true
@@ -18,6 +19,7 @@ export function applicantAllowsTrackingResend(application: ApplicationDetail): b
     return application.personal_email.trim().length > 0
 }
 
+/** Tentukan izin pengguna mengirim ulang tautan tracking dari role/permission-nya; dipakai sebagai gerbang aksi resend. */
 export function userAllowsTrackingResend(user: RecruitmentAuthUser | null | undefined): boolean {
     if (!user) {
         return false
