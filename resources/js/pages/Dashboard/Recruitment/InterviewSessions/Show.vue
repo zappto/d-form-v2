@@ -66,8 +66,8 @@ const props = defineProps<{
 
 const selectedApplicants = ref<string[]>([]);
 
-const scheduleForm = useForm({
-    application_ids: [] as string[],
+const scheduleForm = useForm<{ application_ids: string[] }>({
+    application_ids: [],
 });
 
 const reassignValues = ref<Record<string, string>>({});

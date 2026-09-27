@@ -10,11 +10,10 @@ import HomeFAQ from '@/components/modules/landing/home/HomeFAQ.vue';
 import HomeCTA from '@/components/modules/landing/home/HomeCTA.vue';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import type { ISharedSeoProps } from '@/types/seo';
 import { routes } from '@/lib/routes';
 
 const page = usePage();
-const seo = computed(() => (page.props as { seo: ISharedSeoProps }).seo);
+const seo = computed(() => page.props.seo);
 
 const jsonLd = computed<TJsonLd[]>((): TJsonLd[] => {
     const base = seo.value.siteUrl;

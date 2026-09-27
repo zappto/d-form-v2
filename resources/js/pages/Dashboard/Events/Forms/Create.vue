@@ -82,7 +82,7 @@ function onSave(): void {
     createForm.metadata = toFormMetadataPayload(formMetadata.value);
 
     const merged = prependFormBannerToBackendPayload(formFields.value, bannerState.value);
-    createForm.fields = toBackendFields(merged) as object[];
+    createForm.fields = toBackendFields(merged);
 
     isSaving.value = true;
     createForm.post(routes.admin.events.forms.store(props.event.id), {

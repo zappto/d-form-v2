@@ -92,6 +92,24 @@ function initialFormState(): Record<string, TFormFillAnswerValue> {
 
 const confirmForm = useForm(initialFormState());
 
+/** Jawaban teks field undangan; nilai non-string (array/file/null) dipetakan ke string kosong. */
+function textAnswer(name: string): string {
+    const value = confirmForm[name];
+    return typeof value === 'string' ? value : '';
+}
+
+/** Tulis jawaban teks; angka dari input dikonversi ke string agar konsisten dengan nilai server. */
+function setTextAnswer(name: string, value: string | number): void {
+    confirmForm[name] = String(value);
+}
+
+/** Set jawaban file dari input file; abaikan event yang bukan input. */
+function onFileAnswerChange(name: string, event: Event): void {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    confirmForm[name] = target.files?.[0] ?? null;
+}
+
 /** Cek objek peta nilai draft JSON; param `unknown` dipertahankan sebagai batas penyempitan. */
 function isDraftValuesMap(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null;
@@ -339,7 +357,8 @@ function submitDeclineFromDialog() {
                                             builderType(field)
                                         ) && !readFieldMetadata(field).is_multiple
                                     "
-                                    v-model="confirmForm[field.name] as string"
+                                    :model-value="textAnswer(field.name)"
+                                    @update:model-value="setTextAnswer(field.name, $event)"
                                     class="min-h-11"
                                 />
                                 <Textarea
@@ -348,12 +367,14 @@ function submitDeclineFromDialog() {
                                         builderType(field) === 'address' ||
                                         field.type === 'textarea'
                                     "
-                                    v-model="confirmForm[field.name] as string"
+                                    :model-value="textAnswer(field.name)"
+                                    @update:model-value="setTextAnswer(field.name, $event)"
                                     rows="4"
                                 />
                                 <DatePicker
                                     v-else-if="builderType(field) === 'date' || field.type === 'datePicker'"
-                                    v-model="confirmForm[field.name] as string"
+                                    :model-value="textAnswer(field.name)"
+                                    @update:model-value="setTextAnswer(field.name, $event)"
                                 />
                                 <div
                                     v-else-if="
@@ -401,7 +422,7 @@ function submitDeclineFromDialog() {
                                             type="radio"
                                             :name="field.name"
                                             :value="row.label"
-                                            :checked="(confirmForm[field.name] as string) === row.label"
+                                            :checked="textAnswer(field.name) === row.label"
                                             class="size-4 accent-primary"
                                             @change="confirmForm[field.name] = row.label"
                                         />
@@ -417,7 +438,8 @@ function submitDeclineFromDialog() {
                                 </div>
                                 <SearchableSelect
                                     v-else-if="field.type === 'select'"
-                                    v-model="confirmForm[field.name] as string"
+                                    :model-value="textAnswer(field.name)"
+                                    @update:model-value="setTextAnswer(field.name, $event)"
                                     :options="dropdownOptions(field)"
                                     :id="`invite-select-${field.name}`"
                                     placeholder="Select"
@@ -446,11 +468,7 @@ function submitDeclineFromDialog() {
                                         <input
                                             type="file"
                                             class="w-full text-xs"
-                                            @change="
-                                                (e) =>
-                                                    (confirmForm[field.name] =
-                                                        (e.target as HTMLInputElement).files?.[0] ?? null)
-                                            "
+                                            @change="onFileAnswerChange(field.name, $event)"
                                         />
                                     </div>
                                 </div>

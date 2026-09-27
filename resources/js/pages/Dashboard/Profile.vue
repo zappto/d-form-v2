@@ -127,8 +127,9 @@ function commitAvatarRemoval(): void {
 }
 
 function onAvatarFileChange(ev: Event): void {
-    const input = ev.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const target = ev.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    const file = target.files?.[0];
     if (!file) {
         clearPendingAvatar();
         return;

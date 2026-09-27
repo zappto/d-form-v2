@@ -41,6 +41,26 @@ interface IApplicationFormData {
     twibbon_url: string | null;
 }
 
+type TPortfolioType = 'none' | 'url' | 'file';
+
+interface ITrackEditFormData {
+    full_name: string;
+    nim: string;
+    semester: string;
+    phone: string;
+    personal_email: string;
+    student_email: string;
+    instagram_username: string;
+    primary_division_id: string;
+    secondary_division_id: string;
+    portfolio_type: TPortfolioType;
+    portfolio_url: string;
+    portfolio_file: File | null;
+    cv: File | null;
+    instagram_follow_proof: File | null;
+    twibbon_url: string;
+}
+
 const props = defineProps<{
     application: IApplicationFormData | undefined;
     divisions: IDivisionOption[] | undefined;
@@ -48,7 +68,12 @@ const props = defineProps<{
     dashboardUrl: string;
 }>();
 
-const form = useForm({
+/** Normalisasi portfolio_type dari server ke union; nilai tak dikenal dipetakan ke 'none'. */
+function normalizePortfolioType(value: string | undefined): TPortfolioType {
+    return value === 'url' || value === 'file' ? value : 'none';
+}
+
+const form = useForm<ITrackEditFormData>({
     full_name: props.application?.full_name ?? '',
     nim: props.application?.nim ?? '',
     semester: String(props.application?.semester ?? ''),
@@ -58,11 +83,11 @@ const form = useForm({
     instagram_username: props.application?.instagram_username ?? '',
     primary_division_id: props.application?.primary_division_id ?? '',
     secondary_division_id: props.application?.secondary_division_id ?? '',
-    portfolio_type: (props.application?.portfolio_type as 'url' | 'file' | 'none') || 'none',
+    portfolio_type: normalizePortfolioType(props.application?.portfolio_type),
     portfolio_url: props.application?.portfolio_url ?? '',
-    portfolio_file: null as File | null,
-    cv: null as File | null,
-    instagram_follow_proof: null as File | null,
+    portfolio_file: null,
+    cv: null,
+    instagram_follow_proof: null,
     twibbon_url: props.application?.twibbon_url ?? '',
 });
 
@@ -126,19 +151,22 @@ const instagramFollowHint = computed(() =>
         : 'Unggah screenshot follow Instagram (jpg/jpeg/png/webp)'
 );
 
-function onCvChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    form.cv = target.files?.[0] ?? null;
+/** File terpilih dari input file; null bila event bukan input file. */
+function readSelectedFile(event: Event): File | null {
+    const target = event.target;
+    return target instanceof HTMLInputElement ? (target.files?.[0] ?? null) : null;
 }
 
-function onPortfolioFileChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    form.portfolio_file = target.files?.[0] ?? null;
+function onCvChange(event: Event): void {
+    form.cv = readSelectedFile(event);
 }
 
-function onInstagramFollowChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    form.instagram_follow_proof = target.files?.[0] ?? null;
+function onPortfolioFileChange(event: Event): void {
+    form.portfolio_file = readSelectedFile(event);
+}
+
+function onInstagramFollowChange(event: Event): void {
+    form.instagram_follow_proof = readSelectedFile(event);
 }
 
 function submit(): void {
@@ -176,8 +204,6 @@ const portfolioUrlRadio = ref<HTMLButtonElement | null>(null);
 const portfolioFileRadio = ref<HTMLButtonElement | null>(null);
 const portfolioNoneRadio = ref<HTMLButtonElement | null>(null);
 
-type TPortfolioType = 'none' | 'url' | 'file';
-
 function focusPortfolioRadio(value: TPortfolioType): void {
     const target =
         value === 'url'
@@ -190,7 +216,7 @@ function focusPortfolioRadio(value: TPortfolioType): void {
 
 function onPortfolioTypeKeydown(event: KeyboardEvent): void {
     const order: TPortfolioType[] = ['none', 'url', 'file'];
-    const current = order.indexOf(form.portfolio_type as TPortfolioType);
+    const current = order.indexOf(form.portfolio_type);
     let next: number | null = null;
     switch (event.key) {
         case 'ArrowRight':

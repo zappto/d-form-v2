@@ -8,7 +8,6 @@ import EventList from '@/components/modules/landing/events/EventList.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import type { ISharedSeoProps } from '@/types/seo';
 import { routes } from '@/lib/routes';
 
 const props = defineProps<{
@@ -16,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
-const seo = computed(() => (page.props as { seo: ISharedSeoProps }).seo);
+const seo = computed(() => page.props.seo);
 
 const listDescription = computed(
     () =>

@@ -56,6 +56,19 @@ function applyFilters(periodId: string, action: string) {
 
 /** Skeleton daftar selama partial visit filter (pola M2 Task 1). */
 const isLoadingLogs = ref(false);
+
+/** Nilai teks dari event input/select/textarea; string kosong bila target bukan elemen bernilai. */
+function fieldValue(event: Event): string {
+    const target = event.target;
+    if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLSelectElement ||
+        target instanceof HTMLTextAreaElement
+    ) {
+        return target.value;
+    }
+    return '';
+}
 </script>
 
 <template>
@@ -67,7 +80,7 @@ const isLoadingLogs = ref(false);
                 <select
                     class="h-9 rounded-md border border-input bg-background px-3 text-sm"
                     :value="query.period_id ?? ''"
-                    @change="applyFilters(($event.target as HTMLSelectElement).value, query.action ?? '')"
+                    @change="applyFilters(fieldValue($event), query.action ?? '')"
                 >
                     <option value="">Semua periode</option>
                     <option v-for="period in periodOptions" :key="period.id" :value="period.id">
@@ -79,7 +92,7 @@ const isLoadingLogs = ref(false);
                     class="h-9 min-w-[200px] flex-1 rounded-md border border-input bg-background px-3 text-sm"
                     placeholder="Filter action..."
                     :value="query.action ?? ''"
-                    @change="applyFilters(query.period_id ?? '', ($event.target as HTMLInputElement).value)"
+                    @change="applyFilters(query.period_id ?? '', fieldValue($event))"
                 />
             </CardContent>
         </Card>

@@ -350,9 +350,15 @@ const participantCountLabel = computed<string>(() => {
 
 const validTabs = ['peserta', 'interview', 'laporan', 'interviewer'] as const;
 type TabValue = (typeof validTabs)[number];
+const validTabSet: ReadonlySet<string> = new Set(validTabs);
+
+/** Predikat tab valid; menormalisasi nilai URL bebas menjadi `TabValue`. */
+function isTabValue(value: string): value is TabValue {
+    return validTabSet.has(value);
+}
 
 function normalizeTab(value: string): TabValue {
-    return (validTabs as readonly string[]).includes(value) ? (value as TabValue) : 'peserta';
+    return isTabValue(value) ? value : 'peserta';
 }
 
 const activeTab = ref<TabValue>(normalizeTab(props.tab));
@@ -365,7 +371,7 @@ watch(
 
 function onTabChange(value: string | number): void {
     const next = String(value);
-    if (!(validTabs as readonly string[]).includes(next)) return;
+    if (!isTabValue(next)) return;
     if (next === activeTab.value) return;
     router.get(
         routes.admin.recruitment.periods.show(props.period.id),

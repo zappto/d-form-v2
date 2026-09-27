@@ -17,7 +17,18 @@ import { BannerPickerField } from '@/components/core/field';
 
 defineOptions({ layout: DashboardLayout });
 
-const form = useForm({
+interface IPeriodFormData {
+    name: string;
+    description: string;
+    registration_opens_at: string;
+    registration_closes_at: string;
+    interview_starts_at: string;
+    interview_ends_at: string;
+    finalization_deadline_at: string;
+    banner: File | null;
+}
+
+const form = useForm<IPeriodFormData>({
     name: '',
     description: '',
     registration_opens_at: '',
@@ -25,7 +36,7 @@ const form = useForm({
     interview_starts_at: '',
     interview_ends_at: '',
     finalization_deadline_at: '',
-    banner: null as File | null,
+    banner: null,
 });
 
 onMounted(() => {

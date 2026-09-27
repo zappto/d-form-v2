@@ -47,7 +47,18 @@ function toDateInput(value: string | null): string {
 
 const existingBannerUrl = computed<string | null>(() => props.period?.banner_url ?? null);
 
-const form = useForm({
+interface IPeriodFormData {
+    name: string;
+    description: string;
+    registration_opens_at: string;
+    registration_closes_at: string;
+    interview_starts_at: string;
+    interview_ends_at: string;
+    finalization_deadline_at: string;
+    banner: File | null;
+}
+
+const form = useForm<IPeriodFormData>({
     name: props.period?.name ?? '',
     description: props.period?.description ?? '',
     registration_opens_at: toDatetimeLocal(props.period?.registration_opens_at ?? null),
@@ -55,7 +66,7 @@ const form = useForm({
     interview_starts_at: toDateInput(props.period?.interview_starts_at ?? null),
     interview_ends_at: toDateInput(props.period?.interview_ends_at ?? null),
     finalization_deadline_at: toDateInput(props.period?.finalization_deadline_at ?? null),
-    banner: null as File | null,
+    banner: null,
 });
 
 onMounted(() => {

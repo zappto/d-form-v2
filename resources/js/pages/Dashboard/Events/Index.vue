@@ -78,7 +78,7 @@ const sessionFilterOptions = computed(() => [{ value: 'all', label: 'Semua sesi'
 function readQueryFromProps() {
     suppressFilterApply = true;
     const q = props.query;
-    searchQuery.value = (q?.search as string) ?? '';
+    searchQuery.value = q?.search ?? '';
     filterCategory.value = q?.filter?.categories?.[0] ?? 'all';
     filterSession.value = q?.filter?.sessions?.[0] ?? 'all';
     void nextTick(() => {
@@ -118,7 +118,7 @@ const isLoadingEvents = ref(false);
 
 function applyFilters() {
     if (suppressFilterApply) return;
-    router.get(eventsIndex().url, buildQueryParams() as never, {
+    router.get(eventsIndex().url, buildQueryParams(), {
         preserveState: true,
         preserveScroll: true,
         only: ['events', 'query'],
@@ -134,7 +134,7 @@ function applyFilters() {
 watch([filterCategory, filterSession], applyFilters);
 
 function goToPage(page: number) {
-    router.get(eventsIndex().url, buildQueryParams(page) as never, {
+    router.get(eventsIndex().url, buildQueryParams(page), {
         preserveState: true,
         preserveScroll: true,
         only: ['events', 'query'],

@@ -418,7 +418,8 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
                 body: JSON.stringify({ review_status }),
             });
 
-            const body = (await res.json().catch(() => ({}))) as { message?: string };
+            // Batas luar `fetch`: body mentah diverifikasi oleh parseApiErrorMessage/showHttpErrorToast.
+            const body: unknown = await res.json().catch(() => ({}));
 
             if (!res.ok) {
                 showHttpErrorToast(res.status, body, {

@@ -32,11 +32,10 @@ import {
 import SeoHead from '@/components/seo/SeoHead.vue';
 import type { TJsonLd } from '@/components/seo/SeoHead.vue';
 import { usePage } from '@inertiajs/vue3';
-import type { ISharedSeoProps } from '@/types/seo';
 import { routes } from '@/lib/routes';
 
 const page = usePage();
-const seo = computed(() => (page.props as { seo: ISharedSeoProps }).seo);
+const seo = computed(() => page.props.seo);
 
 const docsDescription = computed(
     () =>
