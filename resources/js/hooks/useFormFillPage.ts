@@ -420,4 +420,4 @@ export function useFormFillPage(props: {
     };
 }
 
-export type FormFillPageContext = ReturnType<typeof useFormFillPage>;
+export type TFormFillPageContext = ReturnType<typeof useFormFillPage>;

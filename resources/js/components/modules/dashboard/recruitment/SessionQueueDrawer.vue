@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { useRecruitmentQueue, type QueueEntryRow, type QueueSnapshot } from '@/hooks/useRecruitmentQueue';
+import { useRecruitmentQueue, type IQueueEntryRow, type IQueueSnapshot } from '@/hooks/useRecruitmentQueue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { padQueueNumber } from '@/lib/format';
 import { FORM_SHEET_FOOTER_CLASS, FORM_SHEET_HEADER_CLASS } from './formSheetClasses';
@@ -12,7 +12,7 @@ const props = defineProps<{
     division: string | null;
 }>();
 
-const EMPTY_SNAPSHOT: QueueSnapshot = {
+const EMPTY_SNAPSHOT: IQueueSnapshot = {
     entries: [],
     current: null,
     next: null,
@@ -54,11 +54,11 @@ function queueNumber(value: number): string {
     return `#${padQueueNumber(value)}`;
 }
 
-const waitingEntries = computed<QueueEntryRow[]>((): QueueEntryRow[] =>
+const waitingEntries = computed<IQueueEntryRow[]>((): IQueueEntryRow[] =>
     queue.value.entries
-        .filter((entry: QueueEntryRow): boolean => entry.status === 'waiting')
+        .filter((entry: IQueueEntryRow): boolean => entry.status === 'waiting')
         .slice()
-        .sort((a: QueueEntryRow, b: QueueEntryRow): number => a.queue_number - b.queue_number)
+        .sort((a: IQueueEntryRow, b: IQueueEntryRow): number => a.queue_number - b.queue_number)
 );
 
 interface StatItem {

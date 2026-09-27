@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { submissionPaginationLabel } from '@/lib/formSubmissionsUi';
 
-interface PaginationLink {
+interface IPaginationLink {
     url: string | null;
     label: string;
     active: boolean;
@@ -11,7 +11,7 @@ interface PaginationLink {
 
 withDefaults(
     defineProps<{
-        links: PaginationLink[] | undefined;
+        links: IPaginationLink[] | undefined;
         currentPage: number;
         lastPage: number;
         total: number;

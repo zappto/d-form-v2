@@ -4,7 +4,7 @@ import { config, mount, type VueWrapper } from '@vue/test-utils';
 import QueueShow from '../Show.vue';
 import QueueDisplay from '@/pages/OpenRecruitment/QueueDisplay.vue';
 import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/SessionQueueDrawer.vue';
-import { useRecruitmentQueue, type QueueEntryRow, type QueueSnapshot } from '@/hooks/useRecruitmentQueue';
+import { useRecruitmentQueue, type IQueueEntryRow, type IQueueSnapshot } from '@/hooks/useRecruitmentQueue';
 import { showErrorToast } from '@/lib/error-message';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
@@ -49,7 +49,7 @@ vi.mock('vue-sonner', () => ({
 
 interface QueueApi {
     // Refs setup kembali ter-unwrap di vm proxy.
-    queue: QueueSnapshot;
+    queue: IQueueSnapshot;
     isInitialLoading: boolean;
     refresh: () => Promise<void>;
 }
@@ -60,12 +60,12 @@ const QueueHarness = defineComponent({
         initial: { type: Object, required: true },
     },
     setup(props) {
-        return useRecruitmentQueue(props.pollUrl, props.initial as QueueSnapshot);
+        return useRecruitmentQueue(props.pollUrl, props.initial as IQueueSnapshot);
     },
     template: '<div />',
 });
 
-function mountHarness(initial: QueueSnapshot): VueWrapper<InstanceType<typeof QueueHarness>> {
+function mountHarness(initial: IQueueSnapshot): VueWrapper<InstanceType<typeof QueueHarness>> {
     return mount(QueueHarness, {
         props: { pollUrl: '/queue/poll', initial },
     });
@@ -75,7 +75,7 @@ function harnessApi(wrapper: VueWrapper): QueueApi {
     return wrapper.vm as unknown as QueueApi;
 }
 
-function demoEntry(id: string, queueNumber: number, status: string, name: string): QueueEntryRow {
+function demoEntry(id: string, queueNumber: number, status: string, name: string): IQueueEntryRow {
     return {
         id,
         queue_number: queueNumber,
@@ -87,7 +87,7 @@ function demoEntry(id: string, queueNumber: number, status: string, name: string
     };
 }
 
-function demoSnapshot(): QueueSnapshot {
+function demoSnapshot(): IQueueSnapshot {
     return {
         entries: [demoEntry('qe-1', 1, 'called', 'Budi Santoso'), demoEntry('qe-2', 2, 'waiting', 'Siti Aminah')],
         current: demoEntry('qe-1', 1, 'called', 'Budi Santoso'),
@@ -96,7 +96,7 @@ function demoSnapshot(): QueueSnapshot {
     };
 }
 
-function emptySnapshot(): QueueSnapshot {
+function emptySnapshot(): IQueueSnapshot {
     return {
         entries: [],
         current: null,
@@ -132,7 +132,7 @@ function resolveGetWith(data: unknown): Promise<void> {
     return flushPromises();
 }
 
-function mountQueueShow(queue: QueueSnapshot): VueWrapper<InstanceType<typeof QueueShow>> {
+function mountQueueShow(queue: IQueueSnapshot): VueWrapper<InstanceType<typeof QueueShow>> {
     return mount(QueueShow, {
         props: {
             session: {

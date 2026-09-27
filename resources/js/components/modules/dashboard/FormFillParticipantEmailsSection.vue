@@ -5,7 +5,7 @@ import { usePage } from '@inertiajs/vue3';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import type { FormFillPageContext } from '@/hooks/useFormFillPage';
+import type { TFormFillPageContext } from '@/hooks/useFormFillPage';
 import { CheckCircle2, ChevronDown, Loader2, UserRound, XCircle } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
 import { humanizeErrorMessage } from '@/lib/error-message';
@@ -63,7 +63,7 @@ interface FoundUser {
 }
 
 const props = defineProps<{
-    ctx: UnwrapNestedRefs<FormFillPageContext>;
+    ctx: UnwrapNestedRefs<TFormFillPageContext>;
 }>();
 
 const page = usePage();

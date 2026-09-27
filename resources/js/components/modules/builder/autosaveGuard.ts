@@ -1,7 +1,7 @@
 import type { BackendField, BuilderField } from '@/types/form-builder';
 import { diffBackendFields, type DirtyFieldsDiff } from '@/components/modules/builder/dirtyFields';
 import { toBackendFields } from '@/components/modules/builder/fieldMapping';
-import { prependFormBannerToBackendPayload, type FormBannerState } from '@/components/modules/builder/formBanner';
+import { prependFormBannerToBackendPayload, type TFormBannerState } from '@/components/modules/builder/formBanner';
 
 /**
  * Guard hydrate anti-timpa (Fase 1-B): lewati hydrate bila draft id SAMA dan
@@ -36,7 +36,7 @@ export interface UnloadBeaconPayload {
  */
 export function buildUnloadPayload(args: {
     canvasFields: BuilderField[];
-    banner: FormBannerState;
+    banner: TFormBannerState;
     lastSent: BackendField[] | null;
 }): UnloadBeaconPayload | null {
     const merged = prependFormBannerToBackendPayload(args.canvasFields, args.banner);

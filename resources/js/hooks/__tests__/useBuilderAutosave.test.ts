@@ -50,13 +50,13 @@ function freshBuilderState(): IBuilderAutosaveState {
     };
 }
 
-interface TestBed {
+interface ITestBed {
     state: IBuilderAutosaveState;
     hook: IBuilderAutosaveResult;
 }
 
 /** Hook + state live untuk satu skenario (baselines internal milik hook). */
-function createBed(): TestBed {
+function createBed(): ITestBed {
     const state = freshBuilderState();
     const hook = useBuilderAutosave({
         getState: () => state,
@@ -69,7 +69,7 @@ function createBed(): TestBed {
 }
 
 /** Bed ter-hydrate ala mount (baselines = state awal), siap untuk mutasi. */
-function createHydratedBed(formId: string): TestBed {
+function createHydratedBed(formId: string): ITestBed {
     const bed = createBed();
     bed.hook.registerHydrated(formId);
     return bed;

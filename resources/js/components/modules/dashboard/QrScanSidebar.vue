@@ -6,14 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Clock3, QrCode } from 'lucide-vue-next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SCAN_STATUS_THEME, type IScanEntry, type IScanResult } from '@/lib/qrScanUi';
+import { SCAN_STATUS_THEME, type TIScanEntry, type TIScanResult } from '@/lib/qrScanUi';
 import { padQueueNumber } from '@/lib/format';
 
 const props = withDefaults(
     defineProps<{
-        scanResult: IScanResult | null;
-        scanHistory: IScanEntry[];
-        logEntries: IScanEntry[];
+        scanResult: TIScanResult | null;
+        scanHistory: TIScanEntry[];
+        logEntries: TIScanEntry[];
         heroEmptyMessage?: string;
         scanBusy?: boolean;
         logExpanded?: boolean;
@@ -49,16 +49,16 @@ function kindBadgeClass(kind: string): string {
     return isOprecKind(kind) ? 'border-violet-500/40 text-violet-600' : 'border-sky-500/40 text-sky-600';
 }
 
-function eventTitleOf(value: IScanResult | IScanEntry): string {
+function eventTitleOf(value: TIScanResult | TIScanEntry): string {
     return value.eventTitle || '';
 }
 
-function hasEventContext(value: IScanResult | IScanEntry): boolean {
+function hasEventContext(value: TIScanResult | TIScanEntry): boolean {
     const title = eventTitleOf(value);
     return title !== '' && title !== '-';
 }
 
-function heroIdentifier(result: IScanResult): string {
+function heroIdentifier(result: TIScanResult): string {
     if (!hasEventContext(result)) {
         return result.email;
     }
@@ -78,7 +78,7 @@ function sourceLabel(source: string): string {
     return source === 'manual' ? 'Manual' : 'Kamera';
 }
 
-const filteredHistory = computed<IScanEntry[]>(() => {
+const filteredHistory = computed<TIScanEntry[]>(() => {
     const query = props.logQuery.trim().toLowerCase();
 
     if (query.length === 0) {

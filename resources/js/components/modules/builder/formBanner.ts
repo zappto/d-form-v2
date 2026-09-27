@@ -1,7 +1,7 @@
 import type { BuilderField } from '@/components/modules/builder/fieldMapping';
 import type { BackendField } from '@/types/form-builder';
 
-export interface FormBannerState {
+export interface TFormBannerState {
     id: string | null;
     bannerUrl: string;
     bannerFileName: string;
@@ -25,7 +25,7 @@ function builderApiType(field: IFormField): string {
 }
 
 /** State banner form kosong tanpa file/url; titik awal sebelum baris banner dimuat dari field. */
-export function defaultFormBannerState(): FormBannerState {
+export function defaultFormBannerState(): TFormBannerState {
     return {
         id: null,
         bannerUrl: '',
@@ -49,19 +49,19 @@ export function normalizeBannerSrc(raw: string): string {
 }
 
 /** True bila ada File banner baru yang menunggu upload via POST /fields. */
-export function hasPendingBannerFile(state: FormBannerState): boolean {
+export function hasPendingBannerFile(state: TFormBannerState): boolean {
     return state.bannerFile instanceof File;
 }
 
 /** Kunci snapshot autosave untuk file pending (nama + ukuran + mtime). */
-export function pendingBannerSnapshotKey(state: FormBannerState): string | null {
+export function pendingBannerSnapshotKey(state: TFormBannerState): string | null {
     const f = state.bannerFile;
     if (!(f instanceof File)) return null;
     return `${f.name}:${f.size}:${f.lastModified}`;
 }
 
 /** Preview yang harus tampil: object URL file baru diutamakan, lalu path tersimpan. */
-export function resolveBannerPreviewSrc(state: FormBannerState, fallback = ''): string {
+export function resolveBannerPreviewSrc(state: TFormBannerState, fallback = ''): string {
     const preview = (state.bannerPreviewUrl ?? '').trim();
     if (preview !== '') return preview;
     const fromUrl = normalizeBannerSrc(state.bannerUrl);
@@ -70,7 +70,7 @@ export function resolveBannerPreviewSrc(state: FormBannerState, fallback = ''): 
 }
 
 /** Cabut object URL preview bila ada (cegah bocor memori). */
-export function revokeBannerPreview(state: FormBannerState): void {
+export function revokeBannerPreview(state: TFormBannerState): void {
     const preview = state.bannerPreviewUrl ?? '';
     if (preview.startsWith('blob:')) {
         try {
@@ -84,7 +84,7 @@ export function revokeBannerPreview(state: FormBannerState): void {
 
 /** Pisahkan baris banner dari daftar field builder ke state banner dan sisakan field kanvas; dipakai saat memuat form. */
 export function extractFormBannerFromBuilderFields(rows: BuilderField[]): {
-    banner: FormBannerState;
+    banner: TFormBannerState;
     canvasFields: BuilderField[];
 } {
     const idxFlag = rows.findIndex(
@@ -99,7 +99,7 @@ export function extractFormBannerFromBuilderFields(rows: BuilderField[]): {
 
     const bf = rows[idx];
     const meta = bf.metadata ?? {};
-    const banner: FormBannerState = {
+    const banner: TFormBannerState = {
         id: bf.id,
         bannerUrl: typeof meta.bannerUrl === 'string' ? meta.bannerUrl : '',
         bannerFileName: typeof meta.bannerFileName === 'string' ? meta.bannerFileName : '',
@@ -115,7 +115,7 @@ export function extractFormBannerFromBuilderFields(rows: BuilderField[]): {
 const FORM_BANNER_NAME = 'form_banner';
 
 /** Bangun field builder banner dari state, atau null bila tak ada isi; dipakai menyusun payload simpan. */
-export function buildFormBannerBuilderField(state: FormBannerState): BuilderField | null {
+export function buildFormBannerBuilderField(state: TFormBannerState): BuilderField | null {
     const trimmedUrl = state.bannerUrl.trim();
     const trimmedCaption = state.caption.trim();
     const hadPrevious = typeof state.id === 'string' && state.id !== '';
@@ -162,7 +162,7 @@ export function buildFormBannerBuilderField(state: FormBannerState): BuilderFiel
 /** Sisipkan field banner hasil sintesis di depan daftar field payload; banner kosong membiarkan daftar apa adanya. */
 export function prependFormBannerToBackendPayload(
     canvasFields: BuilderField[],
-    banner: FormBannerState
+    banner: TFormBannerState
 ): BuilderField[] {
     const synth = buildFormBannerBuilderField(banner);
     if (!synth) {
@@ -208,7 +208,7 @@ export function buildBannerFieldsFormData(dirty: BackendField[], deletedIds: str
 }
 
 /** Setelah upload sukses: state pegang path string, bukan File/base64. */
-export function applyBannerUploadSuccess(state: FormBannerState, storedPath: string, fileName?: string): void {
+export function applyBannerUploadSuccess(state: TFormBannerState, storedPath: string, fileName?: string): void {
     revokeBannerPreview(state);
     state.bannerUrl = storedPath;
     if (typeof fileName === 'string' && fileName.trim() !== '') {

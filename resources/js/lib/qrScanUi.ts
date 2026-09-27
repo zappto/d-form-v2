@@ -9,7 +9,7 @@ export const SCAN_STATUS_THEME: Record<TScanStatus, { icon: Component; class: st
     invalid: { icon: XCircle, class: 'text-destructive', bg: 'bg-destructive/10', label: 'QR tidak valid' },
 };
 
-export interface IScanEntry {
+export interface TIScanEntry {
     id: string;
     name: string;
     email: string;
@@ -21,7 +21,7 @@ export interface IScanEntry {
     queueNumber: number | null;
 }
 
-export interface IScanResult {
+export interface TIScanResult {
     name: string;
     email: string;
     status: TScanStatus;
@@ -60,7 +60,7 @@ export function extractQrCandidate(decodedText: string): string {
 }
 
 /** Bentuk entri riwayat scan dari hasil scan; dipakai untuk menambah baris riwayat scan. */
-export function createScanHistoryEntry(result: IScanResult): IScanEntry {
+export function createScanHistoryEntry(result: TIScanResult): TIScanEntry {
     return {
         id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         name: result.name,
@@ -74,7 +74,7 @@ export function createScanHistoryEntry(result: IScanResult): IScanEntry {
     };
 }
 
-export interface IGlobalScanFeedRow {
+export interface TIGlobalScanFeedRow {
     id: string;
     ts: string;
     type: 'recruitment' | 'event';
@@ -124,12 +124,12 @@ export function isGlobalScanFeedPayload(payload: unknown): boolean {
 }
 
 /** Parse baris feed scan global menjadi daftar terketik sambil melewati baris rusak; dipakai saat memuat feed scan. */
-export function parseGlobalScanFeedRows(payload: unknown): IGlobalScanFeedRow[] {
+export function parseGlobalScanFeedRows(payload: unknown): TIGlobalScanFeedRow[] {
     if (!isRecord(payload)) {
         return [];
     }
 
-    const rows: IGlobalScanFeedRow[] = [];
+    const rows: TIGlobalScanFeedRow[] = [];
     for (const item of toUnknownArray(payload.rows)) {
         if (!isRecord(item)) {
             continue;

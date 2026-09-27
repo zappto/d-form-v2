@@ -2,7 +2,7 @@ import { computed, ref, watch } from 'vue';
 import { Clock, ShieldCheck, ShieldX, Users } from 'lucide-vue-next';
 import { REGISTRANTS_TONE_STYLES } from '@/lib/registrantsUi';
 
-export interface RegistrantsStatCardModel {
+export interface IRegistrantsStatCardModel {
     key: 'all' | 'pending' | 'accepted' | 'rejected';
     label: string;
     helper: string;
@@ -68,7 +68,7 @@ export function useEventRegistrantsPage(props: {
         return Math.round((statusCounts.value.accepted / decided) * 100);
     });
 
-    const statCards = computed<RegistrantsStatCardModel[]>(() => {
+    const statCards = computed<IRegistrantsStatCardModel[]>(() => {
         const formHint =
             props.forms.length === 0
                 ? 'Belum ada formulir pada acara ini'

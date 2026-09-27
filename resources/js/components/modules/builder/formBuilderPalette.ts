@@ -19,21 +19,21 @@ import {
     MessageSquareCheck,
 } from 'lucide-vue-next';
 
-export interface FormBuilderPaletteField {
+export interface TFormBuilderPaletteField {
     type: TFormBuilderType;
     label: string;
     icon: Component;
     description: string;
 }
 
-export interface FormBuilderPaletteCategory {
+export interface TFormBuilderPaletteCategory {
     name: string;
     icon: Component;
     isOpen: boolean;
-    fields: FormBuilderPaletteField[];
+    fields: TFormBuilderPaletteField[];
 }
 
-const SOURCE: FormBuilderPaletteCategory[] = [
+const SOURCE: TFormBuilderPaletteCategory[] = [
     {
         name: 'Text Inputs',
         icon: Type,
@@ -94,7 +94,9 @@ const SOURCE: FormBuilderPaletteCategory[] = [
 ];
 
 /** Flat list of draggable palette entries (search / mobile pickers). */
-export const ALL_FORM_BUILDER_FIELD_TEMPLATES: ReadonlyArray<FormBuilderPaletteField> = SOURCE.flatMap((c) => c.fields);
+export const ALL_FORM_BUILDER_FIELD_TEMPLATES: ReadonlyArray<TFormBuilderPaletteField> = SOURCE.flatMap(
+    (c) => c.fields
+);
 
 export const FORM_VISIBILITY_OPTIONS = [
     { value: 'public', label: 'Public' },
@@ -103,7 +105,7 @@ export const FORM_VISIBILITY_OPTIONS = [
 ] as const;
 
 /** Fresh mutable tree for `ref()` (categories toggle `isOpen` per instance). */
-export function cloneFormBuilderPalette(): FormBuilderPaletteCategory[] {
+export function cloneFormBuilderPalette(): TFormBuilderPaletteCategory[] {
     return SOURCE.map((c) => ({
         ...c,
         fields: c.fields.map((f) => ({ ...f })),

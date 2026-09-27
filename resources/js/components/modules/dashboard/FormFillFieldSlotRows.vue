@@ -9,13 +9,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import type { UnwrapNestedRefs } from 'vue';
 import { Star, ImagePlus, Upload, X } from 'lucide-vue-next';
-import type { FormFillPageContext } from '@/hooks/useFormFillPage';
+import type { TFormFillPageContext } from '@/hooks/useFormFillPage';
 import type { TFormFillOptionRow } from '@/types/form';
 import { formatParagraphContentToHtml } from '@/lib/formParagraphContent';
 
 const props = withDefaults(
     defineProps<{
-        ctx: UnwrapNestedRefs<FormFillPageContext>;
+        ctx: UnwrapNestedRefs<TFormFillPageContext>;
         field: IFormField;
         participationSlot: { slotIndex: number | null; title: string };
         storageKey: string;

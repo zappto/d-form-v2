@@ -1,35 +1,35 @@
 import { ref, computed, type Ref } from 'vue';
 import { showErrorToast } from '@/lib/error-message';
-import { resolveBannerPreviewSrc, type FormBannerState } from '@/components/modules/builder/formBanner';
+import { resolveBannerPreviewSrc, type TFormBannerState } from '@/components/modules/builder/formBanner';
 import {
     cloneFormBuilderPalette,
-    type FormBuilderPaletteCategory,
-    type FormBuilderPaletteField,
+    type TFormBuilderPaletteCategory,
+    type TFormBuilderPaletteField,
 } from '@/components/modules/builder/formBuilderPalette';
 import { createFormBuilderField } from '@/components/modules/builder/formBuilderFieldFactory';
 import type { BuilderField } from '@/types/form-builder';
 
-export type FormBuilderInspectorMode = 'settings' | 'field';
-export type FormBuilderMobileTab = 'build' | 'settings';
+export type TFormBuilderInspectorMode = 'settings' | 'field';
+export type TFormBuilderMobileTab = 'build' | 'settings';
 
-export interface FormBuilderValidationIssue {
+export interface IFormBuilderValidationIssue {
     key: 'title' | 'description' | 'closedAt' | 'visibleFor' | 'fields';
     label: string;
 }
 
-export interface FormBuilderWorkspaceModels {
+export interface IFormBuilderWorkspaceModels {
     formTitle: Ref<string>;
     formDescription: Ref<string>;
     closedAt: Ref<string>;
     visibleFor: Ref<string[]>;
-    banner: Ref<FormBannerState>;
+    banner: Ref<TFormBannerState>;
     formFields: Ref<BuilderField[]>;
     successContent?: Ref<string>;
 }
 
 /** Kategori palette terbuka. `null` = semua tertutup (single-expand). */
-export function useFormBuilderWorkspace(models: FormBuilderWorkspaceModels, options: { onSave: () => void }) {
-    const categories = ref<FormBuilderPaletteCategory[]>(cloneFormBuilderPalette());
+export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, options: { onSave: () => void }) {
+    const categories = ref<TFormBuilderPaletteCategory[]>(cloneFormBuilderPalette());
 
     /** Single-expand: simpan nama kategori yang terbuka (default semua tertutup). */
     const openCategoryName = ref<string | null>(null);
@@ -39,8 +39,8 @@ export function useFormBuilderWorkspace(models: FormBuilderWorkspaceModels, opti
     const dropIndicatorIndex = ref<number>(-1);
     const isDraggingOverCanvas = ref<boolean>(false);
     const dragSourceId = ref<string | null>(null);
-    const inspectorMode = ref<FormBuilderInspectorMode>('settings');
-    const mobileTab = ref<FormBuilderMobileTab>('build');
+    const inspectorMode = ref<TFormBuilderInspectorMode>('settings');
+    const mobileTab = ref<TFormBuilderMobileTab>('build');
     const showAddSheet = ref<boolean>(false);
     const showMobileEditor = ref<boolean>(false);
     const showPreview = ref<boolean>(false);
@@ -84,8 +84,8 @@ export function useFormBuilderWorkspace(models: FormBuilderWorkspaceModels, opti
     const isEmpty = computed<boolean>(() => models.formFields.value.length === 0);
     const bannerPreviewSrc = computed<string>(() => resolveBannerPreviewSrc(models.banner.value));
 
-    const validationIssues = computed<FormBuilderValidationIssue[]>(() => {
-        const issues: FormBuilderValidationIssue[] = [];
+    const validationIssues = computed<IFormBuilderValidationIssue[]>(() => {
+        const issues: IFormBuilderValidationIssue[] = [];
         if (!models.formTitle.value.trim()) issues.push({ key: 'title', label: 'Form title' });
         if (!models.formDescription.value.trim()) issues.push({ key: 'description', label: 'Description' });
         if (!models.closedAt.value) issues.push({ key: 'closedAt', label: 'Close date' });
@@ -96,7 +96,7 @@ export function useFormBuilderWorkspace(models: FormBuilderWorkspaceModels, opti
 
     const isReadyToSave = computed<boolean>(() => validationIssues.value.length === 0);
 
-    function patchBanner(v: FormBannerState): void {
+    function patchBanner(v: TFormBannerState): void {
         Object.assign(models.banner.value, v);
     }
 
@@ -105,7 +105,7 @@ export function useFormBuilderWorkspace(models: FormBuilderWorkspaceModels, opti
         if (models.successContent) models.successContent.value = '';
     }
 
-    function addField(template: FormBuilderPaletteField, openEditorAfter = false): void {
+    function addField(template: TFormBuilderPaletteField, openEditorAfter = false): void {
         // Item palette "Pesan setelah submit" = trigger zona konfirmasi, bukan BuilderField.
         if (template.type === 'confirmation') {
             showSuccessZone.value = true;
@@ -188,7 +188,7 @@ export function useFormBuilderWorkspace(models: FormBuilderWorkspaceModels, opti
         else models.visibleFor.value = models.visibleFor.value.filter((v) => v !== value);
     }
 
-    function toggleCategory(cat: FormBuilderPaletteCategory): void {
+    function toggleCategory(cat: TFormBuilderPaletteCategory): void {
         openCategoryName.value = openCategoryName.value === cat.name ? null : cat.name;
         // Sinkronkan isOpen agar cocok dengan state yang dipakai item kartu.
         for (const c of categories.value) {

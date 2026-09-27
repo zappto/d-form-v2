@@ -67,7 +67,7 @@ vi.mock('@/lib/error-message', () => ({
     showFlashToast: vi.fn(),
 }));
 
-interface RouterMutationOptions {
+interface IRouterMutationOptions {
     preserveScroll?: boolean;
     preserveState?: boolean;
     onSuccess?: () => void;
@@ -75,19 +75,19 @@ interface RouterMutationOptions {
     onFinish?: () => void;
 }
 
-let lastRouterOptions: RouterMutationOptions | undefined;
-let lastFormOptions: RouterMutationOptions | undefined;
+let lastRouterOptions: IRouterMutationOptions | undefined;
+let lastFormOptions: IRouterMutationOptions | undefined;
 
-function lastRouterPostOptions(): RouterMutationOptions {
+function lastRouterPostOptions(): IRouterMutationOptions {
     expect(routerPostMock).toHaveBeenCalled();
     expect(lastRouterOptions).toBeDefined();
-    return lastRouterOptions as RouterMutationOptions;
+    return lastRouterOptions as IRouterMutationOptions;
 }
 
-function lastFormPostOptions(): RouterMutationOptions {
+function lastFormPostOptions(): IRouterMutationOptions {
     expect(formPostMock).toHaveBeenCalled();
     expect(lastFormOptions).toBeDefined();
-    return lastFormOptions as RouterMutationOptions;
+    return lastFormOptions as IRouterMutationOptions;
 }
 
 function demoRow(id: string, fullName: string): ApplicationRow {
@@ -170,11 +170,11 @@ beforeEach(() => {
     routerPostMock.mockReset();
     formPostMock.mockReset();
     routerPostMock.mockImplementation((...args: unknown[]) => {
-        lastRouterOptions = args[2] as RouterMutationOptions | undefined;
+        lastRouterOptions = args[2] as IRouterMutationOptions | undefined;
         return undefined;
     });
     formPostMock.mockImplementation((...args: unknown[]) => {
-        lastFormOptions = args[1] as RouterMutationOptions | undefined;
+        lastFormOptions = args[1] as IRouterMutationOptions | undefined;
         const state = formHolder.state;
         if (state) state.processing = true;
         return undefined;

@@ -1,11 +1,11 @@
 import { computed, ref, type Ref } from 'vue';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
 
-export interface UseRespondentDraftOptions {
+export interface IUseRespondentDraftOptions {
     debounceMs?: number;
 }
 
-export interface UseRespondentDraftResult<T> {
+export interface IUseRespondentDraftResult<T> {
     status: Ref<AutosaveStatus>;
     lastSavedAt: Ref<Date | null>;
     restore: () => T | null;
@@ -105,8 +105,8 @@ export function snapshotRespondentValues(form: unknown): Record<string, unknown>
 export function useRespondentDraft<T>(
     source: () => string,
     storageKey: string,
-    opts: UseRespondentDraftOptions = {}
-): UseRespondentDraftResult<T> {
+    opts: IUseRespondentDraftOptions = {}
+): IUseRespondentDraftResult<T> {
     const lastSavedAt = ref<Date | null>(null);
 
     const autosave = useAutosaveSync(source, async () => false, {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildUnloadPayload, shouldSkipHydrate } from '../autosaveGuard';
-import type { FormBannerState } from '../formBanner';
+import type { TFormBannerState } from '../formBanner';
 import { defaultFormBannerState } from '../formBanner';
 import { toBackendFields } from '../fieldMapping';
 import type { BuilderField } from '@/types/form-builder';
@@ -20,7 +20,7 @@ function builder(id: string, order?: number): BuilderField {
     };
 }
 
-function banner(): FormBannerState {
+function banner(): TFormBannerState {
     return defaultFormBannerState();
 }
 

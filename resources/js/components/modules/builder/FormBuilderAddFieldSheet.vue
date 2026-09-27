@@ -2,19 +2,19 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Search, Plus } from 'lucide-vue-next';
 import type {
-    FormBuilderPaletteCategory,
-    FormBuilderPaletteField,
+    TFormBuilderPaletteCategory,
+    TFormBuilderPaletteField,
 } from '@/components/modules/builder/formBuilderPalette';
 
 const open = defineModel<boolean>('open', { required: true });
 const searchQuery = defineModel<string>('searchQuery', { required: true });
 
 defineProps<{
-    categories: FormBuilderPaletteCategory[];
+    categories: TFormBuilderPaletteCategory[];
 }>();
 
 defineEmits<{
-    pickField: [template: FormBuilderPaletteField];
+    pickField: [template: TFormBuilderPaletteField];
 }>();
 </script>
 

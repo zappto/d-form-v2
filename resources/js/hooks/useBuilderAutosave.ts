@@ -12,7 +12,7 @@ import {
     pendingBannerSnapshotKey,
     prependFormBannerToBackendPayload,
     readBannerPathFromResponse,
-    type FormBannerState,
+    type TFormBannerState,
 } from '@/components/modules/builder/formBanner';
 import {
     applyOptionImageUploadSuccess,
@@ -22,7 +22,7 @@ import {
     ensureOptionImageRowsDirty,
     pendingOptionImagesSnapshotKey,
     readOptionImagePathsFromResponse,
-    type PendingOptionImageFile,
+    type TPendingOptionImageFile,
 } from '@/components/modules/builder/optionImage';
 import { mergeSentHeader, stripBlankRequiredKeys } from '@/lib/autosaveHeader';
 import { toFormMetadataPayload, type IFormRegistrationMetadata } from '@/types/form';
@@ -36,7 +36,7 @@ export interface IBuilderAutosaveState {
     successContent: string;
     closedAt: string;
     visibleFor: string[];
-    banner: FormBannerState;
+    banner: TFormBannerState;
     fields: BuilderField[];
     metadata: IFormRegistrationMetadata;
 }
@@ -162,7 +162,7 @@ interface IPendingDirtyRequest {
     backend: BackendField[];
     dirty: BackendField[];
     bannerFile: File | null;
-    optionFiles: PendingOptionImageFile[];
+    optionFiles: TPendingOptionImageFile[];
 }
 
 /** Pastikan baris banner/opsi pending ikut terkirim walau diff per-id bersih. */
@@ -178,7 +178,7 @@ interface IUploadBodyRequest {
     dirty: BackendField[];
     deletedIds: string[];
     bannerFile: File | null;
-    optionFiles: PendingOptionImageFile[];
+    optionFiles: TPendingOptionImageFile[];
 }
 
 /** Pilih body multipart banner-only vs banner+opsi sesuai file pending. */
@@ -193,7 +193,7 @@ function buildUploadBody(request: IUploadBodyRequest): FormData {
 interface IUploadResultRequest {
     state: IBuilderAutosaveState;
     bannerFile: File | null;
-    optionFiles: PendingOptionImageFile[];
+    optionFiles: TPendingOptionImageFile[];
     response: unknown;
 }
 

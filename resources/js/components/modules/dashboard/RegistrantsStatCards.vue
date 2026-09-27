@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card';
-import type { RegistrantsStatCardModel } from '@/hooks/useEventRegistrantsPage';
+import type { IRegistrantsStatCardModel } from '@/hooks/useEventRegistrantsPage';
 import { formatCountNumber } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 defineProps<{
-    statCards: RegistrantsStatCardModel[];
+    statCards: IRegistrantsStatCardModel[];
     toneStyles: Record<
         'primary' | 'warning' | 'success' | 'destructive',
         { chip: string; ring: string; bar: string; dot: string }

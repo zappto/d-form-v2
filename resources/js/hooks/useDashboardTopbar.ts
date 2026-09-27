@@ -8,7 +8,7 @@ import type { Ref } from 'vue';
  * State di-reset oleh layout saat komponen halaman berganti (watch page.component).
  */
 
-interface TopbarState {
+interface ITopbarState {
     title: string | null;
     subtitle?: string | null;
 }
@@ -17,7 +17,7 @@ const title = ref<string | null>(null);
 const subtitle = ref<string | null>(null);
 
 /** Menyetel judul/subjudul topbar dari halaman dashboard; dipanggil saat halaman dirender. */
-export function setTopbar(state: TopbarState): void {
+export function setTopbar(state: ITopbarState): void {
     title.value = state.title ?? null;
     subtitle.value = state.subtitle ?? null;
 }

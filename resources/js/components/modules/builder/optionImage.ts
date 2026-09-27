@@ -1,15 +1,15 @@
 import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 
-export interface PendingOptionImageFile {
+export interface TPendingOptionImageFile {
     fieldId: string;
     optionId: string;
     file: File;
 }
 
 /** Kumpulkan File mentah opsi yang menunggu upload (tidak ikut serialisasi). */
-export function collectPendingOptionImageFiles(fields: BuilderField[]): PendingOptionImageFile[] {
-    const out: PendingOptionImageFile[] = [];
+export function collectPendingOptionImageFiles(fields: BuilderField[]): TPendingOptionImageFile[] {
+    const out: TPendingOptionImageFile[] = [];
     for (const f of fields) {
         if (!Array.isArray(f.options)) continue;
         if (f.type === 'dropdown') continue;
@@ -70,7 +70,7 @@ function rowHasPendingFile(row: BackendField): boolean {
  * `option_images[fieldId][optionId]` agar server bisa pasangkan tanpa
  * peta tambahan (fieldId/optionId = UUID tanpa karakter khusus).
  */
-export function appendOptionImageFiles(fd: FormData, files: PendingOptionImageFile[]): void {
+export function appendOptionImageFiles(fd: FormData, files: TPendingOptionImageFile[]): void {
     for (const p of files) {
         fd.append(`option_images[${p.fieldId}][${p.optionId}]`, p.file, p.file.name);
     }
@@ -84,7 +84,7 @@ export function appendOptionImageFiles(fd: FormData, files: PendingOptionImageFi
 export function buildOptionImageFieldsFormData(
     dirty: BackendField[],
     deletedIds: string[],
-    optionFiles: PendingOptionImageFile[],
+    optionFiles: TPendingOptionImageFile[],
     bannerFile?: File | null
 ): FormData {
     const fd = new FormData();

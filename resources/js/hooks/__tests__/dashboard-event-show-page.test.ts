@@ -40,14 +40,14 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 
-interface RouterMutationOptions {
+interface IRouterMutationOptions {
     onSuccess?: () => void;
     onError?: (errors: Record<string, string>) => void;
     onFinish?: () => void;
 }
 
-let lastDeleteOptions: RouterMutationOptions | undefined;
-let lastPostOptions: RouterMutationOptions | undefined;
+let lastDeleteOptions: IRouterMutationOptions | undefined;
+let lastPostOptions: IRouterMutationOptions | undefined;
 
 function demoEvent(): IEvent {
     return {
@@ -82,11 +82,11 @@ beforeEach(() => {
     routerDeleteMock.mockReset();
     routerPostMock.mockReset();
     routerDeleteMock.mockImplementation((...args: unknown[]) => {
-        lastDeleteOptions = args[1] as RouterMutationOptions | undefined;
+        lastDeleteOptions = args[1] as IRouterMutationOptions | undefined;
         return undefined;
     });
     routerPostMock.mockImplementation((...args: unknown[]) => {
-        lastPostOptions = args[2] as RouterMutationOptions | undefined;
+        lastPostOptions = args[2] as IRouterMutationOptions | undefined;
         return undefined;
     });
 });

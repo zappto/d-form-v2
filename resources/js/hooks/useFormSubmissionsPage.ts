@@ -5,28 +5,28 @@ import { parseApiErrorMessage, showErrorToast, showHttpErrorToast } from '@/lib/
 import { answerPreview, formatSubmissionDate, humanizeSubmissionKey, submissionFileUrl } from '@/lib/formSubmissionsUi';
 import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAnswerReviewController';
 
-interface PaginationLink {
+interface IPaginationLink {
     url: string | null;
     label: string;
     active: boolean;
 }
 
-interface SubmissionPaginator {
+interface ISubmissionPaginator {
     data?: IFormSubmission[];
     current_page: number;
     last_page: number;
     per_page: number;
     total: number;
-    links?: PaginationLink[];
+    links?: IPaginationLink[];
 }
 
-interface BundleGroupPaginator {
+interface IBundleGroupPaginator {
     data?: IBundleSubmissionGroup[];
     current_page: number;
     last_page: number;
     per_page: number;
     total: number;
-    links?: PaginationLink[];
+    links?: IPaginationLink[];
 }
 
 function readXsrfToken(): string | null {
@@ -34,11 +34,11 @@ function readXsrfToken(): string | null {
     return m?.[1] ? decodeURIComponent(m[1]) : null;
 }
 
-function submissionRows(paginator: SubmissionPaginator | undefined): IFormSubmission[] {
+function submissionRows(paginator: ISubmissionPaginator | undefined): IFormSubmission[] {
     return paginator?.data ?? [];
 }
 
-function bundleGroupRows(paginator: BundleGroupPaginator | undefined): IBundleSubmissionGroup[] {
+function bundleGroupRows(paginator: IBundleGroupPaginator | undefined): IBundleSubmissionGroup[] {
     return paginator?.data ?? [];
 }
 
@@ -47,8 +47,8 @@ export function useFormSubmissionsPage(props: {
     event: { id: string; title: string };
     form: { id: string; title: string; registration_mode?: 'single' | 'bundle' | 'team' };
     fields?: IFormField[];
-    submissions?: SubmissionPaginator;
-    bundleGroups?: BundleGroupPaginator;
+    submissions?: ISubmissionPaginator;
+    bundleGroups?: IBundleGroupPaginator;
 }) {
     const formFields = computed(() => props.fields ?? []);
     const selectedSubmission = ref<IFormSubmission | null>(null);

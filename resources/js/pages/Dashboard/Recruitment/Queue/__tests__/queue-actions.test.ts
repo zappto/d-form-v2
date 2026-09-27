@@ -55,7 +55,7 @@ interface QueueEntry {
     application: QueueApplication | null;
 }
 
-interface QueueSnapshot {
+interface IQueueSnapshot {
     entries: QueueEntry[];
     current: QueueEntry | null;
     next: QueueEntry | null;
@@ -74,7 +74,7 @@ function makeEntry(partial: Partial<QueueEntry> & { id: string }): QueueEntry {
     };
 }
 
-const baseQueue: QueueSnapshot = {
+const baseQueue: IQueueSnapshot = {
     entries: [
         makeEntry({ id: 'qe-1', queue_number: 1, status: 'called', status_label: 'Dipanggil' }),
         makeEntry({

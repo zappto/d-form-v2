@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { routes } from '@/lib/routes';
 import { padQueueNumber } from '@/lib/format';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
-import { useRecruitmentQueue, type QueueSnapshot } from '@/hooks/useRecruitmentQueue';
+import { useRecruitmentQueue, type IQueueSnapshot } from '@/hooks/useRecruitmentQueue';
 import { toast } from 'vue-sonner';
 
 defineOptions({ layout: DashboardLayout });
@@ -30,7 +30,7 @@ interface SessionDetail {
 
 const props = defineProps<{
     session: SessionDetail;
-    queue: QueueSnapshot;
+    queue: IQueueSnapshot;
     pollUrl: string;
     callNextUrl: string;
     completeUrlTemplate: string;

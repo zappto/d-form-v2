@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, onMounted, type ComputedRef, type Ref } from 'vue';
 import { formatSavedTimeLabel } from '@/lib/format';
-import { snapshotRespondentValues, useRespondentDraft, type UseRespondentDraftResult } from './useRespondentDraft';
+import { snapshotRespondentValues, useRespondentDraft, type IUseRespondentDraftResult } from './useRespondentDraft';
 import type { AutosaveStatus } from './useAutosaveSync';
 
 /** Debounce tunggal draft responden; sama dengan autosave builder agar indikator seragam. */
@@ -29,7 +29,7 @@ export function buildValuesDraftSnapshot(form: unknown): string {
 
 /** Bungkus useRespondentDraft + restore toleran saat mount + cancel saat unmount. */
 export function useDraftRestore(args: IDraftRestoreArgs): IDraftRestoreResult {
-    const draft: UseRespondentDraftResult<unknown> = useRespondentDraft<unknown>(args.snapshot, args.storageKey, {
+    const draft: IUseRespondentDraftResult<unknown> = useRespondentDraft<unknown>(args.snapshot, args.storageKey, {
         debounceMs: RESPONDENT_DRAFT_DEBOUNCE_MS,
     });
 

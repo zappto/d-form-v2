@@ -41,19 +41,19 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-interface RouterMutationOptions {
+interface IRouterMutationOptions {
     preserveScroll?: boolean;
     onSuccess?: () => void;
     onError?: (errors: Record<string, string>) => void;
     onFinish?: () => void;
 }
 
-function lastDeleteOptions(): RouterMutationOptions {
+function lastDeleteOptions(): IRouterMutationOptions {
     const calls = routerDeleteMock.mock.calls as unknown[][];
     expect(routerDeleteMock).toHaveBeenCalled();
-    const options = calls[calls.length - 1]?.[1] as RouterMutationOptions | undefined;
+    const options = calls[calls.length - 1]?.[1] as IRouterMutationOptions | undefined;
     expect(options).toBeDefined();
-    return options as RouterMutationOptions;
+    return options as IRouterMutationOptions;
 }
 
 const demoEvent: IEvent = {

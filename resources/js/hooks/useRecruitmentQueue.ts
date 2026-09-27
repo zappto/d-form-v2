@@ -2,7 +2,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import axios from 'axios';
 import { showErrorToast } from '@/lib/error-message';
 
-export interface QueueEntryRow {
+export interface IQueueEntryRow {
     id: string;
     queue_number: number;
     status: string;
@@ -16,10 +16,10 @@ export interface QueueEntryRow {
     } | null;
 }
 
-export interface QueueSnapshot {
-    entries: QueueEntryRow[];
-    current: QueueEntryRow | null;
-    next: QueueEntryRow | null;
+export interface IQueueSnapshot {
+    entries: IQueueEntryRow[];
+    current: IQueueEntryRow | null;
+    next: IQueueEntryRow | null;
     stats: {
         waiting: number;
         called: number;
@@ -31,8 +31,8 @@ export interface QueueSnapshot {
 const POLL_INTERVAL_MS = 10_000;
 
 /** Snapshot antrean rekrutmen yang di-poll berkala beserta status loading dan kontrol polling. */
-export function useRecruitmentQueue(pollUrl: string, initial: QueueSnapshot) {
-    const queue = ref<QueueSnapshot>(initial);
+export function useRecruitmentQueue(pollUrl: string, initial: IQueueSnapshot) {
+    const queue = ref<IQueueSnapshot>(initial);
     const polling = ref(true);
     /** Tick pertama (refresh awal) → skeleton; tick berikut diam. Sekali false, tak pernah true lagi. */
     const isInitialLoading = ref(true);
@@ -42,7 +42,7 @@ export function useRecruitmentQueue(pollUrl: string, initial: QueueSnapshot) {
 
     async function refresh() {
         try {
-            const { data } = await axios.get<QueueSnapshot>(pollUrl, {
+            const { data } = await axios.get<IQueueSnapshot>(pollUrl, {
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
             });
             queue.value = data;

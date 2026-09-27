@@ -49,19 +49,19 @@ vi.mock('@/lib/error-message', () => ({
     showFlashToast: vi.fn(),
 }));
 
-interface RouterMutationOptions {
+interface IRouterMutationOptions {
     preserveScroll?: boolean;
     onSuccess?: () => void;
     onError?: (errors: Record<string, string>) => void;
     onFinish?: () => void;
 }
 
-function lastPostOptions(): RouterMutationOptions {
+function lastPostOptions(): IRouterMutationOptions {
     const calls = routerPostMock.mock.calls as unknown[][];
     expect(routerPostMock).toHaveBeenCalled();
-    const options = calls[calls.length - 1]?.[2] as RouterMutationOptions | undefined;
+    const options = calls[calls.length - 1]?.[2] as IRouterMutationOptions | undefined;
     expect(options).toBeDefined();
-    return options as RouterMutationOptions;
+    return options as IRouterMutationOptions;
 }
 
 function basePeriod(status: 'draft' | 'open') {

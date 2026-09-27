@@ -9,7 +9,7 @@ import FormFillFieldSlotRows from '@/components/modules/dashboard/FormFillFieldS
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
 import FormFillParticipantEmailsSection from '@/components/modules/dashboard/FormFillParticipantEmailsSection.vue';
 import { Send } from 'lucide-vue-next';
-import type { FormFillPageContext } from '@/hooks/useFormFillPage';
+import type { TFormFillPageContext } from '@/hooks/useFormFillPage';
 import { routes } from '@/lib/routes';
 
 type FormSegment = { type: 'linear'; fields: IFormField[] } | { type: 'bundleGroup'; fields: IFormField[] };
@@ -17,7 +17,7 @@ type FormSegment = { type: 'linear'; fields: IFormField[] } | { type: 'bundleGro
 const props = defineProps<{
     fields: IFormField[];
     eventId: string;
-    ctx: UnwrapNestedRefs<FormFillPageContext>;
+    ctx: UnwrapNestedRefs<TFormFillPageContext>;
 }>();
 
 const emit = defineEmits<{
@@ -49,7 +49,7 @@ const formSegments = computed((): FormSegment[] => {
 });
 
 function slotStorageKey(
-    ctx: UnwrapNestedRefs<FormFillPageContext>,
+    ctx: UnwrapNestedRefs<TFormFillPageContext>,
     field: IFormField,
     slot: { slotIndex: number | null }
 ): string {
@@ -57,7 +57,7 @@ function slotStorageKey(
 }
 
 function imageUploadFillReadyForField(
-    ctx: UnwrapNestedRefs<FormFillPageContext>,
+    ctx: UnwrapNestedRefs<TFormFillPageContext>,
     field: IFormField,
     storageKey: string
 ): boolean {

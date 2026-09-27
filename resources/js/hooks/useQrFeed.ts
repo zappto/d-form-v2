@@ -11,9 +11,9 @@ import {
     parseGlobalScanCursor,
     parseGlobalScanFeedRows,
     playScanBeep,
-    type IGlobalScanFeedRow,
-    type IScanEntry,
-    type IScanResult,
+    type TIGlobalScanFeedRow,
+    type TIScanEntry,
+    type TIScanResult,
 } from '@/lib/qrScanUi';
 
 /** Kunci sessionStorage agar id meja kasir stabil selama satu sesi tab. */
@@ -42,17 +42,17 @@ export interface ISubmitScanArgs {
 
 export interface IQrFeedControls {
     deskId: string;
-    scanResult: Ref<IScanResult | null>;
-    scanHistory: Ref<IScanEntry[]>;
+    scanResult: Ref<TIScanResult | null>;
+    scanHistory: Ref<TIScanEntry[]>;
     scanBusy: Ref<boolean>;
     acceptScanInput: (raw: string) => boolean;
     submitScan: (args: ISubmitScanArgs) => Promise<void>;
-    isTodayEntry: (entry: IScanEntry) => boolean;
-    toScanResult: (entry: IScanEntry) => IScanResult;
+    isTodayEntry: (entry: TIScanEntry) => boolean;
+    toScanResult: (entry: TIScanEntry) => TIScanResult;
     clearHistory: () => void;
 }
 
-interface GlobalScanAttendee {
+interface IGlobalScanAttendee {
     name?: string;
     email?: string;
     registration_number?: string;
@@ -61,19 +61,19 @@ interface GlobalScanAttendee {
     form_answer_id?: string;
 }
 
-interface GlobalScanEnvelope {
+interface IGlobalScanEnvelope {
     type: 'event' | 'recruitment';
     eventTitle: string;
-    attendee: GlobalScanAttendee;
+    attendee: IGlobalScanAttendee;
     status: 'success' | 'duplicate';
     scannedAt: string;
 }
 
-interface GlobalScanErrorBody {
+interface IGlobalScanErrorBody {
     message?: string;
     type?: string;
     eventTitle?: string;
-    attendee?: GlobalScanAttendee;
+    attendee?: IGlobalScanAttendee;
     errors?: Record<string, string[]>;
 }
 
@@ -131,8 +131,8 @@ function scanIdentity(
 export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
     const deskId = resolveDeskId();
 
-    const scanResult = ref<IScanResult | null>(null);
-    const scanHistory = ref<IScanEntry[]>([]);
+    const scanResult = ref<TIScanResult | null>(null);
+    const scanHistory = ref<TIScanEntry[]>([]);
     const lastRaw = ref('');
     const lastAt = ref(0);
     const scanBusy = ref(false);
@@ -145,7 +145,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
     let pollTimer: number | null = null;
     let pollAbort: AbortController | null = null;
 
-    function isTodayEntry(entry: IScanEntry): boolean {
+    function isTodayEntry(entry: TIScanEntry): boolean {
         const epoch: number | undefined = scanEntryEpochMs.get(entry.id);
         if (epoch === undefined) {
             return true;
@@ -154,7 +154,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         return new Date(epoch).toDateString() === new Date().toDateString();
     }
 
-    function toScanResult(entry: IScanEntry): IScanResult {
+    function toScanResult(entry: TIScanEntry): TIScanResult {
         return {
             name: entry.name,
             email: entry.email,
@@ -171,10 +171,10 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         return type === 'recruitment' ? 'oprec' : 'event';
     }
 
-    function pushResult(result: IScanResult): void {
+    function pushResult(result: TIScanResult): void {
         localEntryIdentities.add(scanIdentity(result.eventKind, result.email, result.queueNumber, result.eventTitle));
         scanResult.value = result;
-        const entry: IScanEntry = createScanHistoryEntry(result);
+        const entry: TIScanEntry = createScanHistoryEntry(result);
         scanEntryEpochMs.set(entry.id, Date.now());
         rawCodeByEntryId.set(entry.id, result.rawCode);
         scanHistory.value.unshift(entry);
@@ -211,7 +211,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         const rawDisplay = extractQrCandidate(trimmed);
 
         try {
-            const { data } = await axios.post<GlobalScanEnvelope>(
+            const { data } = await axios.post<IGlobalScanEnvelope>(
                 args.storeUrl,
                 { raw: trimmed, desk: deskId },
                 { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
@@ -220,7 +220,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
             const kind = mapEnvelopeKind(data.type);
             const title = formatGlobalEventTitle(kind, data.eventTitle ?? '');
 
-            let result: IScanResult;
+            let result: TIScanResult;
 
             if (kind === 'oprec') {
                 const identifier = data.attendee.registration_number?.trim() || '-';
@@ -259,7 +259,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;
-                const body = error.response?.data as GlobalScanErrorBody | undefined;
+                const body = error.response?.data as IGlobalScanErrorBody | undefined;
 
                 if (status === 409) {
                     const kind = mapEnvelopeKind(body?.type);
@@ -367,7 +367,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         toast('Riwayat scan dibersihkan');
     }
 
-    function ingestFeedRow(row: IGlobalScanFeedRow): void {
+    function ingestFeedRow(row: TIGlobalScanFeedRow): void {
         if (seenFeedIds.has(row.id)) {
             return;
         }
@@ -385,7 +385,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         const parsed = new Date(row.ts);
         const epoch = Number.isNaN(parsed.getTime()) ? Date.now() : parsed.getTime();
 
-        const entry: IScanEntry = {
+        const entry: TIScanEntry = {
             id: row.id,
             name,
             email: identifier,

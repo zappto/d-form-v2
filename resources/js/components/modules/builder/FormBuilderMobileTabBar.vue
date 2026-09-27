@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Layers, SlidersHorizontal } from 'lucide-vue-next';
-import type { FormBuilderMobileTab } from '@/hooks/useFormBuilderWorkspace';
+import type { TFormBuilderMobileTab } from '@/hooks/useFormBuilderWorkspace';
 
-const mobileTab = defineModel<FormBuilderMobileTab>({ required: true });
+const mobileTab = defineModel<TFormBuilderMobileTab>({ required: true });
 
 defineProps<{
     fieldCount: number;
