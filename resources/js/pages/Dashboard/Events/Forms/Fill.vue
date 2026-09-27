@@ -6,17 +6,17 @@ import FormFillHeaderBlock from '@/components/modules/dashboard/FormFillHeaderBl
 import FormFillBlockedCard from '@/components/modules/dashboard/FormFillBlockedCard.vue';
 import FormFillFieldsList from '@/components/modules/dashboard/FormFillFieldsList.vue';
 import { useFormFillPage } from '@/hooks/useFormFillPage';
-import type { FormAccessStatus, FormFillPageEvent, FormFillPageForm } from '@/types/form';
+import type { TFormAccessStatus, IFormFillPageEvent, IFormFillPageForm } from '@/types/form';
 
 defineOptions({ layout: FormFillLayout });
 
 const props = withDefaults(
     defineProps<{
-        event: FormFillPageEvent;
-        form: FormFillPageForm;
+        event: IFormFillPageEvent;
+        form: IFormFillPageForm;
         fields: IFormField[];
         submitUrl: string;
-        accessStatus: FormAccessStatus;
+        accessStatus: TFormAccessStatus;
         accessMessage: string;
         registrationMode?: string;
         memberSlots?: number;

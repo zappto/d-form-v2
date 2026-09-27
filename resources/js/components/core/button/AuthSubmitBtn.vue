@@ -3,11 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { InertiaForm } from '@inertiajs/vue3';
 
-type Props = {
+type TProps = {
     form: InertiaForm<{ email: string; password: string }>;
 };
 
-const { form } = defineProps<Props>();
+const { form } = defineProps<TProps>();
 </script>
 
 <template>

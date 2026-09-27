@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { optionLabel } from '@/components/modules/builder/fieldMapping';
 import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
-import type { BuilderField, FieldOptionEntry } from '@/types/form-builder';
+import type { BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 import {
     Type,
     AlignLeft,
@@ -96,9 +96,9 @@ function canvasPlaceholder(f: BuilderField): string {
 
 const filledStars = computed(() => props.field.metadata?.maxStars ?? 5);
 
-const choiceOptions = computed((): FieldOptionEntry[] => {
+const choiceOptions = computed((): IFieldOptionEntry[] => {
     const raw = props.field.options;
-    if (Array.isArray(raw) && raw.length > 0) return raw as FieldOptionEntry[];
+    if (Array.isArray(raw) && raw.length > 0) return raw as IFieldOptionEntry[];
     return ['Option 1', 'Option 2', 'Option 3'].map((label) => ({
         id: label.toLowerCase().replace(/\s+/g, '-'),
         type: 'text',
@@ -106,7 +106,7 @@ const choiceOptions = computed((): FieldOptionEntry[] => {
     }));
 });
 
-function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
+function choiceImageSrc(entry: IFieldOptionEntry): string | undefined {
     const src = resolveOptionImagePreviewSrc(entry);
     return src !== '' ? src : undefined;
 }

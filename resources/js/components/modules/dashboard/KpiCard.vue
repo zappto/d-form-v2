@@ -3,13 +3,13 @@ import { computed, onMounted, ref } from 'vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { TrendingUp, TrendingDown } from 'lucide-vue-next';
-import type { IconComponent } from '@/types/icons';
+import type { TIconComponent } from '@/types/icons';
 
 const props = defineProps<{
     label: string;
     value: string | number;
     trend?: number;
-    icon: IconComponent;
+    icon: TIconComponent;
     color?: 'primary' | 'success' | 'warning' | 'destructive';
 }>();
 

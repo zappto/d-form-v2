@@ -6,7 +6,7 @@
 import type { BackendField } from '@/components/modules/builder/fieldMapping';
 
 /** Access gate for the public form fill route */
-export type FormAccessStatus =
+export type TFormAccessStatus =
     | 'allowed'
     | 'not_visible'
     | 'form_closed'
@@ -19,20 +19,20 @@ export type FormAccessStatus =
     | 'event_form_already_chosen'
     | 'prerequisite_not_met';
 
-export type FormPurpose = 'registration' | 'other';
+export type TFormPurpose = 'registration' | 'other';
 
-export interface FormSiblingOption {
+export interface IFormSiblingOption {
     id: string;
     title: string;
 }
 
-export interface FormFillPageEvent {
+export interface IFormFillPageEvent {
     id: string;
     slug: string;
     title: string;
 }
 
-export interface FormFillPageForm {
+export interface IFormFillPageForm {
     id: string;
     title: string;
     description: string | null;
@@ -42,15 +42,15 @@ export interface FormFillPageForm {
 }
 
 /** Values stored in the fill `useForm` map (matches file inputs + multi-select) */
-export type FormFillAnswerValue = string | string[] | File | null;
+export type TFormFillAnswerValue = string | string[] | File | null;
 
-export type FormFillAnswerMap = Record<string, FormFillAnswerValue>;
+export type TFormFillAnswerMap = Record<string, TFormFillAnswerValue>;
 
 /** One row in checkbox / radio / dropdown image+label choices on the fill page */
-export type FormFillOptionRow = { type: 'text' | 'image'; label: string; imageSrc?: string };
+export type TFormFillOptionRow = { type: 'text' | 'image'; label: string; imageSrc?: string };
 
 /** Validation rules nested under `metadata.rules` on API fields */
-export type FormFieldRules = {
+export type TFormFieldRules = {
     required?: boolean;
     in?: string;
     mimes?: string;
@@ -60,10 +60,10 @@ export type FormFieldRules = {
 } & Record<string, unknown>;
 
 /** Loose JSON-like metadata bag on `IFormField.metadata` */
-export type FormFieldMetadataBag = Record<string, unknown>;
+export type TFormFieldMetadataBag = Record<string, unknown>;
 
-export interface FormRegistrationMetadata {
-    purpose: FormPurpose;
+export interface IFormRegistrationMetadata {
+    purpose: TFormPurpose;
     requires_form_id: string | null;
     registration_mode: 'single' | 'bundle' | 'team' | null;
     max_team_size: number | null;
@@ -71,7 +71,7 @@ export interface FormRegistrationMetadata {
 }
 
 /** Payload for creating a form from the dashboard builder */
-export interface CreateDashboardFormPayload {
+export interface ICreateDashboardFormPayload {
     title: string;
     description: string;
     success_content: string;
@@ -80,12 +80,12 @@ export interface CreateDashboardFormPayload {
     banner_url: string;
     banner_caption: string;
     /** Payload metadata registrasi; `null` saat form belum diisi (init halaman create). */
-    metadata: FormRegistrationMetadata | null;
+    metadata: IFormRegistrationMetadata | null;
     fields: BackendField[];
 }
 
 /** Metadata registrasi form kosong untuk inisialisasi halaman create; dipakai saat form belum dikonfigurasi. */
-export function emptyFormRegistrationMetadata(): FormRegistrationMetadata {
+export function emptyFormRegistrationMetadata(): IFormRegistrationMetadata {
     return {
         purpose: 'registration',
         requires_form_id: null,
@@ -96,10 +96,10 @@ export function emptyFormRegistrationMetadata(): FormRegistrationMetadata {
 }
 
 /** Parse metadata registrasi dari payload backend menjadi bentuk terketik dengan default aman; dipakai saat memuat form. */
-export function parseFormRegistrationMetadata(raw: unknown): FormRegistrationMetadata {
+export function parseFormRegistrationMetadata(raw: unknown): IFormRegistrationMetadata {
     const m = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
     const purposeRaw = m['purpose'];
-    const purpose: FormPurpose = purposeRaw === 'other' ? 'other' : 'registration';
+    const purpose: TFormPurpose = purposeRaw === 'other' ? 'other' : 'registration';
     const requiresRaw = m['requires_form_id'];
     const requires_form_id = typeof requiresRaw === 'string' && requiresRaw !== '' ? requiresRaw : null;
     const mode = m['registration_mode'];
@@ -119,7 +119,7 @@ export function parseFormRegistrationMetadata(raw: unknown): FormRegistrationMet
  * Always send all registration keys so create/update round-trip reliably
  * (Inertia may omit nulls; partial objects used to wipe unrelated metadata).
  */
-export function toFormMetadataPayload(m: FormRegistrationMetadata): FormRegistrationMetadata {
+export function toFormMetadataPayload(m: IFormRegistrationMetadata): IFormRegistrationMetadata {
     const purpose = m.purpose === 'other' ? 'other' : 'registration';
     const isOther = purpose === 'other';
     return {

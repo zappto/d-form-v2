@@ -67,7 +67,7 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
-const currentUserEmail = computed(() => (page.props as Props).auth?.user?.email?.trim().toLowerCase() ?? '');
+const currentUserEmail = computed(() => (page.props as TProps).auth?.user?.email?.trim().toLowerCase() ?? '');
 
 const expandedBySlot = ref<Record<number, boolean>>({});
 const statusBySlot = ref<Record<number, CheckStatus>>({});

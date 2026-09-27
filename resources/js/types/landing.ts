@@ -1,19 +1,19 @@
-import type { IconComponent } from '@/types/icons';
+import type { TIconComponent } from '@/types/icons';
 import type { LottieName } from '@/lib/lotties';
 
-export interface FeatureItem {
-    readonly icon: IconComponent;
+export interface IFeatureItem {
+    readonly icon: TIconComponent;
     readonly title: string;
     readonly description: string;
 }
 
-export interface StepItem {
+export interface IStepItem {
     readonly title: string;
     readonly description: string;
     readonly lottie?: LottieName;
 }
 
-export interface NavLink {
+export interface INavLink {
     readonly label: string;
     readonly href: string;
 }
@@ -23,13 +23,13 @@ export interface IntegrationLogo {
     readonly category: string;
 }
 
-export interface ComparisonRow {
+export interface IComparisonRow {
     readonly feature: string;
     readonly dform: boolean | string;
     readonly competitor: boolean | string;
 }
 
-export interface EventListItem {
+export interface IEventListItem {
     readonly id: string | number;
     readonly title: string;
     readonly date: string;

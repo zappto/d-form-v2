@@ -3,11 +3,11 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from '
 import { LockKeyholeIcon, EyeIcon, EyeClosedIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-type Props = {
+type TProps = {
     id: string;
 };
 
-const { id } = defineProps<Props>();
+const { id } = defineProps<TProps>();
 
 const showPassword = ref(false);
 </script>

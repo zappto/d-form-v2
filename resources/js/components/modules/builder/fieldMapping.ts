@@ -3,21 +3,21 @@
  * Backend API_TYPES: input, select, textarea, datePicker, fileUpload
  */
 
-import type { BackendField, BuilderField, FieldOptionEntry } from '@/types/form-builder';
+import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 
-export type { BackendField, BuilderField, FieldOptionEntry };
+export type { BackendField, BuilderField, IFieldOptionEntry };
 
 /** Label opsi yang sudah di-trim; dipakai saat menampilkan dan menyerialkan pilihan field. */
-export function optionLabel(entry: FieldOptionEntry): string {
+export function optionLabel(entry: IFieldOptionEntry): string {
     return String(entry.label ?? '').trim();
 }
 
 /** URL gambar opsi yang sudah di-trim, atau undefined bila kosong; dipakai render opsi bergambar. */
-export function optionImageUrl(entry: FieldOptionEntry): string | undefined {
+export function optionImageUrl(entry: IFieldOptionEntry): string | undefined {
     return entry.imageUrl?.trim() || undefined;
 }
 
-function serializeOptionChoices(options: readonly FieldOptionEntry[]): Record<string, unknown>[] {
+function serializeOptionChoices(options: readonly IFieldOptionEntry[]): Record<string, unknown>[] {
     return options.map((o) => {
         const label = String(o.label ?? '').trim();
         // File pending → kirim imageUrl '' agar tak ada base64 baru yang
@@ -32,9 +32,9 @@ function serializeOptionChoices(options: readonly FieldOptionEntry[]): Record<st
     });
 }
 
-function parseOptionChoices(raw: unknown): FieldOptionEntry[] | null {
+function parseOptionChoices(raw: unknown): IFieldOptionEntry[] | null {
     if (!Array.isArray(raw)) return null;
-    const out: FieldOptionEntry[] = [];
+    const out: IFieldOptionEntry[] = [];
     for (const item of raw) {
         if (item && typeof item === 'object' && item !== null) {
             const row = item as Record<string, unknown>;
@@ -306,7 +306,7 @@ export function fromBackendField(bf: BackendField): BuilderField {
     const bt = (m.builderType as string) || guessType(bf.type, m);
     const inStr = (rules.in as string) || '';
     const parsedChoices = parseOptionChoices(m.optionChoices);
-    const optsRaw: FieldOptionEntry[] =
+    const optsRaw: IFieldOptionEntry[] =
         parsedChoices ??
         (['dropdown', 'checkbox', 'radio'].includes(bt)
             ? inStr
@@ -315,7 +315,7 @@ export function fromBackendField(bf: BackendField): BuilderField {
                   .filter(Boolean)
                   .map((label) => ({ id: crypto.randomUUID(), type: 'text' as const, label }))
             : []);
-    const opts: FieldOptionEntry[] =
+    const opts: IFieldOptionEntry[] =
         bt === 'dropdown'
             ? optsRaw.map((opt) => ({
                   ...opt,

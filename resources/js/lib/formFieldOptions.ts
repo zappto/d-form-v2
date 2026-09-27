@@ -1,6 +1,6 @@
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
-import type { FormFillOptionRow } from '@/types/form';
+import type { TFormFillOptionRow } from '@/types/form';
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -129,7 +129,7 @@ function flattenUnknownArray(arr: unknown[]): unknown[] {
     return out;
 }
 
-function parseOptionChoicesRows(value: unknown, builderType: string): FormFillOptionRow[] {
+function parseOptionChoicesRows(value: unknown, builderType: string): TFormFillOptionRow[] {
     const raw: unknown[] = Array.isArray(value)
         ? value
         : typeof value === 'string'
@@ -150,7 +150,7 @@ function parseOptionChoicesRows(value: unknown, builderType: string): FormFillOp
     const source = flattenUnknownArray(raw);
     if (source.length === 0) return [];
 
-    const rows: FormFillOptionRow[] = [];
+    const rows: TFormFillOptionRow[] = [];
     for (const item of source) {
         if (typeof item === 'string') {
             const label = asNonEmptyString(item);
@@ -185,7 +185,7 @@ function parseOptionChoicesRows(value: unknown, builderType: string): FormFillOp
 /**
  * Options / image-choice rows for select, radio, checkbox — shared by fill UI, invitation review, and read-only display.
  */
-export function getFormFieldOptionRows(field: IFormField): FormFillOptionRow[] {
+export function getFormFieldOptionRows(field: IFormField): TFormFillOptionRow[] {
     const builderType = formFieldBuilderType(field);
     const meta = readFieldMetadata(field);
     const oc = meta.optionChoices ?? meta.option_choices;

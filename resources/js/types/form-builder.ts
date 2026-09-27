@@ -1,8 +1,8 @@
-export type FieldOptionType = 'text' | 'image';
+export type TFieldOptionType = 'text' | 'image';
 
-export interface FieldOptionEntry {
+export interface IFieldOptionEntry {
     id: string;
-    type: FieldOptionType;
+    type: TFieldOptionType;
     label: string;
     imageUrl?: string;
     /** File baru yang belum terupload — tidak diserialisasi ke DB, hanya di state. */
@@ -19,7 +19,7 @@ export interface BuilderField {
     name: string;
     placeholder: string;
     required: boolean;
-    options: FieldOptionEntry[];
+    options: IFieldOptionEntry[];
     metadata: Record<string, unknown>;
     /** Field may be edited by invited members (team flow); persisted as `form_fields.is_append`. */
     is_append?: boolean;
@@ -30,7 +30,7 @@ export interface BuilderField {
     order?: number;
 }
 
-export type BackendFieldType =
+export type TBackendFieldType =
     | 'input'
     | 'select'
     | 'textarea'
@@ -42,7 +42,7 @@ export type BackendFieldType =
 
 export interface BackendField {
     id: string;
-    type: BackendFieldType;
+    type: TBackendFieldType;
     label: string;
     description: string | null;
     name: string;

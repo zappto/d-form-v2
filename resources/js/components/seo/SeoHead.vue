@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import type { SharedSeoProps } from '@/types/seo';
+import type { ISharedSeoProps } from '@/types/seo';
 
 const props = withDefaults(
     defineProps<{
@@ -26,7 +26,7 @@ const props = withDefaults(
 
 const page = usePage();
 
-const seo = computed(() => (page.props as { seo?: SharedSeoProps }).seo);
+const seo = computed(() => (page.props as { seo?: ISharedSeoProps }).seo);
 
 const siteName = computed(() => seo.value?.siteName ?? 'App');
 

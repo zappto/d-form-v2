@@ -25,7 +25,7 @@ import {
     type PendingOptionImageFile,
 } from '@/components/modules/builder/optionImage';
 import { mergeSentHeader, stripBlankRequiredKeys } from '@/lib/autosaveHeader';
-import { toFormMetadataPayload, type FormRegistrationMetadata } from '@/types/form';
+import { toFormMetadataPayload, type IFormRegistrationMetadata } from '@/types/form';
 import type { BackendField, BuilderField } from '@/types/form-builder';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
 
@@ -38,7 +38,7 @@ export interface IBuilderAutosaveState {
     visibleFor: string[];
     banner: FormBannerState;
     fields: BuilderField[];
-    metadata: FormRegistrationMetadata;
+    metadata: IFormRegistrationMetadata;
 }
 
 /** Pemasok state + URL + gerbang yang wajib disediakan tiap halaman konsumen. */

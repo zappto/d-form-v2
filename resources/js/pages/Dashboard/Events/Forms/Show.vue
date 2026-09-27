@@ -30,7 +30,7 @@ import {
 } from '@/components/modules/builder/formBanner';
 import { hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
-import type { FormSiblingOption } from '@/types/form';
+import type { IFormSiblingOption } from '@/types/form';
 import {
     answerPreview,
     formatSubmissionDate,
@@ -52,7 +52,7 @@ const props = defineProps<{
     event: { id: string; title: string };
     form: IForm;
     fields: BackendField[];
-    siblingForms?: FormSiblingOption[];
+    siblingForms?: IFormSiblingOption[];
     saveFieldsUrl: string;
     updateFormUrl: string;
     autosaveFormUrl: string;

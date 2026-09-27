@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { BuilderField, FieldOptionEntry } from '@/types/form-builder';
+import type { BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 import { resolveOptionImagePreviewSrc, revokeOptionImagePreviewUrl } from '@/components/modules/builder/optionImage';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
@@ -70,10 +70,10 @@ function updateMeta(key: string, value: unknown) {
 // --- option list helpers (for checkbox / radio / dropdown) ---
 const newOption = ref('');
 
-function optionRows(): FieldOptionEntry[] {
+function optionRows(): IFieldOptionEntry[] {
     const raw = props.field.options;
     if (!Array.isArray(raw)) return [];
-    const rows = raw as FieldOptionEntry[];
+    const rows = raw as IFieldOptionEntry[];
     // Dropdown is intentionally text-only to avoid unstable image option rendering.
     if (props.field.type === 'dropdown') {
         return rows.map((row) => ({
@@ -86,7 +86,7 @@ function optionRows(): FieldOptionEntry[] {
     return rows;
 }
 
-function emitOptions(next: FieldOptionEntry[]) {
+function emitOptions(next: IFieldOptionEntry[]) {
     emit('update:field', { ...props.field, options: next });
 }
 
@@ -146,7 +146,7 @@ function onOptionImageFile(index: number, event: Event) {
     emitOptions(opts);
 }
 
-function optionPreviewSrc(opt: FieldOptionEntry): string {
+function optionPreviewSrc(opt: IFieldOptionEntry): string {
     return resolveOptionImagePreviewSrc(opt);
 }
 

@@ -1,9 +1,9 @@
-import type { FormFieldMetadataBag, FormFieldRules } from '@/types/form';
+import type { TFormFieldMetadataBag, TFormFieldRules } from '@/types/form';
 
 /**
  * Baca flag boolean dari metadata API/Laravel tanpa jebakan `Boolean("false") === true`.
  */
-export function readMetaBoolean(meta: FormFieldMetadataBag, key: string): boolean {
+export function readMetaBoolean(meta: TFormFieldMetadataBag, key: string): boolean {
     const v = meta[key];
     if (v === true || v === 1) return true;
     if (v === false || v === 0 || v === null || v === undefined) return false;
@@ -20,7 +20,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 /** Ambil metadata field sebagai objek (mendukung JSON string dan array); dipakai sebelum membaca rules/flag field. */
-export function readFieldMetadata(field: IFormField): FormFieldMetadataBag {
+export function readFieldMetadata(field: IFormField): TFormFieldMetadataBag {
     let m: unknown = field.metadata;
     if (typeof m === 'string' && m.trim()) {
         try {
@@ -36,7 +36,7 @@ export function readFieldMetadata(field: IFormField): FormFieldMetadataBag {
 }
 
 /** Ambil objek rules dari metadata field; dipakai untuk validasi dan render aturan field. */
-export function readFieldRules(field: IFormField): FormFieldRules {
+export function readFieldRules(field: IFormField): TFormFieldRules {
     const raw = readFieldMetadata(field).rules;
-    return isPlainObject(raw) ? (raw as FormFieldRules) : {};
+    return isPlainObject(raw) ? (raw as TFormFieldRules) : {};
 }

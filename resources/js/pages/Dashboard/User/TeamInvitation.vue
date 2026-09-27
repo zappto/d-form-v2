@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
-import type { FormFillAnswerValue } from '@/types/form';
+import type { TFormFillAnswerValue } from '@/types/form';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
 import { getFormFieldOptionRows, formFieldBuilderType } from '@/lib/formFieldOptions';
@@ -74,8 +74,8 @@ function invitationFieldError(errors: ValidationErrors, key: string): string | u
     return getFieldError(errors, key, errorContext.value);
 }
 
-function initialFormState(): Record<string, FormFillAnswerValue> {
-    const o: Record<string, FormFillAnswerValue> = {};
+function initialFormState(): Record<string, TFormFillAnswerValue> {
+    const o: Record<string, TFormFillAnswerValue> = {};
     for (const f of appendableFields.value) {
         const raw = props.answers[f.name];
         const meta = readFieldMetadata(f);

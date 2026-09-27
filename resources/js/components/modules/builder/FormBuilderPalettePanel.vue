@@ -7,12 +7,12 @@ import { SplitDateTimeField } from '@/components/ui/date-picker';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { ChevronRight, ChevronDown, Search, Settings2 } from 'lucide-vue-next';
 import type { FormBuilderPaletteCategory } from '@/components/modules/builder/formBuilderPalette';
-import type { FormRegistrationMetadata, FormSiblingOption } from '@/types/form';
+import type { IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
 
 const searchQuery = defineModel<string>('searchQuery', { required: true });
 const closedAt = defineModel<string>('closedAt', { required: true });
 const visibleFor = defineModel<string[]>('visibleFor', { required: true });
-const formMetadata = defineModel<FormRegistrationMetadata>('formMetadata', { required: true });
+const formMetadata = defineModel<IFormRegistrationMetadata>('formMetadata', { required: true });
 
 const props = withDefaults(
     defineProps<{
@@ -21,7 +21,7 @@ const props = withDefaults(
         formSettingsOpen: boolean;
         fieldErrors: Partial<Record<'closed_at' | 'visible_for', string>>;
         visibilityOptions: readonly { value: string; label: string }[];
-        siblingForms?: FormSiblingOption[];
+        siblingForms?: IFormSiblingOption[];
     }>(),
     {
         siblingForms: () => [],
@@ -78,8 +78,10 @@ function onRequiresFormChange(value: string): void {
 }
 
 function onRegistrationModeChange(value: string): void {
-    const mode: FormRegistrationMetadata['registration_mode'] =
-        value === noSelectionSentinel || value === '' ? null : (value as FormRegistrationMetadata['registration_mode']);
+    const mode: IFormRegistrationMetadata['registration_mode'] =
+        value === noSelectionSentinel || value === ''
+            ? null
+            : (value as IFormRegistrationMetadata['registration_mode']);
     const keepSizes = mode === 'team' || mode === 'bundle';
     formMetadata.value = {
         ...formMetadata.value,

@@ -1,4 +1,4 @@
-import type { BackendField, BuilderField, FieldOptionEntry } from '@/types/form-builder';
+import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 
 export interface PendingOptionImageFile {
@@ -13,7 +13,7 @@ export function collectPendingOptionImageFiles(fields: BuilderField[]): PendingO
     for (const f of fields) {
         if (!Array.isArray(f.options)) continue;
         if (f.type === 'dropdown') continue;
-        for (const opt of f.options as FieldOptionEntry[]) {
+        for (const opt of f.options as IFieldOptionEntry[]) {
             if (opt.type !== 'image') continue;
             if (opt.imageFile instanceof File) {
                 out.push({ fieldId: f.id, optionId: opt.id, file: opt.imageFile });
@@ -126,7 +126,7 @@ export function readOptionImagePathsFromResponse(payload: unknown): Record<strin
 export function applyOptionImageUploadSuccess(fields: BuilderField[], storedMap: Record<string, string>): void {
     for (const f of fields) {
         if (!Array.isArray(f.options)) continue;
-        for (const opt of f.options as FieldOptionEntry[]) {
+        for (const opt of f.options as IFieldOptionEntry[]) {
             const key = `${f.id}:${opt.id}`;
             const storedPath = storedMap[key];
             if (typeof storedPath !== 'string' || storedPath === '') continue;
@@ -144,7 +144,7 @@ export function discardPendingOptionImageFiles(fields: BuilderField[]): boolean 
     let hadPending = false;
     for (const f of fields) {
         if (!Array.isArray(f.options)) continue;
-        for (const opt of f.options as FieldOptionEntry[]) {
+        for (const opt of f.options as IFieldOptionEntry[]) {
             if (opt.imageFile instanceof File) {
                 hadPending = true;
                 revokeOptionImagePreviewUrl(opt.imagePreviewUrl);
@@ -168,7 +168,7 @@ export function revokeOptionImagePreviewUrl(url: string | undefined | null): voi
 }
 
 /** Preview yang harus tampil: object URL file baru diutamakan, lalu path tersimpan. */
-export function resolveOptionImagePreviewSrc(entry: FieldOptionEntry, fallback = ''): string {
+export function resolveOptionImagePreviewSrc(entry: IFieldOptionEntry, fallback = ''): string {
     const preview = (entry.imagePreviewUrl ?? '').trim();
     if (preview !== '') return preview;
     const fromUrl = normalizeBannerSrc(String(entry.imageUrl ?? ''));

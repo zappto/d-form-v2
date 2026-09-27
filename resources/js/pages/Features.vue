@@ -3,7 +3,7 @@ import LandingLayout from '@/layouts/LandingLayout.vue';
 import SeoHead from '@/components/seo/SeoHead.vue';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import type { SharedSeoProps } from '@/types/seo';
+import type { ISharedSeoProps } from '@/types/seo';
 import FeaturesHero from '@/components/modules/landing/features/FeaturesHero.vue';
 import FeaturesGrid from '@/components/modules/landing/features/FeaturesGrid.vue';
 import FeaturesHowItWorks from '@/components/modules/landing/features/FeaturesHowItWorks.vue';
@@ -13,7 +13,7 @@ import HomeCTA from '@/components/modules/landing/home/HomeCTA.vue';
 import { routes } from '@/lib/routes';
 
 const page = usePage();
-const seo = computed(() => (page.props as { seo: SharedSeoProps }).seo);
+const seo = computed(() => (page.props as { seo: ISharedSeoProps }).seo);
 
 const featuresDescription = computed(
     () =>

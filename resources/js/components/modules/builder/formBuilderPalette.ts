@@ -20,7 +20,7 @@ import {
 } from 'lucide-vue-next';
 
 export interface FormBuilderPaletteField {
-    type: FormBuilderType;
+    type: TFormBuilderType;
     label: string;
     icon: Component;
     description: string;

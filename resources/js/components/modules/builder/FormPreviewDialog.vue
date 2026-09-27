@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { X, Star, Upload, ImagePlus, Send } from 'lucide-vue-next';
-import { optionLabel, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping';
+import { optionLabel, type IFieldOptionEntry } from '@/components/modules/builder/fieldMapping';
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage';
 import PageHeader from '@/components/modules/dashboard/PageHeader.vue';
@@ -22,7 +22,7 @@ export interface FormPreviewField {
     description?: string;
     required?: boolean;
     placeholder?: string;
-    options?: FieldOptionEntry[];
+    options?: IFieldOptionEntry[];
     metadata?: Record<string, unknown>;
 }
 
@@ -74,12 +74,12 @@ function metaNumber(field: FormPreviewField, key: string, fallback: number): num
     return typeof v === 'number' && !Number.isNaN(v) ? v : fallback;
 }
 
-function optionEntries(field: FormPreviewField): FieldOptionEntry[] {
+function optionEntries(field: FormPreviewField): IFieldOptionEntry[] {
     const raw = field.options;
     if (!Array.isArray(raw)) return [];
     return raw.map((opt) => {
-        if (typeof opt === 'object' && opt !== null) return opt as FieldOptionEntry;
-        return { id: crypto.randomUUID(), type: 'text', label: String(opt) } as FieldOptionEntry;
+        if (typeof opt === 'object' && opt !== null) return opt as IFieldOptionEntry;
+        return { id: crypto.randomUUID(), type: 'text', label: String(opt) } as IFieldOptionEntry;
     });
 }
 
@@ -90,15 +90,15 @@ function dropdownOptions(field: FormPreviewField): SearchableSelectOption[] {
     }));
 }
 
-function choiceThumb(entry: FieldOptionEntry): string {
+function choiceThumb(entry: IFieldOptionEntry): string {
     return resolveOptionImagePreviewSrc(entry);
 }
 
-function hasChoiceImage(entry: FieldOptionEntry): boolean {
+function hasChoiceImage(entry: IFieldOptionEntry): boolean {
     return choiceThumb(entry) !== '';
 }
 
-function optKey(opt: FieldOptionEntry, i: number): string {
+function optKey(opt: IFieldOptionEntry, i: number): string {
     return `${opt.id || i}`;
 }
 

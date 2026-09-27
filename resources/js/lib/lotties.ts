@@ -1,4 +1,4 @@
-import type { LottieRegistry } from '@/types/lottie';
+import type { TLottieRegistry } from '@/types/lottie';
 
 /**
  * Registri Lottie — berkas JSON di `public/lotties/` (diperbarui untuk set ilustrasi baru).
@@ -110,6 +110,6 @@ export const lotties = {
         src: '/lotties/events-hero.json',
         label: 'Ilustrasi konferensi dan diskusi acara',
     },
-} as const satisfies LottieRegistry;
+} as const satisfies TLottieRegistry;
 
 export type LottieName = keyof typeof lotties;

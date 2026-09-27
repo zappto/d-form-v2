@@ -236,7 +236,7 @@ export function useFormBuilderWorkspace(models: FormBuilderWorkspaceModels, opti
         const insertAt = dropIndicatorIndex.value < 0 ? models.formFields.value.length : dropIndicatorIndex.value;
         const list = [...models.formFields.value];
         if (data.isNew && data.type && data.label) {
-            const nf = createFormBuilderField(data.type as FormBuilderType, data.label);
+            const nf = createFormBuilderField(data.type as TFormBuilderType, data.label);
             list.splice(insertAt, 0, nf);
             models.formFields.value = list;
             selectedFieldId.value = nf.id;

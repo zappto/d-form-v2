@@ -31,11 +31,11 @@ import {
 } from 'lucide-vue-next';
 import SeoHead from '@/components/seo/SeoHead.vue';
 import { usePage } from '@inertiajs/vue3';
-import type { SharedSeoProps } from '@/types/seo';
+import type { ISharedSeoProps } from '@/types/seo';
 import { routes } from '@/lib/routes';
 
 const page = usePage();
-const seo = computed(() => (page.props as { seo: SharedSeoProps }).seo);
+const seo = computed(() => (page.props as { seo: ISharedSeoProps }).seo);
 
 const docsDescription = computed(
     () =>

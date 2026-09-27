@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { IconComponent } from '@/types/icons';
+import type { TIconComponent } from '@/types/icons';
 import { GripVertical } from 'lucide-vue-next';
 
 const props = withDefaults(
     defineProps<{
         type: string;
         label: string;
-        icon?: IconComponent;
+        icon?: TIconComponent;
         description?: string;
     }>(),
     { description: '' }

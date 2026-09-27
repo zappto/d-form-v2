@@ -28,7 +28,7 @@ import TiptapRichHtml from '@/components/modules/dashboard/events/TiptapRichHtml
 import { routes } from '@/lib/routes';
 import { EVENT_HERO_BANNER_ASPECT } from '@/lib/eventBannerAspect';
 import { eventStatusUi } from '@/lib/eventShowUi';
-import type { FormAccessStatus } from '@/types/form';
+import type { TFormAccessStatus } from '@/types/form';
 
 defineOptions({ layout: DashboardLayout });
 
@@ -37,7 +37,7 @@ type ParticipantFormRow = {
     title: string;
     description: string | null;
     fill_url: string;
-    access_status: FormAccessStatus;
+    access_status: TFormAccessStatus;
     access_message: string;
     can_start: boolean;
     requires_form_title: string | null;
@@ -93,7 +93,7 @@ const myRegistrationLabel: Record<NonNullable<typeof props.registrationStatus>, 
     rejected: 'Tidak diterima',
 };
 
-function participantStatusLabel(s: FormAccessStatus): string {
+function participantStatusLabel(s: TFormAccessStatus): string {
     if (s === 'allowed') return 'Tersedia';
     if (s === 'already_submitted') return 'Sudah diisi';
     if (s === 'prerequisite_not_met') return 'Menunggu syarat';

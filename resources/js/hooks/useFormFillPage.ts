@@ -13,22 +13,22 @@ import {
 import { getFormFieldOptionRows } from '@/lib/formFieldOptions';
 import { readFieldMetadata, readFieldRules, readMetaBoolean } from '@/lib/formFieldMetadata';
 import type {
-    FormAccessStatus,
-    FormFillAnswerMap,
-    FormFillOptionRow,
-    FormFillPageEvent,
-    FormFillPageForm,
-    FormFieldMetadataBag,
-    FormFieldRules,
+    TFormAccessStatus,
+    TFormFillAnswerMap,
+    TFormFillOptionRow,
+    IFormFillPageEvent,
+    IFormFillPageForm,
+    TFormFieldMetadataBag,
+    TFormFieldRules,
 } from '@/types/form';
 
 /** Nilai jawaban, banner, blok akses, validasi, dan draft lokal halaman isi form responden. */
 export function useFormFillPage(props: {
-    event: FormFillPageEvent;
-    form: FormFillPageForm;
+    event: IFormFillPageEvent;
+    form: IFormFillPageForm;
     fields: IFormField[];
     submitUrl: string;
-    accessStatus: FormAccessStatus;
+    accessStatus: TFormAccessStatus;
     accessMessage: string;
     memberSlots: number;
     registrationMode: string;
@@ -37,11 +37,11 @@ export function useFormFillPage(props: {
     const fields = props.fields ?? [];
     const page = usePage();
 
-    function metadata(field: IFormField): FormFieldMetadataBag {
+    function metadata(field: IFormField): TFormFieldMetadataBag {
         return readFieldMetadata(field);
     }
 
-    function rules(field: IFormField): FormFieldRules {
+    function rules(field: IFormField): TFormFieldRules {
         return readFieldRules(field);
     }
 
@@ -81,7 +81,7 @@ export function useFormFillPage(props: {
 
     const blockCopy = computed(() => {
         const fallback = props.accessMessage || 'This form is not available right now.';
-        const map: Record<FormAccessStatus, { title: string; body: string; success?: boolean }> = {
+        const map: Record<TFormAccessStatus, { title: string; body: string; success?: boolean }> = {
             allowed: { title: '', body: '' },
             already_submitted: { title: 'You have already submitted this form.', body: fallback, success: true },
             form_closed: { title: 'Registration is closed.', body: fallback },
@@ -112,7 +112,7 @@ export function useFormFillPage(props: {
         return map[props.accessStatus];
     });
 
-    const initialValues: FormFillAnswerMap = {};
+    const initialValues: TFormFillAnswerMap = {};
     for (const field of fields) {
         if (isDisplayOnly(field)) continue;
         if (field.type === 'checkbox' || (field.type === 'select' && readMetaBoolean(metadata(field), 'is_multiple'))) {
@@ -148,7 +148,7 @@ export function useFormFillPage(props: {
         }
     }
 
-    const answerForm = useForm<FormFillAnswerMap>(initialValues);
+    const answerForm = useForm<TFormFillAnswerMap>(initialValues);
 
     /** Draft lokal responden (tanpa server): File dikecualikan seperti pola Apply. */
     function restoreFillDraftValues(draft: unknown): void {
@@ -189,7 +189,7 @@ export function useFormFillPage(props: {
         }
     }
 
-    function getOptionRows(field: IFormField): FormFillOptionRow[] {
+    function getOptionRows(field: IFormField): TFormFillOptionRow[] {
         return getFormFieldOptionRows(field);
     }
 
@@ -327,7 +327,7 @@ export function useFormFillPage(props: {
     function submit() {
         if (isBlocked.value) return;
 
-        const myEmail = (page.props as Props).auth?.user?.email?.trim().toLowerCase();
+        const myEmail = (page.props as TProps).auth?.user?.email?.trim().toLowerCase();
         if (myEmail && props.memberSlots > 0) {
             const emails = (answerForm.team_member_emails as string[] | undefined) ?? [];
             const clash = emails.some((e) => (e?.trim().toLowerCase() ?? '') === myEmail);

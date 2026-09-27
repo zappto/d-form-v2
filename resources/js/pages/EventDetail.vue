@@ -9,7 +9,7 @@ import { categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummy
 import { formatCountNumber, formatDisplayDate } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
 import { stripHtmlToText } from '@/utils/stripHtml';
-import type { SharedSeoProps } from '@/types/seo';
+import type { ISharedSeoProps } from '@/types/seo';
 import { routes } from '@/lib/routes';
 import { eventHeroBannerContainerClass } from '@/lib/eventBannerAspect';
 import { eventStatusUi } from '@/lib/eventShowUi';
@@ -20,7 +20,7 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
-const seo = computed(() => (page.props as { seo: SharedSeoProps }).seo);
+const seo = computed(() => (page.props as { seo: ISharedSeoProps }).seo);
 
 /** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */
 const eventReady = computed<boolean>(() => props.event !== undefined);

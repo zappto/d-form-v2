@@ -10,7 +10,7 @@ import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/s
 import type { UnwrapNestedRefs } from 'vue';
 import { Star, ImagePlus, Upload, X } from 'lucide-vue-next';
 import type { FormFillPageContext } from '@/hooks/useFormFillPage';
-import type { FormFillOptionRow } from '@/types/form';
+import type { TFormFillOptionRow } from '@/types/form';
 import { formatParagraphContentToHtml } from '@/lib/formParagraphContent';
 
 const props = withDefaults(
@@ -83,7 +83,7 @@ function fillReady(): boolean {
 /** Option rows as SearchableSelect options; value mirrors the label so stored answers stay labels. */
 const selectOptions = computed<SearchableSelectOption[]>(() =>
     props.ctx.getOptionRows(props.field).map(
-        (row: FormFillOptionRow): SearchableSelectOption => ({
+        (row: TFormFillOptionRow): SearchableSelectOption => ({
             value: row.label,
             label: row.label,
             imageSrc: row.type === 'image' ? row.imageSrc : undefined,

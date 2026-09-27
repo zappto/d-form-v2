@@ -53,17 +53,17 @@ declare global {
         purpose?: 'registration' | 'other';
     }
 
-    type FormFieldOptionType = 'text' | 'image';
+    type TFormFieldOptionType = 'text' | 'image';
 
     interface IFormFieldOption {
         id: string;
-        type: FormFieldOptionType;
+        type: TFormFieldOptionType;
         label: string;
         imageUrl?: string;
     }
 
     // Rich types used in the Builder UI
-    type FormBuilderType =
+    type TFormBuilderType =
         | 'short_text'
         | 'long_text'
         | 'email'
@@ -87,12 +87,12 @@ declare global {
         | 'yes_no';
 
     // Simple types stored in the Database
-    type FormApiType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'radio' | 'checkbox';
+    type TFormApiType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'radio' | 'checkbox';
 
     interface IFormField {
         id: string;
         /** `''` menandai field legacy tanpa type tersimpan (lihat `formFieldApiType`). */
-        type: FormApiType | FormBuilderType | '';
+        type: TFormApiType | TFormBuilderType | '';
         label: string;
         description?: string | null;
         name: string;

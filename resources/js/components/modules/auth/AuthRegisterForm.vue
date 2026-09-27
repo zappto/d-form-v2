@@ -7,7 +7,7 @@ import { AuthSubmitButton } from '@/components/core/button';
 import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
 import { store as register } from '@/actions/App/Http/Controllers/Auth/RegisterController';
 import { getFieldError, handleInertiaFormErrors, showErrorToast } from '@/lib/error-message';
-import type { PasswordRule, PasswordStrength } from '@/types/auth';
+import type { IPasswordRule, TPasswordStrength } from '@/types/auth';
 
 const form = useForm({
     name: '',
@@ -16,7 +16,7 @@ const form = useForm({
     password_confirmation: '',
 }).dontRemember('password', 'password_confirmation');
 
-const rules = computed<PasswordRule[]>(() => [
+const rules = computed<IPasswordRule[]>(() => [
     { label: 'At least 8 characters', met: form.password.length >= 8 },
     { label: 'Contains a number', met: /\d/.test(form.password) },
     { label: 'Contains uppercase', met: /[A-Z]/.test(form.password) },
@@ -31,7 +31,7 @@ const strengthPercent = computed<number>(() => {
     return Math.round((met / rules.value.length) * 100);
 });
 
-const strengthKind = computed<PasswordStrength>(() => {
+const strengthKind = computed<TPasswordStrength>(() => {
     if (strengthPercent.value <= 25) return 'weak';
     if (strengthPercent.value <= 50) return 'fair';
     if (strengthPercent.value <= 75) return 'good';
@@ -39,7 +39,7 @@ const strengthKind = computed<PasswordStrength>(() => {
 });
 
 const strengthLabel = computed<string>(() => {
-    const map: Record<PasswordStrength, string> = {
+    const map: Record<TPasswordStrength, string> = {
         weak: 'Weak',
         fair: 'Fair',
         good: 'Good',
@@ -49,7 +49,7 @@ const strengthLabel = computed<string>(() => {
 });
 
 const strengthBarClass = computed<string>(() => {
-    const map: Record<PasswordStrength, string> = {
+    const map: Record<TPasswordStrength, string> = {
         weak: 'bg-destructive',
         fair: 'bg-warning',
         good: 'bg-primary',
@@ -59,7 +59,7 @@ const strengthBarClass = computed<string>(() => {
 });
 
 const strengthBadgeClass = computed<string>(() => {
-    const map: Record<PasswordStrength, string> = {
+    const map: Record<TPasswordStrength, string> = {
         weak: 'border-destructive/25 bg-destructive/10 text-destructive',
         fair: 'border-warning/30 bg-warning/15 text-warning-foreground',
         good: 'border-primary/25 bg-primary/10 text-primary',

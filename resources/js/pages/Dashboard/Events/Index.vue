@@ -22,7 +22,7 @@ import useAuth from '@/hooks/useAuth';
 
 defineOptions({ layout: DashboardLayout });
 
-const page = usePage<IProps>();
+const page = usePage<TPageProps>();
 const user = useAuth(page.props);
 const canManageEvents = computed(() => user.value?.can_manage_events === true);
 

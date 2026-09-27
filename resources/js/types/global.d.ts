@@ -1,6 +1,6 @@
 // global.d.ts
 import '@inertiajs/core';
-import type { SharedSeoProps } from './seo';
+import type { ISharedSeoProps } from './seo';
 
 declare global {
     interface IUser {
@@ -48,19 +48,19 @@ declare global {
         deleted_at?: string;
     }
 
-    type IProps = {
+    type TPageProps = {
         auth: { user: IUser | null };
         appName: string;
-        seo: SharedSeoProps;
+        seo: ISharedSeoProps;
     };
 
     type User = IUser;
-    type Props = IProps;
+    type TProps = TPageProps;
 }
 
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
-        sharedPageProps: IProps;
+        sharedPageProps: TPageProps;
         flashDataType: {
             toast?: { type: 'success' | 'error'; message: string };
         };

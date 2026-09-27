@@ -10,7 +10,7 @@ import { useFormFillPage } from '@/hooks/useFormFillPage';
 import { snapshotRespondentValues } from '@/hooks/useRespondentDraft';
 import { useDraftRestore } from '@/hooks/useDraftRestore';
 import { readFieldRules } from '@/lib/formFieldMetadata';
-import type { FormFillPageEvent, FormFillPageForm } from '@/types/form';
+import type { IFormFillPageEvent, IFormFillPageForm } from '@/types/form';
 import { routes } from '@/lib/routes';
 import { CircleAlert } from 'lucide-vue-next';
 
@@ -20,8 +20,8 @@ interface ApplyPageProps {
     period: Record<string, unknown> | null;
     registration: { is_open: boolean; message: string | null };
     divisions: Array<Record<string, unknown>>;
-    oprecForm: FormFillPageForm;
-    oprecEvent: FormFillPageEvent;
+    oprecForm: IFormFillPageForm;
+    oprecEvent: IFormFillPageEvent;
     fields: IFormField[];
     submitUrl: string;
 }

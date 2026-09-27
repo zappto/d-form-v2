@@ -14,12 +14,12 @@ import {
 import { discardPendingOptionImageFiles, hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
 import { toBackendFields } from '@/components/modules/builder/fieldMapping';
 import type { BuilderField } from '@/types/form-builder';
-import type { CreateDashboardFormPayload, FormSiblingOption } from '@/types/form';
+import type { ICreateDashboardFormPayload, IFormSiblingOption } from '@/types/form';
 import { emptyFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
 import { routes } from '@/lib/routes';
 
 /** Inertia `FormDataType` cannot recurse `BackendField.metadata` (Record<string, unknown>); store fields loosely for typing only. */
-type CreateFormClientPayload = Omit<CreateDashboardFormPayload, 'fields'> & {
+type CreateFormClientPayload = Omit<ICreateDashboardFormPayload, 'fields'> & {
     fields: object[];
 };
 
@@ -27,7 +27,7 @@ defineOptions({ layout: DashboardLayout });
 
 const props = defineProps<{
     event: { id: string; title: string };
-    siblingForms?: FormSiblingOption[];
+    siblingForms?: IFormSiblingOption[];
 }>();
 
 const formTitle = ref<string>('');

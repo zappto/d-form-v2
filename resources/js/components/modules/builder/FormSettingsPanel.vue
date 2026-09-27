@@ -4,18 +4,18 @@ import { Input } from '@/components/ui/input';
 import { SplitDateTimeField } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
-import type { FormPurpose, FormRegistrationMetadata, FormSiblingOption } from '@/types/form';
+import type { TFormPurpose, IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
 
 const closedAt = defineModel<string>('closedAt', { required: true });
 const visibleFor = defineModel<string[]>('visibleFor', { required: true });
-const formMetadata = defineModel<FormRegistrationMetadata>('formMetadata', { required: true });
+const formMetadata = defineModel<IFormRegistrationMetadata>('formMetadata', { required: true });
 
 const props = withDefaults(
     defineProps<{
         idPrefix: string;
         fieldErrors: Partial<Record<'closed_at' | 'visible_for', string>>;
         visibilityOptions: readonly { value: string; label: string }[];
-        siblingForms?: FormSiblingOption[];
+        siblingForms?: IFormSiblingOption[];
     }>(),
     {
         siblingForms: () => [],
@@ -57,7 +57,7 @@ const registrationModeOptions: SearchableSelectOption[] = [
 ];
 
 function onPurposeChange(value: string): void {
-    const purpose: FormPurpose = value === 'other' ? 'other' : 'registration';
+    const purpose: TFormPurpose = value === 'other' ? 'other' : 'registration';
     formMetadata.value = {
         ...formMetadata.value,
         purpose,
@@ -73,10 +73,10 @@ function onRequiresFormChange(value: string): void {
 }
 
 function onRegistrationModeSelect(value: string): void {
-    const mode: FormRegistrationMetadata['registration_mode'] =
+    const mode: IFormRegistrationMetadata['registration_mode'] =
         value === registrationModeSelectSentinel || value === ''
             ? null
-            : (value as FormRegistrationMetadata['registration_mode']);
+            : (value as IFormRegistrationMetadata['registration_mode']);
     const leaveSizes = mode === 'team' || mode === 'bundle';
     formMetadata.value = {
         ...formMetadata.value,

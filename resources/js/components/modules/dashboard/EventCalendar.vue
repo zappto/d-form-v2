@@ -10,11 +10,11 @@ import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData';
 import { formatDisplayDate } from '@/lib/format';
 import { toCategoryList, primaryCategory } from '@/lib/eventCategories';
 
-interface Props {
+interface TProps {
     events?: ICalendarEvent[];
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<TProps>(), {
     events: () => [],
 });
 

@@ -1,11 +1,11 @@
-export interface LottieRegistryEntry {
+export interface ILottieRegistryEntry {
     readonly src: string;
     readonly label: string;
 }
 
-export type LottieRegistry = Readonly<Record<string, LottieRegistryEntry>>;
+export type TLottieRegistry = Readonly<Record<string, ILottieRegistryEntry>>;
 
-export interface LocalLottieProps {
+export interface ILocalLottieProps {
     readonly name?: string;
     readonly src?: string;
     readonly animationLink?: string;

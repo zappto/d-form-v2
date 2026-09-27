@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FileText, ChevronRight, Lock, AlertCircle } from 'lucide-vue-next';
-import type { FormAccessStatus } from '@/types/form';
+import type { TFormAccessStatus } from '@/types/form';
 import { routes } from '@/lib/routes';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 
@@ -21,7 +21,7 @@ const props = defineProps<{
               title: string;
               description: string | null;
               fill_url: string;
-              access_status: FormAccessStatus;
+              access_status: TFormAccessStatus;
               access_message: string;
               can_start: boolean;
           }>
@@ -32,15 +32,15 @@ onMounted(() => {
     setTopbar({ title: props.event?.title ?? 'Pilih formulir', subtitle: 'Pilih formulir pendaftaran' });
 });
 
-function statusBadgeVariant(s: FormAccessStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
+function statusBadgeVariant(s: TFormAccessStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
     if (s === 'allowed') return 'default';
     if (s === 'already_submitted') return 'secondary';
     if (s === 'event_form_already_chosen') return 'outline';
     return 'outline';
 }
 
-function statusLabel(s: FormAccessStatus): string {
-    const map: Record<FormAccessStatus, string> = {
+function statusLabel(s: TFormAccessStatus): string {
+    const map: Record<TFormAccessStatus, string> = {
         allowed: 'Tersedia',
         already_submitted: 'Sudah mengirim',
         event_form_already_chosen: 'Form pendaftaran lain dipilih',
