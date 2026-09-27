@@ -21,6 +21,7 @@ import {
 } from 'lucide-vue-next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { statusColorMap, categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummyData';
+import { CATEGORY_COLOR_FALLBACK } from '@/lib/categoryColor';
 import { formatDisplayDate, formatDisplayDateTime, formatRupiahPrice } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
@@ -257,7 +258,7 @@ const quotaPercent = computed(() => {
                             v-for="cat in toCategoryList(event.category)"
                             :key="cat"
                             class="border-0 text-[10px] font-semibold text-white shadow-sm"
-                            :style="{ backgroundColor: categoryColorMap[cat] ?? '#6B7280' }"
+                            :style="{ backgroundColor: categoryColorMap[cat] ?? CATEGORY_COLOR_FALLBACK }"
                         >
                             {{ categoryLabelMap[cat] ?? cat }}
                         </Badge>

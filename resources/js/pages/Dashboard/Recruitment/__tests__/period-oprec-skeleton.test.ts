@@ -82,7 +82,7 @@ vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<sl
 vi.mock('@/layouts/LandingLayout.vue', () => ({ default: { template: '<slot />' } }));
 vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-vi.mock('@/lib/error-message', () => ({
+vi.mock('@/lib/errorMessage', () => ({
     humanizeErrorMessage: (message: string): string => message,
 }));
 

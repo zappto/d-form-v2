@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import type { TFormFillPageContext } from '@/hooks/useFormFillPage';
 import { CheckCircle2, ChevronDown, Loader2, UserRound, XCircle } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
-import { humanizeErrorMessage } from '@/lib/error-message';
+import { humanizeErrorMessage } from '@/lib/errorMessage';
 import { formatDisplayDate } from '@/lib/format';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
 

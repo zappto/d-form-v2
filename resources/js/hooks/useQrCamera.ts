@@ -2,7 +2,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import type { Ref } from 'vue';
 import { toast } from 'vue-sonner';
 import { Html5Qrcode } from 'html5-qrcode';
-import { humanizeErrorMessage } from '@/lib/error-message';
+import { humanizeErrorMessage } from '@/lib/errorMessage';
 import { useErrorToast } from './useErrorToast';
 
 /** Laju baca QR per detik; 10 fps cukup responsif tanpa membebani CPU ponsel. */

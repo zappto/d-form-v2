@@ -3,7 +3,7 @@ import type { Ref } from 'vue';
 import axios from 'axios';
 import type { AxiosError } from 'axios';
 import { toast } from 'vue-sonner';
-import { humanizeErrorMessage, parseApiErrorMessage } from '@/lib/error-message';
+import { humanizeErrorMessage, parseApiErrorMessage } from '@/lib/errorMessage';
 import { useErrorToast } from './useErrorToast';
 import { padQueueNumber } from '@/lib/format';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';

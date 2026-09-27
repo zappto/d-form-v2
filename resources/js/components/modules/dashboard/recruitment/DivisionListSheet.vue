@@ -4,7 +4,7 @@ import { router } from '@inertiajs/vue3';
 import FormSheet from './FormSheet.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import { Button } from '@/components/ui/button';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { routes } from '@/lib/routes';

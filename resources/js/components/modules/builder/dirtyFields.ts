@@ -1,4 +1,4 @@
-import type { BackendField } from '@/types/form-builder';
+import type { BackendField } from '@/types/formBuilder';
 
 export interface IDirtyFieldsDiff {
     dirty: BackendField[];

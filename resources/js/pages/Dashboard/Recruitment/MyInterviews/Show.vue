@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useErrorToast } from '@/hooks/useErrorToast';

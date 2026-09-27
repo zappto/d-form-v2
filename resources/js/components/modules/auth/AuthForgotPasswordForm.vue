@@ -8,7 +8,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
 import { toast } from 'vue-sonner';
 import { routes } from '@/lib/routes';
-import { getFieldError, humanizeErrorMessage } from '@/lib/error-message';
+import { getFieldError, humanizeErrorMessage } from '@/lib/errorMessage';
 import { useErrorToast } from '@/hooks/useErrorToast';
 
 const { handleInertiaFormErrors, showErrorToast } = useErrorToast();

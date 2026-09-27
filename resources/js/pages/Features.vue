@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LandingLayout from '@/layouts/LandingLayout.vue';
-import SeoHead from '@/components/seo/SeoHead.vue';
-import type { TJsonLd } from '@/components/seo/SeoHead.vue';
+import SeoHead from '@/components/core/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/core/seo/SeoHead.vue';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import FeaturesHero from '@/components/modules/landing/features/FeaturesHero.vue';

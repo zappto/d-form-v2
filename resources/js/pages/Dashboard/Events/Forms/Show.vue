@@ -3,7 +3,7 @@ import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { useBuilderAutosave } from '@/hooks/useBuilderAutosave';
-import { getFieldError, humanizeErrorMessage } from '@/lib/error-message';
+import { getFieldError, humanizeErrorMessage } from '@/lib/errorMessage';
 import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
@@ -14,7 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { AutosaveStatus } from '@/components/ui/autosave-status';
+import AutosaveStatus from '@/components/core/AutosaveStatus.vue';
 import { Check, Eye, FileText, Inbox, PenLine, X } from 'lucide-vue-next';
 import {
     fromBackendField,
@@ -39,7 +39,7 @@ import {
     submissionFileUrl,
     submissionReviewBadge,
 } from '@/lib/formSubmissionsUi';
-import { parseApiErrorMessage } from '@/lib/error-message';
+import { parseApiErrorMessage } from '@/lib/errorMessage';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { isFileUploadTypeName } from '@/lib/formFieldKind';
 import { useInertiaRequest } from '@/hooks/useInertiaRequest';

@@ -2,7 +2,7 @@
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
-import { getFieldError } from '@/lib/error-message';
+import { getFieldError } from '@/lib/errorMessage';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { Card, CardContent } from '@/components/ui/card';

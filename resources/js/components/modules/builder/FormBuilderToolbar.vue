@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue';
 import { Button } from '@/components/ui/button';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Link } from '@inertiajs/vue3';
 import { ArrowLeft, Eye } from 'lucide-vue-next';
 

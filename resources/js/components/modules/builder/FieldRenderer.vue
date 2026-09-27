@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { optionLabel } from '@/components/modules/builder/fieldMapping';
 import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
-import type { BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { BuilderField, IFieldOptionEntry } from '@/types/formBuilder';
 import {
     Type,
     AlignLeft,

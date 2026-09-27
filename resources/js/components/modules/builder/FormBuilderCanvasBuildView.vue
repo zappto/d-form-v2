@@ -15,7 +15,8 @@ import {
     ChevronDown,
     PlusCircle,
 } from 'lucide-vue-next';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
+import { TITLE_MAX_LENGTH } from '@/lib/displayLimits';
 import FormBuilderBannerBlock from './FormBuilderBannerBlock.vue';
 import FormSuccessMessageCard from './FormSuccessMessageCard.vue';
 import type { ITFormBannerState } from './formBanner';
@@ -60,7 +61,6 @@ defineEmits<{
 const currentPage = ref(1);
 
 /** Maks karakter judul & subtitle (validasi frontend saja — payload tidak diubah) */
-const TITLE_MAX = 200;
 const SUBTITLE_MAX = 500;
 
 const titleLength = computed(() => formTitle.value.length);
@@ -73,7 +73,7 @@ function capInput(value: string, max: number): string {
 function onTitleInput(e: Event): void {
     if (!(e.target instanceof HTMLInputElement)) return;
     const el = e.target;
-    el.value = capInput(el.value, TITLE_MAX);
+    el.value = capInput(el.value, TITLE_MAX_LENGTH);
     formTitle.value = el.value;
 }
 
@@ -182,15 +182,15 @@ const showDropChrome = computed(
                                 </Label>
                                 <span
                                     class="text-[10px] font-medium text-muted-foreground/70 tabular-nums"
-                                    :class="titleLength >= TITLE_MAX ? 'text-destructive/80' : ''"
-                                    >{{ titleLength }}/{{ TITLE_MAX }}</span
+                                    :class="titleLength >= TITLE_MAX_LENGTH ? 'text-destructive/80' : ''"
+                                    >{{ titleLength }}/{{ TITLE_MAX_LENGTH }}</span
                                 >
                             </div>
                             <div class="rounded-lg border border-border/90 bg-background px-3 py-2 shadow-sm sm:px-3.5">
                                 <input
                                     id="f-title"
                                     :value="formTitle"
-                                    :maxlength="TITLE_MAX"
+                                    :maxlength="TITLE_MAX_LENGTH"
                                     placeholder="Judul form"
                                     class="w-full border-0 bg-transparent p-0 font-display text-sm leading-snug font-semibold tracking-tight text-foreground placeholder:text-muted-foreground/65 focus:ring-0 focus:outline-none sm:text-base"
                                     @input="onTitleInput"

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PASSWORD_MISMATCH_MESSAGE, humanizeErrorMessage } from '../error-message';
+import { PASSWORD_MISMATCH_MESSAGE, humanizeErrorMessage } from '../errorMessage';
 
 /**
  * DFORM-46 T9 #5: satu konstanta pesan FE untuk konfirmasi kata sandi.

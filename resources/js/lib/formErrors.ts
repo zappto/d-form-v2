@@ -1,4 +1,4 @@
-import type { TValidationErrors } from '@/lib/error-message';
+import type { TValidationErrors } from '@/lib/errorMessage';
 
 /**
  * Reads a raw server error by key, including aggregate keys the backend adds

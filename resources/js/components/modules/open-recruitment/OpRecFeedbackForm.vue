@@ -5,7 +5,7 @@ import { buildValuesDraftSnapshot, useDraftRestore, type IDraftValuesSnapshot } 
 import type { TFormFillAnswerMap } from '@/types/form';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { SENDING_LABEL } from '@/lib/uiLabels';
 import { readFormError } from '@/lib/formErrors';

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import DatePicker from '@/components/ui/date-picker/DatePicker.vue';
-import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue';
+import TimeAmPmInput from '@/components/core/date-picker/TimeAmPmInput.vue';
 import { Label } from '@/components/ui/label';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 

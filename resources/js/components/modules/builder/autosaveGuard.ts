@@ -1,4 +1,4 @@
-import type { BackendField, BuilderField } from '@/types/form-builder';
+import type { BackendField, BuilderField } from '@/types/formBuilder';
 import { diffBackendFields, type IDirtyFieldsDiff } from '@/components/modules/builder/dirtyFields';
 import { toBackendFields } from '@/components/modules/builder/fieldMapping';
 import { prependFormBannerToBackendPayload, type ITFormBannerState } from '@/components/modules/builder/formBanner';

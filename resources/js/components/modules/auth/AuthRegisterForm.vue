@@ -6,7 +6,7 @@ import { AuthField } from '@/components/core/field';
 import { AuthSubmitButton } from '@/components/core/button';
 import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
 import { store as register } from '@/actions/App/Http/Controllers/Auth/RegisterController';
-import { getFieldError, PASSWORD_MISMATCH_MESSAGE } from '@/lib/error-message';
+import { getFieldError, PASSWORD_MISMATCH_MESSAGE } from '@/lib/errorMessage';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import type { IPasswordRule, TPasswordStrength } from '@/types/auth';
 

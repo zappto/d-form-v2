@@ -3,7 +3,7 @@ import { useBuilderAutosave } from '../useBuilderAutosave';
 import type { IBuilderAutosaveResult, IBuilderAutosaveState } from '../useBuilderAutosave';
 import { defaultFormBannerState } from '@/components/modules/builder/formBanner';
 import { emptyFormRegistrationMetadata } from '@/types/form';
-import type { BackendField, BuilderField } from '@/types/form-builder';
+import type { BackendField, BuilderField } from '@/types/formBuilder';
 
 const { axiosPostMock, axiosPatchMock } = vi.hoisted(() => ({
     axiosPostMock: vi.fn(),

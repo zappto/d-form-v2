@@ -5,7 +5,7 @@ import {
     parseValidationErrors,
     type TErrorMessageContext,
     type TValidationErrors,
-} from '@/lib/error-message';
+} from '@/lib/errorMessage';
 
 type TErrorToastOptions = { title?: string; description?: string; duration?: number };
 type TErrorToastContext = TErrorMessageContext & { title?: string };

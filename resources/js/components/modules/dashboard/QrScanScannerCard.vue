@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Camera, ShieldAlert } from 'lucide-vue-next';
 
 const props = defineProps<{

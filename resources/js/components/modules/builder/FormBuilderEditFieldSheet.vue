@@ -2,7 +2,7 @@
 import FieldEditor from '@/components/modules/builder/FieldEditor.vue';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 import { computed } from 'vue';
 
 const open = defineModel<boolean>('open', { required: true });

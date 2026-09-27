@@ -47,7 +47,7 @@ vi.mock('vue3-lottie', () => ({
     Vue3Lottie: { template: '<div />' },
 }));
 
-vi.mock('@/lib/error-message', () => ({
+vi.mock('@/lib/errorMessage', () => ({
     humanizeErrorMessage: (message: string): string => message,
 }));
 

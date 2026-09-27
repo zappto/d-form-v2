@@ -6,7 +6,7 @@ import LandingLayout from '@/layouts/LandingLayout.vue';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Megaphone, WifiOff } from 'lucide-vue-next';
 import { padQueueNumber } from '@/lib/format';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';

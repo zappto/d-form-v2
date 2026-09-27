@@ -10,7 +10,7 @@ import {
     readOptionImagePathsFromResponse,
     resolveOptionImagePreviewSrc,
 } from '../optionImage';
-import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/formBuilder';
 
 function optionField(fieldId: string, optionId: string, extra: Partial<IFieldOptionEntry> = {}): BuilderField {
     return {

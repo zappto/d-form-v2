@@ -4,7 +4,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AutosaveStatus } from '@/components/ui/autosave-status';
+import AutosaveStatus from '@/components/core/AutosaveStatus.vue';
 import FormFillFieldSlotRows from '@/components/modules/dashboard/FormFillFieldSlotRows.vue';
 import { useFormFillPage } from '@/hooks/useFormFillPage';
 import { snapshotRespondentValues } from '@/hooks/useRespondentDraft';

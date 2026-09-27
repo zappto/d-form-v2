@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LandingLayout from '@/layouts/LandingLayout.vue';
-import SeoHead from '@/components/seo/SeoHead.vue';
-import type { TJsonLd } from '@/components/seo/SeoHead.vue';
+import SeoHead from '@/components/core/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/core/seo/SeoHead.vue';
 import EventHero from '@/components/modules/landing/events/EventHero.vue';
 import EventHighlight from '@/components/modules/landing/events/EventHighlight.vue';
 import EventList from '@/components/modules/landing/events/EventList.vue';

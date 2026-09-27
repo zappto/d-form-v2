@@ -4,7 +4,7 @@ import { AuthSubmitButton } from '@/components/core/button';
 import { AuthField } from '@/components/core/field';
 import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
 import { store as resetPassword } from '@/actions/App/Http/Controllers/Auth/ResetPasswordController';
-import { getFieldError, PASSWORD_MISMATCH_MESSAGE } from '@/lib/error-message';
+import { getFieldError, PASSWORD_MISMATCH_MESSAGE } from '@/lib/errorMessage';
 import { useErrorToast } from '@/hooks/useErrorToast';
 
 const { handleInertiaFormErrors, showErrorToast } = useErrorToast();

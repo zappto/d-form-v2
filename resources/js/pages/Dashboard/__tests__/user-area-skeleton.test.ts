@@ -93,7 +93,7 @@ vi.mock('vue3-lottie', () => ({
     Vue3Lottie: { template: '<div />' },
 }));
 
-vi.mock('@/lib/error-message', () => ({
+vi.mock('@/lib/errorMessage', () => ({
     buildFieldLabelMap: () => ({}),
     getFieldError: () => undefined,
     humanizeErrorMessage: (message: string): string => message,

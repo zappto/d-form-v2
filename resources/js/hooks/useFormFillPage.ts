@@ -5,7 +5,8 @@ import type { IDraftValuesSnapshot } from '@/hooks/useDraftRestore';
 import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import { pickFormBannerField } from '@/components/modules/builder/formBanner';
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
-import { buildFieldLabelMap, getFieldError, type TErrorMessageContext } from '@/lib/error-message';
+import { IMAGE_UPLOAD_RECOMMENDED_SIZE } from '@/lib/displayLimits';
+import { buildFieldLabelMap, getFieldError, type TErrorMessageContext } from '@/lib/errorMessage';
 import { useErrorToast } from './useErrorToast';
 import { getFormFieldOptionRows } from '@/lib/formFieldOptions';
 import { readFieldMetadata, readFieldRules, readMetaBoolean } from '@/lib/formFieldMetadata';
@@ -286,7 +287,7 @@ export function useFormFillPage(props: {
     function fileHint(field: IFormField): string {
         const parts: string[] = [];
         const fieldRules = rules(field);
-        if (builderType(field) === 'image_upload') parts.push('Recommended: 1200 x 900 px (4:3)');
+        if (builderType(field) === 'image_upload') parts.push(`Recommended: ${IMAGE_UPLOAD_RECOMMENDED_SIZE} px (4:3)`);
         if (fieldRules.mimes) parts.push(`Allowed: ${String(fieldRules.mimes)}`);
         if (fieldRules.max_size) parts.push(`Max size: ${String(fieldRules.max_size)} KB`);
         return parts.join(' · ');

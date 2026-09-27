@@ -72,7 +72,7 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     },
 }));
 
-vi.mock('@/lib/error-message', () => ({
+vi.mock('@/lib/errorMessage', () => ({
     getFieldError: () => undefined,
     humanizeErrorMessage: (message: string): string => message,
     parseApiErrorMessage: (message: string): string => message,

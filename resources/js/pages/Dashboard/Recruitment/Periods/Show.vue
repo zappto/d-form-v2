@@ -13,14 +13,14 @@ import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/App
 import { type IApplicationDetail } from '@/types/recruitment';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { BarChart3, CalendarClock, Plus, Trash2, UserCheck, Users } from 'lucide-vue-next';

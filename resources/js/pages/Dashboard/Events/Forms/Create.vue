@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
-import { humanizeErrorMessage } from '@/lib/error-message';
+import { humanizeErrorMessage } from '@/lib/errorMessage';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
@@ -14,7 +14,7 @@ import {
 } from '@/components/modules/builder/formBanner';
 import { discardPendingOptionImageFiles, hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
 import { toBackendFields } from '@/components/modules/builder/fieldMapping';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 import type { ICreateDashboardFormPayload, IFormSiblingOption } from '@/types/form';
 import { emptyFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
 import { routes } from '@/lib/routes';

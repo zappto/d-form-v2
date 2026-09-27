@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LandingLayout from '@/layouts/LandingLayout.vue';
-import SeoHead from '@/components/seo/SeoHead.vue';
-import type { TJsonLd } from '@/components/seo/SeoHead.vue';
+import SeoHead from '@/components/core/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/core/seo/SeoHead.vue';
 import { computed, ref, onMounted } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { MapPin, CalendarDays, ArrowRight, Check, Shield } from 'lucide-vue-next';

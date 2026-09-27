@@ -1,4 +1,4 @@
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 
 /**
  * New canvas fields (create + edit form) — matches the builder palette / toBackendField mapping.

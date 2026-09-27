@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import type { UnwrapNestedRefs } from 'vue';
 import { Star, ImagePlus, Upload, X } from 'lucide-vue-next';
 import type { TFormFillPageContext } from '@/hooks/useFormFillPage';

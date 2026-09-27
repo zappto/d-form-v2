@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Clock3, QrCode } from 'lucide-vue-next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SCAN_STATUS_THEME, type TIScanEntry, type TIScanResult } from '@/lib/qrScanUi';
+import { SCAN_STATUS_THEME } from '@/components/modules/dashboard/qrScanStatusTheme';
+import type { TIScanEntry, TIScanResult } from '@/lib/qrScanUi';
 import { padQueueNumber } from '@/lib/format';
 
 const props = withDefaults(

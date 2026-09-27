@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { allocateOrderRun, allocateSpacedOrder, FIELD_ORDER_GAP, toBackendFields } from '../fieldMapping';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 import { diffBackendFields } from '../dirtyFields';
 
 function builder(id: string, order?: number): BuilderField {

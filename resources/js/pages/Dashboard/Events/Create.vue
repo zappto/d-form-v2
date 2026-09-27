@@ -9,8 +9,8 @@ import EventWizardStepper from '@/components/modules/dashboard/events/EventWizar
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import { Button } from '@/components/ui/button';
-import { CometSpinner } from '@/components/ui/comet';
-import { AutosaveStatus } from '@/components/ui/autosave-status';
+import CometSpinner from '@/components/core/CometSpinner.vue';
+import AutosaveStatus from '@/components/core/AutosaveStatus.vue';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import { destroy as destroyEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import FormAutosaveController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAutosaveController';
@@ -26,7 +26,7 @@ import { hasPendingOptionImageFiles } from '@/components/modules/builder/optionI
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata } from '@/types/form';
 import type { TFormFieldMetadataBag } from '@/types/form';
 import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 import { routes } from '@/lib/routes';
 import { SAVING_LABEL } from '@/lib/uiLabels';
 

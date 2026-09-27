@@ -5,7 +5,8 @@ import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker';
+import { DatePicker } from '@/components/ui/date-picker';
+import SplitDateTimeField from '@/components/core/date-picker/SplitDateTimeField.vue';
 import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
 import EventMultiValuePicker from '@/components/modules/dashboard/events/EventMultiValuePicker.vue';
 import {
@@ -24,7 +25,7 @@ import {
     store as storeEvent,
     update as updateEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
-import { getFieldError } from '@/lib/error-message';
+import { getFieldError } from '@/lib/errorMessage';
 import { toCategoryList } from '@/lib/eventCategories';
 import { BannerPickerField } from '@/components/core/field';
 import { cn } from '@/lib/utils';

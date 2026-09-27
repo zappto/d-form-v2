@@ -22,7 +22,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { routes } from '@/lib/routes';
 import { MY_INTERVIEWS_PAGE_SIZE, type IPaginator } from '@/lib/pagination';
 import { padQueueNumber } from '@/lib/format';

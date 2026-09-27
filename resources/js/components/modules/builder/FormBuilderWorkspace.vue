@@ -2,12 +2,13 @@
 import { computed, reactive, ref } from 'vue';
 import FormPreviewDialog from '@/components/modules/builder/FormPreviewDialog.vue';
 import { Button } from '@/components/ui/button';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import type { ITFormBannerState } from '@/components/modules/builder/formBanner';
 import { FORM_VISIBILITY_OPTIONS } from '@/components/modules/builder/formBuilderPalette';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 import type { IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
 import { useFormBuilderWorkspace } from '@/hooks/useFormBuilderWorkspace';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 import FormBuilderToolbar from './FormBuilderToolbar.vue';
 import FormBuilderMobileTabBar from './FormBuilderMobileTabBar.vue';
 import FormBuilderPalettePanel from './FormBuilderPalettePanel.vue';
@@ -197,7 +198,7 @@ defineExpose({
                         @click="workspace.requestSave"
                     >
                         <CometSpinner v-if="processing" :size="16" />
-                        {{ processing ? 'Menyimpan...' : 'Simpan' }}
+                        {{ processing ? SAVING_LABEL : 'Simpan' }}
                     </Button>
                 </div>
             </div>

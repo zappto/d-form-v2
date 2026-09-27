@@ -8,7 +8,7 @@ import {
     type ITFormBuilderPaletteField,
 } from '@/components/modules/builder/formBuilderPalette';
 import { createFormBuilderField } from '@/components/modules/builder/formBuilderFieldFactory';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 
 export type TFormBuilderInspectorMode = 'settings' | 'field';
 export type TFormBuilderMobileTab = 'build' | 'settings';

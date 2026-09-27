@@ -5,7 +5,7 @@ import { useDraftRestore, type IDraftValuesSnapshot } from '@/hooks/useDraftRest
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import OpRecFeedbackForm from '@/components/modules/open-recruitment/OpRecFeedbackForm.vue';
 import { Button } from '@/components/ui/button';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

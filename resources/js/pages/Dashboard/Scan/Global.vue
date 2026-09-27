@@ -11,7 +11,7 @@ import ScanExportDialog, {
 } from '@/components/modules/dashboard/ScanExportDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { FileSpreadsheet, FileText } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
 import { useGlobalQrScanPage, type IGlobalScanTargets } from '@/hooks/useGlobalQrScanPage';

@@ -3,10 +3,10 @@
  * Backend API_TYPES: input, select, textarea, datePicker, fileUpload
  */
 
-import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/formBuilder';
 import type { TFormFieldMetadataBag, TFormFieldRules } from '@/types/form';
 import { isFormFieldRules, isMetadataBag } from '@/lib/formFieldMetadata';
-import { BANNER_ACCEPT_MIMES } from '@/lib/displayLimits';
+import { BANNER_ACCEPT_MIMES, BANNER_MAX_SIZE_KB, FILE_UPLOAD_MAX_SIZE_KB, TEXT_MAX_LENGTH } from '@/lib/displayLimits';
 
 export type { BackendField, BuilderField, IFieldOptionEntry };
 
@@ -76,7 +76,7 @@ function mergeTextRules(req: TFormFieldMetadataBag, f: BuilderField): TFormField
         typeof raw === 'number' ? raw : raw != null && String(raw).trim() !== '' ? parseInt(String(raw), 10) : NaN;
     if (Number.isFinite(ruleValue) && ruleValue > 0) {
         merged.min = 0;
-        merged.max = Math.min(Math.floor(ruleValue), 100_000);
+        merged.max = Math.min(Math.floor(ruleValue), TEXT_MAX_LENGTH);
     }
     return merged;
 }
@@ -254,7 +254,10 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
             return {
                 ...base,
                 type: 'fileUpload',
-                metadata: withMeta(f, { rules: { ...req, mimes, max_size: 5120 }, builderType: 'image_upload' }),
+                metadata: withMeta(f, {
+                    rules: { ...req, mimes, max_size: BANNER_MAX_SIZE_KB },
+                    builderType: 'image_upload',
+                }),
             };
         }
         case 'file_upload': {
@@ -262,7 +265,10 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
             return {
                 ...base,
                 type: 'fileUpload',
-                metadata: withMeta(f, { rules: { ...req, mimes, max_size: 10240 }, builderType: 'file_upload' }),
+                metadata: withMeta(f, {
+                    rules: { ...req, mimes, max_size: FILE_UPLOAD_MAX_SIZE_KB },
+                    builderType: 'file_upload',
+                }),
             };
         }
         case 'banner':

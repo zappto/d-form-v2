@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LandingLayout from '@/layouts/LandingLayout.vue';
-import SeoHead from '@/components/seo/SeoHead.vue';
-import type { TJsonLd } from '@/components/seo/SeoHead.vue';
+import SeoHead from '@/components/core/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/core/seo/SeoHead.vue';
 import HomeHero from '@/components/modules/landing/home/HomeHero.vue';
 import HomeSteps from '@/components/modules/landing/home/HomeSteps.vue';
 import HomeFeatures from '@/components/modules/landing/home/HomeFeatures.vue';

@@ -3,7 +3,7 @@ import { buildUnloadPayload, shouldSkipHydrate } from '../autosaveGuard';
 import type { ITFormBannerState } from '../formBanner';
 import { defaultFormBannerState } from '../formBanner';
 import { toBackendFields } from '../fieldMapping';
-import type { BuilderField } from '@/types/form-builder';
+import type { BuilderField } from '@/types/formBuilder';
 
 function builder(id: string, order?: number): BuilderField {
     return {

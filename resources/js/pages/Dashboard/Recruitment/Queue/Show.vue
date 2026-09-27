@@ -7,7 +7,7 @@ import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { routes } from '@/lib/routes';
 import { padQueueNumber } from '@/lib/format';

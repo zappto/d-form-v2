@@ -29,8 +29,8 @@ import {
     Lock,
     Settings,
 } from 'lucide-vue-next';
-import SeoHead from '@/components/seo/SeoHead.vue';
-import type { TJsonLd } from '@/components/seo/SeoHead.vue';
+import SeoHead from '@/components/core/seo/SeoHead.vue';
+import type { TJsonLd } from '@/components/core/seo/SeoHead.vue';
 import { usePage } from '@inertiajs/vue3';
 import { routes } from '@/lib/routes';
 

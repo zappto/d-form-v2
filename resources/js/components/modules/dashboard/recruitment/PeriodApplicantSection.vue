@@ -17,8 +17,8 @@ import {
 import { Label } from '@/components/ui/label';
 import { ArrowRight, Check, X } from 'lucide-vue-next';
 import { Input } from '@/components/ui/input';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
-import { CometSpinner } from '@/components/ui/comet';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { routes } from '@/lib/routes';

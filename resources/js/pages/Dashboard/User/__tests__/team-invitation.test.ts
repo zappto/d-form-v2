@@ -93,7 +93,7 @@ vi.mock('@inertiajs/vue3', async () => {
 
 vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-vi.mock('@/lib/error-message', () => ({
+vi.mock('@/lib/errorMessage', () => ({
     buildFieldLabelMap: () => ({}),
     getFieldError: () => undefined,
     humanizeErrorMessage: (message: string): string => message,

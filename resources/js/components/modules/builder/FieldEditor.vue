@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { BuilderField, IFieldOptionEntry } from '@/types/formBuilder';
 import type { TFormFieldMetadataValue } from '@/types/form';
 import { resolveOptionImagePreviewSrc, revokeOptionImagePreviewUrl } from '@/components/modules/builder/optionImage';
 import { Switch } from '@/components/ui/switch';

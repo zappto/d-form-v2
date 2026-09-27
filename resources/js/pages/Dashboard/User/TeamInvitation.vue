@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
 import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
@@ -18,7 +18,7 @@ import { getFormFieldOptionRows, formFieldBuilderType } from '@/lib/formFieldOpt
 import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import FormFieldAnswerDisplay from '@/components/modules/dashboard/FormFieldAnswerDisplay.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
-import { CometSpinner } from '@/components/ui/comet';
+import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
     Dialog,
@@ -36,7 +36,7 @@ import {
     getFieldError,
     type TErrorMessageContext,
     type TValidationErrors,
-} from '@/lib/error-message';
+} from '@/lib/errorMessage';
 import { useErrorToast } from '@/hooks/useErrorToast';
 
 const { handleInertiaFormErrors } = useErrorToast();

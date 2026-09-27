@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { fromBackendField, toBackendField } from '../fieldMapping';
-import type { BackendField, BuilderField } from '@/types/form-builder';
+import type { BackendField, BuilderField } from '@/types/formBuilder';
 
 /**
  * DFORM-46 T5 S4: paritas parser/hidrasi fieldMapping setelah cast metadata

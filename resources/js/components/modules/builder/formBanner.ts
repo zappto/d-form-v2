@@ -1,5 +1,5 @@
 import type { BuilderField } from '@/components/modules/builder/fieldMapping';
-import type { BackendField } from '@/types/form-builder';
+import type { BackendField } from '@/types/formBuilder';
 import type { TFormFieldMetadataBag } from '@/types/form';
 import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import { BANNER_ACCEPT_MIMES } from '@/lib/displayLimits';

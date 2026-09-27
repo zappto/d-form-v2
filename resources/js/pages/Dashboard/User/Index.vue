@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarDays, Zap, Clock, MapPin, ArrowRight } from 'lucide-vue-next';
 import { categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
+import { CATEGORY_COLOR_FALLBACK } from '@/lib/categoryColor';
 import { formatDisplayDate } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
 import { routes } from '@/lib/routes';
@@ -135,7 +136,7 @@ onMounted(() => {
                                 v-for="cat in toCategoryList(event.category)"
                                 :key="cat"
                                 class="text-[10px] text-white"
-                                :style="{ backgroundColor: categoryColorMap[cat] ?? '#6B7280' }"
+                                :style="{ backgroundColor: categoryColorMap[cat] ?? CATEGORY_COLOR_FALLBACK }"
                             >
                                 {{ categoryLabelMap[cat] ?? cat }}
                             </Badge>

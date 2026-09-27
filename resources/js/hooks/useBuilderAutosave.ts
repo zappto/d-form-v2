@@ -28,7 +28,7 @@ import { mergeSentHeader, stripBlankRequiredKeys } from '@/lib/autosaveHeader';
 import { AUTOSAVE_DEBOUNCE_MS } from '@/lib/debounce';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import { toFormMetadataPayload, type IFormRegistrationMetadata } from '@/types/form';
-import type { BackendField, BuilderField } from '@/types/form-builder';
+import type { BackendField, BuilderField } from '@/types/formBuilder';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
 import { useInertiaRequest } from './useInertiaRequest';
 

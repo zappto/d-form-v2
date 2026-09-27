@@ -70,7 +70,7 @@ vi.mock('@inertiajs/vue3', async () => {
 
 vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-vi.mock('@/lib/error-message', () => ({
+vi.mock('@/lib/errorMessage', () => ({
     humanizeErrorMessage: (message: string): string => message,
 }));
 

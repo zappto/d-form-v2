@@ -1,4 +1,4 @@
-import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/formBuilder';
 import type { TFormFieldMetadataBag, TFormFieldMetadataValue } from '@/types/form';
 import { isMetadataBag } from '@/lib/formFieldMetadata';
 import { normalizeBannerSrc } from '@/lib/bannerSrc';

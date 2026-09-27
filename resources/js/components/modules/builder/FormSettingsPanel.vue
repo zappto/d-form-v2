@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Input } from '@/components/ui/input';
-import { SplitDateTimeField } from '@/components/ui/date-picker';
+import SplitDateTimeField from '@/components/core/date-picker/SplitDateTimeField.vue';
 import { Label } from '@/components/ui/label';
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import type { TFormPurpose, IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
 
 const closedAt = defineModel<string>('closedAt', { required: true });
