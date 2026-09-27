@@ -7,6 +7,7 @@ import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { routes } from '@/lib/routes';
+import { type IPaginator, type IPaginationLink } from '@/lib/pagination';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardLayout });
@@ -25,8 +26,11 @@ interface ILogRow {
     created_at: string | null;
 }
 
+/** Props paginator log; `data` diambil dari `IPaginator`, `links` memakai `IPaginationLink` (selalu ada di halaman ini). */
+type TActivityLogPage = Pick<IPaginator<ILogRow>, 'data'> & { links: IPaginationLink[] };
+
 defineProps<{
-    logs: { data: ILogRow[]; links: { url: string | null; label: string; active: boolean }[] };
+    logs: TActivityLogPage;
     periodOptions: { id: string; name: string }[];
     query: { period_id: string | null; action: string | null };
 }>();

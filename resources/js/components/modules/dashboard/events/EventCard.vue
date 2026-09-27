@@ -9,6 +9,7 @@ import { CalendarDays, MapPin, Users, MoreVertical, SquarePen, Download, FileSta
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 import { CATEGORY_COLOR_FALLBACK } from '@/lib/categoryColor';
 import { categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
+import { toCategoryList } from '@/lib/eventCategories';
 import { eventStatusUi } from '@/lib/eventShowUi';
 import { formatDisplayDate, formatRupiahPrice } from '@/lib/format';
 import { routes } from '@/lib/routes';
@@ -26,16 +27,6 @@ const props = withDefaults(
 
 const emit = defineEmits<{ delete: [event: IEvent] }>();
 
-function eventTokenList(v: string | string[]): string[] {
-    if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
-    if (typeof v === 'string')
-        return v
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean);
-    return [];
-}
-
 function formatPriceIdr(price: number): string {
     if (!price) return 'Gratis';
     try {
@@ -45,7 +36,7 @@ function formatPriceIdr(price: number): string {
     }
 }
 
-const categoryTokens = computed(() => eventTokenList(props.event.category));
+const categoryTokens = computed(() => toCategoryList(props.event.category));
 
 // ── Kebab native (role-aware, hanya saat canManage) ───────────────────
 const openMenuId = ref<string | null>(null);
