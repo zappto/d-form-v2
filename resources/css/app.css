@@ -21,6 +21,10 @@
     --animate-shake: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* Gerbang mati: `dark:` sengaja tetap scope ke [data-theme=dark] supaya 6 kelas
+   dark: di components/ui/** (Shadcn, tidak boleh diubah) tetap inert.
+   JANGAN dihapus — tanpa baris ini Tailwind v4 mengembalikan `dark:` ke
+   prefers-color-scheme dan pengguna OS dark akan melihat gaya gelap. */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer utilities {
@@ -134,51 +138,6 @@
     --scrollbar-thumb: color-mix(in srgb, var(--muted-foreground) 32%, transparent);
     --scrollbar-thumb-hover: color-mix(in srgb, var(--primary) 52%, var(--muted-foreground) 48%);
     --scrollbar-thumb-active: color-mix(in srgb, var(--primary) 68%, transparent);
-}
-
-[data-theme='dark'],
-.dark {
-    --background: oklch(0.16 0.012 255);
-    --foreground: oklch(0.96 0.005 255);
-    --card: oklch(0.22 0.012 255);
-    --card-foreground: oklch(0.96 0.005 255);
-    --popover: oklch(0.22 0.012 255);
-    --popover-foreground: oklch(0.96 0.005 255);
-    --primary: oklch(0.66 0.15 250);
-    --primary-foreground: oklch(0.18 0.012 255);
-    --secondary: oklch(0.26 0.014 255);
-    --secondary-foreground: oklch(0.96 0.005 255);
-    --muted: oklch(0.26 0.012 255);
-    --muted-foreground: oklch(0.7 0.018 255);
-    --accent: oklch(0.3 0.04 255);
-    --accent-foreground: oklch(0.96 0.005 255);
-    --destructive: oklch(0.7 0.18 22);
-    --destructive-foreground: oklch(0.18 0.012 255);
-    --success: oklch(0.72 0.14 165);
-    --success-foreground: oklch(0.16 0.012 255);
-    --warning: oklch(0.78 0.14 78);
-    --warning-foreground: oklch(0.16 0.012 255);
-    --info: var(--primary);
-    --info-foreground: var(--primary-foreground);
-    --border: oklch(1 0 0 / 10%);
-    --border-strong: oklch(1 0 0 / 18%);
-    --input: oklch(1 0 0 / 14%);
-    --ring: oklch(0.66 0.15 250);
-    --sidebar: oklch(0.18 0.012 255);
-    --sidebar-foreground: oklch(0.86 0.008 255);
-    --sidebar-primary: var(--primary);
-    --sidebar-primary-foreground: var(--primary-foreground);
-    --sidebar-accent: oklch(0.26 0.024 255);
-    --sidebar-accent-foreground: var(--primary);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: var(--ring);
-    --app-blue-soft: oklch(0.32 0.06 255);
-    --app-surface-soft: oklch(0.2 0.012 255);
-    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-sm: 0 4px 12px -6px rgb(0 0 0 / 0.55), 0 1px 2px rgb(0 0 0 / 0.3);
-    --scrollbar-thumb: color-mix(in srgb, var(--muted-foreground) 38%, transparent);
-    --scrollbar-thumb-hover: color-mix(in srgb, var(--primary) 58%, var(--muted-foreground) 42%);
-    --scrollbar-thumb-active: color-mix(in srgb, var(--primary) 72%, transparent);
 }
 
 @layer base {

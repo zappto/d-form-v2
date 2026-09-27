@@ -386,9 +386,6 @@ defineExpose({ submitForm, validateRequired, form });
 .event-form-description-error :deep(.dform-rich-text) {
     background-color: color-mix(in srgb, var(--destructive) 5%, white);
 }
-[data-theme='dark'] .event-form-description-error :deep(.dform-rich-text) {
-    background-color: color-mix(in srgb, var(--destructive) 12%, transparent);
-}
 </style>
 
 <template>
