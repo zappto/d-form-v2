@@ -101,6 +101,36 @@ Ada **pekerja paralel** (DFORM-33 / DFORM-34, cluster Mx) yang menulis di workin
 - Test: `npx vitest run` atas 21 file tersebut → **21 file / 161 test** passed, 0 failed.
 - Jira: DFORM-40.
 
+## Dampak UI (audit tampilan)
+
+Ticket ini perbaikan tipe, jadi mayoritas perubahan **tidak** menyentuh tampilan. Audit dilakukan per-file terhadap setiap file sumber yang diubah — bukan menyimpulkan dari pesan commit.
+
+**Satu perubahan runtime yang terlihat user — `Apply.vue` (commit `b8c853d`)**
+
+- Sebelum: `ctx` adalah objek hasil `useFormFillPage(...)` apa adanya. Di hook, `formBannerImageSrc` adalah `ComputedRef<string>` (`useFormFillPage.ts:61`), sedangkan konsumennya `FormFillHeaderBlock.vue` mendeklarasikan prop `formBannerImageSrc: string` dan memakainya di `v-if="formBannerImageSrc || formBannerCaption"` dan `:src="formBannerImageSrc"`. Ref yang diteruskan lewat `ctx` (objek biasa, bukan `reactive`) **tidak** ter-unwrap di template, sehingga konsumen menerima objek ref: blok banner selalu lolos `v-if` (objek selalu truthy) dan `:src` menerima objek, bukan URL.
+- Sesudah: `reactive(useFormFillPage(...))` — ref di dalamnya ter-unwrap saat diakses sebagai properti, sehingga prop menerima string seperti yang diharapkan.
+- Kenapa ini benar: halaman saudaranya `pages/Dashboard/Events/Forms/Fill.vue` **sudah** memakai pola `reactive(useFormFillPage(...))`; `Apply.vue` satu-satunya konsumen yang tertinggal.
+- Sifat: **memulihkan perilaku yang dimaksud** (banner form OPREC), bukan keputusan desain baru. Tidak ada perubahan layout, warna, tipografi, atau teks.
+- Batasan kejujuran: halaman ini **tidak** dijalankan di browser pada sesi ini (host tanpa PHP/container), jadi buktinya adalah analisis aliran nilai + paritas dengan `Fill.vue`, bukan tangkapan layar.
+
+**Menyentuh baris template, tetapi setara secara tampilan**
+
+- `TeamInvitation.vue` (commit `bd621d9`): `metadataText(field, key)` mengembalikan `''` untuk nilai non-string (`TeamInvitation.vue:46`). Empat binding berubah bentuk (`content`, `bannerUrl`) namun hasil render setara — nilai non-string sebelumnya jatuh ke falsy/label, sekarang jatuh ke `''` → cabang yang sama.
+- `PeriodApplicantSection.vue` (commit `ee95d2b`): pesan error `application` dibaca lewat `rejectApplicationError` dengan **key yang sama**, ditambah penjaga `length > 0` yang hanya mempersempit `''`; praktis sama dengan `v-if` lama.
+- `EventRegistrationPickForm.vue` (commit `b8c853d`): `event.slug` → `props.event.slug` di dalam blok `v-if` yang sama; nilai runtime identik.
+
+**Perubahan runtime lain yang tidak terlihat user**
+
+- `DatePicker.vue`: `class?: string` → `ClassValue` (melegalkan class array yang **sudah** dipakai `SplitDateTimeField.vue` dan sudah didukung runtime Vue) + `ref` → `shallowRef` (objeknya selalu diganti utuh, tidak ada mutasi properti).
+- `QrScanSidebar.vue`: `String(value)` di batas emit `update:logQuery`; `<input>` sudah selalu menghasilkan string → nilai sama.
+- `CategoryChart.vue`: `weight: '500'` → `weight: 500`; chart.js `toFontString` melakukan `weight + ' '`, jadi output canvas identik (dipin `chartTheme.test.ts`).
+
+**Tanpa perubahan tampilan sama sekali** (tidak ada baris template yang berubah; guard hanya di cabang yang tidak dirender saat data kosong): `Track/Show.vue`, `Events/Forms/Index.vue`, `FieldRenderer.vue`, `DashboardTopbar.vue`, `MyInterviews/Show.vue`, `MyInterviews/Index.vue`, `InterviewSessions/Show.vue`, `Periods/Show.vue`, `Input.vue`, `Textarea.vue`, seluruh `types/**`, `lib/chartTheme.ts`, `lib/formErrors.ts`, dan 21 file test.
+
+**DFORM-41: nol dampak UI** — hanya `tsconfig.json`, `package.json`, `package-lock.json`, dan workflow CI.
+
+Tidak ada satu pun perubahan di atas yang memerlukan review desain: tidak ada yang mengubah layout, hierarki visual, warna, tipografi, atau copy user-facing. Satu-satunya yang terlihat user adalah **pemulihan** banner form OPREC yang sebelumnya tidak ter-render.
+
 ## Keputusan yang dicatat
 
 - **Akar environment, bukan workaround.** 3 test merah diperbaiki dengan **install bersih (`npm ci`)** — `node_modules` sebelumnya memuat dua salinan Vue dari instalasi isolated `.pnpm`. Workaround `vitest.config.ts` (dedupe/inline) diuji ulang lalu **dibuang** karena redundant. Tidak ada suppression (`@ts-ignore`/`eslint-disable`) yang ditambahkan.

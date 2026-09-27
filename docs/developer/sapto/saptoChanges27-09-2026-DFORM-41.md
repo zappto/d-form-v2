@@ -54,6 +54,10 @@ Sumber waktu/SHA: `git log --pretty='%h|%ad'`.
 - Workflow divalidasi sebagai YAML (`jobs: ['typecheck']`, `on: ['push','pull_request']`) sebelum commit.
 - Scope commit dipisah: `tsconfig.json` pada commit tersendiri; `package.json` + `package-lock.json` + workflow pada commit kedua; file pekerja paralel (`Makefile`, `database/seeders/UserSeeder.php`, `BannerPickerField*`, `FormBuilderBannerBlock.vue`) **tidak ikut**.
 
+## Dampak UI
+
+**Nol.** Ticket ini hanya menyentuh `tsconfig.json`, `package.json`, `package-lock.json`, dan `.github/workflows/frontend_typecheck.yml` — tidak ada satu pun perubahan di `resources/js`. Tidak ada perubahan tampilan, interaksi, maupun copy. (Audit dampak UI untuk perubahan tipe DFORM-40 ada di [`saptoChanges27-09-2026-DFORM-40.md`](./saptoChanges27-09-2026-DFORM-40.md) bagian "Dampak UI".)
+
 ## Catatan untuk tim
 
 - **Koreksi catatan DFORM-40 (penting):** seluruh verifikasi DFORM-40 dijalankan lewat `npx vue-tsc`, yang menarik `vue-tsc` **beserta TypeScript 6.0.3** ke sandbox npx — bukan toolchain proyek. Setelah gate ini memakai toolchain yang benar (**vue-tsc 3.3.11 + TypeScript 5.9.3**), hasilnya tetap **0 error**, jadi bukti DFORM-40 tetap sah; yang berubah adalah alat ukurnya kini eksplisit dan reproducible. Ini juga menjelaskan kenapa `tsconfig.json` yang invalid di TS 5.9.3 tidak pernah terdeteksi.
