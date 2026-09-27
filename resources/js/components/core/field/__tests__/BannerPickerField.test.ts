@@ -84,6 +84,45 @@ describe('BannerPickerField', () => {
         wrapper.unmount();
     });
 
+    it('emit remove saat Hapus walau model sudah null (banner tersimpan tanpa berkas pending)', async () => {
+        const wrapper = mountField({ initialUrl: STORED_URL, variant: 'plain' });
+
+        await wrapper.find('[aria-label="Hapus banner"]').trigger('click');
+
+        expect(wrapper.emitted('remove')).toHaveLength(1);
+        expect(wrapper.emitted('update:file')).toBeUndefined();
+        wrapper.unmount();
+    });
+
+    it('emit remove bersama update:file null saat Hapus membuang berkas pending', async () => {
+        const wrapper = mountField({ initialUrl: STORED_URL, variant: 'plain' });
+        await pickFile(wrapper, makePng('unggulan.png'));
+
+        await wrapper.find('[aria-label="Hapus banner"]').trigger('click');
+
+        expect(wrapper.emitted('remove')).toHaveLength(1);
+        const updates = wrapper.emitted('update:file') ?? [];
+        expect(updates[updates.length - 1]?.[0]).toBeNull();
+        wrapper.unmount();
+    });
+
+    it('mengosongkan model dari luar mereset pratinjau ke initialUrl dan merevoke blob', async () => {
+        const wrapper = mountField({ initialUrl: STORED_URL, variant: 'plain' });
+        const candidate = makePng('unggulan.png');
+        await pickFile(wrapper, candidate);
+        const blobUrl = wrapper.find('img').attributes('src') ?? '';
+        expect(blobUrl.startsWith('blob:')).toBe(true);
+        expect(wrapper.text()).toContain('baru');
+
+        await wrapper.setProps({ file: candidate });
+        await wrapper.setProps({ file: null });
+
+        expect(wrapper.find('img').attributes('src')).toBe(STORED_URL);
+        expect(revoked).toContain(blobUrl);
+        expect(wrapper.text()).not.toContain('baru');
+        wrapper.unmount();
+    });
+
     it('menolak berkas non-gambar dengan copy galat tanpa mengubah pratinjau', async () => {
         const wrapper = mountField({ variant: 'plain' });
         await pickFile(wrapper, new File(['isi'], 'catatan.txt', { type: 'text/plain' }));

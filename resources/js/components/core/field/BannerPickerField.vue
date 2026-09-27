@@ -17,6 +17,9 @@ const DEFAULT_ACCEPT = 'image/png,image/jpeg,image/gif';
 /** Berkas terpilih sumber upload multipart; null saat kosong atau setelah Hapus. */
 const file = defineModel<File | null>('file', { default: null });
 
+/** `remove` menyertai `update:file: null` agar konsumen banner tersimpan ikut mengetahui Hapus. */
+const emit = defineEmits<{ remove: [] }>();
+
 const props = withDefaults(
     defineProps<{
         /** URL/path banner tersimpan; jadi pratinjau selama belum ada berkas baru. */
@@ -79,6 +82,17 @@ watch(
     }
 );
 
+// Pengosongan model oleh penulis luar (mis. commit autosave) harus menyelaraskan hook yang
+// masih memegang blob lama. Hapus milik hook sudah mengosongkan bannerFile lebih dulu → dilewati.
+watch(
+    (): File | null => file.value,
+    (next: File | null): void => {
+        if (next !== null || picker.bannerFile.value === null) return;
+        picker.clearSelection();
+        picker.bannerPreview.value = props.initialUrl;
+    }
+);
+
 /** Kembalikan pesan galat untuk berkas banner, atau null bila lolos validasi. */
 function validationError(candidate: File): string | null {
     if (!ALLOWED_TYPES.includes(candidate.type)) return TYPE_ERROR;
@@ -99,12 +113,13 @@ function applyPickedFile(candidate: File | null | undefined): void {
     file.value = candidate;
 }
 
-/** Buang pilihan baru; pratinjau kembali ke URL tersimpan dan emit `null`. */
+/** Buang pilihan baru; pratinjau kembali ke URL tersimpan dan emit `null` plus `remove`. */
 function removeFile(): void {
     picker.clearSelection();
     picker.bannerPreview.value = props.initialUrl;
     localError.value = '';
     file.value = null;
+    emit('remove');
 }
 
 /** Buka dialog pilih berkas browser. */
