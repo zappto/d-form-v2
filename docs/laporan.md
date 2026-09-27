@@ -160,7 +160,7 @@ Yang **tidak** boleh: membiarkan keduanya hidup, seperti sekarang.
 - Fixture palsu: `dummyEvents`, `dummyForms`, `dummyFormFields`, `dummyRegistrants`, `dummyChartData`.
 - Helper produksi: `formatDate` (:357), `formatDateTime` (:361), `statusColorMap` (:320), `categoryColorMap` (:334), `categoryLabelMap` (:350), `sessionLabelMap` (:341).
 
-File ini diimpor oleh **minimal 10 file produksi**, termasuk `pages/EventDetail.vue:7`, `pages/Dashboard/User/Index.vue:11`, `pages/Dashboard/Events/Registrants.vue:14`, `pages/Dashboard/Events/Forms/Index.vue:13`, bahkan `utils/composables/useDashboardEventShowPage.ts:13` dan `lib/registrantsUi.ts:1`.
+File ini diimpor oleh **minimal 10 file produksi**, termasuk `pages/EventDetail.vue:7`, `pages/Dashboard/User/Index.vue:11`, `pages/Dashboard/Events/Registrants.vue:14`, `pages/Dashboard/Events/Forms/Index.vue:13`, bahkan `hooks/useDashboardEventShowPage.ts:13` dan `lib/registrantsUi.ts:1`.
 
 **Kenapa ini buruk:** nama file berbohong. Nama "dummyData" membuat reviewer mengira ini fixture test, padahal ini **modul utilitas dengan fan-out tertinggi di frontend**. Setiap orang yang mau berani menghapus "dummy data" akan mematahkan 10 halaman. Dan lambat laun fixture palsu itu akan tercampur makin dalam ke logika nyata.
 
@@ -225,7 +225,7 @@ Ini persis yang user maksud dengan "tidak reusable": setiap fitur baru punya pel
 
 Sementara yang benar-benar reusable justru bagus: `useAuth` (7 LOC, 11 pemakai), `useDashboardTopbar` (31 LOC, 29 pemakai), `usePageFlashToast` (17 LOC, 4 pemakai).
 
-**Pola masalahnya jelas:** begitu sebuah composable diberi nama `use<NamaHalaman>Page`, ia berhenti menjadi composable dan menjadi **file halaman yang kebetulan berekstensi `.ts`**. `useGlobalQrScanPage.ts` = 896 LOC dalam satu file adalah yang terburuk di repo, dan ia mengurus state + HTTP + parsing + navigasi + UI sekaligus (lihat `lib/qrScanUi.ts:38,121,151` yang dipanggil darinya, plus `utils/composables/useGlobalQrScanPage.ts` sebagai pemanggil tunggalnya).
+**Pola masalahnya jelas:** begitu sebuah composable diberi nama `use<NamaHalaman>Page`, ia berhenti menjadi composable dan menjadi **file halaman yang kebetulan berekstensi `.ts`**. `useGlobalQrScanPage.ts` = 896 LOC dalam satu file adalah yang terburuk di repo, dan ia mengurus state + HTTP + parsing + navigasi + UI sekaligus (lihat `lib/qrScanUi.ts:38,121,151` yang dipanggil darinya, plus `hooks/useGlobalQrScanPage.ts` sebagai pemanggil tunggalnya).
 
 Konsekuensinya: logika scan QR global tidak bisa dipakai ulang di halaman lain tanpa memindahkan seluruh file, dan tidak ada test unit yang mungkin dibuat untuk 896 LOC yang mencampur DOM + HTTP.
 
@@ -286,7 +286,7 @@ Duplikasi nyata: pemakaian import path `components/ui/button` = **107** vs `comp
 
 `components/core` **bukan** kode mati (25 file memakainya, dan `LocalLottie` itu legit). Tapi folder ini adalah lapisan kedua yang tidak punya batas tanggung jawab yang jelas terhadap `components/ui`.
 
-Masalah terkait: `components.json` (konfigurasi shadcn CLI) baris 20 menunjuk alias `"composables": "@/lib/composables"` — **path itu tidak ada**. Composable sebenarnya di `resources/js/utils/composables/`. Jadi kalau ada yang pakai shadcn CLI untuk menambah composable, ia akan membuat folder baru yang salah.
+Masalah terkait (**catatan ini sudah usang**): `components.json` (konfigurasi shadcn CLI) dahulu menunjuk alias `"composables": "@/lib/composables"` yang tidak ada. Saat ini alias sudah diperbaiki menjadi `"composables": "@/hooks"`, dan composable sebenarnya berada di `resources/js/hooks/`.
 
 ### P2-6. Komponen UI tanpa pemakai eksternal
 Delapan folder di `components/ui/` **tidak diimpor sama sekali dari luar `components/ui/`**: `breadcrumb`, `calendar`, `native-select`, `pagination`, `popover`, `scroll-area`, `select`, `skeleton`.
@@ -430,7 +430,7 @@ Ini fase yang benar-benar membayar "reusability", dan harus menunggu Fase 1:
 | 3.7 | Gabung 8 file `lib/` di bawah 40 LOC ke modul tematik | 22 file → ~10 |
 | 3.8 | Satukan 3 komponen select (`select`/`styled-select`/`native-select`) jadi satu | hapus 2 varian |
 | 3.9 | Tetapkan batas `components/core` vs `components/ui`, atau lebur `core` ke `ui` | hilangkan lapisan kedua |
-| 3.10 | Perbaiki alias `components.json:20` → `@/utils/composables` | shadcn CLI bekerja benar |
+| 3.10 | Perbaiki alias `components.json` → `@/hooks` (sudah diperbaiki) | shadcn CLI bekerja benar |
 
 **Kriteria fase:** setiap perubahan punya bukti test/build hijau **sebelum dan sesudah**, dan tidak ada PR yang menyentuh lebih dari satu baris tabel di atas.
 

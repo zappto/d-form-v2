@@ -12,10 +12,9 @@ use Illuminate\Mail\Mailables\Envelope;
  * Digest QR untuk pengujian scan: satu email berisi daftar kode + banyak PNG QR
  * sebagai lampiran.
  *
- * Sengaja memakai `htmlString` alih-alih Blade view: semua view di
- * `resources/views/mail/` meng-include `mail.partials.card-header`, yang saat ini
- * gagal dirender karena komponen Livewire-nya sudah dihapus dari dependensi.
- * Dengan begitu email ini tetap bisa terkirim tanpa memperbaiki view lama.
+ * Sengaja memakai `htmlString` alih-alih Blade view: email uji ini tidak butuh
+ * layout mail di `resources/views/mail/` (view tersebut tetap hidup), cukup HTML
+ * ringkas agar isi digest QR mudah dibaca dan tidak bergantung pada partial mana pun.
  *
  * Catatan: properti data dinamai `$qrFiles`, bukan `$attachments`, karena
  * `Illuminate\Mail\Mailable` sudah memiliki properti `public $attachments`

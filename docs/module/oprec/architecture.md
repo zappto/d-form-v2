@@ -120,7 +120,7 @@ Mengikuti [pedoman back-end](../../rules/back-end.md):
 |------|----------|--------|
 | Public OpRec | `resources/js/pages/OpenRecruitment/*.vue` | Layout publik (bukan `DashboardLayout`) |
 | Admin OpRec | `resources/js/pages/Dashboard/Recruitment/**/*.vue` | `DashboardLayout` |
-| Composables | `resources/js/composables/recruitment/*.ts` | — |
+| Composables | `resources/js/hooks/*.ts` | — |
 | Types | `resources/js/types/recruitment.ts` | — |
 
 ### 4.2 Pola yang Diikuti (dari modul Events)

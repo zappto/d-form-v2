@@ -30,7 +30,8 @@ Dokumen ini berfungsi sebagai standarisasi pengembangan Front-End menggunakan **
 | **resources/js/components/ui**     | Komponen dari **Shadcn-Vue**. **Dilarang diubah secara langsung** (Gunakan Wrapper di `core` jika butuh modifikasi). |
 | **resources/js/layouts**           | Template layout aplikasi (AuthenticatedLayout, GuestLayout, AdminLayout).                                            |
 | **resources/js/pages**             | Komponen halaman utama yang dirender oleh `Inertia::render()`.                                                       |
-| **resources/js/utils**             | Tempat menyimpan _helpers_, _composables_, dan logika bisnis murni (pure functions).                                 |
+| **resources/js/utils**             | Tempat menyimpan _helpers_ dan logika bisnis murni (pure functions).                                                 |
+| **resources/js/hooks**             | Tempat menyimpan _composables_ (prefix `use`, contoh: `useAuth.ts`).                                                 |
 | **resources/views/app.blade.php**  | Root template HTML. Tempat menyuntikkan `@inertia` dan `@vite`.                                                      |
 
 ## 3. Cara Penamaan File
@@ -69,7 +70,7 @@ Seluruh komponen Vue disimpan di dalam `resources/js/components` dan dibagi menj
 
 ## 6. Utils & Composables
 
-1.  **Logic Separation:** Pisahkan logika yang rumit ke dalam **Composables** (`resources/js/utils/composables`). Gunakan prefix `use`. Contoh: `useEventValidation.ts`.
+1.  **Logic Separation:** Pisahkan logika yang rumit ke dalam **Composables** (`resources/js/hooks`). Gunakan prefix `use`. Contoh: `useEventValidation.ts`.
 2.  **Formatting:** Gunakan helper untuk hal-hal repetitif seperti `formatDate()` atau `formatCurrency()`.
 
 ## 7. TypeScript Standard
