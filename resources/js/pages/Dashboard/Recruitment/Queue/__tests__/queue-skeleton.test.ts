@@ -5,7 +5,9 @@ import QueueShow from '../Show.vue';
 import QueueDisplay from '@/pages/OpenRecruitment/QueueDisplay.vue';
 import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/SessionQueueDrawer.vue';
 import { useRecruitmentQueue, type IQueueEntryRow, type IQueueSnapshot } from '@/hooks/useRecruitmentQueue';
-import { showErrorToast } from '@/lib/error-message';
+const { showErrorToast } = vi.hoisted(() => ({
+    showErrorToast: vi.fn(),
+}));
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -44,11 +46,8 @@ vi.mock('@inertiajs/vue3', () => ({
 vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 vi.mock('@/layouts/LandingLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ showErrorToast }),
 }));
 
 vi.mock('vue-sonner', () => ({

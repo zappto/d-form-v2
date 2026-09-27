@@ -12,11 +12,13 @@ import { Label } from '@/components/ui/label';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { routes } from '@/lib/routes';
 import { initialsOf } from '@/lib/format';
-import { showErrorToast, showFlashToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
 import { usePage } from '@inertiajs/vue3';
 import { ListOrdered, Plus } from 'lucide-vue-next';
+
+const { showErrorToast, showFlashToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

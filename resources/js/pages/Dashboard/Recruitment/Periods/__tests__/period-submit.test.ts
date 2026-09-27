@@ -3,7 +3,10 @@ import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
 import PeriodCreate from '../Create.vue';
 import PeriodEdit from '../Edit.vue';
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+const { handleInertiaFormErrors, showFlashToast } = vi.hoisted(() => ({
+    handleInertiaFormErrors: vi.fn(),
+    showFlashToast: vi.fn(),
+}));
 import { toast } from 'vue-sonner';
 import { routes } from '@/lib/routes';
 
@@ -51,11 +54,8 @@ vi.mock('@inertiajs/vue3', async () => {
 
 vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ handleInertiaFormErrors, showFlashToast }),
 }));
 
 vi.mock('vue-sonner', () => ({

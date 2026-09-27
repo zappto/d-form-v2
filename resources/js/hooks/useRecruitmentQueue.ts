@@ -1,6 +1,6 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import axios from 'axios';
-import { showErrorToast } from '@/lib/error-message';
+import { useErrorToast } from './useErrorToast';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
 
 export interface IQueueEntryRow {
@@ -33,6 +33,7 @@ const POLL_INTERVAL_MS = 10_000;
 
 /** Snapshot antrean rekrutmen yang di-poll berkala beserta status loading dan kontrol polling. */
 export function useRecruitmentQueue(pollUrl: string, initial: IQueueSnapshot) {
+    const { showErrorToast } = useErrorToast();
     const queue = ref<IQueueSnapshot>(initial);
     const polling = ref(true);
     /** Tick pertama (refresh awal) → skeleton; tick berikut diam. Sekali false, tak pernah true lagi. */

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
@@ -20,6 +20,8 @@ import { routes } from '@/lib/routes';
 import type { IPaginator } from '@/lib/pagination';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

@@ -14,7 +14,9 @@ import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/s
 import { cn } from '@/lib/utils';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import { routes } from '@/lib/routes';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 export interface TInterviewDivisionChoice {
     id: string;

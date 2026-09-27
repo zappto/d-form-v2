@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { showErrorToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { routes } from '@/lib/routes';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
@@ -23,6 +23,8 @@ import {
     Trash2,
     UserRound,
 } from 'lucide-vue-next';
+
+const { showErrorToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

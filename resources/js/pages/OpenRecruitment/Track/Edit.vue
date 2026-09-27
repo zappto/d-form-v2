@@ -13,8 +13,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { Separator } from '@/components/ui/separator';
 import { routes } from '@/lib/routes';
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { readFormError } from '@/lib/formErrors';
+
+const { handleInertiaFormErrors, showFlashToast } = useErrorToast();
 
 defineOptions({ layout: FormFillLayout });
 

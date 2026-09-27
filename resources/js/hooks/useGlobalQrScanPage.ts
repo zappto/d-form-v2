@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { showErrorToast } from '@/lib/error-message';
+import { useErrorToast } from './useErrorToast';
 import { useQrCamera } from '@/hooks/useQrCamera';
 import { useQrFeed, type TQrScanSource } from '@/hooks/useQrFeed';
 import type { TIScanEntry, TIScanResult } from '@/lib/qrScanUi';
@@ -106,6 +106,7 @@ export function useGlobalQrScanPage(
     feedUrl: string,
     getTargets: () => IGlobalScanTargets
 ) {
+    const { showErrorToast } = useErrorToast();
     const registrationCodeInput = ref('');
     const selectedTarget = ref('all');
     const logExpanded = ref(false);

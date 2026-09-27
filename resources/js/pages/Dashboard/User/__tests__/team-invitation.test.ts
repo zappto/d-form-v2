@@ -5,7 +5,10 @@ import TeamInvitation from '../TeamInvitation.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import { Dialog } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+const { handleInertiaFormErrors, showFlashToast } = vi.hoisted(() => ({
+    handleInertiaFormErrors: vi.fn(),
+    showFlashToast: vi.fn(),
+}));
 import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import { toast } from 'vue-sonner';
 
@@ -93,10 +96,11 @@ vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />'
 vi.mock('@/lib/error-message', () => ({
     buildFieldLabelMap: () => ({}),
     getFieldError: () => undefined,
-    handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+}));
+
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ handleInertiaFormErrors, showFlashToast }),
 }));
 
 vi.mock('vue-sonner', () => ({

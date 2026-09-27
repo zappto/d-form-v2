@@ -8,7 +8,9 @@ import { CometSpinner } from '@/components/ui/comet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { routes } from '@/lib/routes';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 export interface TIDashboardDivision {
     id: string;

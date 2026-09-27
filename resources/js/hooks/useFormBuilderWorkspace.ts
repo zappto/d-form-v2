@@ -1,5 +1,5 @@
 import { ref, computed, type Ref } from 'vue';
-import { showErrorToast } from '@/lib/error-message';
+import { useErrorToast } from './useErrorToast';
 import { hasMeaningfulHtmlText } from '@/lib/htmlText';
 import { resolveBannerPreviewSrc, type ITFormBannerState } from '@/components/modules/builder/formBanner';
 import {
@@ -30,6 +30,7 @@ export interface IFormBuilderWorkspaceModels {
 
 /** Kategori palette terbuka. `null` = semua tertutup (single-expand). */
 export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, options: { onSave: () => void }) {
+    const { showErrorToast } = useErrorToast();
     const categories = ref<ITFormBuilderPaletteCategory[]>(cloneFormBuilderPalette());
 
     /** Single-expand: simpan nama kategori yang terbuka (default semua tertutup). */

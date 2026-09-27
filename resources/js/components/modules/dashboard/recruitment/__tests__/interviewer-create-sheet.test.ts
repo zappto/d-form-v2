@@ -2,7 +2,9 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
 import InterviewerCreateSheet from '../InterviewerCreateSheet.vue';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+const { handleInertiaFormErrors } = vi.hoisted(() => ({
+    handleInertiaFormErrors: vi.fn(),
+}));
 import { toast } from 'vue-sonner';
 import { routes } from '@/lib/routes';
 
@@ -50,11 +52,8 @@ vi.mock('@inertiajs/vue3', async () => {
     };
 });
 
-vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ handleInertiaFormErrors }),
 }));
 
 vi.mock('vue-sonner', () => ({

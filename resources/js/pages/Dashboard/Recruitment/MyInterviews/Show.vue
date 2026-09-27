@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CometSpinner } from '@/components/ui/comet';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { formatBytes, padQueueNumber } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
@@ -28,6 +28,8 @@ import {
     Plus,
     XCircle,
 } from 'lucide-vue-next';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

@@ -2,7 +2,9 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
 import DivisionListSheet, { type TIDashboardDivision } from '../DivisionListSheet.vue';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+const { handleInertiaFormErrors } = vi.hoisted(() => ({
+    handleInertiaFormErrors: vi.fn(),
+}));
 import { toast } from 'vue-sonner';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
@@ -32,11 +34,8 @@ vi.mock('@inertiajs/vue3', () => ({
     },
 }));
 
-vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ handleInertiaFormErrors }),
 }));
 
 vi.mock('vue-sonner', () => ({

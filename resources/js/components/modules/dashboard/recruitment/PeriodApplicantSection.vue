@@ -20,8 +20,10 @@ import { Input } from '@/components/ui/input';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { CometSpinner } from '@/components/ui/comet';
 import { Skeleton } from '@/components/ui/skeleton';
-import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { routes } from '@/lib/routes';
+
+const { handleInertiaFormErrors, showErrorToast, showFlashToast } = useErrorToast();
 
 /** Satu-satunya definisi baris aplikan periode; diimpor oleh Periods/Show.vue. */
 export interface TApplicationRow {

@@ -19,9 +19,9 @@ import {
 } from '@/components/ui/dialog';
 import { formatBytes, formatSubmissionDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
-import { showErrorToast, showFlashToast } from '@/lib/error-message';
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
 import type { IApplicationDetail } from '@/types/recruitment';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import useAuth from '@/hooks/useAuth';
 import {
     CheckCircle2,
@@ -35,6 +35,8 @@ import {
     User,
     XCircle,
 } from 'lucide-vue-next';
+
+const { showErrorToast, showFlashToast } = useErrorToast();
 
 type TFinalAction = 'accept' | 'reject' | null;
 

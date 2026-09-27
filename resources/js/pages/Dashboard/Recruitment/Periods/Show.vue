@@ -24,7 +24,7 @@ import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/s
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { BarChart3, CalendarClock, Plus, Trash2, UserCheck, Users } from 'lucide-vue-next';
-import { showErrorToast, showFlashToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import type { IPaginator } from '@/lib/pagination';
 import { routes } from '@/lib/routes';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
@@ -42,6 +42,8 @@ import { initialsOf } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
+
+const { showErrorToast, showFlashToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

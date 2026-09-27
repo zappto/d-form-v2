@@ -2,7 +2,8 @@
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
-import { handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
+import { humanizeErrorMessage } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
 import {
@@ -17,6 +18,8 @@ import type { BuilderField } from '@/types/form-builder';
 import type { ICreateDashboardFormPayload, IFormSiblingOption } from '@/types/form';
 import { emptyFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
 import { routes } from '@/lib/routes';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 /** Inertia `FormDataType` cannot recurse `BackendField.metadata` (`TFormFieldMetadataBag`); store fields loosely for typing only. */
 type TCreateFormClientPayload = Omit<ICreateDashboardFormPayload, 'fields'> & {

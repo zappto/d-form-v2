@@ -8,7 +8,7 @@ import DivisionListSheet, {
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
-import { showErrorToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import type { IPaginator } from '@/lib/pagination';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,8 @@ import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
 import { usePage } from '@inertiajs/vue3';
 import { CalendarRange, ImageOff, Layers, User, Users, ClipboardList, ListOrdered, Trash2 } from 'lucide-vue-next';
+
+const { showErrorToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

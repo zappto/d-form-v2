@@ -12,9 +12,11 @@ import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker';
 import { routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import { BannerPickerField } from '@/components/core/field';
+
+const { handleInertiaFormErrors, showFlashToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

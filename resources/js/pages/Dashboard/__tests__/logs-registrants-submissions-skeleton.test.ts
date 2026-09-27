@@ -74,12 +74,16 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
 
 vi.mock('@/lib/error-message', () => ({
     getFieldError: () => undefined,
-    handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
     parseApiErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showHttpErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+}));
+
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({
+        handleInertiaFormErrors: vi.fn(),
+        showErrorToast: vi.fn(),
+        showHttpErrorToast: vi.fn(),
+    }),
 }));
 
 vi.mock('vue-sonner', () => ({

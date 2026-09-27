@@ -59,10 +59,17 @@ vi.mock('@inertiajs/vue3', async () => {
 vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+}));
+
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({
+        handleInertiaFormErrors: vi.fn(),
+        showErrorToast: vi.fn(),
+        showFlashToast: vi.fn(),
+        showHttpErrorToast: vi.fn(),
+        showValidationErrorToast: vi.fn(),
+    }),
 }));
 
 vi.mock('vue-sonner', () => ({

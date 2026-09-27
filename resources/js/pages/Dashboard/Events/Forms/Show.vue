@@ -3,7 +3,7 @@ import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { useBuilderAutosave } from '@/hooks/useBuilderAutosave';
-import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage } from '@/lib/error-message';
+import { getFieldError, humanizeErrorMessage } from '@/lib/error-message';
 import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
@@ -39,13 +39,16 @@ import {
     submissionFileUrl,
     submissionReviewBadge,
 } from '@/lib/formSubmissionsUi';
-import { parseApiErrorMessage, showErrorToast, showHttpErrorToast } from '@/lib/error-message';
+import { parseApiErrorMessage } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { isFileUploadTypeName } from '@/lib/formFieldKind';
 import { useInertiaRequest } from '@/hooks/useInertiaRequest';
 import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAnswerReviewController';
 import FormAnswerDetailSheet from '@/components/modules/dashboard/FormAnswerDetailSheet.vue';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
 import { userAvatarSeed } from '@/lib/userAvatarFallback';
+
+const { handleInertiaFormErrors, showErrorToast, showHttpErrorToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 

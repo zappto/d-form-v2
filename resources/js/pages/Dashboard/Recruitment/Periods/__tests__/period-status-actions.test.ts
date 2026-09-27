@@ -2,7 +2,10 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper } from '@vue/test-utils';
 import PeriodsShow from '../Show.vue';
-import { showErrorToast, showFlashToast } from '@/lib/error-message';
+const { showErrorToast, showFlashToast } = vi.hoisted(() => ({
+    showErrorToast: vi.fn(),
+    showFlashToast: vi.fn(),
+}));
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -46,9 +49,8 @@ vi.mock('@inertiajs/vue3', () => ({
 
 vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-vi.mock('@/lib/error-message', () => ({
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ showErrorToast, showFlashToast }),
 }));
 
 interface IRouterMutationOptions {

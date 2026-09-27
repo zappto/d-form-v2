@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
@@ -14,6 +14,8 @@ import { formatDisplayDateTime } from '@/lib/format';
 import FormSubmissionsController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormSubmissionsController';
 import { routes } from '@/lib/routes';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 defineOptions({ layout: DashboardFocusLayout });
 

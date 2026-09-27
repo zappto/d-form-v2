@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from './useErrorToast';
 import {
     destroy as destroyEvent,
     restore as restoreEvent,
@@ -13,6 +13,7 @@ import { Banknote, CalendarDays, Clock, MapPin } from 'lucide-vue-next';
 
 /** Data turunan (kuota, status, progres) dan aksi arsip/pulihkan/publish halaman detail event dashboard. */
 export function useDashboardEventShowPage(event: IEvent, forms: { id: string; title: string }[]) {
+    const { handleInertiaFormErrors } = useErrorToast();
     const previewRegistrants: IRegistrant[] = [];
     const totalRegistrants = event.registered_count;
 

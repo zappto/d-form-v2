@@ -4,7 +4,11 @@ import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils
 import PeriodApplicantSection from '../PeriodApplicantSection.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import { Dialog } from '@/components/ui/dialog';
-import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/error-message';
+const { handleInertiaFormErrors, showErrorToast, showFlashToast } = vi.hoisted(() => ({
+    handleInertiaFormErrors: vi.fn(),
+    showErrorToast: vi.fn(),
+    showFlashToast: vi.fn(),
+}));
 
 /** Tipe baris aplikan diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
 type TApplicationRow = NonNullable<InstanceType<typeof PeriodApplicantSection>['$props']['applications']>[number];
@@ -60,11 +64,8 @@ vi.mock('@inertiajs/vue3', async () => {
     };
 });
 
-vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ handleInertiaFormErrors, showErrorToast, showFlashToast }),
 }));
 
 interface IRouterMutationOptions {

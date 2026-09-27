@@ -96,10 +96,17 @@ vi.mock('vue3-lottie', () => ({
 vi.mock('@/lib/error-message', () => ({
     buildFieldLabelMap: () => ({}),
     getFieldError: () => undefined,
-    handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+}));
+
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({
+        handleInertiaFormErrors: vi.fn(),
+        showErrorToast: vi.fn(),
+        showFlashToast: vi.fn(),
+        showHttpErrorToast: vi.fn(),
+        showValidationErrorToast: vi.fn(),
+    }),
 }));
 
 vi.mock('vue-sonner', () => ({

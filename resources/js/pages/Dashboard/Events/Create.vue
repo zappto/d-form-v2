@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { toast } from 'vue-sonner';
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue';
 import EventDashboardForm from '@/components/modules/dashboard/events/EventDashboardForm.vue';
@@ -28,6 +28,8 @@ import type { TFormFieldMetadataBag } from '@/types/form';
 import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
 import type { BuilderField } from '@/types/form-builder';
 import { routes } from '@/lib/routes';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 defineOptions({ layout: DashboardFocusLayout });
 

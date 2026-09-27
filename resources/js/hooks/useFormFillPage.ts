@@ -5,13 +5,8 @@ import type { IDraftValuesSnapshot } from '@/hooks/useDraftRestore';
 import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import { pickFormBannerField } from '@/components/modules/builder/formBanner';
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
-import {
-    buildFieldLabelMap,
-    getFieldError,
-    handleInertiaFormErrors,
-    showErrorToast,
-    type TErrorMessageContext,
-} from '@/lib/error-message';
+import { buildFieldLabelMap, getFieldError, type TErrorMessageContext } from '@/lib/error-message';
+import { useErrorToast } from './useErrorToast';
 import { getFormFieldOptionRows } from '@/lib/formFieldOptions';
 import { readFieldMetadata, readFieldRules, readMetaBoolean } from '@/lib/formFieldMetadata';
 import type {
@@ -37,6 +32,7 @@ export function useFormFillPage(props: {
     registrationMode: string;
     draftKey?: string | null;
 }) {
+    const { handleInertiaFormErrors, showErrorToast } = useErrorToast();
     const fields = props.fields ?? [];
     const page = usePage();
 

@@ -2,7 +2,10 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
 import OpRecFeedbackForm from '../OpRecFeedbackForm.vue';
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+const { handleInertiaFormErrors, showFlashToast } = vi.hoisted(() => ({
+    handleInertiaFormErrors: vi.fn(),
+    showFlashToast: vi.fn(),
+}));
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -43,11 +46,8 @@ vi.mock('@inertiajs/vue3', async () => {
     };
 });
 
-vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ handleInertiaFormErrors, showFlashToast }),
 }));
 
 /** Irisan state form yang diintip test (proses submit) — tipe konkret, bukan peta longgar. */

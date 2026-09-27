@@ -21,7 +21,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { routes } from '@/lib/routes';
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import {
     ArrowRight,
     CalendarClock,
@@ -36,6 +36,8 @@ import {
     QrCode,
     Users,
 } from 'lucide-vue-next';
+
+const { handleInertiaFormErrors, showFlashToast } = useErrorToast();
 
 defineOptions({ layout: FormFillLayout });
 

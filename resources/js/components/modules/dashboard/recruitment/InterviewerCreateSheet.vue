@@ -8,8 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { routes } from '@/lib/routes';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { Eye, EyeOff } from 'lucide-vue-next';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 export interface InterviewerDivisionChoice {
     id: string;

@@ -8,7 +8,10 @@ import { Spinner } from '@/components/ui/spinner';
 import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
 import { toast } from 'vue-sonner';
 import { routes } from '@/lib/routes';
-import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage, showErrorToast } from '@/lib/error-message';
+import { getFieldError, humanizeErrorMessage } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
+
+const { handleInertiaFormErrors, showErrorToast } = useErrorToast();
 
 const PASSWORD_RESET_LINK_URL = routes.auth.passwordResetLink;
 

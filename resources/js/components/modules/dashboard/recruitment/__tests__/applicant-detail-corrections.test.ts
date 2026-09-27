@@ -3,7 +3,10 @@ import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
 import ApplicantDetailContent from '../ApplicantDetailContent.vue';
 import type { IApplicationDetail } from '@/types/recruitment';
-import { showErrorToast, showFlashToast } from '@/lib/error-message';
+const { showErrorToast, showFlashToast } = vi.hoisted(() => ({
+    showErrorToast: vi.fn(),
+    showFlashToast: vi.fn(),
+}));
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -63,10 +66,8 @@ vi.mock('@inertiajs/vue3', async () => {
     };
 });
 
-vi.mock('@/lib/error-message', () => ({
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ showErrorToast, showFlashToast }),
 }));
 
 vi.mock('vue-sonner', () => ({

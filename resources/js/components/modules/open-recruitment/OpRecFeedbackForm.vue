@@ -6,8 +6,10 @@ import type { TFormFillAnswerMap } from '@/types/form';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { CometSpinner } from '@/components/ui/comet';
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { readFormError } from '@/lib/formErrors';
+
+const { handleInertiaFormErrors, showFlashToast } = useErrorToast();
 
 const props = defineProps<{
     storeUrl: string;

@@ -33,10 +33,12 @@ import { routes } from '@/lib/routes';
 import {
     buildFieldLabelMap,
     getFieldError,
-    handleInertiaFormErrors,
     type TErrorMessageContext,
     type TValidationErrors,
 } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 defineOptions({ layout: FormFillLayout });
 

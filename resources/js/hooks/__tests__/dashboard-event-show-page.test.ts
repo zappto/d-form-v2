@@ -1,6 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { useDashboardEventShowPage } from '../useDashboardEventShowPage';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+const { handleInertiaFormErrors } = vi.hoisted(() => ({
+    handleInertiaFormErrors: vi.fn(),
+}));
 import { toast } from 'vue-sonner';
 
 /**
@@ -29,11 +31,8 @@ vi.mock('@inertiajs/vue3', () => ({
     },
 }));
 
-vi.mock('@/lib/error-message', () => ({
-    handleInertiaFormErrors: vi.fn(),
-    humanizeErrorMessage: (message: string): string => message,
-    showErrorToast: vi.fn(),
-    showFlashToast: vi.fn(),
+vi.mock('@/hooks/useErrorToast', () => ({
+    useErrorToast: () => ({ handleInertiaFormErrors }),
 }));
 
 vi.mock('vue-sonner', () => ({

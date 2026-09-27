@@ -5,8 +5,10 @@ import { AuthField } from '@/components/core/field';
 import { store as login } from '@/actions/App/Http/Controllers/Auth/LoginController';
 import { index as forgotPasswordPage } from '@/actions/App/Http/Controllers/Auth/ForgotPasswordController';
 import { index as registerPage } from '@/actions/App/Http/Controllers/Auth/RegisterController';
-import { getFieldError, handleInertiaFormErrors } from '@/lib/error-message';
+import { getFieldError } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 
+const { handleInertiaFormErrors } = useErrorToast();
 const form = useForm({ email: '', password: '' }).dontRemember('password');
 
 function submit(): void {

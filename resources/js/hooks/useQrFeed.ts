@@ -2,7 +2,8 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import type { Ref } from 'vue';
 import axios from 'axios';
 import { toast } from 'vue-sonner';
-import { humanizeErrorMessage, parseApiErrorMessage, showErrorToast } from '@/lib/error-message';
+import { humanizeErrorMessage, parseApiErrorMessage } from '@/lib/error-message';
+import { useErrorToast } from './useErrorToast';
 import { padQueueNumber } from '@/lib/format';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import {
@@ -135,6 +136,7 @@ function scanIdentity(
 
 /** Kelola pengiriman hasil scan, riwayat, dan identitas meja kasir. */
 export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
+    const { showErrorToast } = useErrorToast();
     const deskId = resolveDeskId();
     const { playScanBeep } = useScanFeedback();
 

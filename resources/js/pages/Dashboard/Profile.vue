@@ -2,7 +2,8 @@
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
-import { getFieldError, handleInertiaFormErrors } from '@/lib/error-message';
+import { getFieldError } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,8 @@ import { userAvatarSeed } from '@/lib/userAvatarFallback';
 import useAuth from '@/hooks/useAuth';
 import { Eye, EyeOff, Save, UploadCloud } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 const DASHBOARD_PROFILE_UPDATE_URL = routes.dashboard.profile;
 const DASHBOARD_PROFILE_AVATAR_URL = routes.dashboard.profileAvatar;

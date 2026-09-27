@@ -20,7 +20,9 @@ import {
 } from 'lucide-vue-next';
 import { edit as editEvent } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { routes } from '@/lib/routes';
-import { handleInertiaFormErrors } from '@/lib/error-message';
+import { useErrorToast } from '@/hooks/useErrorToast';
+
+const { handleInertiaFormErrors } = useErrorToast();
 
 const props = defineProps<{
     event: IEvent;

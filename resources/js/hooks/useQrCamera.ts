@@ -2,7 +2,8 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import type { Ref } from 'vue';
 import { toast } from 'vue-sonner';
 import { Html5Qrcode } from 'html5-qrcode';
-import { humanizeErrorMessage, showErrorToast } from '@/lib/error-message';
+import { humanizeErrorMessage } from '@/lib/error-message';
+import { useErrorToast } from './useErrorToast';
 
 /** Laju baca QR per detik; 10 fps cukup responsif tanpa membebani CPU ponsel. */
 const CAMERA_FRAME_RATE = 10;
@@ -36,6 +37,7 @@ export interface IQrCameraControls {
 
 /** Kelola daftar kamera dan siklus hidup Html5Qrcode untuk satu wadah scanner. */
 export function useQrCamera(args: IQrCameraArgs): IQrCameraControls {
+    const { showErrorToast } = useErrorToast();
     const scanner = ref<Html5Qrcode | null>(null);
     const cameras = ref<IQrCameraDevice[]>([]);
     const selectedCameraId = ref('');
