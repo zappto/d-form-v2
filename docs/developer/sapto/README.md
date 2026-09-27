@@ -17,13 +17,14 @@ Folder ini berisi catatan perubahan dan desain yang dikerjakan oleh **Sapto** pa
 | [saptoChanges27-09-2026-DFORM-17.md](./saptoChanges27-09-2026-DFORM-17.md) | DFORM-17 M13: closeout — hapus 17 file pola lama mati + CONTEXT.md + 5 ADR; e2e wizard ditunda (4 commit atomik) |
 | [saptoChanges27-09-2026-DFORM-30.md](./saptoChanges27-09-2026-DFORM-30.md) | DFORM-30 Mx-D: hapus `MiniCalendar` dummy + satu `EventCalendar` data nyata (wiring `calendarEvents` + helper `eventToCalendarArray`) — 1 commit atomik |
 | [saptoChanges27-09-2026-DFORM-31.md](./saptoChanges27-09-2026-DFORM-31.md) | DFORM-31 Mx-B: status registrasi kanonik via `eventStatusUi` (5 adopsi, copy user-visible berubah) — 1 commit atomik |
+| [saptoChanges27-09-2026-DFORM-32.md](./saptoChanges27-09-2026-DFORM-32.md) | DFORM-32 Mx-G: label busy aksi Tolak `Menghapus...` → `Menolak...`; spec "satu RejectApplicantDialog" dibatalkan (YAGNI, hanya 1 pemakai) — 1 commit atomik |
 | [saptoChanges10-06-2026.md](./saptoChanges10-06-2026.md) | Bundle submissions, member dashboard, reusable routes, re-registrasi, password reset |
 | [saptoChanges04-05-2026.md](./saptoChanges04-05-2026.md) | Konsolidasi M1–M4, hapus Livewire/Filament, publik event dari DB |
 | [saptoChanges19-04-2026.md](./saptoChanges19-04-2026.md) | Dashboard admin, halaman event, landing navbar, data seed, Docker dev |
 
 ## Cara membaca (untuk tim)
 
-1. Buka changelog **terbaru** (`saptoChanges27-09-2026-DFORM-31.md`) untuk perubahan terakhir. Catatan: Mx-B — status registrasi kanonik via `eventStatusUi` (copy user-visible berubah). Dokumen sebelumnya `saptoChanges27-09-2026-DFORM-30.md` (Mx-D: hapus `MiniCalendar` dummy + satu `EventCalendar` data nyata) dan `saptoChanges27-09-2026-DFORM-17.md` (pembersihan pola lama, `CONTEXT.md`, 5 ADR; slice e2e wizard ditunda).
+1. Buka changelog **terbaru** (`saptoChanges27-09-2026-DFORM-32.md`) untuk perubahan terakhir. Catatan: Mx-G — label busy aksi Tolak `Menghapus...` → `Menolak...`; syarat spec "satu `RejectApplicantDialog`" dibatalkan (YAGNI, hanya 1 pemakai). Dokumen sebelumnya `saptoChanges27-09-2026-DFORM-31.md` (Mx-B: status registrasi kanonik via `eventStatusUi`), `saptoChanges27-09-2026-DFORM-30.md` (Mx-D: hapus `MiniCalendar` dummy + satu `EventCalendar` data nyata), dan `saptoChanges27-09-2026-DFORM-17.md` (pembersihan pola lama, `CONTEXT.md`, 5 ADR; slice e2e wizard ditunda).
 2. Entri baru memakai tabel per-tanggal per-commit dengan kolom **Issue** — cari `DFORM-*` dulu saat ada issue.
 3. Bagian **Ringkasan (TL;DR)** di setiap dokumen cocok untuk sync singkat.
 4. Bagian **Checklist** di akhir dokumen bisa dipakai sebelum merge atau saat onboarding anggota baru.
