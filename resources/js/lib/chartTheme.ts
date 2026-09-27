@@ -1,3 +1,5 @@
+import type { FontSpec } from 'chart.js';
+
 /** Warna tick sumbu mode terang; dipakai CategoryChart dan RegistrationChart. */
 const CHART_TICK_LIGHT = 'oklch(0.46 0.025 255)';
 
@@ -28,8 +30,8 @@ const CHART_FONT_FAMILY = 'Poppins, sans-serif';
 /** Ukuran font judul tooltip chart dashboard. */
 const CHART_TOOLTIP_TITLE_SIZE = 12;
 
-/** Tebal font judul tooltip chart dashboard. */
-const CHART_TOOLTIP_TITLE_WEIGHT = '600';
+/** Tebal font judul tooltip chart dashboard (CSS menerima string numerik '600'; chart.js hanya mengetik number/label). */
+const CHART_TOOLTIP_TITLE_WEIGHT = '600' as FontSpec['weight'];
 
 /** Ukuran font isi tooltip chart dashboard. */
 const CHART_TOOLTIP_BODY_SIZE = 12;
@@ -48,18 +50,11 @@ export interface IChartThemeTokens {
     tooltipFg: string;
 }
 
-/** Font judul tooltip chart dashboard. */
-export interface IChartTooltipTitleFont {
-    size: number;
-    weight: string;
-    family: string;
-}
+/** Font judul tooltip chart dashboard — subset `FontSpec` chart.js. */
+export type IChartTooltipTitleFont = Partial<FontSpec>;
 
-/** Font isi tooltip chart dashboard. */
-export interface IChartTooltipBodyFont {
-    size: number;
-    family: string;
-}
+/** Font isi tooltip chart dashboard — subset `FontSpec` chart.js. */
+export type IChartTooltipBodyFont = Partial<FontSpec>;
 
 /** Blok dasar tooltip chart dashboard; copy per-chart tetap di call-site. */
 export interface IChartTooltipBaseOptions {

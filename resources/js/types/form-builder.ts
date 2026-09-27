@@ -30,7 +30,7 @@ export interface BuilderField {
     order?: number
 }
 
-export type BackendFieldType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'checkbox' | 'radio'
+export type BackendFieldType = 'input' | 'select' | 'textarea' | 'datePicker' | 'fileUpload' | 'checkbox' | 'radio' | 'banner'
 
 export interface BackendField {
     id: string

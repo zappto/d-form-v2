@@ -76,7 +76,8 @@ declare global {
 
     interface IFormField {
         id: string
-        type: FormApiType | FormBuilderType
+        /** `''` menandai field legacy tanpa type tersimpan (lihat `formFieldApiType`). */
+        type: FormApiType | FormBuilderType | ''
         label: string
         description?: string | null
         name: string

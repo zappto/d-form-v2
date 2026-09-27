@@ -88,7 +88,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
                 grid: { display: false },
                 border: { display: false },
                 ticks: {
-                    font: { size: 12, weight: '500', family: 'Poppins, sans-serif' },
+                    font: { size: 12, weight: 500, family: 'Poppins, sans-serif' },
                     color: chartTokens.tick,
                     autoSkip: false,
                 },

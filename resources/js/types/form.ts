@@ -79,7 +79,8 @@ export interface CreateDashboardFormPayload {
     visible_for: string[]
     banner_url: string
     banner_caption: string
-    metadata: FormRegistrationMetadata | Record<string, unknown>
+    /** Payload metadata registrasi; `null` saat form belum diisi (init halaman create). */
+    metadata: FormRegistrationMetadata | null
     fields: BackendField[]
 }
 
@@ -119,7 +120,7 @@ export function parseFormRegistrationMetadata(raw: unknown): FormRegistrationMet
  * Always send all registration keys so create/update round-trip reliably
  * (Inertia may omit nulls; partial objects used to wipe unrelated metadata).
  */
-export function toFormMetadataPayload(m: FormRegistrationMetadata): Record<string, unknown> {
+export function toFormMetadataPayload(m: FormRegistrationMetadata): FormRegistrationMetadata {
     const purpose = m.purpose === 'other' ? 'other' : 'registration'
     const isOther = purpose === 'other'
     return {
