@@ -162,4 +162,23 @@ class FormBannerUploadTest extends TestCase
             'X-Requested-With' => 'XMLHttpRequest',
         ])->assertStatus(422)->assertJsonValidationErrors(['banner_file']);
     }
+
+    public function test_banner_file_rejects_over_5mb(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $event = Event::factory()->create();
+        $form = Form::factory()->create(['event_id' => $event->id]);
+        $path = $this->fieldSavePath($event, $form);
+
+        $this->actingAs($admin)->post($path, [
+            'fields' => json_encode([$this->bannerRow((string) Str::uuid(), '')]),
+            'deleted_ids' => json_encode([]),
+            'banner_file' => UploadedFile::fake()->image('banner.jpg')->size(5121),
+        ], [
+            'Accept' => 'application/json',
+            'X-Requested-With' => 'XMLHttpRequest',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['banner_file' => 'Ukuran banner maksimal 5 MB.']);
+    }
 }

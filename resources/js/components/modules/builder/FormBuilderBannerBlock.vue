@@ -23,7 +23,8 @@ const isDragging = ref(false);
 const bannerUploadError = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
 
-const MAX_BANNER_BYTES = 10 * 1024 * 1024;
+// Selaras batas backend `banner_file max:5120`.
+const MAX_BANNER_BYTES = 5 * 1024 * 1024;
 
 const previewSrc = computed(() => {
     const pending = (banner.value.bannerPreviewUrl ?? '').trim();
@@ -50,7 +51,7 @@ function applyFile(file: File | null | undefined): void {
         return;
     }
     if (file.size > MAX_BANNER_BYTES) {
-        bannerUploadError.value = 'Ukuran banner maksimal 10 MB.';
+        bannerUploadError.value = 'Ukuran banner maksimal 5 MB.';
         return;
     }
 

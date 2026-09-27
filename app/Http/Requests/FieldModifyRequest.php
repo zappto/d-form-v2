@@ -46,10 +46,10 @@ class FieldModifyRequest extends FormRequest
                 'fields' => 'nullable|array',
                 'deleted_ids' => 'sometimes|array',
                 'deleted_ids.*' => 'uuid',
-                'banner_file' => 'sometimes|nullable|image|max:10240',
+                'banner_file' => 'sometimes|nullable|image|max:5120',
                 'option_images' => 'sometimes|nullable|array',
                 'option_images.*' => 'sometimes|array',
-                'option_images.*.*' => 'sometimes|nullable|image|max:10240',
+                'option_images.*.*' => 'sometimes|nullable|image|max:5120',
             ],
             FormFieldsRequestValidation::nestedFieldRules(),
         );
@@ -91,6 +91,10 @@ class FieldModifyRequest extends FormRequest
         return [
             'fields.required' => 'Please provide form fields to update.',
             'fields.array' => 'Form fields must be a valid list.',
+            'banner_file.max' => 'Ukuran banner maksimal 5 MB.',
+            'banner_file.uploaded' => 'Banner gagal diunggah. Coba lagi dengan file yang lebih kecil.',
+            'option_images.*.*.max' => 'Ukuran gambar opsi maksimal 5 MB.',
+            'option_images.*.*.uploaded' => 'Gambar opsi gagal diunggah. Coba lagi dengan file yang lebih kecil.',
         ];
     }
 
