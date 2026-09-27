@@ -27,7 +27,7 @@ vi.mock('@inertiajs/vue3', async () => {
         Head: { template: '<div style="display:none"></div>' },
         Link: { props: ['href'], template: '<a :href="href"><slot /></a>' },
         router: { post: vi.fn(), get: vi.fn(), visit: vi.fn(), reload: vi.fn() },
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             return reactive({
                 ...initial,

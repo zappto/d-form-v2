@@ -32,13 +32,13 @@ interface IMutationOptions {
 
 interface IPostedCall {
     tag: 'confirm' | 'decline';
-    url: unknown;
+    url: string;
     options: IMutationOptions | undefined;
 }
 
 const { postedCalls, formStates, createdCounter } = vi.hoisted(() => ({
     postedCalls: [] as IPostedCall[],
-    formStates: [] as Array<{ tag: 'confirm' | 'decline'; state: Record<string, unknown> }>,
+    formStates: [] as Array<{ tag: 'confirm' | 'decline'; state: { processing: boolean } }>,
     createdCounter: { count: 0 },
 }));
 
@@ -46,7 +46,7 @@ vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
     return {
         Head: { template: '<div style="display:none"></div>' },
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             createdCounter.count += 1;
             // Urutan setup: confirmForm dulu, declineForm kemudian.
             const tag = createdCounter.count % 2 === 1 ? 'confirm' : 'decline';
@@ -55,13 +55,9 @@ vi.mock('@inertiajs/vue3', async () => {
                 ...initial,
                 errors,
                 processing: false,
-                post: (...args: unknown[]) => {
+                post: (url: string, options?: IMutationOptions) => {
                     state.processing = true;
-                    postedCalls.push({
-                        tag: tag as 'confirm' | 'decline',
-                        url: args[0],
-                        options: args[1] as IMutationOptions | undefined,
-                    });
+                    postedCalls.push({ tag, url, options });
                     return undefined;
                 },
                 transform: () => ({ post: state.post }),
@@ -70,7 +66,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 }),
                 clearErrors: vi.fn(),
             });
-            formStates.push({ tag: tag as 'confirm' | 'decline', state: state as unknown as Record<string, unknown> });
+            formStates.push({ tag, state });
             return state;
         },
     };

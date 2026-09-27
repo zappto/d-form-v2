@@ -21,9 +21,9 @@ config.global.renderStubDefaultSlot = true;
  */
 
 const { formHolder, postMock, putMock } = vi.hoisted(() => ({
-    formHolder: { state: null as Record<string, unknown> | null },
-    postMock: vi.fn(),
-    putMock: vi.fn(),
+    formHolder: { state: null as { processing: boolean } | null },
+    postMock: vi.fn<(url: string, options?: InertiaMutationOptions) => void>(),
+    putMock: vi.fn<(url: string, options?: InertiaMutationOptions) => void>(),
 }));
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -38,7 +38,7 @@ vi.mock('@inertiajs/vue3', async () => {
             reload: vi.fn(),
             visit: vi.fn(),
         },
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
@@ -60,7 +60,7 @@ vi.mock('@inertiajs/vue3', async () => {
                     errors[field] = message;
                 }),
             });
-            formHolder.state = state as unknown as Record<string, unknown>;
+            formHolder.state = state;
             return state;
         },
     };
@@ -230,16 +230,16 @@ beforeEach(() => {
     lastMethod = undefined;
     postMock.mockReset();
     putMock.mockReset();
-    postMock.mockImplementation((...args: unknown[]) => {
+    postMock.mockImplementation((_url, options) => {
         lastMethod = 'post';
-        lastOptions = args[1] as InertiaMutationOptions | undefined;
+        lastOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
         return undefined;
     });
-    putMock.mockImplementation((...args: unknown[]) => {
+    putMock.mockImplementation((_url, options) => {
         lastMethod = 'put';
-        lastOptions = args[1] as InertiaMutationOptions | undefined;
+        lastOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
         return undefined;

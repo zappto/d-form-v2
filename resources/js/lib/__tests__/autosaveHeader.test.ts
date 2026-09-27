@@ -111,7 +111,7 @@ describe('e2e logika diff: kosong-untuk-required', () => {
         const fullDiff: Partial<IHeader> = {};
         (Object.keys(current) as Array<keyof IHeader>).forEach((key) => {
             if (JSON.stringify(current[key]) !== JSON.stringify(prev[key])) {
-                (fullDiff as Record<string, unknown>)[key] = current[key];
+                Object.assign(fullDiff, { [key]: current[key] });
             }
         });
         expect(Object.keys(fullDiff).sort()).toEqual(['description', 'title']);
@@ -130,7 +130,7 @@ describe('e2e logika diff: kosong-untuk-required', () => {
         const fullDiff: Partial<IHeader> = {};
         (Object.keys(refilled) as Array<keyof IHeader>).forEach((key) => {
             if (JSON.stringify(refilled[key]) !== JSON.stringify(lastSent[key])) {
-                (fullDiff as Record<string, unknown>)[key] = refilled[key];
+                Object.assign(fullDiff, { [key]: refilled[key] });
             }
         });
         const sendable = stripBlankRequiredKeys(fullDiff, refilled);

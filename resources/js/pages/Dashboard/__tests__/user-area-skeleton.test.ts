@@ -27,16 +27,17 @@ config.global.renderStubDefaultSlot = true;
  */
 
 const { postedCalls, formStates, createdCounter, mockAuthUser } = vi.hoisted(() => ({
-    postedCalls: [] as Array<{ tag: string; url: unknown }>,
-    formStates: [] as Array<{ tag: string; state: Record<string, unknown> }>,
+    postedCalls: [] as Array<{ tag: string; url: string }>,
+    formStates: [] as Array<{ tag: string; state: { processing: boolean } }>,
     createdCounter: { count: 0 },
     mockAuthUser: {
         value: {
+            id: 'u-1',
             name: 'Budi Santoso',
             email: 'budi@example.com',
             avatar: null,
             has_local_password: true,
-        } as Record<string, unknown> | null,
+        } as IUser | null,
     },
 }));
 
@@ -52,7 +53,7 @@ vi.mock('@inertiajs/vue3', async () => {
             },
             url: '/dashboard',
         }),
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             createdCounter.count += 1;
             const tag = `form-${createdCounter.count}`;
             const errors = reactive<Record<string, string>>({});
@@ -60,9 +61,9 @@ vi.mock('@inertiajs/vue3', async () => {
                 ...initial,
                 errors,
                 processing: false,
-                post: (...args: unknown[]) => {
+                post: (url: string) => {
                     state.processing = true;
-                    postedCalls.push({ tag, url: args[0] });
+                    postedCalls.push({ tag, url });
                     return undefined;
                 },
                 transform: () => ({ post: state.post }),
@@ -71,7 +72,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 defaults: vi.fn(),
                 dontRemember: () => state,
             });
-            formStates.push({ tag, state: state as unknown as Record<string, unknown> });
+            formStates.push({ tag, state });
             return state;
         },
     };
@@ -424,7 +425,8 @@ describe('User/Events skeleton (M2 Task 10)', () => {
 });
 
 describe('Profile skeleton (M2 Task 10)', () => {
-    const fullUser: Record<string, unknown> = {
+    const fullUser: IUser = {
+        id: 'u-1',
         name: 'Budi Santoso',
         email: 'budi@example.com',
         avatar: null,

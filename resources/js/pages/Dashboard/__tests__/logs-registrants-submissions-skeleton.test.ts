@@ -22,9 +22,9 @@ config.global.renderStubDefaultSlot = true;
  */
 
 const { routerGetMock, routerReloadMock, routerVisitMock, putMock } = vi.hoisted(() => ({
-    routerGetMock: vi.fn(),
-    routerReloadMock: vi.fn(),
-    routerVisitMock: vi.fn(),
+    routerGetMock: vi.fn<(url: string, data: TRouterGetData, options?: IAsyncOptions) => void>(),
+    routerReloadMock: vi.fn<(options?: IAsyncOptions) => void>(),
+    routerVisitMock: vi.fn<(url: string, options?: IAsyncOptions) => void>(),
     putMock: vi.fn(),
 }));
 
@@ -44,7 +44,7 @@ vi.mock('@inertiajs/vue3', async () => {
             props: { auth: { user: {} } },
             url: 'http://localhost/dashboard/events/ev-1/forms/fo-1?tab=jawaban',
         }),
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
@@ -100,13 +100,25 @@ interface IAsyncOptions {
     onFinish?: () => void;
 }
 
-function lastOptions(mock: { mock: { calls: unknown[][] } }): IAsyncOptions {
-    expect(mock).toHaveBeenCalled();
-    const args = mock.mock.calls[0] as unknown[];
-    // get(url, data, options) → [2]; visit(url, options) → [1]; reload(options) → [0].
-    const options = (args[2] ?? args[1] ?? args[0]) as IAsyncOptions | undefined;
+/** Bentuk data query yang dikirim `router.get` pada halaman yang diuji. */
+type TRouterGetData = Record<string, string | number | undefined>;
+
+/** Opsi call GET terakhir; mock `get(url, data, options)` → indeks 2. */
+function lastGetOptions(): IAsyncOptions {
+    expect(routerGetMock).toHaveBeenCalled();
+    const options = routerGetMock.mock.calls[0]?.[2];
     expect(options).toBeDefined();
-    return options as IAsyncOptions;
+    if (!options) throw new Error('opsi GET tidak ditemukan');
+    return options;
+}
+
+/** Opsi call reload terakhir; mock `reload(options)` → indeks 0. */
+function lastReloadOptions(): IAsyncOptions {
+    expect(routerReloadMock).toHaveBeenCalled();
+    const options = routerReloadMock.mock.calls[0]?.[0];
+    expect(options).toBeDefined();
+    if (!options) throw new Error('opsi reload tidak ditemukan');
+    return options;
 }
 
 function demoLog(id: string, action: string): ILogRowFixture {
@@ -328,20 +340,18 @@ beforeEach(() => {
     routerReloadMock.mockReset();
     routerVisitMock.mockReset();
     putMock.mockReset();
-    const hangGet = (...args: unknown[]): undefined => {
-        const options = args[2] as IAsyncOptions | undefined;
+    routerGetMock.mockImplementation((_url, _data, options) => {
         options?.onStart?.();
         return undefined;
-    };
-    const hangVisitReload = (...args: unknown[]): undefined => {
-        // visit(url, options) → [1]; reload(options) → [0].
-        const options = (args[1] ?? args[0]) as IAsyncOptions | undefined;
+    });
+    routerReloadMock.mockImplementation((options) => {
         options?.onStart?.();
         return undefined;
-    };
-    routerGetMock.mockImplementation(hangGet);
-    routerReloadMock.mockImplementation(hangVisitReload);
-    routerVisitMock.mockImplementation(hangVisitReload);
+    });
+    routerVisitMock.mockImplementation((_url, options) => {
+        options?.onStart?.();
+        return undefined;
+    });
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }));
 });
 
@@ -398,7 +408,7 @@ describe('ActivityLogs skeleton (M2 Task 3)', () => {
             await nextTick();
             expect(wrapper.findAll('.log-row-skeleton')).toHaveLength(8);
 
-            lastOptions(routerGetMock).onFinish?.();
+            lastGetOptions().onFinish?.();
             await nextTick();
 
             expect(wrapper.findAll('[data-slot="skeleton"]')).toHaveLength(0);
@@ -513,9 +523,7 @@ describe('Forms/Show jawaban skeleton (M2 Task 3)', () => {
             await nextTick();
 
             expect(routerReloadMock).toHaveBeenCalledTimes(1);
-            expect((routerReloadMock.mock.calls[0] as unknown[])[0]).toEqual(
-                expect.objectContaining({ only: ['submissions'] })
-            );
+            expect(routerReloadMock.mock.calls[0]?.[0]).toEqual(expect.objectContaining({ only: ['submissions'] }));
 
             const region = wrapper.find('[aria-busy="true"]');
             expect(region.exists()).toBe(true);
@@ -540,7 +548,7 @@ describe('Forms/Show jawaban skeleton (M2 Task 3)', () => {
             await nextTick();
             expect(wrapper.findAll('.jawaban-row-skeleton')).toHaveLength(10);
 
-            const options = lastOptions(routerReloadMock);
+            const options = lastReloadOptions();
             options.onSuccess?.();
             options.onFinish?.();
             await nextTick();

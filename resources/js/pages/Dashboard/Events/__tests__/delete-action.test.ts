@@ -16,7 +16,9 @@ config.global.renderStubDefaultSlot = true;
  * gagal → handleInertiaFormErrors + modal tetap buka; finish → flag pulih.
  */
 
-const { routerDeleteMock } = vi.hoisted(() => ({ routerDeleteMock: vi.fn() }));
+const { routerDeleteMock } = vi.hoisted(() => ({
+    routerDeleteMock: vi.fn<(url: string, options?: IRouterMutationOptions) => void>(),
+}));
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: { template: '<div style="display:none"></div>' },
@@ -49,11 +51,12 @@ interface IRouterMutationOptions {
 }
 
 function lastDeleteOptions(): IRouterMutationOptions {
-    const calls = routerDeleteMock.mock.calls as unknown[][];
     expect(routerDeleteMock).toHaveBeenCalled();
-    const options = calls[calls.length - 1]?.[1] as IRouterMutationOptions | undefined;
+    const calls = routerDeleteMock.mock.calls;
+    const options = calls[calls.length - 1]?.[1];
     expect(options).toBeDefined();
-    return options as IRouterMutationOptions;
+    if (!options) throw new Error('opsi delete tidak ditemukan');
+    return options;
 }
 
 const demoEvent: IEvent = {
@@ -112,7 +115,7 @@ function mountIndex(): VueWrapper {
                 },
             },
         },
-    }) as unknown as VueWrapper;
+    });
 }
 
 function confirmButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {

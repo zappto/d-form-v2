@@ -20,7 +20,9 @@ config.global.renderStubDefaultSlot = true;
  *   2 `.quick-skeleton` (bukan "3 stat + 6 konten" versi spec).
  */
 
-const { routerGetMock } = vi.hoisted(() => ({ routerGetMock: vi.fn() }));
+const { routerGetMock } = vi.hoisted(() => ({
+    routerGetMock: vi.fn<(url: string, data: TRouterGetData, options?: IRouterGetOptions) => void>(),
+}));
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: { template: '<div style="display:none"></div>' },
@@ -66,11 +68,15 @@ interface IRouterGetOptions {
     onFinish?: () => void;
 }
 
+/** Bentuk data query yang dikirim `router.get` pada halaman yang diuji. */
+type TRouterGetData = Record<string, string | number | undefined>;
+
 function lastGetOptions(): IRouterGetOptions {
     expect(routerGetMock).toHaveBeenCalled();
-    const options = routerGetMock.mock.calls[0]?.[2] as IRouterGetOptions | undefined;
+    const options = routerGetMock.mock.calls[0]?.[2];
     expect(options).toBeDefined();
-    return options as IRouterGetOptions;
+    if (!options) throw new Error('opsi GET tidak ditemukan');
+    return options;
 }
 
 function demoIEvent(id: string, title: string): IEvent {
@@ -223,8 +229,7 @@ beforeEach(() => {
     routerGetMock.mockReset();
     // Cerminkan Inertia: onStart jalan saat request berangkat; onFinish hanya
     // bila test memicunya eksplisit (navigasi "menggantung" seperti throttle nyata).
-    routerGetMock.mockImplementation((...args: unknown[]) => {
-        const options = args[2] as IRouterGetOptions | undefined;
+    routerGetMock.mockImplementation((_url, _data, options) => {
         options?.onStart?.();
         return undefined;
     });
