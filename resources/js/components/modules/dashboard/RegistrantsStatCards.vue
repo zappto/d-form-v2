@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card'
 import type { RegistrantsStatCardModel } from '@/hooks/useEventRegistrantsPage'
+import { formatCountNumber } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 defineProps<{
@@ -40,7 +41,7 @@ const emit = defineEmits<{
                             {{ stat.label }}
                         </p>
                         <p class="font-display mt-2 text-3xl font-semibold tracking-[-0.03em] text-foreground sm:text-4xl">
-                            {{ stat.value.toLocaleString('id-ID') }}
+                            {{ formatCountNumber(stat.value) }}
                         </p>
                         <p class="mt-2 text-xs leading-relaxed text-muted-foreground">{{ stat.helper }}</p>
                     </div>

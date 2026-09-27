@@ -11,6 +11,7 @@ export interface RegistrantsStatCardModel {
     tone: 'primary' | 'warning' | 'success' | 'destructive'
 }
 
+/** View-model halaman pendaftar: filter tab/form, pencarian, hitung status, dan kartu statistik. */
 export function useEventRegistrantsPage(props: {
     event: IEvent
     forms: { id: string; title: string }[]

@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { CalendarDays, FileStack, Users } from 'lucide-vue-next'
-import { formatDisplayDate } from '@/lib/format'
+import { formatCountNumber, formatDisplayDate } from '@/lib/format'
 import { useEventRegistrantsPage } from '@/hooks/useEventRegistrantsPage'
 import { routes } from '@/lib/routes'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
@@ -82,7 +82,7 @@ onMounted(() => {
                     <Label class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Baris pada tabel</Label>
                     <p class="flex min-h-10 items-center gap-2 rounded-md border border-input bg-muted/30 px-3 text-sm tabular-nums text-foreground">
                         <CalendarDays class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                        {{ (props.registrants ?? []).length.toLocaleString('id-ID') }} pengiriman tercantum
+                        {{ formatCountNumber((props.registrants ?? []).length) }} pengiriman tercantum
                     </p>
                 </div>
             </CardContent>
