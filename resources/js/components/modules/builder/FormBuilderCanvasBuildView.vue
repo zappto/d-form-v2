@@ -71,13 +71,15 @@ function capInput(value: string, max: number): string {
 }
 
 function onTitleInput(e: Event): void {
-    const el = e.target as HTMLInputElement;
+    if (!(e.target instanceof HTMLInputElement)) return;
+    const el = e.target;
     el.value = capInput(el.value, TITLE_MAX);
     formTitle.value = el.value;
 }
 
 function onSubtitleInput(e: Event): void {
-    const el = e.target as HTMLTextAreaElement;
+    if (!(e.target instanceof HTMLTextAreaElement)) return;
+    const el = e.target;
     el.value = capInput(el.value, SUBTITLE_MAX);
     formDescription.value = el.value;
 }

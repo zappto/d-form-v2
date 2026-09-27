@@ -1,5 +1,6 @@
 import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
-import type { TFormFieldMetadataBag } from '@/types/form';
+import type { TFormFieldMetadataBag, TFormFieldMetadataValue } from '@/types/form';
+import { isMetadataBag } from '@/lib/formFieldMetadata';
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 
 export interface ITPendingOptionImageFile {
@@ -14,7 +15,7 @@ export function collectPendingOptionImageFiles(fields: BuilderField[]): ITPendin
     for (const f of fields) {
         if (!Array.isArray(f.options)) continue;
         if (f.type === 'dropdown') continue;
-        for (const opt of f.options as IFieldOptionEntry[]) {
+        for (const opt of f.options) {
             if (opt.type !== 'image') continue;
             if (opt.imageFile instanceof File) {
                 out.push({ fieldId: f.id, optionId: opt.id, file: opt.imageFile });
@@ -50,6 +51,11 @@ export function ensureOptionImageRowsDirty(backend: BackendField[], dirty: Backe
     return [...extra, ...dirty];
 }
 
+/** Baca kunci dari baris opsi JSON-like; dipakai setelah guard agar tanpa cast. */
+function readChoiceField(bag: TFormFieldMetadataBag, key: string): TFormFieldMetadataValue | undefined {
+    return bag[key];
+}
+
 function rowHasPendingFile(row: BackendField): boolean {
     const meta: TFormFieldMetadataBag | undefined = row.metadata;
     const choices = meta?.optionChoices;
@@ -59,9 +65,11 @@ function rowHasPendingFile(row: BackendField): boolean {
     // Baris image tanpa file (url kosong manual) ikut terkirim — aman
     // (server hanya mengganti bila file ada untuk pasangan id tersebut).
     return choices.some((candidate) => {
-        if (!candidate || typeof candidate !== 'object') return false;
-        const rec = candidate as TFormFieldMetadataBag;
-        return rec.type === 'image' && String(rec.imageUrl ?? '') === '';
+        if (!isMetadataBag(candidate)) return false;
+        return (
+            readChoiceField(candidate, 'type') === 'image' &&
+            String(readChoiceField(candidate, 'imageUrl') ?? '') === ''
+        );
     });
 }
 
@@ -100,17 +108,16 @@ export function buildOptionImageFieldsFormData(
 
 /** Baca peta stored path opsi dari respons POST /fields (toleran bila tak ada). */
 export function readOptionImagePathsFromResponse(payload: unknown): Record<string, string> | null {
-    if (!payload || typeof payload !== 'object') return null;
-    const rec = payload as TFormFieldMetadataBag;
-    const raw = rec.option_images;
+    if (!isMetadataBag(payload)) return null;
+    const raw = payload.option_images;
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
     const out: Record<string, string> = {};
-    for (const [key, value] of Object.entries(raw as TFormFieldMetadataBag)) {
+    for (const [key, value] of Object.entries(raw)) {
         if (typeof value === 'string' && value.trim() !== '') {
             out[key] = value.trim();
         } else if (value && typeof value === 'object' && !Array.isArray(value)) {
             // Bentuk bersarang { fieldId: { optionId: path } } → ratakan ke "fieldId:optionId".
-            for (const [optionId, path] of Object.entries(value as TFormFieldMetadataBag)) {
+            for (const [optionId, path] of Object.entries(value)) {
                 if (typeof path === 'string' && path.trim() !== '') {
                     out[`${key}:${optionId}`] = path.trim();
                 }
@@ -127,7 +134,7 @@ export function readOptionImagePathsFromResponse(payload: unknown): Record<strin
 export function applyOptionImageUploadSuccess(fields: BuilderField[], storedMap: Record<string, string>): void {
     for (const f of fields) {
         if (!Array.isArray(f.options)) continue;
-        for (const opt of f.options as IFieldOptionEntry[]) {
+        for (const opt of f.options) {
             const key = `${f.id}:${opt.id}`;
             const storedPath = storedMap[key];
             if (typeof storedPath !== 'string' || storedPath === '') continue;
@@ -145,7 +152,7 @@ export function discardPendingOptionImageFiles(fields: BuilderField[]): boolean 
     let hadPending = false;
     for (const f of fields) {
         if (!Array.isArray(f.options)) continue;
-        for (const opt of f.options as IFieldOptionEntry[]) {
+        for (const opt of f.options) {
             if (opt.imageFile instanceof File) {
                 hadPending = true;
                 revokeOptionImagePreviewUrl(opt.imagePreviewUrl);

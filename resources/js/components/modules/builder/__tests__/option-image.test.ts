@@ -106,6 +106,30 @@ describe('option image upload (base64 → file storage)', () => {
         expect(opt.imagePreviewUrl).toBe('');
     });
 
+    it('respons bersarang { fieldId: { optionId } } diratakan tanpa cast', () => {
+        expect(readOptionImagePathsFromResponse({ option_images: { f1: { o1: 'forms/o.jpg' } } })).toEqual({
+            'f1:o1': 'forms/o.jpg',
+        });
+    });
+
+    it('payload non-bag (array) dan option_images array → null', () => {
+        expect(readOptionImagePathsFromResponse([])).toBeNull();
+        expect(readOptionImagePathsFromResponse({ option_images: [1, 2] })).toBeNull();
+    });
+
+    it('optionChoices malformed (string/array) tidak dianggap file pending', () => {
+        const row: BackendField = {
+            id: 'f1',
+            type: 'checkbox',
+            label: 'Pilih',
+            description: null,
+            name: 'pilih',
+            order: 1000,
+            metadata: { optionChoices: ['x', ['y']] },
+        };
+        expect(ensureOptionImageRowsDirty([row], [])).toEqual([]);
+    });
+
     it('path relatif tampil via normalize (/storage/) + preview blob diutamakan', () => {
         expect(
             resolveOptionImagePreviewSrc({

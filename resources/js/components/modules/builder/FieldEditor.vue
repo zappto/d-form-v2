@@ -56,7 +56,15 @@ const TYPE_CONFIG = {
     divider: { icon: Minus, label: 'Garis pemisah', accent: '#9ca3af' },
 };
 
-const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text);
+/** Konfigurasi tampilan untuk sebuah tipe field; fallback short_text bila tipe tak dikenal. */
+function fieldTypeConfig(fieldType: string): (typeof TYPE_CONFIG)[keyof typeof TYPE_CONFIG] {
+    for (const [key, entry] of Object.entries(TYPE_CONFIG)) {
+        if (key === fieldType) return entry;
+    }
+    return TYPE_CONFIG.short_text;
+}
+
+const config = computed(() => fieldTypeConfig(props.field.type));
 
 // --- helpers to mutate without losing reactivity ---
 function update<K extends keyof BuilderField>(key: K, value: BuilderField[K]) {
@@ -75,7 +83,7 @@ const newOption = ref('');
 function optionRows(): IFieldOptionEntry[] {
     const raw = props.field.options;
     if (!Array.isArray(raw)) return [];
-    const rows = raw as IFieldOptionEntry[];
+    const rows = raw;
     // Dropdown is intentionally text-only to avoid unstable image option rendering.
     if (props.field.type === 'dropdown') {
         return rows.map((row) => ({
@@ -134,7 +142,8 @@ function setOptionImageUrl(index: number, url: string) {
 }
 
 function onOptionImageFile(index: number, event: Event) {
-    const input = event.target as HTMLInputElement;
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const input = event.target;
     const file = input.files?.[0];
     input.value = '';
     if (!file || !file.type.startsWith('image/')) return;

@@ -5,6 +5,7 @@
 
 import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 import type { TFormFieldMetadataBag, TFormFieldRules } from '@/types/form';
+import { isFormFieldRules, isMetadataBag } from '@/lib/formFieldMetadata';
 
 export type { BackendField, BuilderField, IFieldOptionEntry };
 
@@ -37,13 +38,15 @@ function parseOptionChoices(raw: unknown): IFieldOptionEntry[] | null {
     if (!Array.isArray(raw)) return null;
     const out: IFieldOptionEntry[] = [];
     for (const item of raw) {
-        if (item && typeof item === 'object' && item !== null) {
-            const row = item as TFormFieldMetadataBag;
-            const id = String(row.id ?? crypto.randomUUID());
-            const type = row.type === 'image' ? 'image' : 'text';
-            const label = String(row.label ?? '').trim();
-            const imageUrl = String(row.imageUrl ?? '').trim();
+        if (isMetadataBag(item)) {
+            const id = String(item.id ?? crypto.randomUUID());
+            const type = item.type === 'image' ? 'image' : 'text';
+            const label = String(item.label ?? '').trim();
+            const imageUrl = String(item.imageUrl ?? '').trim();
             out.push({ id, type, label, imageUrl });
+        } else if (Array.isArray(item)) {
+            // Paritas perilaku lama: array lolos guard objek dan dibaca sebagai bag kosong.
+            out.push({ id: crypto.randomUUID(), type: 'text', label: '', imageUrl: '' });
         } else if (typeof item === 'string') {
             const label = item.trim();
             out.push({ id: crypto.randomUUID(), type: 'text', label });
@@ -147,9 +150,9 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
                 metadata: withMeta(f, {
                     type: 'number',
                     placeholder: '',
-                    rules: { ...req, min: 1, max: (f.metadata?.maxStars as number) ?? 5 },
+                    rules: { ...req, min: 1, max: f.metadata?.maxStars ?? 5 },
                     builderType: 'rating',
-                    maxStars: (f.metadata?.maxStars as number) ?? 5,
+                    maxStars: f.metadata?.maxStars ?? 5,
                 }),
             };
         case 'heading':
@@ -161,7 +164,7 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
                     placeholder: '',
                     rules: {},
                     builderType: 'heading',
-                    content: (f.metadata?.content as string) || 'Section Heading',
+                    content: f.metadata?.content || 'Section Heading',
                 }),
             };
         case 'divider':
@@ -189,7 +192,7 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
                     placeholder: '',
                     rules: {},
                     builderType: 'paragraph',
-                    content: (f.metadata?.content as string) || '',
+                    content: f.metadata?.content || '',
                 }),
             };
 
@@ -269,9 +272,9 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
                     rules: {},
                     builderType: 'banner',
                     accepts: 'gif, png, jpg, jpeg',
-                    bannerUrl: (f.metadata?.bannerUrl as string) || '',
-                    bannerFileName: (f.metadata?.bannerFileName as string) || '',
-                    content: (f.metadata?.content as string) || '',
+                    bannerUrl: f.metadata?.bannerUrl || '',
+                    bannerFileName: f.metadata?.bannerFileName || '',
+                    content: f.metadata?.content || '',
                     formBanner: Boolean(f.metadata?.formBanner),
                 }),
             };
@@ -302,9 +305,9 @@ export function fromBackendField(bf: BackendField): BuilderField {
     const mFull: TFormFieldMetadataBag = bf.metadata && typeof bf.metadata === 'object' ? bf.metadata : {};
     const m: TFormFieldMetadataBag = { ...mFull };
     delete m.options;
-    const rules = (m.rules as TFormFieldRules) || {};
+    const rules: TFormFieldRules = isFormFieldRules(m.rules) ? m.rules : {};
     const bt = (m.builderType as string) || guessType(bf.type, m);
-    const inStr = (rules.in as string) || '';
+    const inStr = rules.in || '';
     const parsedChoices = parseOptionChoices(m.optionChoices);
     const optsRaw: IFieldOptionEntry[] =
         parsedChoices ??
@@ -347,8 +350,8 @@ export function fromBackendField(bf: BackendField): BuilderField {
         order: bf.order,
         metadata: {
             ...m,
-            maxStars: (m.maxStars as number) || 5,
-            accepts: ((rules.mimes as string) || '').replace(/,/g, ', '),
+            maxStars: m.maxStars || 5,
+            accepts: (rules.mimes || '').replace(/,/g, ', '),
             formBanner: m.formBanner === true,
             ...(maxLengthForMeta != null ? { maxLength: maxLengthForMeta } : {}),
         },
@@ -367,8 +370,7 @@ export const FIELD_ORDER_GAP = 1000;
 
 /** Alokasi satu order di antara tetangga (edge ± GAP, tengah midpoint floor). */
 export function allocateSpacedOrder(prev: number | null, next: number | null): number {
-    if (prev === null && next === null) return FIELD_ORDER_GAP;
-    if (prev === null) return (next as number) - FIELD_ORDER_GAP;
+    if (prev === null) return next === null ? FIELD_ORDER_GAP : next - FIELD_ORDER_GAP;
     if (next === null) return prev + FIELD_ORDER_GAP;
     return Math.floor((prev + next) / 2);
 }
@@ -384,10 +386,10 @@ function asKnownOrder(value: unknown): number | null {
  */
 export function allocateOrderRun(prev: number | null, next: number | null, count: number): number[] | null {
     if (count <= 0) return [];
-    if (prev === null && next === null) {
-        return Array.from({ length: count }, (_, i) => (i + 1) * FIELD_ORDER_GAP);
-    }
-    if (prev === null && next !== null) {
+    if (prev === null) {
+        if (next === null) {
+            return Array.from({ length: count }, (_, i) => (i + 1) * FIELD_ORDER_GAP);
+        }
         const spacedFirst = next - count * FIELD_ORDER_GAP;
         if (spacedFirst >= 0) {
             return Array.from({ length: count }, (_, i) => spacedFirst + i * FIELD_ORDER_GAP);
@@ -398,14 +400,14 @@ export function allocateOrderRun(prev: number | null, next: number | null, count
         }
         return null;
     }
-    if (prev !== null && next === null) {
+    if (next === null) {
         return Array.from({ length: count }, (_, i) => prev + (i + 1) * FIELD_ORDER_GAP);
     }
-    const gap = (next as number) - (prev as number);
+    const gap = next - prev;
     if (gap <= count) return null;
     const step = Math.floor(gap / (count + 1));
     if (step < 1) return null;
-    return Array.from({ length: count }, (_, i) => (prev as number) + (i + 1) * step);
+    return Array.from({ length: count }, (_, i) => prev + (i + 1) * step);
 }
 
 function prevMapFrom(prevOrders: Map<string, number> | BackendField[] | null | undefined): Map<string, number> {
@@ -475,7 +477,7 @@ export function toBackendFields(
             while (j < n && known[j] === null) j++;
             const count = j - i;
             const prevVal: number | null = i > 0 ? resultOrders[i - 1] : null;
-            const nextVal: number | null = j < n ? (known[j] as number) : null;
+            const nextVal: number | null = j < n ? known[j] : null;
             const alloc = allocateOrderRun(prevVal, nextVal, count);
             if (alloc === null) {
                 return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP));
@@ -527,9 +529,12 @@ export function toBackendFields(
         const prevVal: number | null = i > 0 ? resultOrders[i - 1] : null;
         let nextVal: number | null = null;
         if (j < n) {
-            if (j >= lo && j <= hi) nextVal = resultOrders[j];
-            else if (known[j] !== null) nextVal = known[j] as number;
-            else nextVal = null;
+            if (j >= lo && j <= hi) {
+                nextVal = resultOrders[j];
+            } else {
+                const knownNext = known[j];
+                nextVal = knownNext === null ? null : knownNext;
+            }
         }
         const alloc = allocateOrderRun(prevVal, nextVal, count);
         if (alloc === null) {

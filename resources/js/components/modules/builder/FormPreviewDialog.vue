@@ -79,8 +79,8 @@ function optionEntries(field: IFormPreviewField): IFieldOptionEntry[] {
     const raw = field.options;
     if (!Array.isArray(raw)) return [];
     return raw.map((opt) => {
-        if (typeof opt === 'object' && opt !== null) return opt as IFieldOptionEntry;
-        return { id: crypto.randomUUID(), type: 'text', label: String(opt) } as IFieldOptionEntry;
+        if (typeof opt === 'object' && opt !== null) return opt;
+        return { id: crypto.randomUUID(), type: 'text', label: String(opt) };
     });
 }
 

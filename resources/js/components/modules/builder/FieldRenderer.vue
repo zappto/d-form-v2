@@ -48,6 +48,18 @@ function patch(partial: Partial<BuilderField>): void {
     emit('updateField', { ...props.field, ...partial });
 }
 
+/** Perbarui label dari input teks; abaikan event non-input agar tak ada cast target. */
+function onLabelInput(event: Event): void {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    patch({ label: event.target.value });
+}
+
+/** Perbarui teks bantu dari input teks; abaikan event non-input agar tak ada cast target. */
+function onDescriptionInput(event: Event): void {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    patch({ description: event.target.value });
+}
+
 const hasOptions = computed(() => ['dropdown', 'checkbox', 'radio'].includes(props.field.type));
 
 const TYPE_CONFIG = {
@@ -78,7 +90,15 @@ const FIELD_TONE_CLASSES: Record<'neutral' | 'info' | 'primary' | 'success' | 'w
     warning: 'text-warning',
 };
 
-const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text);
+/** Konfigurasi tampilan untuk sebuah tipe field; fallback short_text bila tipe tak dikenal. */
+function fieldTypeConfig(fieldType: string): (typeof TYPE_CONFIG)[keyof typeof TYPE_CONFIG] {
+    for (const [key, entry] of Object.entries(TYPE_CONFIG)) {
+        if (key === fieldType) return entry;
+    }
+    return TYPE_CONFIG.short_text;
+}
+
+const config = computed(() => fieldTypeConfig(props.field.type));
 
 /** Petunjuk di kanvas bila admin belum mengisi placeholder — hanya tampilan, bukan nilai tersimpan. */
 function canvasPlaceholder(f: BuilderField): string {
@@ -99,7 +119,7 @@ const filledStars = computed(() => props.field.metadata?.maxStars ?? 5);
 
 const choiceOptions = computed((): IFieldOptionEntry[] => {
     const raw = props.field.options;
-    if (Array.isArray(raw) && raw.length > 0) return raw as IFieldOptionEntry[];
+    if (Array.isArray(raw) && raw.length > 0) return raw;
     return ['Option 1', 'Option 2', 'Option 3'].map((label) => ({
         id: label.toLowerCase().replace(/\s+/g, '-'),
         type: 'text',
@@ -195,7 +215,7 @@ function choiceImageSrc(entry: IFieldOptionEntry): string | undefined {
                     :value="field.label"
                     :placeholder="field.required ? 'Label pertanyaan' : 'Label pertanyaan (opsional)'"
                     class="w-full border-0 border-b border-transparent bg-transparent p-0 font-display text-[15px] font-semibold tracking-tight text-foreground transition-colors duration-200 outline-none group-hover/label:border-border placeholder:text-muted-foreground/50 focus:border-primary/60"
-                    @input="patch({ label: ($event.target as HTMLInputElement).value })"
+                    @input="onLabelInput"
                 />
                 <span v-if="field.required" class="text-destructive">*</span>
             </label>
@@ -203,7 +223,7 @@ function choiceImageSrc(entry: IFieldOptionEntry): string | undefined {
                 :value="field.description ?? ''"
                 :placeholder="field.description ? '' : 'Teks bantu (opsional)'"
                 class="w-full border-0 border-b border-transparent bg-transparent p-0 text-xs leading-relaxed text-muted-foreground transition-colors duration-200 outline-none placeholder:text-muted-foreground/45 hover:border-border/70 focus:border-primary/50"
-                @input="patch({ description: ($event.target as HTMLInputElement).value })"
+                @input="onDescriptionInput"
             />
 
             <!-- Preview by type -->

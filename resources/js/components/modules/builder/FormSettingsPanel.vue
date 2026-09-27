@@ -73,10 +73,9 @@ function onRequiresFormChange(value: string): void {
 }
 
 function onRegistrationModeSelect(value: string): void {
+    // Nilai select hanya sentinel/single/bundle/team; di luar itu (malformed) → null.
     const mode: IFormRegistrationMetadata['registration_mode'] =
-        value === registrationModeSelectSentinel || value === ''
-            ? null
-            : (value as IFormRegistrationMetadata['registration_mode']);
+        value === 'single' || value === 'bundle' || value === 'team' ? value : null;
     const leaveSizes = mode === 'team' || mode === 'bundle';
     formMetadata.value = {
         ...formMetadata.value,
