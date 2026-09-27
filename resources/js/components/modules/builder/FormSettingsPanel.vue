@@ -86,7 +86,7 @@ function onRegistrationModeSelect(value: string): void {
 }
 
 function setMaxTeamSize(v: string | number): void {
-    const s = typeof v === 'number' ? String(v) : vString(v);
+    const s = String(v);
     const n = s === '' ? null : Number(s);
     formMetadata.value = {
         ...formMetadata.value,
@@ -95,16 +95,12 @@ function setMaxTeamSize(v: string | number): void {
 }
 
 function setTeamSize(v: string | number): void {
-    const s = typeof v === 'number' ? String(v) : vString(v);
+    const s = String(v);
     const n = s === '' ? null : Number(s);
     formMetadata.value = {
         ...formMetadata.value,
         team_size: n === null || Number.isNaN(n) ? null : n,
     };
-}
-
-function vString(v: unknown): string {
-    return v == null ? '' : String(v);
 }
 </script>
 

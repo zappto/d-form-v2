@@ -13,8 +13,9 @@ import { Textarea } from '@/components/ui/textarea';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
 import { Checkbox } from '@/components/ui/checkbox';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import type { TFormFieldMetadataBag } from '@/types/form';
 
-/** Mirrors canvas builder field shape used by Show/Create with unknown metadata values. */
+/** Mirrors canvas builder field shape used by Show/Create, dengan metadata terketik. */
 export interface IFormPreviewField {
     id: string;
     type: string;
@@ -23,7 +24,7 @@ export interface IFormPreviewField {
     required?: boolean;
     placeholder?: string;
     options?: IFieldOptionEntry[];
-    metadata?: Record<string, unknown>;
+    metadata?: TFormFieldMetadataBag;
 }
 
 const props = defineProps<{

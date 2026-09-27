@@ -10,16 +10,16 @@ import { useFormFillPage } from '@/hooks/useFormFillPage';
 import { snapshotRespondentValues } from '@/hooks/useRespondentDraft';
 import { useDraftRestore } from '@/hooks/useDraftRestore';
 import { readFieldRules } from '@/lib/formFieldMetadata';
-import type { IFormFillPageEvent, IFormFillPageForm } from '@/types/form';
+import type { IFormFillPageEvent, IFormFillPageForm, TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import { routes } from '@/lib/routes';
 import { CircleAlert } from 'lucide-vue-next';
 
 defineOptions({ layout: FormFillLayout });
 
 interface IApplyPageProps {
-    period: Record<string, unknown> | null;
+    period: { name: string } | null;
     registration: { is_open: boolean; message: string | null };
-    divisions: Array<Record<string, unknown>>;
+    divisions: Array<{ id: string; name: string }>;
     oprecForm: IFormFillPageForm;
     oprecEvent: IFormFillPageEvent;
     fields: IFormField[];
@@ -55,13 +55,13 @@ function stepFields(step: number): IFormField[] {
     return props.fields.filter((field) => stepOf(field) === step);
 }
 
-function isEmptyValue(value: unknown): boolean {
+function isEmptyValue(value: TFormFillAnswerValue | undefined): boolean {
     return value === null || value === undefined || value === '';
 }
 
 /** Sembunyikan cabang portfolio yang tak dipilih; belum pilih / none = keduanya opsional tampil. */
 function isFieldVisible(field: IFormField): boolean {
-    const portfolioType: unknown = ctx.answerForm['portfolio_type'];
+    const portfolioType = ctx.answerForm['portfolio_type'];
     if (field.name === 'portfolio_url') return portfolioType !== 'file' && portfolioType !== 'none';
     if (field.name === 'portfolio_file') return portfolioType !== 'url' && portfolioType !== 'none';
     return true;
@@ -155,10 +155,12 @@ function draftSnapshot(): string {
     return JSON.stringify({ step: currentStep.value, values: snapshotRespondentValues(ctx.answerForm) });
 }
 
+/** Guard bentuk draft JSON yang tidak dipercaya: param `unknown` dipertahankan sebagai batas penyempitan. */
 function isDraftShape(value: unknown): value is { step?: unknown; values?: unknown } {
     return typeof value === 'object' && value !== null;
 }
 
+/** Tuang draft tersimpan; param `unknown` dipertahankan karena isi localStorage bisa korup/tidak cocok bentuk. */
 function restoreApplyDraft(parsed: unknown): void {
     if (!isDraftShape(parsed)) return;
     if (typeof parsed.step === 'number' && parsed.step >= 1 && parsed.step <= TOTAL_STEPS) {
@@ -186,12 +188,12 @@ const {
 
 /** Hapus pesan error begitu isian sudah diperbaiki, agar card-nya tidak tetap merah. */
 watch(
-    (): Record<string, unknown> => {
-        const snapshot: Record<string, unknown> = {};
+    (): TFormFillAnswerMap => {
+        const snapshot: TFormFillAnswerMap = {};
         for (const field of props.fields) snapshot[field.name] = ctx.answerForm[field.name];
         return snapshot;
     },
-    (values: Record<string, unknown>): void => {
+    (values: TFormFillAnswerMap): void => {
         for (const field of props.fields) {
             if (!isEmptyValue(values[field.name])) delete clientErrors.value[field.name];
         }
@@ -251,7 +253,7 @@ function openUploadLightbox(src: string | undefined): void {
 
 const reviewRows = computed((): Array<{ label: string; value: string }> => {
     const get = (name: string): string => {
-        const value: unknown = ctx.answerForm[name];
+        const value = ctx.answerForm[name];
         if (value instanceof File) return value.name;
         return typeof value === 'string' && value !== '' ? value : '—';
     };
@@ -296,7 +298,7 @@ const STEPS = [
 const progressPct = computed((): number => (currentStep.value / TOTAL_STEPS) * 100);
 
 const periodName = computed((): string => {
-    const raw: unknown = props.period?.name;
+    const raw = props.period?.name;
     return typeof raw === 'string' && raw !== '' ? raw : 'Open Recruitment';
 });
 </script>

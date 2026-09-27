@@ -49,6 +49,16 @@ export type TFormFillAnswerMap = Record<string, TFormFillAnswerValue>;
 /** One row in checkbox / radio / dropdown image+label choices on the fill page */
 export type TFormFillOptionRow = { type: 'text' | 'image'; label: string; imageSrc?: string };
 
+/** Nilai JSON-like metadata field/form (rekursif); pengganti `unknown` longgar. */
+export type TFormFieldMetadataValue =
+    | string
+    | number
+    | boolean
+    | null
+    | TFormFieldRules
+    | TFormFieldMetadataValue[]
+    | { [key: string]: TFormFieldMetadataValue };
+
 /** Validation rules nested under `metadata.rules` on API fields */
 export type TFormFieldRules = {
     required?: boolean;
@@ -57,10 +67,10 @@ export type TFormFieldRules = {
     max_size?: string | number;
     min?: number;
     max?: number;
-} & Record<string, unknown>;
+} & TFormFieldMetadataBag;
 
-/** Loose JSON-like metadata bag on `IFormField.metadata` */
-export type TFormFieldMetadataBag = Record<string, unknown>;
+/** Metadata bag JSON-like pada field/form; index signature dipertahankan untuk pembaca metadata. */
+export type TFormFieldMetadataBag = { [key: string]: TFormFieldMetadataValue };
 
 export interface IFormRegistrationMetadata {
     purpose: TFormPurpose;
@@ -97,7 +107,7 @@ export function emptyFormRegistrationMetadata(): IFormRegistrationMetadata {
 
 /** Parse metadata registrasi dari payload backend menjadi bentuk terketik dengan default aman; dipakai saat memuat form. */
 export function parseFormRegistrationMetadata(raw: unknown): IFormRegistrationMetadata {
-    const m = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+    const m = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as TFormFieldMetadataBag) : {};
     const purposeRaw = m['purpose'];
     const purpose: TFormPurpose = purposeRaw === 'other' ? 'other' : 'registration';
     const requiresRaw = m['requires_form_id'];

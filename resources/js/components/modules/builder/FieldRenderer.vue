@@ -94,6 +94,7 @@ function canvasPlaceholder(f: BuilderField): string {
     return byType[f.type] ?? 'Ketik di sini…';
 }
 
+/** Jumlah bintang tampil; nilai metadata dipakai apa adanya agar rentang v-for mempertahankan perilaku lama (Vue dispatch `renderList`, bukan loop `<=`). */
 const filledStars = computed(() => props.field.metadata?.maxStars ?? 5);
 
 const choiceOptions = computed((): IFieldOptionEntry[] => {
@@ -377,11 +378,12 @@ function choiceImageSrc(entry: IFieldOptionEntry): string | undefined {
                 <!-- Rating -->
                 <div v-else-if="field.type === 'rating'" class="flex flex-col gap-2">
                     <div class="flex items-center gap-2">
+                        <!-- Nilai `i` turunan metadata bisa union; koersi eksplisit ke angka. ToNumber(`<=`) === Number(), jadi paritas perilaku terjaga. -->
                         <Star
                             v-for="i in filledStars"
                             :key="i"
                             class="size-6 text-amber-400"
-                            :fill="i <= 3 ? '#fbbf24' : 'none'"
+                            :fill="Number(i) <= 3 ? '#fbbf24' : 'none'"
                         />
                     </div>
                     <p class="text-[10px] text-muted-foreground/80">Tap bintang untuk nilai</p>

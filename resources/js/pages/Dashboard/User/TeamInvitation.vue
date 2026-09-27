@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
-import type { TFormFillAnswerValue } from '@/types/form';
+import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
 import { getFormFieldOptionRows, formFieldBuilderType } from '@/lib/formFieldOptions';
@@ -44,7 +44,7 @@ const props = defineProps<{
     event: { id: string; slug: string; title: string } | undefined;
     form: { id: string; title: string } | undefined;
     fields: IFormField[] | undefined;
-    answers: Record<string, unknown>;
+    answers: TFormFillAnswerMap;
     leader: { name: string; email: string };
     alreadyConfirmed: boolean;
     confirmUrl: string;
@@ -92,15 +92,21 @@ function initialFormState(): Record<string, TFormFillAnswerValue> {
 
 const confirmForm = useForm(initialFormState());
 
+/** Cek objek peta nilai draft JSON; param `unknown` dipertahankan sebagai batas penyempitan. */
+function isDraftValuesMap(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null;
+}
+
+/** Tuang draft tersimpan; param `unknown` dipertahankan karena isi localStorage bisa korup/tidak cocok bentuk. */
 function applyInviteDraftValues(draft: unknown): void {
-    if (typeof draft !== 'object' || draft === null) return;
-    const values = (draft as { values?: unknown }).values;
-    if (typeof values !== 'object' || values === null) return;
-    for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
+    if (typeof draft !== 'object' || draft === null || !('values' in draft)) return;
+    const values = draft.values;
+    if (!isDraftValuesMap(values)) return;
+    for (const [key, value] of Object.entries(values)) {
         if (!(key in confirmForm)) continue;
         if (typeof value === 'string') {
             confirmForm[key] = value;
-        } else if (Array.isArray(value) && value.every((v) => typeof v === 'string')) {
+        } else if (Array.isArray(value) && value.every((v: unknown): v is string => typeof v === 'string')) {
             confirmForm[key] = [...value];
         }
     }

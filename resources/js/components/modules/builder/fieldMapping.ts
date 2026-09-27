@@ -4,6 +4,7 @@
  */
 
 import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { TFormFieldMetadataBag, TFormFieldRules } from '@/types/form';
 
 export type { BackendField, BuilderField, IFieldOptionEntry };
 
@@ -17,7 +18,7 @@ export function optionImageUrl(entry: IFieldOptionEntry): string | undefined {
     return entry.imageUrl?.trim() || undefined;
 }
 
-function serializeOptionChoices(options: readonly IFieldOptionEntry[]): Record<string, unknown>[] {
+function serializeOptionChoices(options: readonly IFieldOptionEntry[]): TFormFieldMetadataBag[] {
     return options.map((o) => {
         const label = String(o.label ?? '').trim();
         // File pending → kirim imageUrl '' agar tak ada base64 baru yang
@@ -37,7 +38,7 @@ function parseOptionChoices(raw: unknown): IFieldOptionEntry[] | null {
     const out: IFieldOptionEntry[] = [];
     for (const item of raw) {
         if (item && typeof item === 'object' && item !== null) {
-            const row = item as Record<string, unknown>;
+            const row = item as TFormFieldMetadataBag;
             const id = String(row.id ?? crypto.randomUUID());
             const type = row.type === 'image' ? 'image' : 'text';
             const label = String(row.label ?? '').trim();
@@ -51,7 +52,7 @@ function parseOptionChoices(raw: unknown): IFieldOptionEntry[] | null {
     return out.length > 0 ? out : null;
 }
 
-function preservedMeta(f: BuilderField): Record<string, unknown> {
+function preservedMeta(f: BuilderField): TFormFieldMetadataBag {
     const raw = f.metadata && typeof f.metadata === 'object' && !Array.isArray(f.metadata) ? { ...f.metadata } : {};
     // API validation allows only string|null for metadata.options (radio/checkbox).
     // Stale array-shaped `options` from DB or legacy clients must not be re-submitted.
@@ -59,12 +60,12 @@ function preservedMeta(f: BuilderField): Record<string, unknown> {
     return raw;
 }
 
-function withMeta(f: BuilderField, specific: Record<string, unknown>): Record<string, unknown> {
+function withMeta(f: BuilderField, specific: TFormFieldMetadataBag): TFormFieldMetadataBag {
     return { ...preservedMeta(f), ...specific };
 }
 
 /** Batas panjang teks untuk short/long — disimpan sebagai rules.min (0) + rules.max di API. */
-function mergeTextRules(req: Record<string, unknown>, f: BuilderField): Record<string, unknown> {
+function mergeTextRules(req: TFormFieldMetadataBag, f: BuilderField): TFormFieldMetadataBag {
     const merged = { ...req };
     const raw = f.metadata?.maxLength;
     const n =
@@ -86,7 +87,7 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
         order,
         is_append: f.is_append === true,
     };
-    const req: Record<string, unknown> = f.required ? { required: true } : {};
+    const req: TFormFieldMetadataBag = f.required ? { required: true } : {};
 
     switch (f.type) {
         case 'short_text':
@@ -280,7 +281,7 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
     }
 }
 
-function guessType(apiType: string, m: Record<string, unknown>): string {
+function guessType(apiType: string, m: TFormFieldMetadataBag): string {
     if (apiType === 'input') {
         if (m.type === 'email') return 'email';
         if (m.type === 'tel') return 'phone';
@@ -298,11 +299,10 @@ function guessType(apiType: string, m: Record<string, unknown>): string {
 
 /** Konversi field backend ke bentuk builder (menebak tipe builder bila metadata minim); dipakai saat memuat form ke editor. */
 export function fromBackendField(bf: BackendField): BuilderField {
-    const mFull: Record<string, unknown> =
-        bf.metadata && typeof bf.metadata === 'object' ? (bf.metadata as Record<string, unknown>) : {};
-    const m: Record<string, unknown> = { ...mFull };
+    const mFull: TFormFieldMetadataBag = bf.metadata && typeof bf.metadata === 'object' ? bf.metadata : {};
+    const m: TFormFieldMetadataBag = { ...mFull };
     delete m.options;
-    const rules = (m.rules as Record<string, unknown>) || {};
+    const rules = (m.rules as TFormFieldRules) || {};
     const bt = (m.builderType as string) || guessType(bf.type, m);
     const inStr = (rules.in as string) || '';
     const parsedChoices = parseOptionChoices(m.optionChoices);

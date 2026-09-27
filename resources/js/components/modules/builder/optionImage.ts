@@ -1,4 +1,5 @@
 import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { TFormFieldMetadataBag } from '@/types/form';
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 
 export interface ITPendingOptionImageFile {
@@ -50,16 +51,16 @@ export function ensureOptionImageRowsDirty(backend: BackendField[], dirty: Backe
 }
 
 function rowHasPendingFile(row: BackendField): boolean {
-    const meta = row.metadata as Record<string, unknown> | undefined;
+    const meta: TFormFieldMetadataBag | undefined = row.metadata;
     const choices = meta?.optionChoices;
     if (!Array.isArray(choices)) return false;
     // Serialisasi mengirim imageUrl '' saat file pending; baris dengan
     // pilihan image ber-url kosong dianggap membawa file baru.
     // Baris image tanpa file (url kosong manual) ikut terkirim — aman
     // (server hanya mengganti bila file ada untuk pasangan id tersebut).
-    return choices.some((c) => {
-        if (!c || typeof c !== 'object') return false;
-        const rec = c as Record<string, unknown>;
+    return choices.some((candidate) => {
+        if (!candidate || typeof candidate !== 'object') return false;
+        const rec = candidate as TFormFieldMetadataBag;
         return rec.type === 'image' && String(rec.imageUrl ?? '') === '';
     });
 }
@@ -100,16 +101,16 @@ export function buildOptionImageFieldsFormData(
 /** Baca peta stored path opsi dari respons POST /fields (toleran bila tak ada). */
 export function readOptionImagePathsFromResponse(payload: unknown): Record<string, string> | null {
     if (!payload || typeof payload !== 'object') return null;
-    const rec = payload as Record<string, unknown>;
+    const rec = payload as TFormFieldMetadataBag;
     const raw = rec.option_images;
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
     const out: Record<string, string> = {};
-    for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    for (const [key, value] of Object.entries(raw as TFormFieldMetadataBag)) {
         if (typeof value === 'string' && value.trim() !== '') {
             out[key] = value.trim();
         } else if (value && typeof value === 'object' && !Array.isArray(value)) {
             // Bentuk bersarang { fieldId: { optionId: path } } → ratakan ke "fieldId:optionId".
-            for (const [optionId, path] of Object.entries(value as Record<string, unknown>)) {
+            for (const [optionId, path] of Object.entries(value as TFormFieldMetadataBag)) {
                 if (typeof path === 'string' && path.trim() !== '') {
                     out[`${key}:${optionId}`] = path.trim();
                 }

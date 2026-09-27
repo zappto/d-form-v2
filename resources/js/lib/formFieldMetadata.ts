@@ -15,7 +15,7 @@ export function readMetaBoolean(meta: TFormFieldMetadataBag, key: string): boole
     return Boolean(v);
 }
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
+function isPlainObject(value: unknown): value is TFormFieldMetadataBag {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 

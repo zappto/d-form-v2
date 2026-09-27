@@ -1,3 +1,5 @@
+import type { TFormFieldMetadataBag } from '@/types/form';
+
 export type TFieldOptionType = 'text' | 'image';
 
 export interface IFieldOptionEntry {
@@ -20,7 +22,7 @@ export interface BuilderField {
     placeholder: string;
     required: boolean;
     options: IFieldOptionEntry[];
-    metadata: Record<string, unknown>;
+    metadata: TFormFieldMetadataBag;
     /** Field may be edited by invited members (team flow); persisted as `form_fields.is_append`. */
     is_append?: boolean;
     /**
@@ -47,6 +49,6 @@ export interface BackendField {
     description: string | null;
     name: string;
     order: number;
-    metadata: Record<string, unknown>;
+    metadata: TFormFieldMetadataBag;
     is_append?: boolean;
 }

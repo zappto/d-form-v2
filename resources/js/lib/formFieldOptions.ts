@@ -1,10 +1,8 @@
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
-import type { TFormFillOptionRow } from '@/types/form';
+import type { TFormFieldMetadataBag, TFormFieldMetadataValue, TFormFillOptionRow } from '@/types/form';
 
-type TUnknownRecord = Record<string, unknown>;
-
-function isRecord(value: unknown): value is TUnknownRecord {
+function isRecord(value: unknown): value is TFormFieldMetadataBag {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
@@ -26,7 +24,7 @@ function asStringList(value: unknown): string[] {
 
 function parseJsonUnknown(raw: string): unknown {
     try {
-        return JSON.parse(raw) as unknown;
+        return JSON.parse(raw);
     } catch {
         return null;
     }
@@ -108,20 +106,20 @@ function fallbackOptionLabels(field: IFormField): string[] {
 }
 
 type TOptionChoiceRaw = {
-    type?: unknown;
-    label?: unknown;
-    value?: unknown;
-    text?: unknown;
-    name?: unknown;
-    imageUrl?: unknown;
-    image_url?: unknown;
+    type?: TFormFieldMetadataValue;
+    label?: TFormFieldMetadataValue;
+    value?: TFormFieldMetadataValue;
+    text?: TFormFieldMetadataValue;
+    name?: TFormFieldMetadataValue;
+    imageUrl?: TFormFieldMetadataValue;
+    image_url?: TFormFieldMetadataValue;
 };
 
-function flattenUnknownArray(arr: unknown[]): unknown[] {
-    const out: unknown[] = [];
+function flattenMetadataValueArray(arr: TFormFieldMetadataValue[]): TFormFieldMetadataValue[] {
+    const out: TFormFieldMetadataValue[] = [];
     for (const item of arr) {
         if (Array.isArray(item)) {
-            out.push(...flattenUnknownArray(item));
+            out.push(...flattenMetadataValueArray(item));
         } else {
             out.push(item);
         }
@@ -130,7 +128,7 @@ function flattenUnknownArray(arr: unknown[]): unknown[] {
 }
 
 function parseOptionChoicesRows(value: unknown, builderType: string): TFormFillOptionRow[] {
-    const raw: unknown[] = Array.isArray(value)
+    const raw: TFormFieldMetadataValue[] = Array.isArray(value)
         ? value
         : typeof value === 'string'
           ? (() => {
@@ -147,7 +145,7 @@ function parseOptionChoicesRows(value: unknown, builderType: string): TFormFillO
             })()
           : [];
 
-    const source = flattenUnknownArray(raw);
+    const source = flattenMetadataValueArray(raw);
     if (source.length === 0) return [];
 
     const rows: TFormFillOptionRow[] = [];

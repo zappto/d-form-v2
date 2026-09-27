@@ -1,3 +1,5 @@
+import type { TFormFieldMetadataBag, TFormFillAnswerValue } from './form';
+
 declare global {
     interface IEvent {
         id: string;
@@ -48,7 +50,7 @@ declare global {
         event_id: string;
         banner_url: string | null;
         banner_caption: string | null;
-        metadata?: Record<string, unknown>;
+        metadata?: TFormFieldMetadataBag;
         registration_mode?: 'single' | 'bundle';
         purpose?: 'registration' | 'other';
     }
@@ -97,7 +99,7 @@ declare global {
         description?: string | null;
         name: string;
         order: number;
-        metadata: Record<string, unknown>;
+        metadata: TFormFieldMetadataBag;
         /** Team flow: member may edit on confirmation when true */
         is_append?: boolean;
         required?: boolean;
@@ -126,7 +128,7 @@ declare global {
     interface IFormSubmission {
         id: string;
         user: { id: string; name: string; email: string; avatar?: string | null } | null;
-        answers: Record<string, unknown>;
+        answers: Record<string, TFormFillAnswerValue>;
         submitted_at: string;
         review_status?: 'pending' | 'accepted' | 'rejected' | null;
         reviewed_at?: string | null;

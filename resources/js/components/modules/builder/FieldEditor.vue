@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { BuilderField, IFieldOptionEntry } from '@/types/form-builder';
+import type { TFormFieldMetadataValue } from '@/types/form';
 import { resolveOptionImagePreviewSrc, revokeOptionImagePreviewUrl } from '@/components/modules/builder/optionImage';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
@@ -61,7 +62,8 @@ const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_
 function update<K extends keyof BuilderField>(key: K, value: BuilderField[K]) {
     emit('update:field', { ...props.field, [key]: value });
 }
-function updateMeta(key: string, value: unknown) {
+/** Tulis satu kunci metadata field; nilai mengikuti bentuk JSON-like metadata (bukan `unknown` longgar). */
+function updateMeta(key: string, value: TFormFieldMetadataValue) {
     const meta = { ...(props.field.metadata || {}) };
     meta[key] = value;
     emit('update:field', { ...props.field, metadata: meta });
