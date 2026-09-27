@@ -6,7 +6,7 @@ import LandingLayout from '@/layouts/LandingLayout.vue'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { Megaphone, WifiOff } from 'lucide-vue-next'
 import { padQueueNumber } from '@/lib/format'
 
@@ -76,7 +76,7 @@ function entryStatusLabel(entry: QueueDisplayEntry): string {
 
 const entries = computed<QueueDisplayEntry[]>(() => live.value.entries ?? [])
 
-function uniqueOptions(values: (string | null | undefined)[], allLabel: string): SimpleSelectOption[] {
+function uniqueOptions(values: (string | null | undefined)[], allLabel: string): SearchableSelectOption[] {
     const seen = new Map<string, string>()
     for (const raw of values) {
         const value = (raw ?? '').trim()
@@ -85,15 +85,15 @@ function uniqueOptions(values: (string | null | undefined)[], allLabel: string):
     return [{ value: '', label: allLabel }, ...[...seen.entries()].map(([value, label]) => ({ value, label }))]
 }
 
-const divisionOptions = computed<SimpleSelectOption[]>(() =>
+const divisionOptions = computed<SearchableSelectOption[]>(() =>
     uniqueOptions(entries.value.map((e) => e.division), 'Semua divisi'),
 )
 
-const roomOptions = computed<SimpleSelectOption[]>(() =>
+const roomOptions = computed<SearchableSelectOption[]>(() =>
     uniqueOptions(entries.value.map((e) => e.room), 'Semua ruang'),
 )
 
-const statusOptions = computed<SimpleSelectOption[]>(() => {
+const statusOptions = computed<SearchableSelectOption[]>(() => {
     const seen = new Map<string, string>()
     for (const entry of entries.value) {
         const value = (entry.status ?? '').trim()
@@ -306,7 +306,7 @@ onUnmounted((): void => {
             <section aria-label="Daftar antrean">
                 <div class="mb-4 flex flex-wrap items-end gap-3">
                     <div class="min-w-36 flex-1">
-                        <SimpleSelect
+                        <SearchableSelect
                             v-model="divisionFilter"
                             :options="divisionOptions"
                             placeholder="Semua divisi"
@@ -314,7 +314,7 @@ onUnmounted((): void => {
                         />
                     </div>
                     <div class="min-w-36 flex-1">
-                        <SimpleSelect
+                        <SearchableSelect
                             v-model="roomFilter"
                             :options="roomOptions"
                             placeholder="Semua ruang"
@@ -322,7 +322,7 @@ onUnmounted((): void => {
                         />
                     </div>
                     <div class="min-w-36 flex-1">
-                        <SimpleSelect
+                        <SearchableSelect
                             v-model="statusFilter"
                             :options="statusOptions"
                             placeholder="Semua status"

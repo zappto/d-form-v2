@@ -129,7 +129,7 @@ function mountTrackEdit(): VueWrapper {
                 CardContent: true,
                 CardHeader: true,
                 CardTitle: true,
-                SimpleSelect: true,
+                SearchableSelect: true,
                 Separator: true,
             },
         },

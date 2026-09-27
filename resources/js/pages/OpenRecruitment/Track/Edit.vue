@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { Separator } from '@/components/ui/separator';
 import { routes } from '@/lib/routes';
 import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
@@ -82,19 +82,19 @@ const { clear: clearTrackEditDraft } = useDraftRestore({
     restoreIntoForm: applyTrackEditDraftValues,
 });
 
-const semesterOptions: SimpleSelectOption[] = [
+const semesterOptions: SearchableSelectOption[] = [
     { value: '1', label: 'Semester 1' },
     { value: '3', label: 'Semester 3' },
 ];
 
-const divisionOptions = computed<SimpleSelectOption[]>(() =>
-    (props.divisions ?? []).map((division: DivisionOption): SimpleSelectOption => ({
+const divisionOptions = computed<SearchableSelectOption[]>(() =>
+    (props.divisions ?? []).map((division: DivisionOption): SearchableSelectOption => ({
         value: division.id,
         label: division.name,
     }))
 );
 
-const secondaryDivisionOptions = computed<SimpleSelectOption[]>(() => [
+const secondaryDivisionOptions = computed<SearchableSelectOption[]>(() => [
     { value: '', label: 'Tidak ada' },
     ...divisionOptions.value,
 ]);
@@ -374,7 +374,7 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
                 <CardContent class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-2">
                         <Label for="semester">Semester</Label>
-                        <SimpleSelect
+                        <SearchableSelect
                             id="semester"
                             v-model="form.semester"
                             :options="semesterOptions"
@@ -388,7 +388,7 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
 
                     <div class="space-y-2">
                         <Label for="primary_division_id">Divisi utama</Label>
-                        <SimpleSelect
+                        <SearchableSelect
                             id="primary_division_id"
                             v-model="form.primary_division_id"
                             :options="divisionOptions"
@@ -404,7 +404,7 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
 
                     <div class="space-y-2 sm:col-span-2">
                         <Label for="secondary_division_id">Divisi cadangan</Label>
-                        <SimpleSelect
+                        <SearchableSelect
                             id="secondary_division_id"
                             v-model="form.secondary_division_id"
                             :options="secondaryDivisionOptions"
