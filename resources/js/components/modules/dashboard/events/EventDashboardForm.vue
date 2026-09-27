@@ -27,6 +27,7 @@ import {
 import { getFieldError } from '@/lib/error-message';
 import { BannerPickerField } from '@/components/core/field';
 import { cn } from '@/lib/utils';
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import {
     formatIntegerId,
     formatPriceId,
@@ -274,13 +275,6 @@ function isFieldShaking(key: string): boolean {
     return shakingFields.value.has(key);
 }
 
-/** Class error untuk input sederhana (Input, DatePicker, TimeAmPmInput, Combobox). */
-function errorClass(key: string): string {
-    return fieldError(key)
-        ? 'border-destructive/70 bg-red-50 dark:bg-red-500/10 focus-visible:border-destructive focus-visible:ring-destructive/20'
-        : '';
-}
-
 function onQuotaInput(v: string | number): void {
     const s = sanitizeQuotaTyping(String(v));
     quotaDisplay.value = s;
@@ -370,12 +364,6 @@ function validateRequired(): boolean {
     // also check description plain length for TipTap (already covered but ensure)
     if (missing.length) {
         shakeFields(missing)
-        // also trigger form errors visually via errorClass/fieldError is server-driven,
-        // but shake + red border via errorClass fallback when fieldError empty yet missing
-        // force a dummy error to show red border by setting form errors temporarily
-        // instead we rely on shake + missing check will make errorClass via fieldError? So set manual shake enough
-        // Populate form.errors for red border via errorClass check (fieldError)
-        // We set a temporary error message to ensure red border shows even without server roundtrip
         for (const k of missing) {
             if (!form.errors[k as keyof typeof form.errors]) {
                 // @ts-expect-error manual set for UI
@@ -469,7 +457,7 @@ defineExpose({ submitForm, validateRequired, form })
                                 :aria-invalid="!!fieldError('title')"
                                 :class="[
                                     'bg-white',
-                                    errorClass('title'),
+                                    fieldInvalidClass(Boolean(fieldError('title'))),
                                     isFieldShaking('title') ? 'animate-shake' : '',
                                 ]"
                                 @update:model-value="onTitleInput"
@@ -569,7 +557,7 @@ defineExpose({ submitForm, validateRequired, form })
                                     :aria-invalid="!!fieldError('location')"
                                     :class="[
                                         'bg-white pl-9',
-                                        errorClass('location'),
+                                        fieldInvalidClass(Boolean(fieldError('location'))),
                                         isFieldShaking('location') ? 'animate-shake' : '',
                                     ]"
                                 />
@@ -606,7 +594,7 @@ defineExpose({ submitForm, validateRequired, form })
                             :class="
                                 cn(
                                     'bg-white',
-                                    errorClass('start_date'),
+                                    fieldInvalidClass(Boolean(fieldError('start_date'))),
                                     isFieldShaking('start_date') && 'animate-shake'
                                 )
                             "
@@ -625,7 +613,7 @@ defineExpose({ submitForm, validateRequired, form })
                             v-model="form.end_date"
                             :aria-invalid="!!fieldError('end_date')"
                             :class="
-                                cn('bg-white', errorClass('end_date'), isFieldShaking('end_date') && 'animate-shake')
+                                cn('bg-white', fieldInvalidClass(Boolean(fieldError('end_date'))), isFieldShaking('end_date') && 'animate-shake')
                             "
                         />
                         <p v-if="fieldError('end_date')" class="text-destructive text-xs">
@@ -692,7 +680,7 @@ defineExpose({ submitForm, validateRequired, form })
                                 :aria-invalid="!!fieldError('quota')"
                                 :class="[
                                     'h-10 bg-white pr-14 text-sm tabular-nums',
-                                    errorClass('quota'),
+                                    fieldInvalidClass(Boolean(fieldError('quota'))),
                                     isFieldShaking('quota') ? 'animate-shake' : '',
                                 ]"
                                 :model-value="quotaDisplay"
@@ -724,7 +712,7 @@ defineExpose({ submitForm, validateRequired, form })
                                 :aria-invalid="!!fieldError('price')"
                                 :class="[
                                     'h-10 bg-white pl-9 text-sm tabular-nums',
-                                    errorClass('price'),
+                                    fieldInvalidClass(Boolean(fieldError('price'))),
                                     isFieldShaking('price') ? 'animate-shake' : '',
                                 ]"
                                 :model-value="priceDisplay"

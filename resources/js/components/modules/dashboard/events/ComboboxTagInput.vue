@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, useId } from 'vue'
 import { X, ChevronDown, Plus } from 'lucide-vue-next'
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
 
 export interface TagSuggestion {
     value: string
@@ -228,7 +229,7 @@ watch(open, val => {
         <div
             :class="[
  'flex min-h-9 items-stretch overflow-hidden rounded-lg border bg-white text-sm transition-colors',
- open ? 'border-ring ring-2 ring-ring/20' : props.error ? 'border-destructive/70 bg-red-50 dark:bg-red-500/10' : 'border-input hover:border-muted-foreground/25',
+ open ? 'border-ring ring-2 ring-ring/20' : props.error ? fieldInvalidClass(props.error) : 'border-input hover:border-muted-foreground/25',
  disabled ? 'pointer-events-none opacity-50' : '',
  ]"
         >

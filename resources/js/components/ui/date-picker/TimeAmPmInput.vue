@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
 
 /**
  * Input jam 12-jam + AM/PM. Nilai keluar TETAP `HH:mm` 24-jam
@@ -20,9 +21,6 @@ const props = withDefaults(
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
 const rootClass = computed(() => props.class)
-
-const invalidSegClass =
-    'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10 dark:focus-visible:border-destructive/70'
 
 /** Parse "HH:mm" (24h) → { h12: 1-12, meridian: 'AM'|'PM', minute: '00' } */
 /** Parse "HH:mm" (24h) → { h12: 1-12, meridian: 'AM'|'PM', minute: '00' } */
@@ -92,7 +90,7 @@ function setMeridian(m: 'AM' | 'PM'): void {
                 :aria-invalid="ariaInvalid === true ? true : undefined"
                 :class="[
                     'bg-white border-input focus-visible:border-ring focus-visible:ring-ring/30 h-9 w-12 rounded-lg border text-center text-sm font-medium tabular-nums shadow-xs outline-none transition-[border-color,box-shadow] duration-200 focus-visible:ring-[3px]',
-                    ariaInvalid ? invalidSegClass : '',
+                    fieldInvalidClass(ariaInvalid),
                 ]"
                 aria-label="Jam"
                 @input="onHourInput(($event.target as HTMLInputElement).value)"
@@ -108,7 +106,7 @@ function setMeridian(m: 'AM' | 'PM'): void {
                 :aria-invalid="ariaInvalid === true ? true : undefined"
                 :class="[
                     'bg-white border-input focus-visible:border-ring focus-visible:ring-ring/30 h-9 w-12 rounded-lg border text-center text-sm font-medium tabular-nums shadow-xs outline-none transition-[border-color,box-shadow] duration-200 focus-visible:ring-[3px]',
-                    ariaInvalid ? invalidSegClass : '',
+                    fieldInvalidClass(ariaInvalid),
                 ]"
                 aria-label="Menit"
                 @input="onMinuteInput(($event.target as HTMLInputElement).value)"
@@ -119,7 +117,7 @@ function setMeridian(m: 'AM' | 'PM'): void {
         <div
             :class="[
                 'bg-muted/60 flex h-9 items-center gap-0.5 rounded-lg border border-border p-0.5',
-                ariaInvalid ? 'border-destructive/70 bg-red-50 dark:bg-red-500/10' : '',
+                fieldInvalidClass(ariaInvalid),
             ]"
         >
             <button

@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { DatePicker, SplitDateTimeField } from '@/components/ui/date-picker'
 import { routes } from '@/lib/routes'
 import { cn } from '@/lib/utils'
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
 import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
 import { BannerPickerField } from '@/components/core/field'
@@ -56,9 +57,6 @@ const form = useForm({
     finalization_deadline_at: toDateInput(props.period?.finalization_deadline_at ?? null),
     banner: null as File | null,
 })
-
-const dateErrorClass =
-    'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10'
 
 onMounted(() => {
     setTopbar({ title: 'Edit periode', subtitle: props.period?.name ?? '' })
@@ -217,7 +215,7 @@ function submit(): void {
                                 id="interview_starts_at"
                                 v-model="form.interview_starts_at"
                                 :aria-invalid="!!form.errors.interview_starts_at"
-                                :class="cn('bg-white', !!form.errors.interview_starts_at && dateErrorClass)"
+                                :class="cn('bg-white', fieldInvalidClass(!!form.errors.interview_starts_at))"
                             />
                             <p v-if="form.errors.interview_starts_at" class="text-destructive text-xs">
                                 {{ form.errors.interview_starts_at }}
@@ -230,7 +228,7 @@ function submit(): void {
                                 id="interview_ends_at"
                                 v-model="form.interview_ends_at"
                                 :aria-invalid="!!form.errors.interview_ends_at"
-                                :class="cn('bg-white', !!form.errors.interview_ends_at && dateErrorClass)"
+                                :class="cn('bg-white', fieldInvalidClass(!!form.errors.interview_ends_at))"
                             />
                             <p v-if="form.errors.interview_ends_at" class="text-destructive text-xs">
                                 {{ form.errors.interview_ends_at }}
@@ -243,7 +241,7 @@ function submit(): void {
                                 id="finalization_deadline_at"
                                 v-model="form.finalization_deadline_at"
                                 :aria-invalid="!!form.errors.finalization_deadline_at"
-                                :class="cn('bg-white', !!form.errors.finalization_deadline_at && dateErrorClass)"
+                                :class="cn('bg-white', fieldInvalidClass(!!form.errors.finalization_deadline_at))"
                             />
                             <p v-if="form.errors.finalization_deadline_at" class="text-destructive text-xs">
                                 {{ form.errors.finalization_deadline_at }}

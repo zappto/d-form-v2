@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import DatePicker from '@/components/ui/date-picker/DatePicker.vue'
 import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue'
 import { Label } from '@/components/ui/label'
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
 
 /**
  * Satu field tanggal + jam yang nilai keluar/masuknya tetap
@@ -92,9 +93,7 @@ const timeId = computed(() => `${props.idPrefix}-time`)
                 :aria-invalid="invalid"
                 :class="[
                     'text-sm',
-                    invalid
-                        ? 'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10 dark:focus-visible:border-destructive/70'
-                        : '',
+                    fieldInvalidClass(invalid),
                     pickerClass,
                 ]"
                 @update:model-value="parts.date = $event"

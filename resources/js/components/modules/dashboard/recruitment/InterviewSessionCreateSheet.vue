@@ -12,11 +12,9 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { cn } from '@/lib/utils'
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
 import { routes } from '@/lib/routes'
 import { handleInertiaFormErrors } from '@/lib/error-message'
-
-const dateErrorClass =
-    'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10'
 
 export interface InterviewDivisionChoice {
     id: string
@@ -150,7 +148,7 @@ function submit(): void {
                         id="session-date"
                         v-model="form.session_date"
                         :aria-invalid="!!form.errors.session_date"
-                        :class="cn('bg-white text-sm', !!form.errors.session_date && dateErrorClass)"
+                        :class="cn('bg-white text-sm', fieldInvalidClass(!!form.errors.session_date))"
                     />
                     <p v-if="form.errors.session_date" role="alert" class="text-xs text-destructive">
                         {{ form.errors.session_date }}
