@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { Head } from '@inertiajs/vue3';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import AuthResetPasswordForm from '@/components/modules/auth/AuthResetPasswordForm.vue';
 
@@ -9,6 +10,8 @@ defineProps<{
 </script>
 
 <template>
+    <Head title="Choose a new password" />
+
     <AuthLayout>
         <AuthResetPasswordForm :token="token" :email="email" />
     </AuthLayout>
