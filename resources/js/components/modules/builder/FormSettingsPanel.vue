@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { Input } from '@/components/ui/input'
 import { SplitDateTimeField } from '@/components/ui/date-picker'
 import { Label } from '@/components/ui/label'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import type { FormPurpose, FormRegistrationMetadata, FormSiblingOption } from '@/types/form'
 
 const closedAt = defineModel<string>('closedAt', { required: true })
@@ -39,17 +39,17 @@ const isTeamStyleRegistration = computed(() => {
 const registrationModeSelectSentinel = '__none__' as const
 const requiresFormSelectSentinel = '__none__' as const
 
-const purposeOptions: SimpleSelectOption[] = [
+const purposeOptions: SearchableSelectOption[] = [
     { value: 'registration', label: 'Pendaftaran' },
     { value: 'other', label: 'Lainnya (feedback, survei, …)' },
 ]
 
-const requiresFormOptions = computed<SimpleSelectOption[]>(() => [
+const requiresFormOptions = computed<SearchableSelectOption[]>(() => [
     { value: requiresFormSelectSentinel, label: 'Tidak ada' },
     ...props.siblingForms.map((sibling) => ({ value: sibling.id, label: sibling.title })),
 ])
 
-const registrationModeOptions: SimpleSelectOption[] = [
+const registrationModeOptions: SearchableSelectOption[] = [
     { value: registrationModeSelectSentinel, label: 'Not set (individual)' },
     { value: 'single', label: 'Single' },
     { value: 'bundle', label: 'Bundle' },
@@ -146,7 +146,7 @@ function vString(v: unknown): string {
         <div class="border-border space-y-4 border-t pt-5">
             <div class="space-y-2">
                 <Label :for="`${idPrefix}-purpose`" class="text-sm font-medium">Tujuan form</Label>
-                <SimpleSelect
+                <SearchableSelect
                     :model-value="formMetadata.purpose"
                     :options="purposeOptions"
                     :id="`${idPrefix}-purpose`"
@@ -161,7 +161,7 @@ function vString(v: unknown): string {
 
             <div class="space-y-2">
                 <Label :for="`${idPrefix}-requires`" class="text-sm font-medium">Memerlukan form</Label>
-                <SimpleSelect
+                <SearchableSelect
                     :model-value="formMetadata.requires_form_id ?? requiresFormSelectSentinel"
                     :options="requiresFormOptions"
                     :id="`${idPrefix}-requires`"
@@ -176,7 +176,7 @@ function vString(v: unknown): string {
 
             <div v-if="isRegistrationPurpose" class="space-y-2">
                 <Label :for="`${idPrefix}-reg-mode`" class="text-sm font-medium">Registration mode</Label>
-                <SimpleSelect
+                <SearchableSelect
                     :model-value="formMetadata.registration_mode ?? registrationModeSelectSentinel"
                     :options="registrationModeOptions"
                     :id="`${idPrefix}-reg-mode`"

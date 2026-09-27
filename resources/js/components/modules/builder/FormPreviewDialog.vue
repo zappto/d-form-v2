@@ -12,7 +12,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
 import { Checkbox } from '@/components/ui/checkbox'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 
 /** Mirrors canvas builder field shape used by Show/Create with unknown metadata values. */
 export interface FormPreviewField {
@@ -83,7 +83,7 @@ function optionEntries(field: FormPreviewField): FieldOptionEntry[] {
     })
 }
 
-function dropdownOptions(field: FormPreviewField): SimpleSelectOption[] {
+function dropdownOptions(field: FormPreviewField): SearchableSelectOption[] {
     return optionEntries(field).map((opt, oi) => ({
         value: String(opt.id || `option-${oi}`),
         label: optionLabel(opt),
@@ -251,7 +251,7 @@ function ratingStars(field: FormPreviewField): number[] {
                                             />
 
                                             <div v-else-if="field.type === 'dropdown'" class="space-y-2">
-                                                <SimpleSelect
+                                                <SearchableSelect
                                                     model-value=""
                                                     :options="dropdownOptions(field)"
                                                     placeholder="Choose an option"

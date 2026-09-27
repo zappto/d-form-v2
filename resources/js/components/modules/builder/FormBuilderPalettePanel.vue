@@ -4,7 +4,7 @@ import DraggableItem from '@/components/modules/builder/DraggableItem.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SplitDateTimeField } from '@/components/ui/date-picker';
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { ChevronRight, ChevronDown, Search, Settings2 } from 'lucide-vue-next';
 import type { FormBuilderPaletteCategory } from '@/components/modules/builder/formBuilderPalette';
 import type { FormRegistrationMetadata, FormSiblingOption } from '@/types/form';
@@ -37,17 +37,17 @@ defineEmits<{
 /** Kunci select "Memerlukan form" / "Registration mode" saat memilih opsi kosong. */
 const noSelectionSentinel = '__none__' as const;
 
-const purposeOptions: SimpleSelectOption[] = [
+const purposeOptions: SearchableSelectOption[] = [
     { value: 'registration', label: 'Pendaftaran' },
     { value: 'other', label: 'Lainnya (feedback, survei, …)' },
 ];
 
-const requiresFormOptions = computed<SimpleSelectOption[]>(() => [
+const requiresFormOptions = computed<SearchableSelectOption[]>(() => [
     { value: noSelectionSentinel, label: 'Tidak ada' },
     ...props.siblingForms.map((sibling) => ({ value: sibling.id, label: sibling.title })),
 ]);
 
-const registrationModeOptions: SimpleSelectOption[] = [
+const registrationModeOptions: SearchableSelectOption[] = [
     { value: noSelectionSentinel, label: 'Not set (individual)' },
     { value: 'single', label: 'Single' },
     { value: 'bundle', label: 'Bundle' },
@@ -223,7 +223,7 @@ function isCategoryExpanded(name: string): boolean {
                             <div class="border-border/70 mt-0.5 flex flex-col gap-2.5 border-t pt-2.5">
                                 <div class="flex flex-col gap-1">
                                     <Label for="l-purpose" class="text-xs font-medium">Tujuan form</Label>
-                                    <SimpleSelect
+                                    <SearchableSelect
                                         :model-value="formMetadata.purpose"
                                         :options="purposeOptions"
                                         id="l-purpose"
@@ -238,7 +238,7 @@ function isCategoryExpanded(name: string): boolean {
 
                                 <div class="flex flex-col gap-1">
                                     <Label for="l-requires-form" class="text-xs font-medium">Memerlukan form</Label>
-                                    <SimpleSelect
+                                    <SearchableSelect
                                         :model-value="formMetadata.requires_form_id ?? noSelectionSentinel"
                                         :options="requiresFormOptions"
                                         id="l-requires-form"
@@ -255,7 +255,7 @@ function isCategoryExpanded(name: string): boolean {
                                     <Label for="l-registration-mode" class="text-xs font-medium"
                                         >Mode registrasi</Label
                                     >
-                                    <SimpleSelect
+                                    <SearchableSelect
                                         :model-value="formMetadata.registration_mode ?? noSelectionSentinel"
                                         :options="registrationModeOptions"
                                         id="l-registration-mode"
