@@ -1,6 +1,7 @@
 import { computed, onBeforeUnmount, reactive } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore';
+import type { IDraftValuesSnapshot } from '@/hooks/useDraftRestore';
 import { normalizeBannerSrc, pickFormBannerField } from '@/components/modules/builder/formBanner';
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
 import {
@@ -151,12 +152,19 @@ export function useFormFillPage(props: {
 
     const answerForm = useForm<TFormFillAnswerMap>(initialValues);
 
+    /**
+     * Predikat bentuk snapshot draft `{ values: object }`; isi localStorage tak tepercaya,
+     * jadi tiap nilai peta tetap divalidasi per entri oleh restorasi.
+     */
+    function isDraftValuesSnapshot(raw: unknown): raw is IDraftValuesSnapshot {
+        if (typeof raw !== 'object' || raw === null) return false;
+        return 'values' in raw && raw.values !== null && typeof raw.values === 'object';
+    }
+
     /** Draft lokal responden (tanpa server): File dikecualikan seperti pola Apply. */
-    function restoreFillDraftValues(draft: unknown): void {
-        if (typeof draft !== 'object' || draft === null) return;
-        const values = (draft as { values?: unknown }).values;
-        if (typeof values !== 'object' || values === null) return;
-        for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
+    function restoreFillDraftValues(raw: unknown): void {
+        if (!isDraftValuesSnapshot(raw)) return;
+        for (const [key, value] of Object.entries(raw.values)) {
             if (!(key in answerForm)) continue;
             if (typeof value === 'string') {
                 answerForm[key] = value;
@@ -269,7 +277,7 @@ export function useFormFillPage(props: {
             if (Number.isFinite(n) && n > 0) return n;
         }
         const meta = metadata(field);
-        const ml = meta.maxLength as unknown;
+        const ml = meta.maxLength;
         if (typeof ml === 'number' && ml > 0) return ml;
         if (typeof ml === 'string' && ml.trim() !== '') {
             const n = parseInt(ml, 10);
