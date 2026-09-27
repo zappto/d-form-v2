@@ -21,22 +21,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationNext,
-    PaginationPrevious,
-} from '@/components/ui/pagination'
+import DataPagination from '@/components/modules/dashboard/DataPagination.vue'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { routes } from '@/lib/routes'
 import { padQueueNumber } from '@/lib/format'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
 import useAuth from '@/hooks/useAuth'
 import {
-    ChevronLeft,
-    ChevronRight,
     ClipboardCheck,
     ListOrdered,
     RotateCcw,
@@ -790,35 +781,12 @@ const emptyDescription = computed<string>((): string =>
         </EmptyState>
 
         <div v-if="interviews.last_page > 1" class="flex flex-col items-center gap-3">
-            <Pagination
+            <DataPagination
                 :page="interviews.current_page"
                 :total="interviews.total"
-                :items-per-page="perPage"
-                :sibling-count="1"
+                :per-page="perPage"
                 @update:page="applyFilters"
-            >
-                <PaginationContent v-slot="{ items }">
-                    <PaginationPrevious>
-                        <ChevronLeft class="size-4" aria-hidden="true" />
-                        <span class="hidden sm:block">Sebelumnya</span>
-                    </PaginationPrevious>
-                    <template v-for="(item, index) in items" :key="index">
-                        <PaginationItem
-                            v-if="item.type === 'page'"
-                            :value="item.value"
-                            :is-active="item.value === interviews.current_page"
-                            :aria-label="`Ke halaman ${item.value}`"
-                        >
-                            {{ item.value }}
-                        </PaginationItem>
-                        <PaginationEllipsis v-else :index="index" />
-                    </template>
-                    <PaginationNext>
-                        <span class="hidden sm:block">Berikutnya</span>
-                        <ChevronRight class="size-4" aria-hidden="true" />
-                    </PaginationNext>
-                </PaginationContent>
-            </Pagination>
+            />
             <p class="text-sm text-muted-foreground">{{ rangeLabel }}</p>
         </div>
         <p v-else-if="interviews.data.length > 0" class="text-center text-sm text-muted-foreground">

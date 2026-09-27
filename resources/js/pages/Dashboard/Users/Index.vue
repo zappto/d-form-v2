@@ -7,14 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationNext,
-    PaginationPrevious,
-} from '@/components/ui/pagination'
+import DataPagination from '@/components/modules/dashboard/DataPagination.vue'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import {
     Table,
@@ -29,7 +22,7 @@ import { routes } from '@/lib/routes'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
 import useAuth from '@/hooks/useAuth'
-import { ChevronLeft, ChevronRight, Eye, Pencil, Plus, RotateCcw, Search, Trash2 } from 'lucide-vue-next'
+import { Eye, Pencil, Plus, RotateCcw, Search, Trash2 } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardLayout })
 
@@ -297,35 +290,12 @@ function confirmDelete(): void {
             </Card>
 
             <div v-if="users.last_page > 1" class="flex flex-col items-center gap-3">
-                <Pagination
+                <DataPagination
                     :page="users.current_page"
                     :total="users.total"
-                    :items-per-page="perPage"
-                    :sibling-count="1"
+                    :per-page="perPage"
                     @update:page="applyFilters"
-                >
-                    <PaginationContent v-slot="{ items }">
-                        <PaginationPrevious>
-                            <ChevronLeft class="size-4" aria-hidden="true" />
-                            <span class="hidden sm:block">Sebelumnya</span>
-                        </PaginationPrevious>
-                        <template v-for="(item, index) in items" :key="index">
-                            <PaginationItem
-                                v-if="item.type === 'page'"
-                                :value="item.value"
-                                :is-active="item.value === users.current_page"
-                                :aria-label="`Ke halaman ${item.value}`"
-                            >
-                                {{ item.value }}
-                            </PaginationItem>
-                            <PaginationEllipsis v-else :index="index" />
-                        </template>
-                        <PaginationNext>
-                            <span class="hidden sm:block">Berikutnya</span>
-                            <ChevronRight class="size-4" aria-hidden="true" />
-                        </PaginationNext>
-                    </PaginationContent>
-                </Pagination>
+                />
                 <p class="text-muted-foreground text-sm">{{ rangeLabel }}</p>
             </div>
             <p v-else class="text-muted-foreground text-center text-sm">{{ rangeLabel }}</p>
