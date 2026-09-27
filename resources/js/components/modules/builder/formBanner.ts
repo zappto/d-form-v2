@@ -1,5 +1,6 @@
 import type { BuilderField } from '@/components/modules/builder/fieldMapping';
 import type { BackendField } from '@/types/form-builder';
+import type { TFormFieldMetadataBag } from '@/types/form';
 
 export interface ITFormBannerState {
     id: string | null;
@@ -14,7 +15,7 @@ export interface ITFormBannerState {
     order?: number | null;
 }
 
-function recordMetadata(field: IFormField): Record<string, unknown> {
+function recordMetadata(field: IFormField): TFormFieldMetadataBag {
     return field.metadata && typeof field.metadata === 'object' ? field.metadata : {};
 }
 
@@ -87,9 +88,7 @@ export function extractFormBannerFromBuilderFields(rows: BuilderField[]): {
     banner: ITFormBannerState;
     canvasFields: BuilderField[];
 } {
-    const idxFlag = rows.findIndex(
-        (f) => f.type === 'banner' && Boolean((f.metadata as Record<string, unknown> | undefined)?.formBanner)
-    );
+    const idxFlag = rows.findIndex((f) => f.type === 'banner' && Boolean(f.metadata?.formBanner));
     const idxLegacy = idxFlag === -1 ? rows.findIndex((f) => f.type === 'banner') : -1;
     const idx = idxFlag >= 0 ? idxFlag : idxLegacy;
 
@@ -176,7 +175,7 @@ export function prependFormBannerToBackendPayload(
 export function isBannerBackendRow(row: Pick<BackendField, 'name' | 'type' | 'metadata'>): boolean {
     if (row.name === FORM_BANNER_NAME) return true;
     if (row.type === 'banner') return true;
-    const meta = row.metadata as Record<string, unknown> | undefined;
+    const meta: TFormFieldMetadataBag | undefined = row.metadata;
     if (meta && typeof meta === 'object') {
         if (meta.formBanner === true) return true;
         if (typeof meta.builderType === 'string' && meta.builderType === 'banner') return true;
@@ -219,10 +218,15 @@ export function applyBannerUploadSuccess(state: ITFormBannerState, storedPath: s
     state.bannerPreviewUrl = '';
 }
 
+/** True bila value berupa objek JSON-like non-null; menyempitkan body respons HTTP tanpa cast. */
+function isMetadataBag(value: unknown): value is TFormFieldMetadataBag {
+    return value !== null && typeof value === 'object';
+}
+
 /** Baca stored path dari respons POST /fields (tetap toleran bila tak ada). */
 export function readBannerPathFromResponse(payload: unknown): string | null {
-    if (!payload || typeof payload !== 'object') return null;
-    const rec = payload as Record<string, unknown>;
+    if (!isMetadataBag(payload)) return null;
+    const rec = payload;
     for (const key of ['banner_url', 'banner_path', 'bannerUrl']) {
         const v = rec[key];
         if (typeof v === 'string' && v.trim() !== '') return v.trim();

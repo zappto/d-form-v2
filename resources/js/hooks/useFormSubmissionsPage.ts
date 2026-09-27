@@ -3,6 +3,7 @@ import { router } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import { parseApiErrorMessage, showErrorToast, showHttpErrorToast } from '@/lib/error-message';
 import { answerPreview, formatSubmissionDate, humanizeSubmissionKey, submissionFileUrl } from '@/lib/formSubmissionsUi';
+import type { TFormFillAnswerValue } from '@/types/form';
 import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAnswerReviewController';
 
 interface IPaginationLink {
@@ -119,7 +120,7 @@ export function useFormSubmissionsPage(props: {
         return humanizeSubmissionKey(fieldLabelMap.value, value);
     }
 
-    function fileUrl(value: unknown): string | null {
+    function fileUrl(value: TFormFillAnswerValue | undefined): string | null {
         return submissionFileUrl(value);
     }
 

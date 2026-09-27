@@ -11,9 +11,10 @@ export function humanizeSubmissionKey(fieldLabelMap: Record<string, string>, val
 }
 
 import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import type { TFormFillAnswerValue } from '@/types/form';
 
 /** Buat pratinjau singkat nilai jawaban untuk daftar; dipakai di ringkasan jawaban submission. */
-export function answerPreview(value: unknown): string {
+export function answerPreview(value: TFormFillAnswerValue | undefined): string {
     if (Array.isArray(value)) return value.map(String).join(', ');
     if (typeof value === 'string') return value;
     if (value === null || value === undefined) return '—';
@@ -22,7 +23,7 @@ export function answerPreview(value: unknown): string {
 }
 
 /** Resolve URL berkas jawaban submission atau null bila kosong; dipakai untuk tautan unduh lampiran. */
-export function submissionFileUrl(value: unknown): string | null {
+export function submissionFileUrl(value: TFormFillAnswerValue | undefined): string | null {
     if (typeof value !== 'string') {
         return null;
     }

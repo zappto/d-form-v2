@@ -6,11 +6,13 @@ import { getFormFieldOptionRows, formFieldApiType, formFieldBuilderType } from '
 import { readFieldMetadata } from '@/lib/formFieldMetadata';
 import { cn } from '@/lib/utils';
 import { Download, FileText, FileImage, ExternalLink, Maximize2, Image as ImageIcon, X } from 'lucide-vue-next';
+import type { TFormFillAnswerValue } from '@/types/form';
 
 const props = defineProps<{
     /** When null, file detection uses a light heuristic (e.g. form-uploads paths). */
     field: IFormField | null;
-    value: unknown;
+    /** Nilai jawaban fill (`string`/`string[]`/`File`/`null`); `undefined` saat key tidak ada di map jawaban. */
+    value: TFormFillAnswerValue | undefined;
 }>();
 
 const lightboxUrl = ref<string | null>(null);

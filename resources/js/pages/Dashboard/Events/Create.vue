@@ -24,6 +24,7 @@ import {
 } from '@/components/modules/builder/formBanner';
 import { hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata } from '@/types/form';
+import type { TFormFieldMetadataBag } from '@/types/form';
 import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
 import type { BuilderField } from '@/types/form-builder';
 import { routes } from '@/lib/routes';
@@ -39,7 +40,7 @@ interface IWizardDraftForm {
     visible_for: string[];
     banner_url: string | null;
     banner_caption: string | null;
-    metadata: unknown;
+    metadata: TFormFieldMetadataBag;
     fields: BackendField[];
 }
 
@@ -197,18 +198,15 @@ function goBackToEvent(): void {
 }
 
 function goToForms(): void {
-    const api = eventFormRef.value as unknown as {
-        validateRequired?: () => boolean;
-        submitForm?: (publish: boolean) => void;
-    } | null;
+    const api = eventFormRef.value;
 
     if (!draftEvent.value) {
-        if (api?.validateRequired && !api.validateRequired()) return;
-        api?.submitForm?.(false);
+        if (api && !api.validateRequired()) return;
+        api?.submitForm(false);
         return;
     }
 
-    if (api?.validateRequired && !api.validateRequired()) return;
+    if (api && !api.validateRequired()) return;
 
     const eventId = draftEvent.value?.id;
     if (!eventId) return;

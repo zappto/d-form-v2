@@ -30,7 +30,7 @@ import {
 } from '@/components/modules/builder/formBanner';
 import { hasPendingOptionImageFiles } from '@/components/modules/builder/optionImage';
 import { emptyFormRegistrationMetadata, parseFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
-import type { IFormSiblingOption } from '@/types/form';
+import type { IFormSiblingOption, TFormFieldMetadataBag, TFormFillAnswerValue } from '@/types/form';
 import {
     answerPreview,
     formatSubmissionDate,
@@ -306,7 +306,7 @@ const answerKeys = computed(() => {
 const FILE_FIELD_TYPE_NAMES: ReadonlySet<string> = new Set(['fileUpload', 'file_upload', 'image_upload']);
 
 function backendFieldBuilderType(field: BackendField): string {
-    const metadata = (field.metadata ?? {}) as Record<string, unknown>;
+    const metadata: TFormFieldMetadataBag = field.metadata ?? {};
     const builderType = metadata.builderType;
     return typeof builderType === 'string' ? builderType : '';
 }
@@ -336,11 +336,11 @@ const submissionLabelMap = computed(() => {
 });
 const humanizeKey = (key: string): string => humanizeSubmissionKey(submissionLabelMap.value, key);
 const formatDate = (value: string): string => formatSubmissionDate(value);
-const submissionFileUrlOf = (value: unknown): string | null => submissionFileUrl(value);
-const answerPreviewOf = (value: unknown): string => answerPreview(value);
+const submissionFileUrlOf = (value: TFormFillAnswerValue | undefined): string | null => submissionFileUrl(value);
+const answerPreviewOf = (value: TFormFillAnswerValue | undefined): string => answerPreview(value);
 
 /** Nama file polos untuk sel lampiran — tanpa link, tanpa membuka tab baru. */
-function fileNameOf(value: unknown): string {
+function fileNameOf(value: TFormFillAnswerValue | undefined): string {
     const raw = typeof value === 'string' ? value.trim() : '';
     if (!raw) return 'Lampiran';
     try {

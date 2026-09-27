@@ -336,21 +336,30 @@ export function handleInertiaFormErrors(
     showValidationErrorToast(errors, ctx);
 }
 
+/** Bentuk minimal body error API yang dibaca; dipakai untuk pesan/error envelope. */
+interface IApiErrorBody {
+    message?: string;
+    errors?: TValidationErrors;
+}
+
+/** True bila value objek JSON-like non-null (body respons HTTP); menyempitkan tanpa cast. */
+function isApiErrorBody(value: unknown): value is IApiErrorBody {
+    return value !== null && typeof value === 'object';
+}
+
 /** Ambil pesan error pertama dari body respons API dengan fallback; dipakai saat menangani respons HTTP gagal. */
 export function parseApiErrorMessage(body: unknown, fallback = 'Terjadi kesalahan. Coba lagi.'): string {
-    if (!body || typeof body !== 'object') return fallback;
+    if (!isApiErrorBody(body)) return fallback;
 
-    const record = body as Record<string, unknown>;
-
-    if (typeof record.message === 'string' && record.message.trim()) {
-        return humanizeErrorMessage(record.message);
+    if (typeof body.message === 'string' && body.message.trim()) {
+        return humanizeErrorMessage(body.message);
     }
 
-    if (record.errors && typeof record.errors === 'object') {
-        const firstKey = Object.keys(record.errors as TValidationErrors)[0];
+    const errors = body.errors;
+    if (errors && typeof errors === 'object') {
+        const firstKey = Object.keys(errors)[0];
         if (firstKey) {
-            const firstValue = (record.errors as TValidationErrors)[firstKey];
-            const parsed = humanizeErrorMessage(firstValue, firstKey);
+            const parsed = humanizeErrorMessage(errors[firstKey], firstKey);
             if (parsed) return parsed;
         }
     }

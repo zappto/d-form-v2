@@ -93,12 +93,18 @@ watch(
     { deep: true }
 );
 
-function buildQueryParams(page?: number) {
-    const params: Record<string, unknown> = {};
+/** Filter query daftar acara; hanya kategori/sesi yang di-set dari UI. */
+type TEventIndexQueryFilter = { categories?: string[]; sessions?: string[] };
+
+/** Query string daftar acara; bentuknya subset dari prop `query` halaman. */
+type TEventIndexQueryParams = { search?: string; page?: number; filter?: TEventIndexQueryFilter };
+
+function buildQueryParams(page?: number): TEventIndexQueryParams {
+    const params: TEventIndexQueryParams = {};
     if (searchQuery.value.trim()) params.search = searchQuery.value.trim();
     if (page && page > 1) params.page = page;
 
-    const filter: Record<string, unknown> = {};
+    const filter: TEventIndexQueryFilter = {};
     if (filterCategory.value !== 'all') filter.categories = [filterCategory.value];
     if (filterSession.value !== 'all') filter.sessions = [filterSession.value];
 

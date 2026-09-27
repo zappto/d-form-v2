@@ -75,7 +75,7 @@ const categories = computed(() =>
         : (props.options?.categories ?? defaultCategories)
 );
 
-function toTokenList(v: unknown): string[] {
+function toTokenList(v: string | string[]): string[] {
     if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
     if (typeof v === 'string')
         return v

@@ -194,6 +194,7 @@ interface IUploadResultRequest {
     state: IBuilderAutosaveState;
     bannerFile: File | null;
     optionFiles: ITPendingOptionImageFile[];
+    /** Body JSON respons POST /fields (batas eksternal); disempitkan guard `readBannerPathFromResponse`/`readOptionImagePathsFromResponse`. */
     response: unknown;
 }
 

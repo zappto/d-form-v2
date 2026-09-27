@@ -18,7 +18,7 @@ import type { ICreateDashboardFormPayload, IFormSiblingOption } from '@/types/fo
 import { emptyFormRegistrationMetadata, toFormMetadataPayload } from '@/types/form';
 import { routes } from '@/lib/routes';
 
-/** Inertia `FormDataType` cannot recurse `BackendField.metadata` (Record<string, unknown>); store fields loosely for typing only. */
+/** Inertia `FormDataType` cannot recurse `BackendField.metadata` (`TFormFieldMetadataBag`); store fields loosely for typing only. */
 type TCreateFormClientPayload = Omit<ICreateDashboardFormPayload, 'fields'> & {
     fields: object[];
 };
