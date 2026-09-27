@@ -8,7 +8,7 @@ import {
     getFieldError,
     handleInertiaFormErrors,
     showErrorToast,
-    type ErrorMessageContext,
+    type TErrorMessageContext,
 } from '@/lib/error-message';
 import { getFormFieldOptionRows } from '@/lib/formFieldOptions';
 import { readFieldMetadata, readFieldRules, readMetaBoolean } from '@/lib/formFieldMetadata';
@@ -173,7 +173,7 @@ export function useFormFillPage(props: {
           })
         : null;
 
-    const errorContext = computed<ErrorMessageContext>(() => ({
+    const errorContext = computed<TErrorMessageContext>(() => ({
         fields,
         fieldLabels: buildFieldLabelMap(fields),
     }));

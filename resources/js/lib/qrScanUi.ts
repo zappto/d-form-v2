@@ -1,30 +1,30 @@
 import type { Component } from 'vue';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-vue-next';
 
-export type ScanStatus = 'success' | 'already' | 'invalid';
+export type TScanStatus = 'success' | 'already' | 'invalid';
 
-export const SCAN_STATUS_THEME: Record<ScanStatus, { icon: Component; class: string; bg: string; label: string }> = {
+export const SCAN_STATUS_THEME: Record<TScanStatus, { icon: Component; class: string; bg: string; label: string }> = {
     success: { icon: CheckCircle, class: 'text-success', bg: 'bg-success/10', label: 'Check-in berhasil' },
     already: { icon: AlertTriangle, class: 'text-warning', bg: 'bg-warning/10', label: 'Sudah pernah scan' },
     invalid: { icon: XCircle, class: 'text-destructive', bg: 'bg-destructive/10', label: 'QR tidak valid' },
 };
 
-export interface ScanEntry {
+export interface IScanEntry {
     id: string;
     name: string;
     email: string;
     time: string;
-    status: ScanStatus;
+    status: TScanStatus;
     source: 'camera' | 'manual';
     eventKind: 'event' | 'oprec';
     eventTitle: string;
     queueNumber: number | null;
 }
 
-export interface ScanResult {
+export interface IScanResult {
     name: string;
     email: string;
-    status: ScanStatus;
+    status: TScanStatus;
     source: 'camera' | 'manual';
     rawCode: string;
     eventKind: 'event' | 'oprec';
@@ -60,7 +60,7 @@ export function extractQrCandidate(decodedText: string): string {
 }
 
 /** Bentuk entri riwayat scan dari hasil scan; dipakai untuk menambah baris riwayat scan. */
-export function createScanHistoryEntry(result: ScanResult): ScanEntry {
+export function createScanHistoryEntry(result: IScanResult): IScanEntry {
     return {
         id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         name: result.name,
@@ -74,7 +74,7 @@ export function createScanHistoryEntry(result: ScanResult): ScanEntry {
     };
 }
 
-export interface GlobalScanFeedRow {
+export interface IGlobalScanFeedRow {
     id: string;
     ts: string;
     type: 'recruitment' | 'event';
@@ -124,12 +124,12 @@ export function isGlobalScanFeedPayload(payload: unknown): boolean {
 }
 
 /** Parse baris feed scan global menjadi daftar terketik sambil melewati baris rusak; dipakai saat memuat feed scan. */
-export function parseGlobalScanFeedRows(payload: unknown): GlobalScanFeedRow[] {
+export function parseGlobalScanFeedRows(payload: unknown): IGlobalScanFeedRow[] {
     if (!isRecord(payload)) {
         return [];
     }
 
-    const rows: GlobalScanFeedRow[] = [];
+    const rows: IGlobalScanFeedRow[] = [];
     for (const item of toUnknownArray(payload.rows)) {
         if (!isRecord(item)) {
             continue;
@@ -164,7 +164,7 @@ export function parseGlobalScanCursor(payload: unknown): string {
 }
 
 /** Bunyikan beep (dan getar) sesuai status scan; dipakai sebagai umpan balik setelah scan QR. */
-export function playScanBeep(status: ScanStatus): void {
+export function playScanBeep(status: TScanStatus): void {
     try {
         const ctx = new AudioContext();
         const osc = ctx.createOscillator();

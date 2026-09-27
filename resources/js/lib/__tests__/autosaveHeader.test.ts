@@ -9,7 +9,7 @@ import {
     type TRequiredHeaderFields,
 } from '../autosaveHeader';
 
-interface Header {
+interface IHeader {
     title: string;
     description: string;
     success_content: string | null;
@@ -17,7 +17,7 @@ interface Header {
     visible_for: string[];
 }
 
-function header(overrides: Partial<Header> = {}): Header {
+function header(overrides: Partial<IHeader> = {}): IHeader {
     return {
         title: 'Judul lama',
         description: 'Deskripsi lama',
@@ -108,8 +108,8 @@ describe('e2e logika diff: kosong-untuk-required', () => {
         const prev = header();
         const current = header({ title: '', description: '   ' });
         // diff per-key ala halaman: hanya key berubah.
-        const fullDiff: Partial<Header> = {};
-        (Object.keys(current) as Array<keyof Header>).forEach((key) => {
+        const fullDiff: Partial<IHeader> = {};
+        (Object.keys(current) as Array<keyof IHeader>).forEach((key) => {
             if (JSON.stringify(current[key]) !== JSON.stringify(prev[key])) {
                 (fullDiff as Record<string, unknown>)[key] = current[key];
             }
@@ -127,8 +127,8 @@ describe('e2e logika diff: kosong-untuk-required', () => {
         // Setelah blank dikecualikan, lastSent tetap = server truth.
         const lastSent = mergeSentHeader(serverTruth, header({ title: '' }), {});
         const refilled = header({ title: 'Judul baru' });
-        const fullDiff: Partial<Header> = {};
-        (Object.keys(refilled) as Array<keyof Header>).forEach((key) => {
+        const fullDiff: Partial<IHeader> = {};
+        (Object.keys(refilled) as Array<keyof IHeader>).forEach((key) => {
             if (JSON.stringify(refilled[key]) !== JSON.stringify(lastSent[key])) {
                 (fullDiff as Record<string, unknown>)[key] = refilled[key];
             }

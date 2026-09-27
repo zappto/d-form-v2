@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { ChevronRight } from 'lucide-vue-next';
-import type { BreadcrumbItem } from '@/lib/breadcrumbs';
+import type { IBreadcrumbItem } from '@/lib/breadcrumbs';
 
 defineProps<{
-    items: BreadcrumbItem[];
+    items: IBreadcrumbItem[];
 }>();
 </script>
 

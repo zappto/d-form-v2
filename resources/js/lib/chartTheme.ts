@@ -51,18 +51,18 @@ export interface IChartThemeTokens {
 }
 
 /** Font judul tooltip chart dashboard — subset `FontSpec` chart.js. */
-export type IChartTooltipTitleFont = Partial<FontSpec>;
+export type TIChartTooltipTitleFont = Partial<FontSpec>;
 
 /** Font isi tooltip chart dashboard — subset `FontSpec` chart.js. */
-export type IChartTooltipBodyFont = Partial<FontSpec>;
+export type TIChartTooltipBodyFont = Partial<FontSpec>;
 
 /** Blok dasar tooltip chart dashboard; copy per-chart tetap di call-site. */
 export interface IChartTooltipBaseOptions {
     backgroundColor: string;
     titleColor: string;
     bodyColor: string;
-    titleFont: IChartTooltipTitleFont;
-    bodyFont: IChartTooltipBodyFont;
+    titleFont: TIChartTooltipTitleFont;
+    bodyFont: TIChartTooltipBodyFont;
     padding: number;
     cornerRadius: number;
 }

@@ -1,8 +1,8 @@
 import { toast } from 'vue-sonner';
 
-export type ValidationErrors = Record<string, string | string[] | undefined>;
+export type TValidationErrors = Record<string, string | string[] | undefined>;
 
-export type ErrorMessageContext = {
+export type TErrorMessageContext = {
     fields?: IFormField[];
     fieldLabels?: Record<string, string>;
 };
@@ -126,12 +126,12 @@ const KNOWN_BACKEND_MESSAGES: Record<string, string> = {
         'Terjadi kesalahan server saat memuat halaman. Coba refresh; jika tetap terjadi, hubungi admin.',
 };
 
-type LaravelRulePattern = {
+type TLaravelRulePattern = {
     test: RegExp;
     build: (label: string, match: RegExpMatchArray) => string;
 };
 
-const LARAVEL_EN_RULES: LaravelRulePattern[] = [
+const LARAVEL_EN_RULES: TLaravelRulePattern[] = [
     { test: /^The .+ field is required\.?$/i, build: (l) => `${l} wajib diisi.` },
     {
         test: /^The .+ field must be a valid email address\.?$/i,
@@ -164,7 +164,7 @@ const LARAVEL_EN_RULES: LaravelRulePattern[] = [
     { test: /^The .+ confirmation does not match\.?$/i, build: (l) => `Konfirmasi ${l} tidak cocok.` },
 ];
 
-const LARAVEL_ID_RULES: LaravelRulePattern[] = [
+const LARAVEL_ID_RULES: TLaravelRulePattern[] = [
     { test: /^:.+ harus diisi\.?$/i, build: (l) => `${l} wajib diisi.` },
     { test: /^:.+ wajib diisi\.?$/i, build: (l) => `${l} wajib diisi.` },
 ];
@@ -191,7 +191,7 @@ function fieldNameFromKey(key: string): string {
 }
 
 /** Ubah key error menjadi label field yang ramah manusia; dipakai saat menampilkan pesan validasi. */
-export function humanizeFieldKey(key: string, ctx?: ErrorMessageContext): string {
+export function humanizeFieldKey(key: string, ctx?: TErrorMessageContext): string {
     if (STATIC_FIELD_LABELS[key]) return STATIC_FIELD_LABELS[key];
 
     const bundleMatch = key.match(/^bundle__(.+)__(\d+)$/);
@@ -211,7 +211,7 @@ export function humanizeFieldKey(key: string, ctx?: ErrorMessageContext): string
 }
 
 /** Cari label field dari label statis/peta/metadata, lalu fallback nama ber-title-case; dipakai humanizer pesan. */
-export function resolveFieldLabel(name: string, ctx?: ErrorMessageContext): string {
+export function resolveFieldLabel(name: string, ctx?: TErrorMessageContext): string {
     if (STATIC_FIELD_LABELS[name]) return STATIC_FIELD_LABELS[name];
     if (ctx?.fieldLabels?.[name]) return ctx.fieldLabels[name];
 
@@ -261,7 +261,7 @@ function translateLaravelMessage(message: string, label: string): string {
 export function humanizeErrorMessage(
     raw: string | string[] | undefined,
     fieldKey?: string,
-    ctx?: ErrorMessageContext
+    ctx?: TErrorMessageContext
 ): string {
     const message = normalizeErrorText(raw);
     if (!message) return '';
@@ -278,7 +278,7 @@ export function humanizeErrorMessage(
 }
 
 /** Ambil dan humanisasi pesan error satu field; dipakai binding error per field form. */
-export function getFieldError(errors: ValidationErrors, key: string, ctx?: ErrorMessageContext): string | undefined {
+export function getFieldError(errors: TValidationErrors, key: string, ctx?: TErrorMessageContext): string | undefined {
     const message = normalizeErrorText(errors[key]);
     if (!message) return undefined;
     return humanizeErrorMessage(message, key, ctx);
@@ -286,8 +286,8 @@ export function getFieldError(errors: ValidationErrors, key: string, ctx?: Error
 
 /** Ubah seluruh error validasi menjadi daftar baris berlabel siap tampil; dipakai saat merangkum validasi. */
 export function parseValidationErrors(
-    errors: ValidationErrors,
-    ctx?: ErrorMessageContext
+    errors: TValidationErrors,
+    ctx?: TErrorMessageContext
 ): Array<{ key: string; label: string; message: string; line: string }> {
     return Object.entries(errors)
         .filter(([, value]) => normalizeErrorText(value).length > 0)
@@ -300,8 +300,8 @@ export function parseValidationErrors(
 
 /** Tampilkan toast validasi — ringkas untuk satu error, daftar untuk banyak error; dipakai setelah submit gagal validasi. */
 export function showValidationErrorToast(
-    errors: ValidationErrors,
-    ctx?: ErrorMessageContext & { title?: string }
+    errors: TValidationErrors,
+    ctx?: TErrorMessageContext & { title?: string }
 ): void {
     const parsed = parseValidationErrors(errors, ctx);
     const title = ctx?.title ?? 'Validasi gagal';
@@ -330,8 +330,8 @@ export function showValidationErrorToast(
 
 /** Jembatan error Inertia ke toast validasi; dipakai di callback onError useForm. */
 export function handleInertiaFormErrors(
-    errors: ValidationErrors,
-    ctx?: ErrorMessageContext & { title?: string }
+    errors: TValidationErrors,
+    ctx?: TErrorMessageContext & { title?: string }
 ): void {
     showValidationErrorToast(errors, ctx);
 }
@@ -347,9 +347,9 @@ export function parseApiErrorMessage(body: unknown, fallback = 'Terjadi kesalaha
     }
 
     if (record.errors && typeof record.errors === 'object') {
-        const firstKey = Object.keys(record.errors as ValidationErrors)[0];
+        const firstKey = Object.keys(record.errors as TValidationErrors)[0];
         if (firstKey) {
-            const firstValue = (record.errors as ValidationErrors)[firstKey];
+            const firstValue = (record.errors as TValidationErrors)[firstKey];
             const parsed = humanizeErrorMessage(firstValue, firstKey);
             if (parsed) return parsed;
         }
@@ -416,7 +416,7 @@ export function showFlashToast(flash: { type?: string; message?: string } | null
 }
 
 /** @deprecated Gunakan {@link showValidationErrorToast} */
-export function showEventValidationToast(errors: ValidationErrors): void {
+export function showEventValidationToast(errors: TValidationErrors): void {
     showValidationErrorToast(errors, { title: 'Validasi gagal' });
 }
 

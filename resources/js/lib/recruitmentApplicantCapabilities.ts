@@ -1,6 +1,6 @@
 import type { ApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
 
-type RecruitmentAuthUser = {
+type TRecruitmentAuthUser = {
     roles?: string[];
     can_manage_users?: boolean;
     can_screen_recruitment_applications?: boolean;
@@ -20,7 +20,7 @@ export function applicantAllowsTrackingResend(application: ApplicationDetail): b
 }
 
 /** Tentukan izin pengguna mengirim ulang tautan tracking dari role/permission-nya; dipakai sebagai gerbang aksi resend. */
-export function userAllowsTrackingResend(user: RecruitmentAuthUser | null | undefined): boolean {
+export function userAllowsTrackingResend(user: TRecruitmentAuthUser | null | undefined): boolean {
     if (!user) {
         return false;
     }

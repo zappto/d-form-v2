@@ -1,5 +1,5 @@
 import type { TIconComponent } from '@/types/icons';
-import type { LottieName } from '@/lib/lotties';
+import type { TLottieName } from '@/lib/lotties';
 
 export interface IFeatureItem {
     readonly icon: TIconComponent;
@@ -10,7 +10,7 @@ export interface IFeatureItem {
 export interface IStepItem {
     readonly title: string;
     readonly description: string;
-    readonly lottie?: LottieName;
+    readonly lottie?: TLottieName;
 }
 
 export interface INavLink {

@@ -3,14 +3,14 @@ import { computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import LocalLottie from '@/components/core/LocalLottie.vue';
 import { Button } from '@/components/ui/button';
-import type { LottieName } from '@/lib/lotties';
+import type { TLottieName } from '@/lib/lotties';
 import { routes } from '@/lib/routes';
 
 const props = defineProps<{
     status: number;
 }>();
 
-const lottieName = computed<LottieName>(() => (props.status === 404 ? 'error404Page' : 'errorState'));
+const lottieName = computed<TLottieName>(() => (props.status === 404 ? 'error404Page' : 'errorState'));
 
 const title = computed(() => {
     switch (props.status) {

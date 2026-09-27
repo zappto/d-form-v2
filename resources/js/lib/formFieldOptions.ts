@@ -2,9 +2,9 @@ import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
 import type { TFormFillOptionRow } from '@/types/form';
 
-type UnknownRecord = Record<string, unknown>;
+type TUnknownRecord = Record<string, unknown>;
 
-function isRecord(value: unknown): value is UnknownRecord {
+function isRecord(value: unknown): value is TUnknownRecord {
     return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
@@ -107,7 +107,7 @@ function fallbackOptionLabels(field: IFormField): string[] {
     return listFromUnknown(ruleOptions);
 }
 
-type OptionChoiceRaw = {
+type TOptionChoiceRaw = {
     type?: unknown;
     label?: unknown;
     value?: unknown;
@@ -160,7 +160,7 @@ function parseOptionChoicesRows(value: unknown, builderType: string): TFormFillO
         }
         if (!isRecord(item)) continue;
 
-        const typedItem = item as OptionChoiceRaw;
+        const typedItem = item as TOptionChoiceRaw;
         const resolvedLabel =
             asNonEmptyString(typedItem.label) ??
             asNonEmptyString(typedItem.value) ??

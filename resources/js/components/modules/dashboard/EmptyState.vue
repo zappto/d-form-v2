@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import LocalLottie from '@/components/core/LocalLottie.vue';
-import type { LottieName } from '@/lib/lotties';
+import type { TLottieName } from '@/lib/lotties';
 
 withDefaults(
     defineProps<{
         title: string;
         description?: string;
         animationUrl?: string;
-        animationName?: LottieName;
+        animationName?: TLottieName;
         size?: number;
         /** Presentation mode: `panel` = surface card with lottie (default), `inline` = plain text. */
         variant?: 'panel' | 'inline';

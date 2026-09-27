@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import LocalLottie from '@/components/core/LocalLottie.vue';
-import type { LottieName } from '@/lib/lotties';
+import type { TLottieName } from '@/lib/lotties';
 import { CalendarPlus, PenTool, Rocket } from 'lucide-vue-next';
 import type { Component } from 'vue';
 
@@ -10,7 +10,7 @@ interface Step {
     title: string;
     desc: string;
     detail: string;
-    lottie: LottieName;
+    lottie: TLottieName;
     icon: Component;
 }
 

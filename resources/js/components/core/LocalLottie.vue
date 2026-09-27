@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Vue3Lottie } from 'vue3-lottie';
-import { lotties, type LottieName } from '@/lib/lotties';
+import { lotties, type TLottieName } from '@/lib/lotties';
 import type { ILocalLottieProps } from '@/types/lottie';
 
-const props = withDefaults(defineProps<Omit<ILocalLottieProps, 'name'> & { name?: LottieName }>(), {
+const props = withDefaults(defineProps<Omit<ILocalLottieProps, 'name'> & { name?: TLottieName }>(), {
     name: undefined,
     src: undefined,
     animationLink: '',

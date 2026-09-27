@@ -1,6 +1,6 @@
 import { pathWithoutQuery, routes } from '@/lib/routes';
 
-export interface BreadcrumbItem {
+export interface IBreadcrumbItem {
     label: string;
     href: string;
 }
@@ -10,7 +10,7 @@ export interface BreadcrumbItem {
  * Urut dari path terpanjang dulu agar prefix paling spesifik menang
  * (mis. `/admin/events` sebelum `/admin`).
  */
-const BASE_PATHS: BreadcrumbItem[] = [
+const BASE_PATHS: IBreadcrumbItem[] = [
     { label: 'Acara', href: routes.admin.events.index },
     { label: 'Rekrutmen', href: routes.admin.recruitment.index },
     { label: 'Acara Diikuti', href: routes.member.joined },
@@ -52,7 +52,7 @@ export const ACTION_LABELS: Record<string, string> = {
  * - Base page (path === base) → 1 crumb aktif.
  * - Fallback tak dikenal → 1 crumb judul.
  */
-export function buildBreadcrumbs(url: string, pageTitle: string): BreadcrumbItem[] {
+export function buildBreadcrumbs(url: string, pageTitle: string): IBreadcrumbItem[] {
     const path = pathWithoutQuery(url);
     const base = BASE_PATHS.find((b) => path === b.href || path.startsWith(`${b.href}/`));
 
@@ -60,7 +60,7 @@ export function buildBreadcrumbs(url: string, pageTitle: string): BreadcrumbItem
         return [{ label: pageTitle, href: path }];
     }
 
-    const crumbs: BreadcrumbItem[] = [{ label: base.label, href: base.href }];
+    const crumbs: IBreadcrumbItem[] = [{ label: base.label, href: base.href }];
     if (path === base.href) {
         return crumbs;
     }

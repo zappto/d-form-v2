@@ -112,4 +112,4 @@ export const lotties = {
     },
 } as const satisfies TLottieRegistry;
 
-export type LottieName = keyof typeof lotties;
+export type TLottieName = keyof typeof lotties;

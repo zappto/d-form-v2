@@ -1,6 +1,6 @@
-export type PeriodStatusValue = 'draft' | 'open' | 'closed' | 'archived';
+export type TPeriodStatusValue = 'draft' | 'open' | 'closed' | 'archived';
 
-export type PeriodPhase =
+export type TPeriodPhase =
     | 'draft'
     | 'not_open'
     | 'registration'
@@ -11,8 +11,8 @@ export type PeriodPhase =
     | 'closed'
     | 'archived';
 
-export interface PeriodPhaseInput {
-    status: PeriodStatusValue;
+export interface IPeriodPhaseInput {
+    status: TPeriodStatusValue;
     registrationOpensAt: string | null;
     registrationClosesAt: string | null;
     interviewStartsAt: string | null;
@@ -41,7 +41,7 @@ export function parsePeriodDate(value: string | null): Date | null {
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-const PHASE_LABELS: Record<PeriodPhase, string> = {
+const PHASE_LABELS: Record<TPeriodPhase, string> = {
     draft: 'Draf — belum dibuka',
     not_open: 'Pendaftaran segera dibuka',
     registration: 'Pendaftaran dibuka',
@@ -53,7 +53,7 @@ const PHASE_LABELS: Record<PeriodPhase, string> = {
     archived: 'Periode diarsipkan',
 };
 
-const STATUS_LABELS: Record<PeriodStatusValue, string> = {
+const STATUS_LABELS: Record<TPeriodStatusValue, string> = {
     draft: 'Draf',
     open: 'Dibuka',
     closed: 'Ditutup',
@@ -61,17 +61,17 @@ const STATUS_LABELS: Record<PeriodStatusValue, string> = {
 };
 
 /** Label Bahasa Indonesia untuk satu fase periode; dipakai di badge/status periode. */
-export function phaseLabel(phase: PeriodPhase): string {
+export function phaseLabel(phase: TPeriodPhase): string {
     return PHASE_LABELS[phase];
 }
 
 /** Label Bahasa Indonesia untuk satu status periode; dipakai di badge status periode. */
-export function statusLabel(status: PeriodStatusValue): string {
+export function statusLabel(status: TPeriodStatusValue): string {
     return STATUS_LABELS[status];
 }
 
 /** Tentukan fase periode aktif dari jadwal registrasi/interview/finalisasi; dipakai untuk menampilkan tahap periode. */
-export function resolvePeriodPhase(input: PeriodPhaseInput, now: Date = new Date()): PeriodPhase {
+export function resolvePeriodPhase(input: IPeriodPhaseInput, now: Date = new Date()): TPeriodPhase {
     if (input.status === 'archived') return 'archived';
     if (input.status === 'draft') return 'draft';
     if (input.status === 'closed') return 'closed';
@@ -98,7 +98,7 @@ export function resolvePeriodPhase(input: PeriodPhaseInput, now: Date = new Date
 }
 
 /** Tanggal tenggat untuk satu fase periode (null bila tak ada); dipakai menghitung countdown fase. */
-export function phaseDeadline(phase: PeriodPhase, input: PeriodPhaseInput): Date | null {
+export function phaseDeadline(phase: TPeriodPhase, input: IPeriodPhaseInput): Date | null {
     switch (phase) {
         case 'not_open':
             return parsePeriodDate(input.registrationOpensAt);
@@ -115,7 +115,7 @@ export function phaseDeadline(phase: PeriodPhase, input: PeriodPhaseInput): Date
     }
 }
 
-const COUNTDOWN_ACTIONS: Partial<Record<PeriodPhase, string>> = {
+const COUNTDOWN_ACTIONS: Partial<Record<TPeriodPhase, string>> = {
     not_open: 'dibuka',
     registration: 'ditutup',
     awaiting_interview: 'interview mulai',
@@ -124,7 +124,7 @@ const COUNTDOWN_ACTIONS: Partial<Record<PeriodPhase, string>> = {
 };
 
 /** Teks countdown sisa hari menuju tenggat fase (null bila tidak relevan); dipakai di kartu periode. */
-export function phaseCountdownLabel(phase: PeriodPhase, days: number | null): string | null {
+export function phaseCountdownLabel(phase: TPeriodPhase, days: number | null): string | null {
     if (days === null) return null;
     const action = COUNTDOWN_ACTIONS[phase];
     if (!action) return null;

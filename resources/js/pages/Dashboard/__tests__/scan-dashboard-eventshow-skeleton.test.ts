@@ -4,7 +4,7 @@ import { config, mount, type VueWrapper } from '@vue/test-utils';
 import QrScanSidebar from '@/components/modules/dashboard/QrScanSidebar.vue';
 import DashboardIndex from '../Index.vue';
 import EventsShow from '../Events/Show.vue';
-import type { ScanResult } from '@/lib/qrScanUi';
+import type { IScanResult } from '@/lib/qrScanUi';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -44,7 +44,7 @@ vi.mock('@/components/modules/dashboard/EventCalendar.vue', () => ({
     },
 }));
 
-function demoScanResult(): ScanResult {
+function demoScanResult(): IScanResult {
     return {
         name: 'Budi Santoso',
         email: 'budi@example.com',
@@ -58,7 +58,7 @@ function demoScanResult(): ScanResult {
 }
 
 function mountSidebar(
-    scanResult: ScanResult | null,
+    scanResult: IScanResult | null,
     scanBusy: boolean
 ): VueWrapper<InstanceType<typeof QrScanSidebar>> {
     return mount(QrScanSidebar, {

@@ -26,7 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { BarChart3, CalendarClock, Plus, Trash2, UserCheck, Users } from 'lucide-vue-next';
 import { showErrorToast, showFlashToast } from '@/lib/error-message';
 import { routes } from '@/lib/routes';
-import type { PeriodStatusValue } from '@/lib/recruitmentPeriodPhase';
+import type { TPeriodStatusValue } from '@/lib/recruitmentPeriodPhase';
 import {
     daysRemaining,
     parsePeriodDate,
@@ -47,7 +47,7 @@ interface Period {
     id: string;
     name: string;
     slug: string;
-    status: PeriodStatusValue;
+    status: TPeriodStatusValue;
     status_label: string;
     description: string | null;
     registration_opens_at: string | null;
@@ -472,7 +472,7 @@ const phase = computed(() => resolvePeriodPhase(phaseInput.value));
 const remainingDays = computed<number | null>(() => daysRemaining(phaseDeadline(phase.value, phaseInput.value)));
 const countdown = computed<string | null>(() => phaseCountdownLabel(phase.value, remainingDays.value));
 
-const statusClasses: Record<PeriodStatusValue, string> = {
+const statusClasses: Record<TPeriodStatusValue, string> = {
     draft: 'border-border bg-secondary text-secondary-foreground',
     open: 'border-success/20 bg-success/10 text-success',
     closed: 'border-warning/25 bg-warning/10 text-warning-foreground',

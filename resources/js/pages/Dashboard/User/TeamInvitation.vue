@@ -34,8 +34,8 @@ import {
     buildFieldLabelMap,
     getFieldError,
     handleInertiaFormErrors,
-    type ErrorMessageContext,
-    type ValidationErrors,
+    type TErrorMessageContext,
+    type TValidationErrors,
 } from '@/lib/error-message';
 
 defineOptions({ layout: FormFillLayout });
@@ -65,12 +65,12 @@ function dropdownOptions(field: IFormField): SearchableSelectOption[] {
 
 const appendableFields = computed(() => (props.fields ?? []).filter((f) => f.is_append));
 
-const errorContext = computed<ErrorMessageContext>(() => ({
+const errorContext = computed<TErrorMessageContext>(() => ({
     fields: appendableFields.value,
     fieldLabels: buildFieldLabelMap(appendableFields.value),
 }));
 
-function invitationFieldError(errors: ValidationErrors, key: string): string | undefined {
+function invitationFieldError(errors: TValidationErrors, key: string): string | undefined {
     return getFieldError(errors, key, errorContext.value);
 }
 
