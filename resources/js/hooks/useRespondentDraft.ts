@@ -1,4 +1,5 @@
 import { computed, ref, type Ref } from 'vue';
+import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
 
 export interface IUseRespondentDraftOptions {
@@ -62,29 +63,30 @@ const INERTIA_INTERNAL_KEYS: ReadonlySet<string> = new Set([
     'cancel',
 ]);
 
+/** Nilai mentah sumber form sebelum penyaringan; method internal dibuang saat iterasi. */
+type TRawFormValues = Record<string, TFormFillAnswerValue>;
+
 /**
  * Ambil isian responden dari Inertia useForm apa adanya:
  * - pakai `.data()` bila tersedia (Inertia asli),
  * - fallback ke properti langsung (mock vitest tanpa `.data()`).
  * File dikecualikan; fungsi + kunci internal Inertia dilewati.
  */
-export function snapshotRespondentValues(form: unknown): Record<string, unknown> {
-    let src: Record<string, unknown>;
-    if (
-        typeof form === 'object' &&
-        form !== null &&
-        'data' in form &&
-        typeof (form as { data: unknown }).data === 'function'
-    ) {
+export function snapshotRespondentValues(form: unknown): TFormFillAnswerMap {
+    let src: TRawFormValues;
+    if (typeof form === 'object' && form !== null && 'data' in form && typeof form.data === 'function') {
         try {
-            src = (form as { data: () => Record<string, unknown> }).data();
+            // `as` Inertia useForm: batas eksternal `unknown`; `.data()` mengembalikan peta jawaban mentah.
+            src = (form as { data: () => TRawFormValues }).data();
         } catch {
-            src = { ...(form as Record<string, unknown>) };
+            // `as` fallback: `.data()` gagal, form tetap objek mentah.
+            src = { ...(form as TRawFormValues) };
         }
     } else {
-        src = { ...(form as Record<string, unknown>) };
+        // `as` fallback: mock tanpa `.data()`, nilai dipetakan langsung ke peta jawaban.
+        src = { ...(form as TRawFormValues) };
     }
-    const values: Record<string, unknown> = {};
+    const values: TFormFillAnswerMap = {};
     for (const [key, value] of Object.entries(src)) {
         if (typeof value === 'function') continue;
         if (INERTIA_INTERNAL_KEYS.has(key)) continue;
@@ -133,6 +135,7 @@ export function useRespondentDraft<T>(
         const raw: string | null = readLocal(storageKey);
         if (!raw) return null;
         try {
+            // `as T`: JSON.parse mengembalikan `any`; bentuk snapshot ditentukan pemanggil.
             return JSON.parse(raw) as T;
         } catch {
             return null;
