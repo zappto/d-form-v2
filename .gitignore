@@ -36,7 +36,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
-/docs/agents
 **/caddy
 frankenphp
 frankenphp-worker.php
@@ -58,4 +57,3 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 .superpowers/
 docs/big-changes/
-AGENTS.md
