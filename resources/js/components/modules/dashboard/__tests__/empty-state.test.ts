@@ -68,3 +68,49 @@ describe('EmptyState — mode inline', () => {
         wrapper.unmount();
     });
 });
+
+describe('EmptyState — mode dashed (DFORM-37 Mx-I)', () => {
+    it('kotak dashed: border, padding px-4 py-8, ikon via slot, tipografi gaya asli', () => {
+        const wrapper = mount(EmptyState, {
+            props: {
+                variant: 'dashed',
+                title: 'Belum ada interviewer yang ditugaskan.',
+                description: 'Pilih interviewer dan divisi di atas untuk menugaskan.',
+            },
+            slots: { icon: '<svg data-testid="empty-state-icon" />' },
+        });
+
+        expect(wrapper.classes()).toContain('rounded-xl');
+        expect(wrapper.classes()).toContain('border-dashed');
+        expect(wrapper.classes()).toContain('px-4');
+        expect(wrapper.classes()).toContain('py-8');
+        expect(wrapper.classes()).toContain('text-center');
+        expect(wrapper.find('[data-testid="empty-state-icon"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="local-lottie"]').exists()).toBe(false);
+        expect(wrapper.find('p.font-medium').text()).toBe('Belum ada interviewer yang ditugaskan.');
+        expect(wrapper.find('p.text-xs').text()).toBe('Pilih interviewer dan divisi di atas untuk menugaskan.');
+
+        wrapper.unmount();
+    });
+
+    it('tanpa slot ikon tidak merender badge ikon', () => {
+        const wrapper = mount(EmptyState, { props: { variant: 'dashed', title: 'Belum ada data.' } });
+
+        expect(wrapper.find('span').exists()).toBe(false);
+        expect(wrapper.findAll('p')).toHaveLength(1);
+
+        wrapper.unmount();
+    });
+
+    it('varian lama tetap utuh: panel tetap surface, inline tetap teks polos tanpa border', () => {
+        const panel = mountState();
+        expect(panel.classes()).toContain('app-surface');
+
+        const inline = mountState({ variant: 'inline' });
+        expect(inline.classes()).not.toContain('border-dashed');
+        expect(inline.find('span').exists()).toBe(false);
+
+        panel.unmount();
+        inline.unmount();
+    });
+});

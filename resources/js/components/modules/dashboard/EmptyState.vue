@@ -9,8 +9,11 @@ withDefaults(
         animationUrl?: string;
         animationName?: TLottieName;
         size?: number;
-        /** Presentation mode: `panel` = surface card with lottie (default), `inline` = plain text. */
-        variant?: 'panel' | 'inline';
+        /**
+         * Presentation mode: `panel` = surface card with lottie (default),
+         * `inline` = plain text, `dashed` = dashed-border box that may receive an `icon` slot.
+         */
+        variant?: 'panel' | 'inline' | 'dashed';
     }>(),
     { variant: 'panel' }
 );
@@ -32,6 +35,24 @@ withDefaults(
         <p class="font-display text-base font-bold tracking-[-0.015em] text-foreground">{{ title }}</p>
         <p v-if="description" class="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">{{ description }}</p>
         <div class="mt-5">
+            <slot />
+        </div>
+    </div>
+
+    <div
+        v-else-if="variant === 'dashed'"
+        class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border/70 px-4 py-8 text-center"
+    >
+        <span
+            v-if="$slots.icon"
+            aria-hidden="true"
+            class="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg]:size-5"
+        >
+            <slot name="icon" />
+        </span>
+        <p class="text-sm font-medium">{{ title }}</p>
+        <p v-if="description" class="max-w-sm text-xs leading-relaxed text-muted-foreground">{{ description }}</p>
+        <div v-if="$slots.default">
             <slot />
         </div>
     </div>
