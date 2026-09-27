@@ -69,6 +69,7 @@ Komponen F1 mengunci batas di **5 MB + png/jpeg/gif**, sehingga memigrasikan ket
 
 - **Trade-off**: pengguna tidak lagi bisa mengunggah banner WebP atau 5–10 MB ke periods/events meskipun API menerimanya.
 - **Saran tindak lanjut**: selaraskan aturan backend ke 5 MB + mimes, **atau** parameterkan komponen dengan `maxBytes`/`accept` per konteks.
+- **Sudah dikerjakan sebagian (DFORM-48)**: batas **ukuran** backend event & periode diselaraskan ke 5 MB (`max:5120`) lewat commit `97bf512`; daftar **mimes/format belum** diselaraskan. Lihat [`saptoChanges27-09-2026-DFORM-48.md`](./saptoChanges27-09-2026-DFORM-48.md).
 
 ### Deviasi/limitasi lain
 
