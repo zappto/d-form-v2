@@ -23,7 +23,8 @@ export function userAvatarFallbackPaletteIndex(seed: string): number {
 
 /** Ambil kelas warna background+ikon fallback avatar untuk seed tertentu; dipakai merender avatar tanpa foto. */
 export function userAvatarFallbackClasses(seed: string): { bg: string; icon: string } {
-    return USER_AVATAR_FALLBACK_PALETTE[userAvatarFallbackPaletteIndex(seed)]!;
+    const palette = USER_AVATAR_FALLBACK_PALETTE[userAvatarFallbackPaletteIndex(seed)];
+    return palette ?? USER_AVATAR_FALLBACK_PALETTE[0];
 }
 
 /** Stable seed: prefer user id, then email (lowercased). */

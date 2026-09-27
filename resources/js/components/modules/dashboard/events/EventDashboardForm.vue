@@ -42,7 +42,7 @@ export type TEventDashboardFormVariant = 'create' | 'edit';
 const props = defineProps<{
     variant: TEventDashboardFormVariant;
     /** Edit: wajib. Create: tidak dipakai. */
-    event?: IEvent;
+    event?: IEvent | null;
     /** Create: opsional (fallback default). Edit: wajib dari halaman. */
     options?: { categories: { value: string; label: string }[]; sessions: { value: string; label: string }[] };
     /** Mode wizard (Create → forms): POST via Inertia (X-Inertia) → BE render ulang
@@ -85,75 +85,73 @@ function toTokenList(v: unknown): string[] {
     return [];
 }
 
-function buildFormPayload():
-    | {
-          title: string;
-          description: string;
-          location: string;
-          start_date: string;
-          end_date: string;
-          registration_start: string;
-          registration_end: string;
-          quota: number;
-          price: number;
-          session: string;
-          category: string;
-          banner: File | null;
-          publish: boolean;
-      }
-    | {
-          _method: 'PUT';
-          title: string;
-          description: string;
-          location: string;
-          start_date: string;
-          end_date: string;
-          registration_start: string;
-          registration_end: string;
-          quota: number;
-          price: number;
-          session: string;
-          category: string;
-          banner: File | null;
-          publish: boolean;
-      } {
+type TEventFormData = {
+    title: string;
+    description: string;
+    location: string;
+    start_date: string;
+    end_date: string;
+    registration_start: string;
+    registration_end: string;
+    quota: number;
+    price: number;
+    session: string;
+    category: string;
+    banner: File | null;
+    publish: boolean;
+};
+
+/** Payload form event: nilai dasar, plus `_method` PUT saat mode edit. */
+type TEventFormPayload = TEventFormData | (TEventFormData & { _method: 'PUT' });
+
+/** Nilai awal form event kosong; dipakai mode create dan fallback edit tanpa data. */
+function emptyEventFormData(): TEventFormData {
+    return {
+        title: '',
+        description: '',
+        location: '',
+        start_date: '',
+        end_date: '',
+        registration_start: '',
+        registration_end: '',
+        quota: 100,
+        price: 0,
+        session: '',
+        category: '',
+        banner: null,
+        publish: false,
+    };
+}
+
+/** Susun nilai awal form dari event (mode edit) atau nilai kosong bila event tidak tersedia. */
+function buildFormPayload(): TEventFormPayload {
     if (props.variant === 'create') {
-        return {
-            title: '',
-            description: '',
-            location: '',
-            start_date: '',
-            end_date: '',
-            registration_start: '',
-            registration_end: '',
-            quota: 100,
-            price: 0,
-            session: '',
-            category: '',
-            banner: null,
-            publish: false,
-        };
+        return emptyEventFormData();
     }
 
-    const e = props.event!;
-    const initialCategories = toTokenList(e.category);
-    const initialSessions = toTokenList(e.session);
+    const event = props.event;
+    if (event === null || event === undefined) {
+        return { ...emptyEventFormData(), _method: 'PUT' as const };
+    }
+
+    const initialCategories = toTokenList(event.category);
+    const initialSessions = toTokenList(event.session);
 
     return {
         _method: 'PUT' as const,
-        title: e.title,
-        description: e.description,
-        location: e.location,
-        start_date: e.start_date,
-        end_date: e.end_date,
-        registration_start: e.registration_start.replace(/\+.*$/, '').slice(0, 16),
-        registration_end: e.registration_end.replace(/\+.*$/, '').slice(0, 16),
-        quota: e.quota,
-        price: e.price,
+        title: event.title,
+        description: event.description,
+        location: event.location,
+        start_date: event.start_date,
+        end_date: event.end_date,
+        registration_start: event.registration_start.replace(/\+.*$/, '').slice(0, 16),
+        registration_end: event.registration_end.replace(/\+.*$/, '').slice(0, 16),
+        quota: event.quota,
+        price: event.price,
         session: initialSessions.join(','),
         category: initialCategories.join(','),
         banner: null,
-        publish: e.status === 'published',
+        publish: event.status === 'published',
     };
 }
 
@@ -198,7 +196,7 @@ const categoryPickerId = computed(() => (props.variant === 'create' ? 'field-cat
  * Field yang wajib diisi, selaras dengan StoreEventRequest.
  * Kuota & harga opsional. Banner wajib hanya saat create (saat edit banner lama dipakai).
  */
-const REQUIRED_FIELDS: ReadonlySet<string> = new Set([
+const REQUIRED_FIELDS: ReadonlySet<keyof TEventFormData> = new Set([
     'title',
     'description',
     'location',
@@ -212,7 +210,7 @@ const REQUIRED_FIELDS: ReadonlySet<string> = new Set([
 ]);
 
 /** Penanda wajib (*) softcoded: cukup edit REQUIRED_FIELDS, tanpa menyentuh template. */
-function isRequired(fieldName: string): boolean {
+function isRequired(fieldName: keyof TEventFormData): boolean {
     if (!REQUIRED_FIELDS.has(fieldName)) return false;
     if (fieldName === 'banner') return props.variant === 'create';
     return true;
@@ -255,7 +253,10 @@ function shakeFields(keys: string[]): void {
     if (keys.length === 0) return;
     const next = new Set(shakingFields.value);
     for (const key of keys) {
-        if (shakeTimers.has(key)) clearTimeout(shakeTimers.get(key)!);
+        if (shakeTimers.has(key)) {
+            const timer = shakeTimers.get(key);
+            if (timer !== undefined) clearTimeout(timer);
+        }
         next.add(key);
         shakeTimers.set(
             key,
@@ -315,7 +316,14 @@ function submitForm(publish: boolean): void {
         session: toTokenList(data.session),
     }));
 
-    const url = props.variant === 'create' ? storeEvent().url : updateEvent(props.event!.id).url;
+    let url: string;
+    if (props.variant === 'create') {
+        url = storeEvent().url;
+    } else {
+        const event = props.event;
+        if (event === null || event === undefined) return;
+        url = updateEvent(event.id).url;
+    }
 
     const isWizard = props.wizardMode === true && props.variant === 'create';
 
@@ -348,26 +356,19 @@ function fieldError(key: string): string | undefined {
 }
 
 function validateRequired(): boolean {
-    const missing: string[] = [];
+    const missing: (keyof TEventFormData)[] = [];
     for (const key of REQUIRED_FIELDS) {
-        if (key === 'banner' && props.variant !== 'create') continue;
-        const raw = (form as unknown as Record<string, unknown>)[key];
-        const val = Array.isArray(raw) ? raw.join('').trim() : String(raw ?? '').trim();
-        // banner is File | null, check file existence separately
         if (key === 'banner') {
-            if (!form.banner) missing.push(key);
+            if (props.variant === 'create' && !form.banner) missing.push(key);
             continue;
         }
-        if (val === '') missing.push(key);
+        if (String(form[key] ?? '').trim() === '') missing.push(key);
     }
-    // also check description plain length for TipTap (already covered but ensure)
+
     if (missing.length) {
         shakeFields(missing);
         for (const k of missing) {
-            if (!form.errors[k as keyof typeof form.errors]) {
-                // @ts-expect-error manual set for UI
-                form.errors[k] = 'Wajib diisi.';
-            }
+            if (!form.errors[k]) form.errors[k] = 'Wajib diisi.';
         }
         return false;
     }

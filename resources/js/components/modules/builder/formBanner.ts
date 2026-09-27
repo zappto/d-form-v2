@@ -135,7 +135,8 @@ export function buildFormBannerBuilderField(state: ITFormBannerState): BuilderFi
         state.id = crypto.randomUUID();
     }
 
-    const id = state.id!;
+    const id = state.id;
+    if (id === null) return null;
 
     const order = typeof state.order === 'number' && Number.isFinite(state.order) ? Math.trunc(state.order) : undefined;
 

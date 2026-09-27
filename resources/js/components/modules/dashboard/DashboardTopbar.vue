@@ -68,6 +68,12 @@ function formatRole(r: string): string {
         .join(' ');
 }
 
+/** Label role utama user (role pertama, format judul); null bila user tak punya role. */
+function primaryRoleLabel(roles: string[] | null | undefined): string | null {
+    const firstRole = roles?.[0];
+    return firstRole === undefined ? null : formatRole(firstRole);
+}
+
 /** Judul dari halaman (eksplisit) jika ada; fallback ke parsing document.title. */
 const pageTitle = computed(() => topbar.title.value ?? fallbackTitle.value);
 
@@ -201,7 +207,7 @@ function handleLogout(): void {
                             {{ user?.name }}
                         </span>
                         <span class="max-w-[140px] truncate text-xs leading-tight text-muted-foreground">
-                            {{ user?.roles?.length ? formatRole(user.roles[0]!) : user?.email }}
+                            {{ user?.roles?.length ? primaryRoleLabel(user.roles) : user?.email }}
                         </span>
                     </span>
                 </Link>

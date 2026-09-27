@@ -98,7 +98,8 @@ describe('option image upload (base64 → file storage)', () => {
             option_images: { 'f1:o1': 'forms/options/kucing.jpg' },
         });
         expect(storedMap).toEqual({ 'f1:o1': 'forms/options/kucing.jpg' });
-        applyOptionImageUploadSuccess(fields, storedMap!);
+        if (storedMap === null) throw new Error('peta stored path opsi harus ada');
+        applyOptionImageUploadSuccess(fields, storedMap);
         const opt = fields[0].options[0];
         expect(opt.imageUrl).toBe('forms/options/kucing.jpg');
         expect(opt.imageFile).toBeNull();

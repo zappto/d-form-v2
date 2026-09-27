@@ -386,6 +386,11 @@ function queueBadgeCount(key: string): number | null {
     return count !== undefined ? count : null;
 }
 
+/** Jumlah badge antrean tab; 0 saat tidak ada data agar render aman tanpa assertion. */
+function queueBadgeLabel(key: string): number {
+    return queueBadgeCount(key) ?? 0;
+}
+
 const perPage = computed<number>((): number => props.interviews.per_page ?? FALLBACK_PER_PAGE);
 
 const rangeStart = computed<number>((): number => {
@@ -619,12 +624,12 @@ const emptyDescription = computed<string>((): string =>
             >
                 {{ tab.label }}
                 <Badge
-                    v-if="queueBadgeCount(tab.key) !== null && queueBadgeCount(tab.key)! > 0"
+                    v-if="queueBadgeLabel(tab.key) > 0"
                     variant="secondary"
                     class="tabular-nums"
                     :class="queueTab === tab.key ? 'bg-primary-foreground/20 text-primary-foreground' : ''"
                 >
-                    {{ formatInt(queueBadgeCount(tab.key)!) }}
+                    {{ formatInt(queueBadgeLabel(tab.key)) }}
                 </Badge>
             </button>
         </div>
