@@ -68,12 +68,8 @@ describe('baseChartTooltipOptions', () => {
     });
 
     it('komposisi token + tooltip rantai penuh identik untuk dua tema', () => {
-        expect(baseChartTooltipOptions(chartThemeTokens(false)).backgroundColor).toBe(
-            LEGACY_LIGHT_TOKENS.tooltipBg,
-        );
-        expect(baseChartTooltipOptions(chartThemeTokens(true)).backgroundColor).toBe(
-            LEGACY_DARK_TOKENS.tooltipBg,
-        );
+        expect(baseChartTooltipOptions(chartThemeTokens(false)).backgroundColor).toBe(LEGACY_LIGHT_TOKENS.tooltipBg);
+        expect(baseChartTooltipOptions(chartThemeTokens(true)).backgroundColor).toBe(LEGACY_DARK_TOKENS.tooltipBg);
     });
 });
 
@@ -81,7 +77,7 @@ describe('chartTheme non-regresi', () => {
     it('hanya tujuh kunci dasar; copy per-chart tetap milik call-site', () => {
         const keys = Object.keys(baseChartTooltipOptions(LEGACY_LIGHT_TOKENS)).sort();
         expect(keys).toEqual(
-            ['backgroundColor', 'bodyColor', 'bodyFont', 'cornerRadius', 'padding', 'titleColor', 'titleFont'].sort(),
+            ['backgroundColor', 'bodyColor', 'bodyFont', 'cornerRadius', 'padding', 'titleColor', 'titleFont'].sort()
         );
     });
 

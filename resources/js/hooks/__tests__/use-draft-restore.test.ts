@@ -28,7 +28,11 @@ function mountRestoreHost(args: {
             });
             const label = computed<string>(() => draft.savedTimeLabel.value);
             return () =>
-                h('div', { id: 'draft-label' }, `${draft.status.value}|${label.value}|${draft.lastSavedAt.value === null ? 'empty' : 'set'}`);
+                h(
+                    'div',
+                    { id: 'draft-label' },
+                    `${draft.status.value}|${label.value}|${draft.lastSavedAt.value === null ? 'empty' : 'set'}`
+                );
         },
     });
     const wrapper = mount(host);
@@ -89,7 +93,7 @@ describe('useDraftRestore', () => {
                 return () =>
                     h(
                         'div',
-                        `${draft.status.value}|${draft.savedTimeLabel.value}|${draft.lastSavedAt.value === null ? 'empty' : 'set'}`,
+                        `${draft.status.value}|${draft.savedTimeLabel.value}|${draft.lastSavedAt.value === null ? 'empty' : 'set'}`
                     );
             },
         });

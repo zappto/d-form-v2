@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { useEventRegistrantsPage } from '../useEventRegistrantsPage'
+import { describe, expect, it } from 'vitest';
+import { useEventRegistrantsPage } from '../useEventRegistrantsPage';
 
 /**
  * M5 closeout: pin perilaku useEventRegistrantsPage (filter tab + form,
@@ -45,7 +45,7 @@ function demoRegistrants(): IRegistrant[] {
             registration_code: null,
             reviewed_at: '2026-09-13',
         },
-    ]
+    ];
 }
 
 function demoEvent(): IEvent {
@@ -71,14 +71,14 @@ function demoEvent(): IEvent {
         deleted_at: null,
         created_at: '2026-09-01',
         updated_at: '2026-09-01',
-    }
+    };
 }
 
 function demoForms(): { id: string; title: string }[] {
     return [
         { id: 'f-1', title: 'Formulir A' },
         { id: 'f-2', title: 'Formulir B' },
-    ]
+    ];
 }
 
 describe('useEventRegistrantsPage (pin M5)', () => {
@@ -87,50 +87,50 @@ describe('useEventRegistrantsPage (pin M5)', () => {
             event: demoEvent(),
             forms: demoForms(),
             registrants: demoRegistrants(),
-        })
-        expect(page.statusCounts.value).toEqual({ all: 3, pending: 1, accepted: 1, rejected: 1 })
-        expect(page.pendingCount.value).toBe(1)
-    })
+        });
+        expect(page.statusCounts.value).toEqual({ all: 3, pending: 1, accepted: 1, rejected: 1 });
+        expect(page.pendingCount.value).toBe(1);
+    });
 
     it('tab status + filter form menyaring daftar', () => {
         const page = useEventRegistrantsPage({
             event: demoEvent(),
             forms: demoForms(),
             registrants: demoRegistrants(),
-        })
-        expect(page.filteredRegistrants.value).toHaveLength(3)
-        page.setStatTab('pending')
-        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-1'])
-        page.setStatTab('all')
-        page.activeFormFilter.value = 'f-1'
-        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-1', 'r-3'])
-    })
+        });
+        expect(page.filteredRegistrants.value).toHaveLength(3);
+        page.setStatTab('pending');
+        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-1']);
+        page.setStatTab('all');
+        page.activeFormFilter.value = 'f-1';
+        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-1', 'r-3']);
+    });
 
     it('pencarian cocok nama/email/kode, clearFilters mengembalikan semua', () => {
         const page = useEventRegistrantsPage({
             event: demoEvent(),
             forms: demoForms(),
             registrants: demoRegistrants(),
-        })
-        page.searchQuery.value = 'sari'
-        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-2'])
-        page.searchQuery.value = 'REG-001'
-        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-1'])
-        page.clearFilters()
-        expect(page.filteredRegistrants.value).toHaveLength(3)
-        expect(page.searchQuery.value).toBe('')
-        expect(page.activeStatusTab.value).toBe('all')
-    })
+        });
+        page.searchQuery.value = 'sari';
+        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-2']);
+        page.searchQuery.value = 'REG-001';
+        expect(page.filteredRegistrants.value.map((r) => r.id)).toEqual(['r-1']);
+        page.clearFilters();
+        expect(page.filteredRegistrants.value).toHaveLength(3);
+        expect(page.searchQuery.value).toBe('');
+        expect(page.activeStatusTab.value).toBe('all');
+    });
 
     it('kartu statistik: 4 kartu, nilai ikut hitung, helper approvalRate', () => {
         const page = useEventRegistrantsPage({
             event: demoEvent(),
             forms: demoForms(),
             registrants: demoRegistrants(),
-        })
-        const cards = page.statCards.value
-        expect(cards.map((c) => c.key)).toEqual(['all', 'pending', 'accepted', 'rejected'])
-        expect(cards.map((c) => c.value)).toEqual([3, 1, 1, 1])
-        expect(cards[2]?.helper).toBe('50% dari yang sudah diputus')
-    })
-})
+        });
+        const cards = page.statCards.value;
+        expect(cards.map((c) => c.key)).toEqual(['all', 'pending', 'accepted', 'rejected']);
+        expect(cards.map((c) => c.value)).toEqual([3, 1, 1, 1]);
+        expect(cards[2]?.helper).toBe('50% dari yang sudah diputus');
+    });
+});

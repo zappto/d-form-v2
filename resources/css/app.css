@@ -10,7 +10,9 @@
 @source '../js/**/*.vue';
 
 @theme {
-    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans:
+        'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
     --font-display: 'Poppins', ui-sans-serif, system-ui, sans-serif;
     --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
     --animate-fade-in: fade-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -22,7 +24,9 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer utilities {
-    .container { @apply w-[92.5%] sm:w-[90%] lg:w-[87.5%] 2xl:w-[85%]; }
+    .container {
+        @apply w-[92.5%] sm:w-[90%] lg:w-[87.5%] 2xl:w-[85%];
+    }
 }
 
 @theme inline {
@@ -178,7 +182,9 @@
 }
 
 @layer base {
-    * { @apply border-border outline-ring/60; }
+    * {
+        @apply border-border outline-ring/60;
+    }
     html {
         text-size-adjust: 100%;
         font-size: 15px;
@@ -187,14 +193,40 @@
         scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
     }
     body {
-        background: linear-gradient(180deg, var(--background) 0%, color-mix(in srgb, var(--muted) 35%, var(--background)) 100%);
-        color: var(--foreground); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; font-size: 1rem; line-height: 1.6;
+        background: linear-gradient(
+            180deg,
+            var(--background) 0%,
+            color-mix(in srgb, var(--muted) 35%, var(--background)) 100%
+        );
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        font-size: 1rem;
+        line-height: 1.6;
     }
-    @media (min-width: 640px) { html { font-size: 16px; } }
-    ::selection { background: color-mix(in srgb, var(--primary) 22%, white); color: var(--foreground); }
-    h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; font-weight: 600; }
-    h1 { line-height: 1.08; }
-    h2 { line-height: 1.12; }
+    @media (min-width: 640px) {
+        html {
+            font-size: 16px;
+        }
+    }
+    ::selection {
+        background: color-mix(in srgb, var(--primary) 22%, white);
+        color: var(--foreground);
+    }
+    h1,
+    h2,
+    h3,
+    .font-display {
+        font-family: var(--font-display);
+        letter-spacing: -0.02em;
+        font-weight: 600;
+    }
+    h1 {
+        line-height: 1.08;
+    }
+    h2 {
+        line-height: 1.12;
+    }
     * {
         scrollbar-width: thin;
         scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -226,13 +258,23 @@
 }
 
 @layer utilities {
-    .app-page { @apply mx-auto w-full max-w-7xl px-4 py-8 sm:px-8; }
-    .app-surface {
-        border: 1px solid var(--app-border); background: var(--card); box-shadow: var(--shadow-sm);
-        transition: border-color 220ms var(--app-ease), box-shadow 220ms var(--app-ease);
+    .app-page {
+        @apply mx-auto w-full max-w-7xl px-4 py-8 sm:px-8;
     }
-    .app-surface:hover { border-color: color-mix(in srgb, var(--primary) 18%, var(--app-border)); }
-    .app-focus-ring { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background; }
+    .app-surface {
+        border: 1px solid var(--app-border);
+        background: var(--card);
+        box-shadow: var(--shadow-sm);
+        transition:
+            border-color 220ms var(--app-ease),
+            box-shadow 220ms var(--app-ease);
+    }
+    .app-surface:hover {
+        border-color: color-mix(in srgb, var(--primary) 18%, var(--app-border));
+    }
+    .app-focus-ring {
+        @apply focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none;
+    }
     .app-scroll {
         overflow: auto;
         overscroll-behavior: contain;
@@ -248,7 +290,11 @@
 }
 
 @layer components {
-    [data-slot='badge'] { border-radius: 999px; font-weight: 600; box-shadow: none; }
+    [data-slot='badge'] {
+        border-radius: 999px;
+        font-weight: 600;
+        box-shadow: none;
+    }
     .app-scroll-area-thumb {
         background-color: var(--scrollbar-thumb);
         transition: background-color 180ms var(--app-ease);
@@ -261,28 +307,111 @@
     }
 }
 
-@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes app-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes app-slide-down { from { opacity: 0; max-height: 0; transform: translateY(-4px); } to { opacity: 1; max-height: 2000px; transform: translateY(0); } }
+@keyframes shimmer {
+    from {
+        background-position: 200% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
+}
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@keyframes app-rise {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes app-slide-down {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        max-height: 2000px;
+        transform: translateY(0);
+    }
+}
 @keyframes shake {
-    10%, 90% { transform: translateX(-1px); }
-    20%, 80% { transform: translateX(2px); }
-    30%, 50%, 70% { transform: translateX(-4px); }
-    40%, 60% { transform: translateX(4px); }
+    10%,
+    90% {
+        transform: translateX(-1px);
+    }
+    20%,
+    80% {
+        transform: translateX(2px);
+    }
+    30%,
+    50%,
+    70% {
+        transform: translateX(-4px);
+    }
+    40%,
+    60% {
+        transform: translateX(4px);
+    }
 }
 
 @layer utilities {
-    .animate-app-fade-in { opacity: 0; animation: app-rise 360ms var(--app-ease) forwards; }
-    .animate-app-slide-down { animation: app-slide-down 400ms var(--app-ease) forwards; }
-    .fade-up { animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .animate-app-fade-in {
+        opacity: 0;
+        animation: app-rise 360ms var(--app-ease) forwards;
+    }
+    .animate-app-slide-down {
+        animation: app-slide-down 400ms var(--app-ease) forwards;
+    }
+    .fade-up {
+        animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .fade-up { animation: none; }
-    [data-slot='skeleton'] { animation: none; }
+    .fade-up {
+        animation: none;
+    }
+    [data-slot='skeleton'] {
+        animation: none;
+    }
 }
 
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}

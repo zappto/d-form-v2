@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import 'vue-sonner/style.css'
-import { watch } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
-import { Toaster } from '@/components/ui/sonner'
-import DashboardSidebar from '@/components/modules/dashboard/DashboardSidebar.vue'
-import DashboardTopbar from '@/components/modules/dashboard/DashboardTopbar.vue'
-import { usePageFlashToast } from '@/hooks/usePageFlashToast'
-import { clearTopbar } from '@/hooks/useDashboardTopbar'
+import 'vue-sonner/style.css';
+import { watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
+import DashboardSidebar from '@/components/modules/dashboard/DashboardSidebar.vue';
+import DashboardTopbar from '@/components/modules/dashboard/DashboardTopbar.vue';
+import { usePageFlashToast } from '@/hooks/usePageFlashToast';
+import { clearTopbar } from '@/hooks/useDashboardTopbar';
 
-usePageFlashToast()
+usePageFlashToast();
 
 // Reset state topbar saat navigasi Inertia ke halaman lain,
 // supaya judul/subtitle halaman sebelumnya tidak bocor.
-const page = usePage()
+const page = usePage();
 watch(
     () => page.component,
     () => {
-        clearTopbar()
-    },
-)
+        clearTopbar();
+    }
+);
 </script>
 
 <template>
@@ -27,7 +27,7 @@ watch(
         <DashboardSidebar />
         <SidebarInset class="h-svh overflow-x-hidden bg-gradient-to-b from-background via-muted/20 to-background">
             <DashboardTopbar />
-            <div class="flex-1 overflow-y-auto px-4 pb-10 pt-6 md:px-6 md:pb-12 md:pt-8 lg:px-8">
+            <div class="flex-1 overflow-y-auto px-4 pt-6 pb-10 md:px-6 md:pt-8 md:pb-12 lg:px-8">
                 <div class="w-full max-w-full">
                     <slot />
                 </div>

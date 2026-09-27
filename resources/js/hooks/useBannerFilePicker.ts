@@ -76,5 +76,14 @@ export function useBannerFilePicker(args: IBannerFilePickerArgs): IBannerFilePic
         bannerPreview.value = args.initialUrl;
     }
 
-    return { bannerPreview, bannerFile, isDragging, openPicker, applyFile, handleInputChange, handleDrop, clearSelection };
+    return {
+        bannerPreview,
+        bannerFile,
+        isDragging,
+        openPicker,
+        applyFile,
+        handleInputChange,
+        handleDrop,
+        clearSelection,
+    };
 }

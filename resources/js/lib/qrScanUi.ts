@@ -1,60 +1,62 @@
-import type { Component } from 'vue'
-import { AlertTriangle, CheckCircle, XCircle } from 'lucide-vue-next'
+import type { Component } from 'vue';
+import { AlertTriangle, CheckCircle, XCircle } from 'lucide-vue-next';
 
-export type ScanStatus = 'success' | 'already' | 'invalid'
+export type ScanStatus = 'success' | 'already' | 'invalid';
 
-export const SCAN_STATUS_THEME: Record<
-    ScanStatus,
-    { icon: Component; class: string; bg: string; label: string }
-> = {
+export const SCAN_STATUS_THEME: Record<ScanStatus, { icon: Component; class: string; bg: string; label: string }> = {
     success: { icon: CheckCircle, class: 'text-success', bg: 'bg-success/10', label: 'Check-in berhasil' },
     already: { icon: AlertTriangle, class: 'text-warning', bg: 'bg-warning/10', label: 'Sudah pernah scan' },
     invalid: { icon: XCircle, class: 'text-destructive', bg: 'bg-destructive/10', label: 'QR tidak valid' },
-}
+};
 
 export interface ScanEntry {
-    id: string
-    name: string
-    email: string
-    time: string
-    status: ScanStatus
-    source: 'camera' | 'manual'
-    eventKind: 'event' | 'oprec'
-    eventTitle: string
-    queueNumber: number | null
+    id: string;
+    name: string;
+    email: string;
+    time: string;
+    status: ScanStatus;
+    source: 'camera' | 'manual';
+    eventKind: 'event' | 'oprec';
+    eventTitle: string;
+    queueNumber: number | null;
 }
 
 export interface ScanResult {
-    name: string
-    email: string
-    status: ScanStatus
-    source: 'camera' | 'manual'
-    rawCode: string
-    eventKind: 'event' | 'oprec'
-    eventTitle: string
-    queueNumber: number | null
+    name: string;
+    email: string;
+    status: ScanStatus;
+    source: 'camera' | 'manual';
+    rawCode: string;
+    eventKind: 'event' | 'oprec';
+    eventTitle: string;
+    queueNumber: number | null;
 }
 
 /** Ambil kode kandidat dari teks hasil scan (JSON atau teks polos); dipakai saat memproses QR masuk. */
 export function extractQrCandidate(decodedText: string): string {
-    const raw = decodedText.trim()
+    const raw = decodedText.trim();
     if (!raw.startsWith('{') || !raw.endsWith('}')) {
-        return raw
+        return raw;
     }
 
     try {
-        const parsed = JSON.parse(raw) as Record<string, unknown>
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
         const candidate =
-            parsed.application_id ?? parsed.submission_id ?? parsed.token ?? parsed.code ?? parsed.qr ?? parsed.email ?? parsed.id
+            parsed.application_id ??
+            parsed.submission_id ??
+            parsed.token ??
+            parsed.code ??
+            parsed.qr ??
+            parsed.email ??
+            parsed.id;
         if (typeof candidate === 'string' && candidate.trim().length > 0) {
-            return candidate.trim()
+            return candidate.trim();
         }
-    }
-    catch {
-        return raw
+    } catch {
+        return raw;
     }
 
-    return raw
+    return raw;
 }
 
 /** Bentuk entri riwayat scan dari hasil scan; dipakai untuk menambah baris riwayat scan. */
@@ -69,73 +71,73 @@ export function createScanHistoryEntry(result: ScanResult): ScanEntry {
         eventKind: result.eventKind,
         eventTitle: result.eventTitle,
         queueNumber: result.queueNumber,
-    }
+    };
 }
 
 export interface GlobalScanFeedRow {
-    id: string
-    ts: string
-    type: 'recruitment' | 'event'
-    eventTitle: string
-    name: string
-    identifier: string
-    queueNumber: number | null
+    id: string;
+    ts: string;
+    type: 'recruitment' | 'event';
+    eventTitle: string;
+    name: string;
+    identifier: string;
+    queueNumber: number | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value)
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function toUnknownArray(value: unknown): unknown[] {
     if (!Array.isArray(value)) {
-        return []
+        return [];
     }
 
-    const items: unknown[] = []
+    const items: unknown[] = [];
     for (let index = 0; index < value.length; index += 1) {
-        const item: unknown = value[index]
-        items.push(item)
+        const item: unknown = value[index];
+        items.push(item);
     }
 
-    return items
+    return items;
 }
 
 function readString(record: Record<string, unknown>, key: string): string {
-    const value = record[key]
+    const value = record[key];
 
-    return typeof value === 'string' ? value : ''
+    return typeof value === 'string' ? value : '';
 }
 
 function readQueueNumber(record: Record<string, unknown>, key: string): number | null {
-    const value = record[key]
+    const value = record[key];
 
-    return typeof value === 'number' && Number.isFinite(value) ? value : null
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
 /** Cek bentuk payload feed scan global; dipakai sebagai guard sebelum mem-parse feed. */
 export function isGlobalScanFeedPayload(payload: unknown): boolean {
     if (!isRecord(payload)) {
-        return false
+        return false;
     }
 
-    return Array.isArray(payload.rows)
+    return Array.isArray(payload.rows);
 }
 
 /** Parse baris feed scan global menjadi daftar terketik sambil melewati baris rusak; dipakai saat memuat feed scan. */
 export function parseGlobalScanFeedRows(payload: unknown): GlobalScanFeedRow[] {
     if (!isRecord(payload)) {
-        return []
+        return [];
     }
 
-    const rows: GlobalScanFeedRow[] = []
+    const rows: GlobalScanFeedRow[] = [];
     for (const item of toUnknownArray(payload.rows)) {
         if (!isRecord(item)) {
-            continue
+            continue;
         }
 
-        const id = readString(item, 'id')
+        const id = readString(item, 'id');
         if (id.length === 0) {
-            continue
+            continue;
         }
 
         rows.push({
@@ -146,41 +148,40 @@ export function parseGlobalScanFeedRows(payload: unknown): GlobalScanFeedRow[] {
             name: readString(item, 'name'),
             identifier: readString(item, 'identifier'),
             queueNumber: readQueueNumber(item, 'queueNumber'),
-        })
+        });
     }
 
-    return rows
+    return rows;
 }
 
 /** Ambil cursor pagination dari payload feed scan global; dipakai untuk memuat halaman feed berikutnya. */
 export function parseGlobalScanCursor(payload: unknown): string {
     if (!isRecord(payload)) {
-        return ''
+        return '';
     }
 
-    return readString(payload, 'cursor')
+    return readString(payload, 'cursor');
 }
 
 /** Bunyikan beep (dan getar) sesuai status scan; dipakai sebagai umpan balik setelah scan QR. */
 export function playScanBeep(status: ScanStatus): void {
     try {
-        const ctx = new AudioContext()
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.frequency.value = status === 'success' ? 880 : status === 'already' ? 440 : 200
-        osc.start()
-        const ms = status === 'already' ? 320 : 160
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = status === 'success' ? 880 : status === 'already' ? 440 : 200;
+        osc.start();
+        const ms = status === 'already' ? 320 : 160;
         window.setTimeout(() => {
-            osc.stop()
-            void ctx.close()
-        }, ms)
+            osc.stop();
+            void ctx.close();
+        }, ms);
         if (navigator.vibrate) {
-            navigator.vibrate(50)
+            navigator.vibrate(50);
         }
-    }
-    catch {
-        return
+    } catch {
+        return;
     }
 }

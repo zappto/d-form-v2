@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import 'vue-sonner/style.css'
-import { computed } from 'vue'
-import { usePage, Link, router } from '@inertiajs/vue3'
-import { Toaster } from '@/components/ui/sonner'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-vue-next'
-import { routes } from '@/lib/routes'
-import { usePageFlashToast } from '@/hooks/usePageFlashToast'
+import 'vue-sonner/style.css';
+import { computed } from 'vue';
+import { usePage, Link, router } from '@inertiajs/vue3';
+import { Toaster } from '@/components/ui/sonner';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-vue-next';
+import { routes } from '@/lib/routes';
+import { usePageFlashToast } from '@/hooks/usePageFlashToast';
 
-const page = usePage()
-usePageFlashToast()
+const page = usePage();
+usePageFlashToast();
 
 const fallbackBackHref = computed((): string => {
-    const event = (page.props.event as { id: string; slug?: string; title: string } | undefined)
-    if (event) return routes.member.event.show(event.slug ?? event.id)
-    return routes.member.joined
-})
+    const event = page.props.event as { id: string; slug?: string; title: string } | undefined;
+    if (event) return routes.member.event.show(event.slug ?? event.id);
+    return routes.member.joined;
+});
 
 /** URL logo publik — dibentuk saat runtime agar Vite tidak mem-bundel path file PNG. */
-const formFillLogoSrc = `/${encodeURIComponent('DForm 1.png')}`
+const formFillLogoSrc = `/${encodeURIComponent('DForm 1.png')}`;
 
 function goBack(): void {
     if (typeof window !== 'undefined' && window.history.length > 1) {
-        window.history.back()
-        return
+        window.history.back();
+        return;
     }
-    router.visit(fallbackBackHref.value)
+    router.visit(fallbackBackHref.value);
 }
 </script>
 
@@ -45,13 +45,7 @@ function goBack(): void {
                 </Button>
 
                 <Link :href="routes.home" class="hidden sm:block">
-                    <img
-                        :src="formFillLogoSrc"
-                        alt="DForm"
-                        class="h-9 w-auto select-none"
-                        width="160"
-                        height="40"
-                    />
+                    <img :src="formFillLogoSrc" alt="DForm" class="h-9 w-auto select-none" width="160" height="40" />
                 </Link>
             </div>
         </header>

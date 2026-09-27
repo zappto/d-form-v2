@@ -37,7 +37,7 @@ vi.mock('html5-qrcode', () => {
                 aspectRatio: number;
             },
             onSuccess: (decodedText: string) => void,
-            onFailure: () => void,
+            onFailure: () => void
         ): Promise<void> {
             void onSuccess;
             void onFailure;
@@ -143,8 +143,7 @@ describe('useQrCamera', () => {
             expect(start.aspectRatio).toBe(1);
             expect(start.qrbox(640.8, 480.2)).toEqual({ width: 640, height: 480 });
             expect(controls().isCameraReady.value).toBe(true);
-        }
-        finally {
+        } finally {
             wrapper.unmount();
         }
     });

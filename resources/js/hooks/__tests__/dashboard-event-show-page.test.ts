@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { useDashboardEventShowPage } from '../useDashboardEventShowPage'
-import { handleInertiaFormErrors } from '@/lib/error-message'
-import { toast } from 'vue-sonner'
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { useDashboardEventShowPage } from '../useDashboardEventShowPage';
+import { handleInertiaFormErrors } from '@/lib/error-message';
+import { toast } from 'vue-sonner';
 
 /**
  * Task 8 audit: arsip/pulihkan event dari Events/Show —
@@ -17,7 +17,7 @@ import { toast } from 'vue-sonner'
 const { routerDeleteMock, routerPostMock } = vi.hoisted(() => ({
     routerDeleteMock: vi.fn(),
     routerPostMock: vi.fn(),
-}))
+}));
 
 vi.mock('@inertiajs/vue3', () => ({
     router: {
@@ -27,27 +27,27 @@ vi.mock('@inertiajs/vue3', () => ({
         reload: vi.fn(),
         visit: vi.fn(),
     },
-}))
+}));
 
 vi.mock('@/lib/error-message', () => ({
     handleInertiaFormErrors: vi.fn(),
     humanizeErrorMessage: (message: string): string => message,
     showErrorToast: vi.fn(),
     showFlashToast: vi.fn(),
-}))
+}));
 
 vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}))
+}));
 
 interface RouterMutationOptions {
-    onSuccess?: () => void
-    onError?: (errors: Record<string, string>) => void
-    onFinish?: () => void
+    onSuccess?: () => void;
+    onError?: (errors: Record<string, string>) => void;
+    onFinish?: () => void;
 }
 
-let lastDeleteOptions: RouterMutationOptions | undefined
-let lastPostOptions: RouterMutationOptions | undefined
+let lastDeleteOptions: RouterMutationOptions | undefined;
+let lastPostOptions: RouterMutationOptions | undefined;
 
 function demoEvent(): IEvent {
     return {
@@ -72,77 +72,74 @@ function demoEvent(): IEvent {
         deleted_at: null,
         created_at: '2026-09-01',
         updated_at: '2026-09-01',
-    }
+    };
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-    lastDeleteOptions = undefined
-    lastPostOptions = undefined
-    routerDeleteMock.mockReset()
-    routerPostMock.mockReset()
+    vi.clearAllMocks();
+    lastDeleteOptions = undefined;
+    lastPostOptions = undefined;
+    routerDeleteMock.mockReset();
+    routerPostMock.mockReset();
     routerDeleteMock.mockImplementation((...args: unknown[]) => {
-        lastDeleteOptions = args[1] as RouterMutationOptions | undefined
-        return undefined
-    })
+        lastDeleteOptions = args[1] as RouterMutationOptions | undefined;
+        return undefined;
+    });
     routerPostMock.mockImplementation((...args: unknown[]) => {
-        lastPostOptions = args[2] as RouterMutationOptions | undefined
-        return undefined
-    })
-})
+        lastPostOptions = args[2] as RouterMutationOptions | undefined;
+        return undefined;
+    });
+});
 
 describe('useDashboardEventShowPage arsip/pulihkan (Task 8 audit)', () => {
     it('arsip sukses → TANPA toast manual (flash global) + modal tutup', () => {
-        const page = useDashboardEventShowPage(demoEvent(), [])
+        const page = useDashboardEventShowPage(demoEvent(), []);
 
-        page.handleDelete()
-        expect(routerDeleteMock).toHaveBeenCalledTimes(1)
+        page.handleDelete();
+        expect(routerDeleteMock).toHaveBeenCalledTimes(1);
 
-        lastDeleteOptions?.onSuccess?.()
-        lastDeleteOptions?.onFinish?.()
+        lastDeleteOptions?.onSuccess?.();
+        lastDeleteOptions?.onFinish?.();
 
-        expect(toast.success).not.toHaveBeenCalled()
-        expect(page.showDeleteModal.value).toBe(false)
-        expect(page.isDeleting.value).toBe(false)
-    })
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(page.showDeleteModal.value).toBe(false);
+        expect(page.isDeleting.value).toBe(false);
+    });
 
     it('arsip gagal → handleInertiaFormErrors + tanpa toast sukses', () => {
-        const page = useDashboardEventShowPage(demoEvent(), [])
+        const page = useDashboardEventShowPage(demoEvent(), []);
 
-        page.handleDelete()
-        lastDeleteOptions?.onError?.({ event: 'Gagal.' })
+        page.handleDelete();
+        lastDeleteOptions?.onError?.({ event: 'Gagal.' });
 
         expect(handleInertiaFormErrors).toHaveBeenCalledWith(
             { event: 'Gagal.' },
-            { title: 'Gagal mengarsipkan event' },
-        )
-        expect(toast.success).not.toHaveBeenCalled()
-    })
+            { title: 'Gagal mengarsipkan event' }
+        );
+        expect(toast.success).not.toHaveBeenCalled();
+    });
 
     it('pulihkan sukses → TANPA toast manual (flash global) + modal tutup', () => {
-        const page = useDashboardEventShowPage(demoEvent(), [])
+        const page = useDashboardEventShowPage(demoEvent(), []);
 
-        page.handleRestore()
-        expect(routerPostMock).toHaveBeenCalledTimes(1)
+        page.handleRestore();
+        expect(routerPostMock).toHaveBeenCalledTimes(1);
 
-        lastPostOptions?.onSuccess?.()
-        lastPostOptions?.onFinish?.()
+        lastPostOptions?.onSuccess?.();
+        lastPostOptions?.onFinish?.();
 
-        expect(toast.success).not.toHaveBeenCalled()
-        expect(page.showRestoreModal.value).toBe(false)
-        expect(page.isRestoring.value).toBe(false)
-    })
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(page.showRestoreModal.value).toBe(false);
+        expect(page.isRestoring.value).toBe(false);
+    });
 
     it('pulihkan gagal → handleInertiaFormErrors + tanpa toast sukses', () => {
-        const page = useDashboardEventShowPage(demoEvent(), [])
+        const page = useDashboardEventShowPage(demoEvent(), []);
 
-        page.handleRestore()
-        lastPostOptions?.onError?.({ event: 'Gagal.' })
+        page.handleRestore();
+        lastPostOptions?.onError?.({ event: 'Gagal.' });
 
-        expect(handleInertiaFormErrors).toHaveBeenCalledWith(
-            { event: 'Gagal.' },
-            { title: 'Gagal memulihkan event' },
-        )
-        expect(toast.success).not.toHaveBeenCalled()
-    })
-})
+        expect(handleInertiaFormErrors).toHaveBeenCalledWith({ event: 'Gagal.' }, { title: 'Gagal memulihkan event' });
+        expect(toast.success).not.toHaveBeenCalled();
+    });
+});

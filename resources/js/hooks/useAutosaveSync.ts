@@ -35,7 +35,7 @@ export interface UseAutosaveSyncResult {
 export function useAutosaveSync(
     source: () => string,
     save: (snapshot: string) => Promise<boolean>,
-    opts: UseAutosaveSyncOptions = {},
+    opts: UseAutosaveSyncOptions = {}
 ): UseAutosaveSyncResult {
     const debounceMs = opts.debounceMs ?? 800;
     const status = ref<AutosaveStatus>('idle');

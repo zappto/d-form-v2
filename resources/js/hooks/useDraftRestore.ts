@@ -34,7 +34,7 @@ export function useDraftRestore(args: IDraftRestoreArgs): IDraftRestoreResult {
     });
 
     const savedTimeLabel: ComputedRef<string> = computed<string>((): string =>
-        formatSavedTimeLabel(draft.lastSavedAt.value),
+        formatSavedTimeLabel(draft.lastSavedAt.value)
     );
 
     onMounted((): void => {

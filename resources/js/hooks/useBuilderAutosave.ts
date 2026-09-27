@@ -114,7 +114,7 @@ interface IChangedFieldsRequest<GObject extends object, GKey extends keyof GObje
 
 /** Ambil key yang nilainya berbeda antara current dan sent (satu objek argumen, maks dua param). */
 function pickChangedFields<GObject extends object, GKey extends keyof GObject>(
-    request: IChangedFieldsRequest<GObject, GKey>,
+    request: IChangedFieldsRequest<GObject, GKey>
 ): Partial<GObject> {
     const diff: Partial<GObject> = {};
     // Object.keys selalu string[] di TS; cast sempit ini satu-satunya cara iterasi runtime.
@@ -244,7 +244,7 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
     async function postFieldChanges(request: ISaveRequest): Promise<boolean> {
         const backend = toBackendFields(
             prependFormBannerToBackendPayload(request.state.fields, request.state.banner),
-            lastSentFields.value,
+            lastSentFields.value
         );
         const fieldDiff = diffBackendFields(backend, lastSentFields.value);
         const bannerFile = pendingBannerUpload(request.state);
@@ -272,7 +272,7 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
             await axios.post(
                 request.url,
                 { fields: dirtyRows, deleted_ids: fieldDiff.deletedIds },
-                { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
+                { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
             );
         }
         lastSentFields.value = snapshotBackendFields(backend);
@@ -319,7 +319,7 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
         const state = options.getState();
         lastSentHeader.value = buildHeaderPayload(state);
         lastSentFields.value = snapshotBackendFields(
-            toBackendFields(prependFormBannerToBackendPayload(state.fields, state.banner)),
+            toBackendFields(prependFormBannerToBackendPayload(state.fields, state.banner))
         );
         lastHydratedFormId.value = formId;
         lastCleanSnapshot.value = buildSnapshotText(state);

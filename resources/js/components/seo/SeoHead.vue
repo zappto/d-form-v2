@@ -41,9 +41,7 @@ const documentTitle = computed(() => {
     return t.toLowerCase().includes(sn.toLowerCase()) ? t : `${t} · ${sn}`;
 });
 
-const description = computed(
-    () => props.description?.trim() || seo.value?.defaultDescription || '—'
-);
+const description = computed(() => props.description?.trim() || seo.value?.defaultDescription || '—');
 
 const canonicalUrl = computed(() => {
     const base = (seo.value?.siteUrl ?? '').replace(/\/$/, '');

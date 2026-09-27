@@ -105,7 +105,7 @@ export function snapshotRespondentValues(form: unknown): Record<string, unknown>
 export function useRespondentDraft<T>(
     source: () => string,
     storageKey: string,
-    opts: UseRespondentDraftOptions = {},
+    opts: UseRespondentDraftOptions = {}
 ): UseRespondentDraftResult<T> {
     const lastSavedAt = ref<Date | null>(null);
 

@@ -34,7 +34,9 @@ usePageFlashToast();
                 <AuthOAuthButtons />
 
                 <!-- Mobile footer -->
-                <p class="mt-9 text-center text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground lg:hidden">
+                <p
+                    class="mt-9 text-center text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase lg:hidden"
+                >
                     Created by Dinus Open Source Community
                 </p>
             </div>

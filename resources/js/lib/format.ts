@@ -71,7 +71,10 @@ export function formatBytes(byteCount: number | null | undefined): string | null
 
 /** Inisial dua huruf nama; dipakai avatar opsi select dan daftar panitia. */
 export function initialsOf(fullName: string): string {
-    const words: string[] = fullName.trim().split(/\s+/).filter((word) => word.length > 0);
+    const words: string[] = fullName
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0);
     if (words.length === 0) return EMPTY_INITIALS_MARK;
     const first: string = words[0]?.charAt(0) ?? '';
     const second: string = words.length > 1 ? (words[1]?.charAt(0) ?? '') : '';

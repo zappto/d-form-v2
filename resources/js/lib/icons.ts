@@ -59,9 +59,9 @@ import {
     Star,
     Send,
     GripVertical,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
-import type { CuratedIconName, IconComponent } from '@/types/icons'
+import type { CuratedIconName, IconComponent } from '@/types/icons';
 
 export const icons = {
     arrowRight: ArrowRight,
@@ -115,6 +115,6 @@ export const icons = {
     star: Star,
     send: Send,
     grip: GripVertical,
-} as const satisfies Record<CuratedIconName, IconComponent>
+} as const satisfies Record<CuratedIconName, IconComponent>;
 
-export type { CuratedIconName, IconComponent }
+export type { CuratedIconName, IconComponent };

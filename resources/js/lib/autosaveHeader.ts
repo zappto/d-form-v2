@@ -43,7 +43,7 @@ export function requiredHeaderError(kind: TRequiredHeaderKey, value: string | nu
  */
 export function stripBlankRequiredKeys<GDiff extends Partial<TRequiredHeaderFields>>(
     diff: GDiff,
-    current: TRequiredHeaderFields,
+    current: TRequiredHeaderFields
 ): GDiff {
     const next: GDiff = { ...diff };
     // Object.keys selalu string[] di TS; cast sempit ini satu-satunya cara iterasi runtime.
@@ -61,7 +61,7 @@ export function stripBlankRequiredKeys<GDiff extends Partial<TRequiredHeaderFiel
 export function mergeSentHeader<GHeader extends object>(
     prev: GHeader | null,
     current: GHeader,
-    sent: Partial<GHeader>,
+    sent: Partial<GHeader>
 ): GHeader {
     return { ...(prev ?? current), ...sent };
 }

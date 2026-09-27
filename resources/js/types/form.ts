@@ -3,7 +3,7 @@
  * Keep page components thin — import from here instead of inlining large `type` blocks.
  */
 
-import type { BackendField } from '@/components/modules/builder/fieldMapping'
+import type { BackendField } from '@/components/modules/builder/fieldMapping';
 
 /** Access gate for the public form fill route */
 export type FormAccessStatus =
@@ -17,71 +17,71 @@ export type FormAccessStatus =
     | 'invitation_closed'
     | 'already_submitted'
     | 'event_form_already_chosen'
-    | 'prerequisite_not_met'
+    | 'prerequisite_not_met';
 
-export type FormPurpose = 'registration' | 'other'
+export type FormPurpose = 'registration' | 'other';
 
 export interface FormSiblingOption {
-    id: string
-    title: string
+    id: string;
+    title: string;
 }
 
 export interface FormFillPageEvent {
-    id: string
-    slug: string
-    title: string
+    id: string;
+    slug: string;
+    title: string;
 }
 
 export interface FormFillPageForm {
-    id: string
-    title: string
-    description: string | null
-    closed_at: string | null
-    banner_url: string | null
-    banner_caption: string | null
+    id: string;
+    title: string;
+    description: string | null;
+    closed_at: string | null;
+    banner_url: string | null;
+    banner_caption: string | null;
 }
 
 /** Values stored in the fill `useForm` map (matches file inputs + multi-select) */
-export type FormFillAnswerValue = string | string[] | File | null
+export type FormFillAnswerValue = string | string[] | File | null;
 
-export type FormFillAnswerMap = Record<string, FormFillAnswerValue>
+export type FormFillAnswerMap = Record<string, FormFillAnswerValue>;
 
 /** One row in checkbox / radio / dropdown image+label choices on the fill page */
-export type FormFillOptionRow = { type: 'text' | 'image'; label: string; imageSrc?: string }
+export type FormFillOptionRow = { type: 'text' | 'image'; label: string; imageSrc?: string };
 
 /** Validation rules nested under `metadata.rules` on API fields */
 export type FormFieldRules = {
-    required?: boolean
-    in?: string
-    mimes?: string
-    max_size?: string | number
-    min?: number
-    max?: number
-} & Record<string, unknown>
+    required?: boolean;
+    in?: string;
+    mimes?: string;
+    max_size?: string | number;
+    min?: number;
+    max?: number;
+} & Record<string, unknown>;
 
 /** Loose JSON-like metadata bag on `IFormField.metadata` */
-export type FormFieldMetadataBag = Record<string, unknown>
+export type FormFieldMetadataBag = Record<string, unknown>;
 
 export interface FormRegistrationMetadata {
-    purpose: FormPurpose
-    requires_form_id: string | null
-    registration_mode: 'single' | 'bundle' | 'team' | null
-    max_team_size: number | null
-    team_size: number | null
+    purpose: FormPurpose;
+    requires_form_id: string | null;
+    registration_mode: 'single' | 'bundle' | 'team' | null;
+    max_team_size: number | null;
+    team_size: number | null;
 }
 
 /** Payload for creating a form from the dashboard builder */
 export interface CreateDashboardFormPayload {
-    title: string
-    description: string
-    success_content: string
-    closed_at: string
-    visible_for: string[]
-    banner_url: string
-    banner_caption: string
+    title: string;
+    description: string;
+    success_content: string;
+    closed_at: string;
+    visible_for: string[];
+    banner_url: string;
+    banner_caption: string;
     /** Payload metadata registrasi; `null` saat form belum diisi (init halaman create). */
-    metadata: FormRegistrationMetadata | null
-    fields: BackendField[]
+    metadata: FormRegistrationMetadata | null;
+    fields: BackendField[];
 }
 
 /** Metadata registrasi form kosong untuk inisialisasi halaman create; dipakai saat form belum dikonfigurasi. */
@@ -92,30 +92,27 @@ export function emptyFormRegistrationMetadata(): FormRegistrationMetadata {
         registration_mode: null,
         max_team_size: null,
         team_size: null,
-    }
+    };
 }
 
 /** Parse metadata registrasi dari payload backend menjadi bentuk terketik dengan default aman; dipakai saat memuat form. */
 export function parseFormRegistrationMetadata(raw: unknown): FormRegistrationMetadata {
-    const m =
-        raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {}
-    const purposeRaw = m['purpose']
-    const purpose: FormPurpose = purposeRaw === 'other' ? 'other' : 'registration'
-    const requiresRaw = m['requires_form_id']
-    const requires_form_id =
-        typeof requiresRaw === 'string' && requiresRaw !== '' ? requiresRaw : null
-    const mode = m['registration_mode']
-    const rm =
-        mode === 'single' || mode === 'bundle' || mode === 'team' ? mode : null
-    const maxTs = m['max_team_size']
-    const teamS = m['team_size']
+    const m = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+    const purposeRaw = m['purpose'];
+    const purpose: FormPurpose = purposeRaw === 'other' ? 'other' : 'registration';
+    const requiresRaw = m['requires_form_id'];
+    const requires_form_id = typeof requiresRaw === 'string' && requiresRaw !== '' ? requiresRaw : null;
+    const mode = m['registration_mode'];
+    const rm = mode === 'single' || mode === 'bundle' || mode === 'team' ? mode : null;
+    const maxTs = m['max_team_size'];
+    const teamS = m['team_size'];
     return {
         purpose,
         requires_form_id,
         registration_mode: purpose === 'other' ? (rm === 'team' || rm === 'bundle' ? null : rm) : rm,
         max_team_size: maxTs != null && maxTs !== '' ? Number(maxTs) : null,
         team_size: teamS != null && teamS !== '' ? Number(teamS) : null,
-    }
+    };
 }
 
 /**
@@ -123,14 +120,12 @@ export function parseFormRegistrationMetadata(raw: unknown): FormRegistrationMet
  * (Inertia may omit nulls; partial objects used to wipe unrelated metadata).
  */
 export function toFormMetadataPayload(m: FormRegistrationMetadata): FormRegistrationMetadata {
-    const purpose = m.purpose === 'other' ? 'other' : 'registration'
-    const isOther = purpose === 'other'
+    const purpose = m.purpose === 'other' ? 'other' : 'registration';
+    const isOther = purpose === 'other';
     return {
         purpose,
         requires_form_id:
-            typeof m.requires_form_id === 'string' && m.requires_form_id !== ''
-                ? m.requires_form_id
-                : null,
+            typeof m.requires_form_id === 'string' && m.requires_form_id !== '' ? m.requires_form_id : null,
         registration_mode: isOther
             ? m.registration_mode === 'single'
                 ? 'single'
@@ -146,5 +141,5 @@ export function toFormMetadataPayload(m: FormRegistrationMetadata): FormRegistra
             : m.team_size != null && !Number.isNaN(Number(m.team_size))
               ? Number(m.team_size)
               : null,
-    }
+    };
 }

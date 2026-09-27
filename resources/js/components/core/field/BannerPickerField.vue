@@ -149,7 +149,7 @@ function onDrop(event: DragEvent): void {
             <button
                 v-if="!hasImage"
                 type="button"
-                class="group hover:bg-muted/25 flex w-full cursor-pointer items-center gap-3 px-5 py-6 text-left transition-colors duration-200 sm:px-7"
+                class="group flex w-full cursor-pointer items-center gap-3 px-5 py-6 text-left transition-colors duration-200 hover:bg-muted/25 sm:px-7"
                 :aria-invalid="invalid || undefined"
                 @click="openPicker"
                 @dragover.prevent="isDragging = true"
@@ -157,23 +157,23 @@ function onDrop(event: DragEvent): void {
                 @drop.prevent="onDrop"
             >
                 <span
-                    class="bg-muted text-muted-foreground group-hover:border-primary/40 group-hover:text-primary border-border/70 grid size-10 shrink-0 place-items-center rounded-xl border shadow-xs transition-[color,border-color] duration-200"
+                    class="grid size-10 shrink-0 place-items-center rounded-xl border border-border/70 bg-muted text-muted-foreground shadow-xs transition-[color,border-color] duration-200 group-hover:border-primary/40 group-hover:text-primary"
                 >
                     <ImageUp class="size-5" aria-hidden="true" />
                 </span>
                 <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span class="text-foreground text-sm font-semibold">Tambahkan banner form</span>
-                    <span class="text-muted-foreground text-xs leading-snug">
+                    <span class="text-sm font-semibold text-foreground">Tambahkan banner form</span>
+                    <span class="text-xs leading-snug text-muted-foreground">
                         Gambar sampul di bagian atas form — rasio 3:1
                     </span>
                 </span>
                 <span
-                    class="border-border bg-background text-muted-foreground/80 rounded-full border px-2.5 py-1 text-[10px] font-semibold sm:hidden"
+                    class="rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold text-muted-foreground/80 sm:hidden"
                 >
                     PNG · JPG · GIF
                 </span>
                 <span
-                    class="text-muted-foreground hidden shrink-0 text-[10px] font-semibold tracking-wide uppercase sm:block"
+                    class="hidden shrink-0 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase sm:block"
                 >
                     Klik atau seret
                 </span>
@@ -184,15 +184,15 @@ function onDrop(event: DragEvent): void {
                     <img :src="previewSrc" alt="Pratinjau banner" class="size-full object-cover" />
                 </div>
                 <div
-                    class="border-border/70 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t px-5 py-2.5 sm:px-7"
+                    class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-border/70 px-5 py-2.5 sm:px-7"
                 >
                     <div class="flex min-w-0 items-center gap-2">
-                        <span class="text-muted-foreground truncate text-xs font-medium">
+                        <span class="truncate text-xs font-medium text-muted-foreground">
                             {{ fileName || 'banner-form' }}
                         </span>
                         <span
                             v-if="isNewFile"
-                            class="border-primary/20 bg-primary/8 text-primary shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
+                            class="shrink-0 rounded-full border border-primary/20 bg-primary/8 px-1.5 py-0.5 text-[10px] font-semibold text-primary"
                         >
                             baru
                         </span>
@@ -223,7 +223,7 @@ function onDrop(event: DragEvent): void {
             </div>
             <p
                 v-if="message"
-                class="bg-destructive/5 text-destructive border-border/70 border-t px-5 py-2 text-xs font-medium sm:px-7"
+                class="border-t border-border/70 bg-destructive/5 px-5 py-2 text-xs font-medium text-destructive sm:px-7"
             >
                 {{ message }}
             </p>
@@ -260,32 +260,32 @@ function onDrop(event: DragEvent): void {
                         @drop.prevent="onDrop"
                         @click="openPicker"
                     >
-                        <span class="bg-muted text-muted-foreground grid size-12 place-items-center rounded-full">
+                        <span class="grid size-12 place-items-center rounded-full bg-muted text-muted-foreground">
                             <ImageUp class="size-5.5 stroke-[1.75]" aria-hidden="true" />
                         </span>
                         <div>
                             <p class="text-sm font-medium">Unggah banner</p>
-                            <p class="text-muted-foreground mt-0.5 text-xs">
+                            <p class="mt-0.5 text-xs text-muted-foreground">
                                 Klik untuk memilih, atau seret gambar ke sini
                             </p>
                         </div>
                     </div>
                     <div
                         v-if="hasImage && isNewFile"
-                        class="bg-background/85 absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center gap-1.5 rounded-full px-2 py-1 shadow-sm backdrop-blur-sm"
+                        class="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center gap-1.5 rounded-full bg-background/85 px-2 py-1 shadow-sm backdrop-blur-sm"
                     >
-                        <span class="text-foreground max-w-[12rem] truncate text-[11px] font-medium">{{
+                        <span class="max-w-[12rem] truncate text-[11px] font-medium text-foreground">{{
                             fileName
                         }}</span>
                         <span
-                            class="border-primary/20 bg-primary/8 text-primary shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold"
+                            class="shrink-0 rounded-full border border-primary/20 bg-primary/8 px-1.5 py-0.5 text-[10px] font-semibold text-primary"
                         >
                             baru
                         </span>
                     </div>
                 </div>
             </div>
-            <p v-if="message" class="text-destructive mt-2 text-xs">{{ message }}</p>
+            <p v-if="message" class="mt-2 text-xs text-destructive">{{ message }}</p>
         </template>
 
         <input

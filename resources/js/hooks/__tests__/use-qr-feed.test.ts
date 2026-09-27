@@ -49,7 +49,7 @@ describe('useQrFeed', () => {
                 attendee: { name: 'Ana', email: 'ana@example.id' },
                 status: 'success',
                 scannedAt: new Date().toISOString(),
-            }),
+            })
         );
     });
 
@@ -69,8 +69,7 @@ describe('useQrFeed', () => {
         const second = mountFeedHost();
         try {
             expect(second.feed().deskId).toBe(deskId);
-        }
-        finally {
+        } finally {
             second.wrapper.unmount();
         }
     });
@@ -97,8 +96,7 @@ describe('useQrFeed', () => {
 
             vi.advanceTimersByTime(2000);
             expect(feed().acceptScanInput('CODE-1')).toBe(true);
-        }
-        finally {
+        } finally {
             wrapper.unmount();
         }
     });
@@ -120,7 +118,7 @@ describe('useQrFeed', () => {
                     },
                 ],
                 cursor: 'c1',
-            }),
+            })
         );
 
         const { feed, wrapper } = mountFeedHost();
@@ -135,8 +133,7 @@ describe('useQrFeed', () => {
             await vi.advanceTimersByTimeAsync(2000);
             expect(getSpy).toHaveBeenCalledTimes(3);
             expect(feed().scanHistory.value.length).toBe(1);
-        }
-        finally {
+        } finally {
             wrapper.unmount();
         }
     });
