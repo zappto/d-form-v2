@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useChartTheme } from '@/hooks/useChartTheme';
 import { chartTickCallback, formatChartCount } from '@/lib/format';
 import { baseChartTooltipOptions, chartThemeTokens } from '@/lib/chartTheme';
 import { Line } from 'vue-chartjs';
@@ -26,8 +25,6 @@ const props = withDefaults(
     { points: () => [] }
 );
 
-const { isDark } = useChartTheme();
-
 const total = computed(() => props.points.reduce((s, d) => s + d.count, 0));
 
 const chartData = computed(() => ({
@@ -36,16 +33,16 @@ const chartData = computed(() => ({
         {
             label: 'Pengajuan',
             data: props.points.map((d) => d.count),
-            borderColor: isDark.value ? 'oklch(0.72 0.14 250)' : 'oklch(0.52 0.16 255)',
-            backgroundColor: isDark.value ? 'oklch(0.72 0.14 250 / 0.12)' : 'oklch(0.52 0.16 255 / 0.14)',
+            borderColor: 'oklch(0.52 0.16 255)',
+            backgroundColor: 'oklch(0.52 0.16 255 / 0.14)',
             fill: true,
             tension: 0.35,
             pointRadius: 3,
             pointHoverRadius: 6,
-            pointBackgroundColor: isDark.value ? 'oklch(0.85 0.08 250)' : 'oklch(0.52 0.16 255)',
-            pointBorderColor: isDark.value ? 'oklch(0.2 0.02 255)' : 'oklch(1 0 0)',
-            pointHoverBackgroundColor: isDark.value ? 'oklch(0.82 0.12 250)' : 'oklch(0.45 0.15 255)',
-            pointHoverBorderColor: isDark.value ? 'oklch(0.96 0.005 255)' : 'oklch(0.18 0.018 255)',
+            pointBackgroundColor: 'oklch(0.52 0.16 255)',
+            pointBorderColor: 'oklch(1 0 0)',
+            pointHoverBackgroundColor: 'oklch(0.45 0.15 255)',
+            pointHoverBorderColor: 'oklch(0.18 0.018 255)',
             pointBorderWidth: 2,
             pointHoverBorderWidth: 2,
             borderWidth: 2.5,
@@ -54,7 +51,7 @@ const chartData = computed(() => ({
 }));
 
 const chartOptions = computed<ChartOptions<'line'>>(() => {
-    const chartTokens = chartThemeTokens(isDark.value);
+    const chartTokens = chartThemeTokens();
 
     return {
         responsive: true,
@@ -104,9 +101,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
 </script>
 
 <template>
-    <Card
-        class="overflow-hidden rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]"
-    >
+    <Card class="overflow-hidden rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03]">
         <CardHeader
             class="flex flex-row flex-wrap items-center justify-between gap-4 border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6"
         >
@@ -134,7 +129,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
                 Tidak ada data
             </div>
             <div v-else class="rounded-xl bg-gradient-to-b from-muted/25 to-transparent p-2 sm:min-h-[16rem]">
-                <Line :key="String(isDark)" :data="chartData" :options="chartOptions" />
+                <Line :data="chartData" :options="chartOptions" />
             </div>
         </CardContent>
     </Card>

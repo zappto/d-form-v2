@@ -3,7 +3,6 @@ export { default as useAuth } from './useAuth';
 export * from './useAutosaveSync';
 export * from './useBannerFilePicker';
 export * from './useBuilderAutosave';
-export * from './useChartTheme';
 export * from './useDashboardEventShowPage';
 export * from './useDashboardTopbar';
 export * from './useDraftRestore';

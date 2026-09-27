@@ -1,28 +1,16 @@
 import type { FontSpec } from 'chart.js';
 
-/** Warna tick sumbu mode terang; dipakai CategoryChart dan RegistrationChart. */
+/** Warna tick sumbu; dipakai CategoryChart dan RegistrationChart. */
 const CHART_TICK_LIGHT = 'oklch(0.46 0.025 255)';
 
-/** Warna tick sumbu mode gelap; dipakai CategoryChart dan RegistrationChart. */
-const CHART_TICK_DARK = 'oklch(0.72 0.018 255)';
-
-/** Warna grid mode terang; dipakai CategoryChart dan RegistrationChart. */
+/** Warna grid; dipakai CategoryChart dan RegistrationChart. */
 const CHART_GRID_LIGHT = 'oklch(0.92 0.008 255)';
 
-/** Warna grid mode gelap; dipakai CategoryChart dan RegistrationChart. */
-const CHART_GRID_DARK = 'oklch(0.32 0.02 255)';
-
-/** Latar tooltip mode terang; dipakai CategoryChart dan RegistrationChart. */
+/** Latar tooltip; dipakai CategoryChart dan RegistrationChart. */
 const CHART_TOOLTIP_BG_LIGHT = 'oklch(0.18 0.018 255)';
 
-/** Latar tooltip mode gelap; dipakai CategoryChart dan RegistrationChart. */
-const CHART_TOOLTIP_BG_DARK = 'oklch(0.22 0.012 255)';
-
-/** Teks tooltip mode terang; dipakai CategoryChart dan RegistrationChart. */
+/** Teks tooltip; dipakai CategoryChart dan RegistrationChart. */
 const CHART_TOOLTIP_FG_LIGHT = 'oklch(0.99 0 0)';
-
-/** Teks tooltip mode gelap; dipakai CategoryChart dan RegistrationChart. */
-const CHART_TOOLTIP_FG_DARK = 'oklch(0.96 0.005 255)';
 
 /** Family font chart dashboard; satu-satunya sumber literal Poppins tooltip. */
 const CHART_FONT_FAMILY = 'Poppins, sans-serif';
@@ -42,7 +30,7 @@ const CHART_TOOLTIP_PADDING = 12;
 /** Radius sudut tooltip chart dashboard. */
 const CHART_TOOLTIP_CORNER_RADIUS = 10;
 
-/** Palet terang/gelap chart dashboard: tick, grid, dan warna tooltip. */
+/** Palet chart dashboard: tick, grid, dan warna tooltip. */
 export interface IChartThemeTokens {
     tick: string;
     grid: string;
@@ -67,13 +55,13 @@ export interface IChartTooltipBaseOptions {
     cornerRadius: number;
 }
 
-/** Petakan flag gelap ke palet chart; satu-satunya sumber literal oklch token. */
-export function chartThemeTokens(isDark: boolean): IChartThemeTokens {
+/** Palet chart dashboard; satu-satunya sumber literal oklch token. */
+export function chartThemeTokens(): IChartThemeTokens {
     return {
-        tick: isDark ? CHART_TICK_DARK : CHART_TICK_LIGHT,
-        grid: isDark ? CHART_GRID_DARK : CHART_GRID_LIGHT,
-        tooltipBg: isDark ? CHART_TOOLTIP_BG_DARK : CHART_TOOLTIP_BG_LIGHT,
-        tooltipFg: isDark ? CHART_TOOLTIP_FG_DARK : CHART_TOOLTIP_FG_LIGHT,
+        tick: CHART_TICK_LIGHT,
+        grid: CHART_GRID_LIGHT,
+        tooltipBg: CHART_TOOLTIP_BG_LIGHT,
+        tooltipFg: CHART_TOOLTIP_FG_LIGHT,
     };
 }
 

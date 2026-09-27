@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useChartTheme } from '@/hooks/useChartTheme';
 import { chartTickCallback, formatChartCount } from '@/lib/format';
 import { baseChartTooltipOptions, chartThemeTokens } from '@/lib/chartTheme';
 import { Bar } from 'vue-chartjs';
@@ -18,15 +17,9 @@ const props = withDefaults(
     { breakdown: () => [] }
 );
 
-const { isDark } = useChartTheme();
-
 const labels = computed(() => props.breakdown.map((d) => categoryLabelMap[d.token] ?? d.token));
 
-const barColors = computed(() =>
-    props.breakdown.map(
-        (d) => categoryColorMap[d.token] ?? (isDark.value ? 'oklch(0.55 0.12 255)' : 'oklch(0.52 0.16 255)')
-    )
-);
+const barColors = computed(() => props.breakdown.map((d) => categoryColorMap[d.token] ?? 'oklch(0.52 0.16 255)'));
 
 const totalInChart = computed(() => props.breakdown.reduce((s, d) => s + d.count, 0));
 
@@ -37,7 +30,7 @@ const chartData = computed(() => ({
             label: 'Jumlah acara',
             data: props.breakdown.map((d) => d.count),
             backgroundColor: barColors.value,
-            borderColor: isDark.value ? 'oklch(0.16 0.012 255)' : 'oklch(1 0 0)',
+            borderColor: 'oklch(1 0 0)',
             borderWidth: 1.5,
             borderRadius: 10,
             borderSkipped: false,
@@ -47,7 +40,7 @@ const chartData = computed(() => ({
 }));
 
 const chartOptions = computed<ChartOptions<'bar'>>(() => {
-    const chartTokens = chartThemeTokens(isDark.value);
+    const chartTokens = chartThemeTokens();
 
     return {
         indexAxis: 'y',
@@ -94,9 +87,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
 </script>
 
 <template>
-    <Card
-        class="overflow-hidden rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]"
-    >
+    <Card class="overflow-hidden rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03]">
         <CardHeader
             class="flex flex-row flex-wrap items-center justify-between gap-4 border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6"
         >
@@ -125,7 +116,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
             </div>
             <template v-else>
                 <div class="rounded-xl bg-gradient-to-b from-muted/25 to-transparent p-2 sm:min-h-[18rem]">
-                    <Bar :key="String(isDark)" :data="chartData" :options="chartOptions" />
+                    <Bar :data="chartData" :options="chartOptions" />
                 </div>
                 <ul class="flex flex-wrap gap-2">
                     <li
