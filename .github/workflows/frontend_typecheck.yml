@@ -5,10 +5,12 @@ name: Frontend Typecheck
 on:
     push:
         branches:
+            - main
             - dev
             - temp
     pull_request:
         branches:
+            - main
             - dev
             - temp
 
