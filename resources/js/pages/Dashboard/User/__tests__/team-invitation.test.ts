@@ -91,7 +91,7 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }))
 
-function mountInvitation(): VueWrapper {
+function mountInvitation(): VueWrapper<InstanceType<typeof TeamInvitation>> {
     return mount(TeamInvitation, {
         props: {
             event: { id: 'ev-1', slug: 'acara', title: 'Acara' },
@@ -120,7 +120,7 @@ function mountInvitation(): VueWrapper {
                 DialogTitle: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function triggerButton(
@@ -143,12 +143,12 @@ function declineSubmit(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
     return triggerButton(wrapper, 'Decline invitation', 'Mengirim...')
 }
 
-function acceptModal(wrapper: VueWrapper): VueWrapper {
-    return wrapper.findComponent(ConfirmationModal) as unknown as VueWrapper
+function acceptModal(wrapper: VueWrapper): VueWrapper<InstanceType<typeof ConfirmationModal>> {
+    return wrapper.findComponent(ConfirmationModal)
 }
 
-function declineDialog(wrapper: VueWrapper): VueWrapper {
-    return wrapper.findComponent(Dialog) as unknown as VueWrapper
+function declineDialog(wrapper: VueWrapper): VueWrapper<InstanceType<typeof Dialog>> {
+    return wrapper.findComponent(Dialog)
 }
 
 function confirmCalls(): PostedCall[] {
@@ -173,9 +173,7 @@ async function confirmAccept(wrapper: VueWrapper): Promise<void> {
     await openAcceptModal(wrapper)
     // ConfirmationModal milik Task 3 (tombolnya sudah diuji di
     // ConfirmationModal.test.ts) — di sini cukup emit 'confirm'.
-    ;(
-        acceptModal(wrapper).vm as unknown as { $emit: (event: string) => void }
-    ).$emit('confirm')
+    acceptModal(wrapper).vm.$emit('confirm')
     await nextTick()
 }
 

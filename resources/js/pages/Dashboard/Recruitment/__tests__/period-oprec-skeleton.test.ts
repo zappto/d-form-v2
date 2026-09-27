@@ -8,6 +8,13 @@ import AttendancePage from '@/pages/OpenRecruitment/Attendance.vue'
 import TrackEdit from '@/pages/OpenRecruitment/Track/Edit.vue'
 import { Tabs } from '@/components/ui/tabs'
 
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TPeriodsShowProps = InstanceType<typeof PeriodsShow>['$props']
+type TPeriodsEditProps = InstanceType<typeof PeriodsEdit>['$props']
+type TQueueIndexProps = InstanceType<typeof QueueIndexPage>['$props']
+type TAttendanceProps = InstanceType<typeof AttendancePage>['$props']
+type TTrackEditProps = InstanceType<typeof TrackEdit>['$props']
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -101,14 +108,13 @@ function lastGetOptions(): RouterGetOptions {
 function switchTab(wrapper: VueWrapper, value: string): Promise<void> {
     const tabs = wrapper.findComponent(Tabs)
     if (!tabs.exists()) throw new Error('komponen Tabs tidak ditemukan')
-    ;(tabs.vm as unknown as { $emit: (event: string, value: string) => void }).$emit(
-        'update:modelValue',
-        value,
-    )
+    tabs.vm.$emit('update:modelValue', value)
     return nextTick()
 }
 
-function demoPeriod(): Record<string, unknown> {
+type TEditPeriod = NonNullable<TPeriodsEditProps['period']>
+
+function demoPeriod(): TEditPeriod {
     return {
         id: 'per-1',
         name: 'Gelombang 1',
@@ -122,7 +128,9 @@ function demoPeriod(): Record<string, unknown> {
     }
 }
 
-function demoSessionRow(): Record<string, unknown> {
+type TSessionRow = NonNullable<TPeriodsShowProps['sessions']>['data'][number]
+
+function demoSessionRow(): TSessionRow {
     return {
         id: 'ses-1',
         session_date: '2026-10-01',
@@ -137,7 +145,9 @@ function demoSessionRow(): Record<string, unknown> {
     }
 }
 
-function demoReport(): Record<string, unknown> {
+type TReportPayload = NonNullable<TPeriodsShowProps['report']>
+
+function demoReport(): TReportPayload {
     return {
         period: { id: 'per-1', name: 'Gelombang 1' },
         funnel: [
@@ -151,7 +161,9 @@ function demoReport(): Record<string, unknown> {
     }
 }
 
-function demoApplicantRow(): Record<string, unknown> {
+type TApplicationRow = NonNullable<TPeriodsShowProps['applications']>[number]
+
+function demoApplicantRow(): TApplicationRow {
     return {
         id: 'ap-1',
         registration_number: 'OPREC-2026-00001',
@@ -170,7 +182,7 @@ function demoApplicantRow(): Record<string, unknown> {
     }
 }
 
-function baseShowProps(): Record<string, unknown> {
+function baseShowProps(): Omit<TPeriodsShowProps, 'tab'> {
     return {
         period: {
             id: 'per-1',
@@ -200,9 +212,14 @@ function baseShowProps(): Record<string, unknown> {
     }
 }
 
-function mountShow(tab: string, interviewStub: boolean, reportStub: boolean): VueWrapper {
+function mountShow(
+    tab: string,
+    interviewStub: boolean,
+    reportStub: boolean,
+): VueWrapper<InstanceType<typeof PeriodsShow>> {
+    const props: TPeriodsShowProps = { ...baseShowProps(), tab }
     return mount(PeriodsShow, {
-        props: { ...baseShowProps(), tab } as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 PeriodApplicantSection: true,
@@ -228,7 +245,7 @@ function mountShow(tab: string, interviewStub: boolean, reportStub: boolean): Vu
                 CometSpinner: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 beforeEach(() => {
@@ -242,11 +259,11 @@ beforeEach(() => {
 })
 
 describe('Periods/Edit skeleton (M2 Task 12)', () => {
-    function mountEdit(period: Record<string, unknown> | undefined): VueWrapper {
-        const props: Record<string, unknown> = {}
-        if (period !== undefined) props.period = period
+    function mountEdit(
+        period: TPeriodsEditProps['period'],
+    ): VueWrapper<InstanceType<typeof PeriodsEdit>> {
         return mount(PeriodsEdit, {
-            props: props as unknown as Record<string, never>,
+            props: { period },
             global: {
                 stubs: {
                     Button: true,
@@ -259,7 +276,7 @@ describe('Periods/Edit skeleton (M2 Task 12)', () => {
                     SplitDateTimeField: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
     it('props lengkap → form + tombol M1 utuh, tanpa skeleton', async () => {
@@ -402,11 +419,13 @@ describe('Show tab interviewer skeleton (M2 Task 12)', () => {
 })
 
 describe('QueueIndex skeleton (M2 Task 12)', () => {
-    function mountIndex(sessions: Record<string, unknown>[] | undefined): VueWrapper {
-        const props: Record<string, unknown> = {}
-        if (sessions !== undefined) props.sessions = sessions
+    type TQueueSession = NonNullable<TQueueIndexProps['sessions']>[number]
+
+    function mountIndex(
+        sessions: TQueueIndexProps['sessions'],
+    ): VueWrapper<InstanceType<typeof QueueIndexPage>> {
         return mount(QueueIndexPage, {
-            props: props as unknown as Record<string, never>,
+            props: { sessions },
             global: {
                 stubs: {
                     Badge: true,
@@ -415,10 +434,10 @@ describe('QueueIndex skeleton (M2 Task 12)', () => {
                     CardContent: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
-    function demoQueueSession(): Record<string, unknown> {
+    function demoQueueSession(): TQueueSession {
         return {
             id: 'ses-1',
             name: 'Sesi Pagi',
@@ -461,11 +480,11 @@ describe('QueueIndex skeleton (M2 Task 12)', () => {
 })
 
 describe('Attendance skeleton (M2 Task 12)', () => {
-    function mountAttendance(url: string | undefined): VueWrapper {
-        const props: Record<string, unknown> = {}
-        if (url !== undefined) props.trackingLoginUrl = url
+    function mountAttendance(
+        url: TAttendanceProps['trackingLoginUrl'],
+    ): VueWrapper<InstanceType<typeof AttendancePage>> {
         return mount(AttendancePage, {
-            props: props as unknown as Record<string, never>,
+            props: { trackingLoginUrl: url },
             global: {
                 stubs: {
                     Button: true,
@@ -475,7 +494,7 @@ describe('Attendance skeleton (M2 Task 12)', () => {
                     CardTitle: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
     it('props lengkap → konten, tanpa skeleton', async () => {
@@ -508,7 +527,9 @@ describe('Attendance skeleton (M2 Task 12)', () => {
 })
 
 describe('Track/Edit skeleton (M2 Task 12)', () => {
-    function demoApplication(): Record<string, unknown> {
+    type TApplicationFormData = NonNullable<TTrackEditProps['application']>
+
+    function demoApplication(): TApplicationFormData {
         return {
             full_name: 'Ayu Lestari',
             nim: 'A11.2023.12345',
@@ -528,15 +549,16 @@ describe('Track/Edit skeleton (M2 Task 12)', () => {
         }
     }
 
-    function mountEdit(application: Record<string, unknown> | undefined): VueWrapper {
-        const props: Record<string, unknown> = {
-            divisions: [{ id: 'div-1', name: 'Divisi A' }],
-            updateUrl: '/recruitment/track',
-            dashboardUrl: '/recruitment/track/dashboard',
-        }
-        if (application !== undefined) props.application = application
+    function mountEdit(
+        application: TTrackEditProps['application'],
+    ): VueWrapper<InstanceType<typeof TrackEdit>> {
         return mount(TrackEdit, {
-            props: props as unknown as Record<string, never>,
+            props: {
+                application,
+                divisions: [{ id: 'div-1', name: 'Divisi A' }],
+                updateUrl: '/recruitment/track',
+                dashboardUrl: '/recruitment/track/dashboard',
+            },
             global: {
                 stubs: {
                     Button: true,
@@ -551,7 +573,7 @@ describe('Track/Edit skeleton (M2 Task 12)', () => {
                     Separator: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
     it('props lengkap → form + tombol M1 utuh, tanpa skeleton', async () => {

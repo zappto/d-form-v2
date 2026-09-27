@@ -4,6 +4,12 @@ import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils
 import MyInterviewsShow from '../MyInterviews/Show.vue'
 import InterviewSessionsShow from '../InterviewSessions/Show.vue'
 
+/** Tipe detail diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type DetailPayload = NonNullable<InstanceType<typeof MyInterviewsShow>['$props']['detail']>
+
+/** Tipe sesi interview diturunkan dari props komponen. */
+type SessionDetail = NonNullable<InstanceType<typeof InterviewSessionsShow>['$props']['session']>
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -63,7 +69,7 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }))
 
-function demoDetail(): Record<string, unknown> {
+function demoDetail(): DetailPayload {
     return {
         application: {
             id: 'ap-1',
@@ -115,8 +121,11 @@ function demoDetail(): Record<string, unknown> {
     }
 }
 
-function mountMyInterviews(detail: Record<string, unknown> | undefined): VueWrapper {
-    const props: Record<string, unknown> = {
+function mountMyInterviews(
+    detail: DetailPayload | undefined,
+): VueWrapper<InstanceType<typeof MyInterviewsShow>> {
+    const props: InstanceType<typeof MyInterviewsShow>['$props'] = {
+        detail,
         evaluateUrl: '/dashboard/recruitment/my-interviews/ap-1/evaluate',
         recommendationOptions: [
             { value: 'recommended', label: 'Direkomendasikan' },
@@ -124,9 +133,8 @@ function mountMyInterviews(detail: Record<string, unknown> | undefined): VueWrap
         ],
         flashMessage: null,
     }
-    if (detail !== undefined) props.detail = detail
     return mount(MyInterviewsShow, {
-        props: props as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 Badge: true,
@@ -139,10 +147,10 @@ function mountMyInterviews(detail: Record<string, unknown> | undefined): VueWrap
                 SessionQueueDrawer: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function demoSession(): Record<string, unknown> {
+function demoSession(): SessionDetail {
     return {
         id: 'ses-1',
         session_date: '2026-10-01',
@@ -174,17 +182,19 @@ function demoSession(): Record<string, unknown> {
     }
 }
 
-function mountInterviewSessions(session: Record<string, unknown> | undefined): VueWrapper {
-    const props: Record<string, unknown> = {
+function mountInterviewSessions(
+    session: SessionDetail | undefined,
+): VueWrapper<InstanceType<typeof InterviewSessionsShow>> {
+    const props: InstanceType<typeof InterviewSessionsShow>['$props'] = {
+        session,
         eligibleApplicants: [],
         interviewerOptions: [],
         otherSessions: [
             { id: 'ses-2', session_date: '2026-10-02', starts_at: '13:00', division: null },
         ],
     }
-    if (session !== undefined) props.session = session
     return mount(InterviewSessionsShow, {
-        props: props as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 Card: true,
@@ -200,7 +210,7 @@ function mountInterviewSessions(session: Record<string, unknown> | undefined): V
                 TooltipTrigger: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function actionButton(wrapper: VueWrapper, label: string): DOMWrapper<HTMLButtonElement> {

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import axios from 'axios';
+import axios, { AxiosHeaders } from 'axios';
 import type { AxiosResponse } from 'axios';
 import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
@@ -12,7 +12,7 @@ function axiosOk(data: unknown): AxiosResponse {
         status: 200,
         statusText: 'OK',
         headers: {},
-        config: { headers: {} },
+        config: { headers: new AxiosHeaders() },
     };
 }
 

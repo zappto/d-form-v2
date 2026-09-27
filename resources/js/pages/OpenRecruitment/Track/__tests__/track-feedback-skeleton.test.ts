@@ -4,6 +4,12 @@ import { config, mount, type VueWrapper } from '@vue/test-utils'
 import TrackShow from '../Show.vue'
 import TrackFeedback from '../Feedback.vue'
 
+/** Tipe payload tracking diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type TrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>
+
+/** Tipe aplikasi ringkas Feedback diturunkan dari props komponen. */
+type FeedbackApplication = NonNullable<InstanceType<typeof TrackFeedback>['$props']['application']>
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -37,7 +43,7 @@ vi.mock('@inertiajs/vue3', async () => {
 
 vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />' } }))
 
-function demoTracking(): Record<string, unknown> {
+function demoTracking(): TrackingPayload {
     return {
         application: {
             registration_number: 'OPREC-2026-00001',
@@ -76,16 +82,18 @@ function demoTracking(): Record<string, unknown> {
     }
 }
 
-function mountTrackShow(tracking: Record<string, unknown> | undefined): VueWrapper {
-    const props: Record<string, unknown> = {
+function mountTrackShow(
+    tracking: TrackingPayload | undefined,
+): VueWrapper<InstanceType<typeof TrackShow>> {
+    const props: InstanceType<typeof TrackShow>['$props'] = {
+        tracking,
         logoutUrl: '/recruitment/track/logout',
         editUrl: '/recruitment/track/edit',
         correctionUrl: '/recruitment/track/correction',
         feedbackStoreUrl: '/recruitment/track/feedback',
     }
-    if (tracking !== undefined) props.tracking = tracking
     return mount(TrackShow, {
-        props: props as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 OpRecFeedbackForm: true,
@@ -105,17 +113,19 @@ function mountTrackShow(tracking: Record<string, unknown> | undefined): VueWrapp
                 DialogTitle: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function mountFeedback(application: Record<string, unknown> | undefined): VueWrapper {
-    const props: Record<string, unknown> = {
+function mountFeedback(
+    application: FeedbackApplication | undefined,
+): VueWrapper<InstanceType<typeof TrackFeedback>> {
+    const props: InstanceType<typeof TrackFeedback>['$props'] = {
+        application,
         storeUrl: '/recruitment/track/feedback',
         dashboardUrl: '/recruitment/track/dashboard',
     }
-    if (application !== undefined) props.application = application
     return mount(TrackFeedback, {
-        props: props as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 OpRecFeedbackForm: true,
@@ -126,7 +136,7 @@ function mountFeedback(application: Record<string, unknown> | undefined): VueWra
                 Button: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 beforeEach(() => {

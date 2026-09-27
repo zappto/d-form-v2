@@ -77,13 +77,13 @@ function demoForm(): IForm {
     }
 }
 
-function mountIndex(): VueWrapper {
+function mountIndex(): VueWrapper<InstanceType<typeof FormsIndex>> {
     return mount(FormsIndex, {
         props: {
             event: { id: 'ev-1', title: 'Acara' },
             forms: [demoForm()],
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function deleteTrigger(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
@@ -94,14 +94,14 @@ function deleteTrigger(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
     return found as DOMWrapper<HTMLButtonElement>
 }
 
-function deleteModal(wrapper: VueWrapper): VueWrapper {
-    return wrapper.findComponent(ConfirmationModal) as unknown as VueWrapper
+function deleteModal(wrapper: VueWrapper): VueWrapper<InstanceType<typeof ConfirmationModal>> {
+    return wrapper.findComponent(ConfirmationModal)
 }
 
 async function confirmDelete(wrapper: VueWrapper): Promise<void> {
     await deleteTrigger(wrapper).trigger('click')
     await nextTick()
-    ;(deleteModal(wrapper).vm as unknown as { $emit: (event: string) => void }).$emit('confirm')
+    deleteModal(wrapper).vm.$emit('confirm')
     await nextTick()
 }
 

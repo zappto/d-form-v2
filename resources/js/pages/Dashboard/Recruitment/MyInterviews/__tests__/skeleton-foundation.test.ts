@@ -3,6 +3,9 @@ import { nextTick } from 'vue'
 import { config, mount, type VueWrapper } from '@vue/test-utils'
 import MyInterviewsIndex from '../Index.vue'
 
+/** Tipe baris interview diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type InterviewRow = InstanceType<typeof MyInterviewsIndex>['$props']['interviews']['data'][number]
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -53,7 +56,7 @@ function lastGetOptions(): RouterGetOptions {
     return options as RouterGetOptions
 }
 
-function demoRow(): Record<string, unknown> {
+function demoRow(): InterviewRow {
     return {
         interview_id: 'iv-1',
         scheduled_at: null,
@@ -75,7 +78,7 @@ function demoRow(): Record<string, unknown> {
     }
 }
 
-function baseProps(data: Record<string, unknown>[]): Record<string, unknown> {
+function baseProps(data: InterviewRow[]): InstanceType<typeof MyInterviewsIndex>['$props'] {
     return {
         interviews: {
             data,
@@ -93,9 +96,9 @@ function baseProps(data: Record<string, unknown>[]): Record<string, unknown> {
     }
 }
 
-function mountIndex(data: Record<string, unknown>[] = [demoRow()]): VueWrapper {
+function mountIndex(data: InterviewRow[] = [demoRow()]): VueWrapper<InstanceType<typeof MyInterviewsIndex>> {
     return mount(MyInterviewsIndex, {
-        props: baseProps(data) as unknown as Record<string, never>,
+        props: baseProps(data),
         global: {
             stubs: {
                 Badge: true,
@@ -110,7 +113,7 @@ function mountIndex(data: Record<string, unknown>[] = [demoRow()]): VueWrapper {
                 PaginationPrevious: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function skeletonRegion(wrapper: VueWrapper): ReturnType<VueWrapper['find']> {

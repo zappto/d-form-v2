@@ -6,6 +6,9 @@ import { Tabs } from '@/components/ui/tabs'
 import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/ApplicantDetailPanel.vue'
 import type { ApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue'
 
+/** Tipe baris aplikan diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type ApplicationRow = NonNullable<InstanceType<typeof PeriodsShow>['$props']['applications']>[number]
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -86,7 +89,7 @@ function lastGetOptions(): RouterGetOptions {
     return options as RouterGetOptions
 }
 
-function demoRow(): Record<string, unknown> {
+function demoRow(): ApplicationRow {
     return {
         id: 'ap-1',
         registration_number: 'OPREC-2026-00001',
@@ -105,7 +108,7 @@ function demoRow(): Record<string, unknown> {
     }
 }
 
-function mountShow(): VueWrapper {
+function mountShow(): VueWrapper<InstanceType<typeof PeriodsShow>> {
     return mount(PeriodsShow, {
         props: {
             period: {
@@ -146,7 +149,7 @@ function mountShow(): VueWrapper {
                 TooltipTrigger: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function switchTab(wrapper: VueWrapper, value: string): Promise<void> {
@@ -155,10 +158,7 @@ function switchTab(wrapper: VueWrapper, value: string): Promise<void> {
     // yang diuji adalah wiring onTabChange → flag → skeleton, bukan reka-ui.
     const tabs = wrapper.findComponent(Tabs)
     if (!tabs.exists()) throw new Error('komponen Tabs tidak ditemukan')
-    ;(tabs.vm as unknown as { $emit: (event: string, value: string) => void }).$emit(
-        'update:modelValue',
-        value,
-    )
+    tabs.vm.$emit('update:modelValue', value)
     return nextTick()
 }
 
@@ -197,10 +197,14 @@ function demoApplication(): ApplicationDetail {
         can_screen: false,
         can_verify: false,
         can_decide_final: false,
+        can_resend_tracking: false,
     }
 }
 
-function mountPanel(application: ApplicationDetail | null, loading: boolean): VueWrapper {
+function mountPanel(
+    application: ApplicationDetail | null,
+    loading: boolean,
+): VueWrapper<InstanceType<typeof ApplicantDetailPanel>> {
     return mount(ApplicantDetailPanel, {
         props: { application, loading, editable: false },
         global: {
@@ -215,7 +219,7 @@ function mountPanel(application: ApplicationDetail | null, loading: boolean): Vu
                 ApplicantDetailContent: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 beforeEach(() => {

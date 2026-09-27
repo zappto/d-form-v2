@@ -53,7 +53,10 @@ function demoScanResult(): ScanResult {
     }
 }
 
-function mountSidebar(scanResult: ScanResult | null, scanBusy: boolean): VueWrapper {
+function mountSidebar(
+    scanResult: ScanResult | null,
+    scanBusy: boolean,
+): VueWrapper<InstanceType<typeof QrScanSidebar>> {
     return mount(QrScanSidebar, {
         props: {
             scanResult,
@@ -73,16 +76,27 @@ function mountSidebar(scanResult: ScanResult | null, scanBusy: boolean): VueWrap
                 Input: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function demoStats(): Record<string, number> {
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TDashboardProps = InstanceType<typeof DashboardIndex>['$props']
+type TDashboardStats = NonNullable<TDashboardProps['stats']>
+
+function demoStats(): TDashboardStats {
     return { totalEvents: 5, activeEvents: 3, totalRegistrants: 120, completionRate: 60 }
 }
 
-function mountDashboardIndex(props: Record<string, unknown>): VueWrapper {
+function mountDashboardIndex(
+    props: Partial<TDashboardProps>,
+): VueWrapper<InstanceType<typeof DashboardIndex>> {
     return mount(DashboardIndex, {
-        props: props as unknown as Record<string, never>,
+        props: {
+            recentEvents: props.recentEvents,
+            calendarEvents: props.calendarEvents,
+            stats: props.stats,
+            adminCharts: props.adminCharts,
+        },
         global: {
             stubs: {
                 KpiCard: true,
@@ -91,10 +105,10 @@ function mountDashboardIndex(props: Record<string, unknown>): VueWrapper {
                 CategoryChart: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function fullDashboardProps(): Record<string, unknown> {
+function fullDashboardProps(): TDashboardProps {
     return {
         recentEvents: [],
         calendarEvents: [
@@ -131,9 +145,14 @@ function demoIEvent(): IEvent {
     }
 }
 
-function mountEventsShow(props: Record<string, unknown>): VueWrapper {
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TEventsShowProps = InstanceType<typeof EventsShow>['$props']
+
+function mountEventsShow(
+    props: TEventsShowProps,
+): VueWrapper<InstanceType<typeof EventsShow>> {
     return mount(EventsShow, {
-        props: props as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 EventShowHeroSection: true,
@@ -145,7 +164,7 @@ function mountEventsShow(props: Record<string, unknown>): VueWrapper {
                 TooltipProvider: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 beforeEach(() => {
@@ -283,7 +302,7 @@ describe('Events/Show skeleton (M2 Task 6)', () => {
     })
 
     it('event belum ada → skeleton hero + 3 kartu kiri + aside', async () => {
-        const wrapper = mountEventsShow({})
+        const wrapper = mountEventsShow({ event: undefined, forms: undefined })
         try {
             await nextTick()
 

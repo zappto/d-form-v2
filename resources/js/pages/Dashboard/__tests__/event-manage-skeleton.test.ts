@@ -80,11 +80,14 @@ function demoIEvent(id: string, title: string): IEvent {
     }
 }
 
-function mountPublicEvent(events: IEvent[] | undefined): VueWrapper {
-    const props: Record<string, unknown> = {}
-    if (events !== undefined) props.events = events
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TPublicEventProps = InstanceType<typeof PublicEventPage>['$props']
+
+function mountPublicEvent(
+    events: TPublicEventProps['events'],
+): VueWrapper<InstanceType<typeof PublicEventPage>> {
     return mount(PublicEventPage, {
-        props: props as unknown as Record<string, never>,
+        props: { events },
         global: {
             stubs: {
                 SeoHead: true,
@@ -93,7 +96,7 @@ function mountPublicEvent(events: IEvent[] | undefined): VueWrapper {
                 EventList: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function demoIForm(id: string, title: string): IForm {
@@ -109,12 +112,15 @@ function demoIForm(id: string, title: string): IForm {
     }
 }
 
-function mountFormsIndex(event: Record<string, string> | undefined, forms: IForm[] | undefined): VueWrapper {
-    const props: Record<string, unknown> = {}
-    if (event !== undefined) props.event = event
-    if (forms !== undefined) props.forms = forms
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TFormsIndexProps = InstanceType<typeof FormsIndex>['$props']
+
+function mountFormsIndex(
+    event: TFormsIndexProps['event'],
+    forms: TFormsIndexProps['forms'],
+): VueWrapper<InstanceType<typeof FormsIndex>> {
     return mount(FormsIndex, {
-        props: props as unknown as Record<string, never>,
+        props: { event, forms },
         global: {
             stubs: {
                 Card: true,
@@ -124,22 +130,23 @@ function mountFormsIndex(event: Record<string, string> | undefined, forms: IForm
                 ConfirmationModal: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function mountEventsEdit(event: IEvent | undefined): VueWrapper {
-    const props: Record<string, unknown> = {
-        options: { categories: [], sessions: [] },
-    }
-    if (event !== undefined) props.event = event
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TEventsEditProps = InstanceType<typeof EventsEdit>['$props']
+
+function mountEventsEdit(
+    event: TEventsEditProps['event'],
+): VueWrapper<InstanceType<typeof EventsEdit>> {
     return mount(EventsEdit, {
-        props: props as unknown as Record<string, never>,
+        props: { event, options: { categories: [], sessions: [] } },
         global: {
             stubs: {
                 EventDashboardForm: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function busyRegions(wrapper: VueWrapper): void {

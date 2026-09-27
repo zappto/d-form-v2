@@ -6,6 +6,7 @@ import {
     requiredHeaderError,
     stripBlankRequiredKeys,
     TITLE_REQUIRED_MESSAGE,
+    type TRequiredHeaderFields,
 } from '../autosaveHeader';
 
 interface Header {
@@ -71,8 +72,11 @@ describe('stripBlankRequiredKeys', () => {
     });
 
     it('tak menyentuh closed_at/visible_for', () => {
-        const diff = { closed_at: null, visible_for: [] as string[] };
-        const current = { title: '', description: '' };
+        const diff: Partial<TRequiredHeaderFields> & {
+            closed_at: string | null;
+            visible_for: string[];
+        } = { closed_at: null, visible_for: [] };
+        const current: TRequiredHeaderFields = { title: '', description: '' };
         expect(stripBlankRequiredKeys(diff, current)).toEqual(diff);
     });
 });

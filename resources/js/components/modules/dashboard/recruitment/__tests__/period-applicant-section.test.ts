@@ -6,6 +6,11 @@ import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 import { Dialog } from '@/components/ui/dialog'
 import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/error-message'
 
+/** Tipe baris aplikan diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type ApplicationRow = NonNullable<
+    InstanceType<typeof PeriodApplicantSection>['$props']['applications']
+>[number]
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -87,7 +92,7 @@ function lastFormPostOptions(): RouterMutationOptions {
     return lastFormOptions as RouterMutationOptions
 }
 
-function demoRow(id: string, fullName: string): Record<string, unknown> {
+function demoRow(id: string, fullName: string): ApplicationRow {
     return {
         id,
         registration_number: `REG-${id}`,
@@ -106,7 +111,7 @@ function demoRow(id: string, fullName: string): Record<string, unknown> {
     }
 }
 
-function mountSection(): VueWrapper {
+function mountSection(): VueWrapper<InstanceType<typeof PeriodApplicantSection>> {
     return mount(PeriodApplicantSection, {
         props: {
             periodId: 'per-1',
@@ -128,7 +133,7 @@ function mountSection(): VueWrapper {
                 DialogTitle: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function rowButton(wrapper: VueWrapper, ariaLabel: string): DOMWrapper<HTMLButtonElement> {
@@ -137,12 +142,12 @@ function rowButton(wrapper: VueWrapper, ariaLabel: string): DOMWrapper<HTMLButto
     return found as DOMWrapper<HTMLButtonElement>
 }
 
-function passModal(wrapper: VueWrapper): VueWrapper {
-    return wrapper.findComponent(ConfirmationModal) as unknown as VueWrapper
+function passModal(wrapper: VueWrapper): VueWrapper<InstanceType<typeof ConfirmationModal>> {
+    return wrapper.findComponent(ConfirmationModal)
 }
 
-function rejectDialog(wrapper: VueWrapper): VueWrapper {
-    return wrapper.findComponent(Dialog) as unknown as VueWrapper
+function rejectDialog(wrapper: VueWrapper): VueWrapper<InstanceType<typeof Dialog>> {
+    return wrapper.findComponent(Dialog)
 }
 
 function rejectSubmitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
@@ -197,9 +202,7 @@ describe('PeriodApplicantSection pass (Task 7)', () => {
         try {
             await rowButton(wrapper, 'Loloskan Budi Santoso').trigger('click')
             await nextTick()
-            await (passModal(wrapper).vm as unknown as { $emit: (e: string) => void }).$emit(
-                'confirm',
-            )
+            passModal(wrapper).vm.$emit('confirm')
             await nextTick()
 
             expect(routerPostMock).toHaveBeenCalledTimes(1)
@@ -221,9 +224,7 @@ describe('PeriodApplicantSection pass (Task 7)', () => {
         try {
             await rowButton(wrapper, 'Loloskan Budi Santoso').trigger('click')
             await nextTick()
-            await (passModal(wrapper).vm as unknown as { $emit: (e: string) => void }).$emit(
-                'confirm',
-            )
+            passModal(wrapper).vm.$emit('confirm')
             await nextTick()
 
             lastRouterPostOptions().onSuccess?.()
@@ -249,9 +250,7 @@ describe('PeriodApplicantSection pass (Task 7)', () => {
         try {
             await rowButton(wrapper, 'Loloskan Budi Santoso').trigger('click')
             await nextTick()
-            await (passModal(wrapper).vm as unknown as { $emit: (e: string) => void }).$emit(
-                'confirm',
-            )
+            passModal(wrapper).vm.$emit('confirm')
             await nextTick()
 
             lastRouterPostOptions().onError?.({})

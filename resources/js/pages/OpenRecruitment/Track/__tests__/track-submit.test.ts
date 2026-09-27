@@ -133,7 +133,7 @@ function mountTrackEdit(): VueWrapper {
                 Separator: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function editSubmitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
@@ -144,7 +144,10 @@ function editSubmitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
     return found as DOMWrapper<HTMLButtonElement>
 }
 
-const demoTracking = {
+/** Fixture demo bertipe sama dengan prop `tracking` milik Track/Show. */
+type TTrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>
+
+const demoTracking: TTrackingPayload = {
     application: {
         registration_number: 'OPREC-2026-00001',
         full_name: 'Ayu Lestari',
@@ -204,7 +207,7 @@ function mountTrackShow(): VueWrapper {
                 DialogTitle: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function correctionSubmitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {

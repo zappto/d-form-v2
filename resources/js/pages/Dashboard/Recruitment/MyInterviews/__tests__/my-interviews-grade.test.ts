@@ -5,6 +5,9 @@ import MyInterviewsShow from '../Show.vue'
 import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
 import { toast } from 'vue-sonner'
 
+/** Tipe detail diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type DetailPayload = NonNullable<InstanceType<typeof MyInterviewsShow>['$props']['detail']>
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -77,7 +80,7 @@ function lastPostOptions(): InertiaMutationOptions {
     return lastOptions as InertiaMutationOptions
 }
 
-function demoDetail(): Record<string, unknown> {
+function demoDetail(): DetailPayload {
     return {
         application: {
             id: 'ap-1',
@@ -129,7 +132,7 @@ function demoDetail(): Record<string, unknown> {
     }
 }
 
-function mountShow(flashMessage: string | null = null): VueWrapper {
+function mountShow(flashMessage: string | null = null): VueWrapper<InstanceType<typeof MyInterviewsShow>> {
     return mount(MyInterviewsShow, {
         props: {
             detail: demoDetail(),
@@ -152,7 +155,7 @@ function mountShow(flashMessage: string | null = null): VueWrapper {
                 SessionQueueDrawer: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function submitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {

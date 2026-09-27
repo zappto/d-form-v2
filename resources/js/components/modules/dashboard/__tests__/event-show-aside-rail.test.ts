@@ -83,14 +83,14 @@ function demoEvent(): IEvent {
     }
 }
 
-function mountRail(): VueWrapper {
+function mountRail(): VueWrapper<InstanceType<typeof EventShowAsideRail>> {
     return mount(EventShowAsideRail, {
         props: {
             event: demoEvent(),
             forms: [{ id: 'fo-1', title: 'Formulir A' }],
             cardShadow: 'shadow-sm',
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function rowButton(wrapper: VueWrapper, ariaLabel: string): DOMWrapper<HTMLButtonElement> {
@@ -99,14 +99,14 @@ function rowButton(wrapper: VueWrapper, ariaLabel: string): DOMWrapper<HTMLButto
     return found as DOMWrapper<HTMLButtonElement>
 }
 
-function deleteModal(wrapper: VueWrapper): VueWrapper {
-    return wrapper.findComponent(ConfirmationModal) as unknown as VueWrapper
+function deleteModal(wrapper: VueWrapper): VueWrapper<InstanceType<typeof ConfirmationModal>> {
+    return wrapper.findComponent(ConfirmationModal)
 }
 
 async function confirmDelete(wrapper: VueWrapper): Promise<void> {
     await rowButton(wrapper, 'Hapus form Formulir A').trigger('click')
     await nextTick()
-    ;(deleteModal(wrapper).vm as unknown as { $emit: (event: string) => void }).$emit('confirm')
+    deleteModal(wrapper).vm.$emit('confirm')
     await nextTick()
 }
 

@@ -6,6 +6,7 @@ import QueueDisplay from '@/pages/OpenRecruitment/QueueDisplay.vue'
 import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/SessionQueueDrawer.vue'
 import {
     useRecruitmentQueue,
+    type QueueEntryRow,
     type QueueSnapshot,
 } from '@/hooks/useRecruitmentQueue'
 import { showErrorToast } from '@/lib/error-message'
@@ -68,17 +69,17 @@ const QueueHarness = defineComponent({
     template: '<div />',
 })
 
-function mountHarness(initial: QueueSnapshot): VueWrapper {
+function mountHarness(initial: QueueSnapshot): VueWrapper<InstanceType<typeof QueueHarness>> {
     return mount(QueueHarness, {
         props: { pollUrl: '/queue/poll', initial },
-    }) as unknown as VueWrapper
+    })
 }
 
 function harnessApi(wrapper: VueWrapper): QueueApi {
     return wrapper.vm as unknown as QueueApi
 }
 
-function demoEntry(id: string, queueNumber: number, status: string, name: string): Record<string, unknown> {
+function demoEntry(id: string, queueNumber: number, status: string, name: string): QueueEntryRow {
     return {
         id,
         queue_number: queueNumber,
@@ -99,7 +100,7 @@ function demoSnapshot(): QueueSnapshot {
         current: demoEntry('qe-1', 1, 'called', 'Budi Santoso'),
         next: demoEntry('qe-2', 2, 'waiting', 'Siti Aminah'),
         stats: { waiting: 1, called: 1, completed: 0, total: 2 },
-    } as unknown as QueueSnapshot
+    }
 }
 
 function emptySnapshot(): QueueSnapshot {
@@ -138,7 +139,7 @@ function resolveGetWith(data: unknown): Promise<void> {
     return flushPromises()
 }
 
-function mountQueueShow(queue: QueueSnapshot): VueWrapper {
+function mountQueueShow(queue: QueueSnapshot): VueWrapper<InstanceType<typeof QueueShow>> {
     return mount(QueueShow, {
         props: {
             session: {
@@ -157,10 +158,10 @@ function mountQueueShow(queue: QueueSnapshot): VueWrapper {
             completeUrlTemplate: '/queue/entries/__ENTRY__/complete',
             canManage: true,
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function mountDisplay(snapshot: Record<string, unknown>): VueWrapper {
+function mountDisplay(snapshot: Record<string, unknown>): VueWrapper<InstanceType<typeof QueueDisplay>> {
     return mount(QueueDisplay, {
         props: { snapshot, pollUrl: '/display/poll' },
         global: {
@@ -169,7 +170,7 @@ function mountDisplay(snapshot: Record<string, unknown>): VueWrapper {
                 Badge: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function demoDisplaySnapshot(): Record<string, unknown> {
@@ -185,7 +186,7 @@ function demoDisplaySnapshot(): Record<string, unknown> {
     }
 }
 
-function mountDrawer(): VueWrapper {
+function mountDrawer(): VueWrapper<InstanceType<typeof SessionQueueDrawer>> {
     return mount(SessionQueueDrawer, {
         props: { pollUrl: '/queue/poll', sessionDate: '2026-10-01', division: 'Divisi A' },
         global: {
@@ -196,7 +197,7 @@ function mountDrawer(): VueWrapper {
                 SheetFooter: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 beforeEach(() => {

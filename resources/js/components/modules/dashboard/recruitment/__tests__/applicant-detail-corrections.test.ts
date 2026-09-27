@@ -132,10 +132,11 @@ function demoApplication(): ApplicationDetail {
         can_screen: false,
         can_verify: false,
         can_decide_final: false,
+        can_resend_tracking: false,
     }
 }
 
-function mountContent(): VueWrapper {
+function mountContent(): VueWrapper<InstanceType<typeof ApplicantDetailContent>> {
     return mount(ApplicantDetailContent, {
         props: { application: demoApplication() },
         global: {
@@ -157,7 +158,7 @@ function mountContent(): VueWrapper {
                 DialogTitle: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function correctionButton(

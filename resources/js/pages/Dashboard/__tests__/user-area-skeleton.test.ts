@@ -9,6 +9,11 @@ import UserEvents from '../User/Events.vue'
 import ProfilePage from '../Profile.vue'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 
+/** Tipe baris form picker diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
+type PickFormRow = NonNullable<
+    InstanceType<typeof UserEventRegistrationPickForm>['$props']['forms']
+>[number]
+
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true
 
@@ -153,17 +158,16 @@ beforeEach(() => {
 })
 
 describe('User/EventDetail skeleton (M2 Task 10)', () => {
-    function mountDetail(event: IEvent | undefined): VueWrapper {
-        const props: Record<string, unknown> = {
-            isRegistered: false,
-            registrationStatus: null,
-            qr_base64: null,
-            registration_code: null,
-            participantForms: [],
-        }
-        if (event !== undefined) props.event = event
+    function mountDetail(event: IEvent | undefined): VueWrapper<InstanceType<typeof UserEventDetail>> {
         return mount(UserEventDetail, {
-            props: props as unknown as Record<string, never>,
+            props: {
+                event,
+                isRegistered: false,
+                registrationStatus: null,
+                qr_base64: null,
+                registration_code: null,
+                participantForms: [],
+            },
             global: {
                 stubs: {
                     ...UI_STUBS,
@@ -171,7 +175,7 @@ describe('User/EventDetail skeleton (M2 Task 10)', () => {
                     TiptapRichHtml: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
     it('props lengkap → konten fade-up, tanpa skeleton', async () => {
@@ -203,25 +207,26 @@ describe('User/EventDetail skeleton (M2 Task 10)', () => {
 })
 
 describe('User/EventRegistration skeleton (M2 Task 10)', () => {
-    function mountRegistration(event: IEvent | undefined): VueWrapper {
-        const props: Record<string, unknown> = {
-            form: { id: 'fo-1', title: 'Formulir A', registration_mode: 'single', success_content: null },
-            registration: {
-                review_status: 'pending',
-                submitted_at: '2026-01-01T10:00:00+07:00',
-                reviewed_at: null,
-                registration_code: null,
-                registration_role: null,
-                answers_summary: { Nama: 'Budi Santoso' },
-                qr_base64: null,
-            },
-            bundle_participants: [],
-        }
-        if (event !== undefined) props.event = event
+    function mountRegistration(
+        event: IEvent | undefined,
+    ): VueWrapper<InstanceType<typeof UserEventRegistration>> {
         return mount(UserEventRegistration, {
-            props: props as unknown as Record<string, never>,
+            props: {
+                event,
+                form: { id: 'fo-1', title: 'Formulir A', registration_mode: 'single', success_content: null },
+                registration: {
+                    review_status: 'pending',
+                    submitted_at: '2026-01-01T10:00:00+07:00',
+                    reviewed_at: null,
+                    registration_code: null,
+                    registration_role: null,
+                    answers_summary: { Nama: 'Budi Santoso' },
+                    qr_base64: null,
+                },
+                bundle_participants: [],
+            },
             global: { stubs: { ...UI_STUBS, EventBannerImage: true, TiptapRichHtml: true } },
-        }) as unknown as VueWrapper
+        })
     }
 
     it('props lengkap → konten fade-up, tanpa skeleton', async () => {
@@ -254,17 +259,17 @@ describe('User/EventRegistration skeleton (M2 Task 10)', () => {
 })
 
 describe('User/EventRegistrationPickForm skeleton (M2 Task 10)', () => {
-    function mountPickForm(event: IEvent | undefined, forms: Record<string, unknown>[] | undefined): VueWrapper {
-        const props: Record<string, unknown> = {}
-        if (event !== undefined) props.event = event
-        if (forms !== undefined) props.forms = forms
+    function mountPickForm(
+        event: IEvent | undefined,
+        forms: PickFormRow[] | undefined,
+    ): VueWrapper<InstanceType<typeof UserEventRegistrationPickForm>> {
         return mount(UserEventRegistrationPickForm, {
-            props: props as unknown as Record<string, never>,
+            props: { event, forms },
             global: { stubs: UI_STUBS },
-        }) as unknown as VueWrapper
+        })
     }
 
-    function demoFormRow(): Record<string, unknown> {
+    function demoFormRow(): PickFormRow {
         return {
             id: 'fo-1',
             title: 'Formulir A',
@@ -305,20 +310,17 @@ describe('User/EventRegistrationPickForm skeleton (M2 Task 10)', () => {
 })
 
 describe('User/TeamInvitation skeleton (M2 Task 10)', () => {
-    function mountInvitation(withData: boolean): VueWrapper {
-        const props: Record<string, unknown> = {
-            answers: {},
-            leader: { name: 'Ketua', email: 'ketua@example.com' },
-            alreadyConfirmed: false,
-            confirmUrl: '/invitation/token-abc',
-        }
-        if (withData) {
-            props.event = { id: 'ev-1', slug: 'acara', title: 'Acara' }
-            props.form = { id: 'fo-1', title: 'Formulir' }
-            props.fields = []
-        }
+    function mountInvitation(withData: boolean): VueWrapper<InstanceType<typeof UserTeamInvitation>> {
         return mount(UserTeamInvitation, {
-            props: props as unknown as Record<string, never>,
+            props: {
+                event: withData ? { id: 'ev-1', slug: 'acara', title: 'Acara' } : undefined,
+                form: withData ? { id: 'fo-1', title: 'Formulir' } : undefined,
+                fields: withData ? [] : undefined,
+                answers: {},
+                leader: { name: 'Ketua', email: 'ketua@example.com' },
+                alreadyConfirmed: false,
+                confirmUrl: '/invitation/token-abc',
+            },
             global: {
                 stubs: {
                     ...UI_STUBS,
@@ -345,7 +347,7 @@ describe('User/TeamInvitation skeleton (M2 Task 10)', () => {
                     DialogTitle: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
     it('props lengkap → ringkasan + aksi non-modal, tanpa skeleton', async () => {
@@ -379,11 +381,12 @@ describe('User/TeamInvitation skeleton (M2 Task 10)', () => {
 })
 
 describe('User/Events skeleton (M2 Task 10)', () => {
-    function mountEvents(listMode: string, events: IEvent[] | undefined): VueWrapper {
-        const props: Record<string, unknown> = { listMode }
-        if (events !== undefined) props.events = events
+    function mountEvents(
+        listMode: 'mine' | 'browse',
+        events: IEvent[] | undefined,
+    ): VueWrapper<InstanceType<typeof UserEvents>> {
         return mount(UserEvents, {
-            props: props as unknown as Record<string, never>,
+            props: { listMode, events },
             global: {
                 stubs: {
                     ...UI_STUBS,
@@ -392,10 +395,10 @@ describe('User/Events skeleton (M2 Task 10)', () => {
                     EmptyState: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
-    it.each(['mine', 'browse'])('tab %s terisi → grid fade-up, tanpa skeleton', async (listMode) => {
+    it.each(['mine', 'browse'] as const)('tab %s terisi → grid fade-up, tanpa skeleton', async (listMode) => {
         const wrapper = mountEvents(listMode, [demoIEvent('ev-1', 'Acara A')])
         try {
             await nextTick()
@@ -407,7 +410,7 @@ describe('User/Events skeleton (M2 Task 10)', () => {
         }
     })
 
-    it.each(['mine', 'browse'])('tab %s kosong-props → 6 skeleton + filter tetap', async (listMode) => {
+    it.each(['mine', 'browse'] as const)('tab %s kosong-props → 6 skeleton + filter tetap', async (listMode) => {
         const wrapper = mountEvents(listMode, undefined)
         try {
             await nextTick()
@@ -428,7 +431,7 @@ describe('Profile skeleton (M2 Task 10)', () => {
         has_local_password: true,
     }
 
-    function mountProfile(): VueWrapper {
+    function mountProfile(): VueWrapper<InstanceType<typeof ProfilePage>> {
         return mount(ProfilePage, {
             global: {
                 stubs: {
@@ -436,7 +439,7 @@ describe('Profile skeleton (M2 Task 10)', () => {
                     UserAvatarFallback: true,
                 },
             },
-        }) as unknown as VueWrapper
+        })
     }
 
     it('user login → konten + tombol simpan, tanpa skeleton', async () => {

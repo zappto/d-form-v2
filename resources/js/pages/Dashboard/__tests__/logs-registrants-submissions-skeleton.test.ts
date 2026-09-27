@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
-import { config, mount, type VueWrapper } from '@vue/test-utils'
+import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils'
 import ActivityLogsIndex from '../Recruitment/ActivityLogs/Index.vue'
 import RegistrantsPage from '../Events/Registrants.vue'
 import FormsShow from '../Events/Forms/Show.vue'
@@ -135,14 +135,14 @@ interface LogRowFixture {
     created_at: string | null
 }
 
-function mountLogs(data: LogRowFixture[]): VueWrapper {
+function mountLogs(data: LogRowFixture[]): VueWrapper<InstanceType<typeof ActivityLogsIndex>> {
     return mount(ActivityLogsIndex, {
         props: {
             logs: { data, links: [] },
             periodOptions: [{ id: 'per-1', name: 'Gelombang 1' }],
             query: { period_id: null, action: null },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function demoEvent(): IEvent {
@@ -186,7 +186,9 @@ function demoRegistrant(id: string, name: string): IRegistrant {
     }
 }
 
-function mountRegistrants(registrants: IRegistrant[] | undefined): VueWrapper {
+function mountRegistrants(
+    registrants: IRegistrant[] | undefined,
+): VueWrapper<InstanceType<typeof RegistrantsPage>> {
     return mount(RegistrantsPage, {
         props: {
             event: demoEvent(),
@@ -212,7 +214,7 @@ function mountRegistrants(registrants: IRegistrant[] | undefined): VueWrapper {
                 SearchableSelect: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function demoForm(): IForm {
@@ -239,7 +241,7 @@ function demoSubmission(id: string, name: string): IFormSubmission {
     }
 }
 
-function mountFormsShow(submissions: IFormSubmission[]): VueWrapper {
+function mountFormsShow(submissions: IFormSubmission[]): VueWrapper<InstanceType<typeof FormsShow>> {
     return mount(FormsShow, {
         props: {
             event: { id: 'ev-1', title: 'Acara' },
@@ -274,23 +276,25 @@ function mountFormsShow(submissions: IFormSubmission[]): VueWrapper {
                 TabsTrigger: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function reviewButton(wrapper: VueWrapper, label: string): DOMWrapperFixture {
+function reviewButton(wrapper: VueWrapper, label: string): DOMWrapper<HTMLButtonElement> {
     const found = wrapper
         .findAll('button')
         .find((b) => b.attributes('aria-label') === label)
     if (!found) throw new Error(`tombol "${label}" tidak ditemukan`)
-    return found as unknown as DOMWrapperFixture
+    return found as DOMWrapper<HTMLButtonElement>
 }
 
-interface DOMWrapperFixture {
-    trigger: (event: string) => Promise<void>
-}
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TFormAnswerDetailSheetProps = InstanceType<typeof FormAnswerDetailSheet>['$props']
 
-function mountSheet(submission: IFormSubmission | null, loading?: boolean): VueWrapper {
-    const props: Record<string, unknown> = {
+function mountSheet(
+    submission: IFormSubmission | null,
+    loading?: boolean,
+): VueWrapper<InstanceType<typeof FormAnswerDetailSheet>> {
+    const props: TFormAnswerDetailSheetProps = {
         open: true,
         submission,
         answerKeys: ['nama'],
@@ -298,10 +302,10 @@ function mountSheet(submission: IFormSubmission | null, loading?: boolean): VueW
         formatDate: (value: string): string => value,
         humanizeKey: (key: string): string => key,
         isSubmissionReviewing: (): boolean => false,
+        loading,
     }
-    if (loading !== undefined) props.loading = loading
     return mount(FormAnswerDetailSheet, {
-        props: props as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 Sheet: true,
@@ -315,7 +319,7 @@ function mountSheet(submission: IFormSubmission | null, loading?: boolean): VueW
                 FormFieldAnswerDisplay: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 beforeEach(() => {

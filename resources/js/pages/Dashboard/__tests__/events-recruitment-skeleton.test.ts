@@ -95,7 +95,10 @@ function demoIEvent(id: string, title: string): IEvent {
     }
 }
 
-function mountEventsIndex(events: IEvent[], lastPage: number): VueWrapper {
+function mountEventsIndex(
+    events: IEvent[],
+    lastPage: number,
+): VueWrapper<InstanceType<typeof EventsIndex>> {
     return mount(EventsIndex, {
         props: {
             events: {
@@ -117,7 +120,7 @@ function mountEventsIndex(events: IEvent[], lastPage: number): VueWrapper {
                 ConfirmationModal: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 function nextPageButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
@@ -128,7 +131,14 @@ function nextPageButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
     return found as DOMWrapper<HTMLButtonElement>
 }
 
-function demoPeriod(id: string, name: string): Record<string, unknown> {
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TRecruitmentIndexProps = InstanceType<typeof RecruitmentIndex>['$props']
+type TRecruitmentSummary = TRecruitmentIndexProps['summary']
+type TPeriodRow = NonNullable<TRecruitmentIndexProps['periods']>['data'][number]
+type TActionQueue = NonNullable<TRecruitmentSummary['action_queues']>[number]
+type TTodaySession = NonNullable<TRecruitmentSummary['today_sessions']>[number]
+
+function demoPeriod(id: string, name: string): TPeriodRow {
     return {
         id,
         name,
@@ -145,7 +155,7 @@ function demoPeriod(id: string, name: string): Record<string, unknown> {
     }
 }
 
-function demoSummary(queues: Record<string, unknown>[], sessions: Record<string, unknown>[]): Record<string, unknown> {
+function demoSummary(queues: TActionQueue[], sessions: TTodaySession[]): TRecruitmentSummary {
     return {
         active_period: { id: 'per-1', name: 'Gelombang 1', status: 'open', status_label: 'Buka' },
         stats: {},
@@ -154,11 +164,11 @@ function demoSummary(queues: Record<string, unknown>[], sessions: Record<string,
     }
 }
 
-function demoQueue(key: string): Record<string, unknown> {
+function demoQueue(key: string): TActionQueue {
     return { key, label: `Antrean ${key}`, description: 'Deskripsi antrean', count: 2 }
 }
 
-function demoSession(): Record<string, unknown> {
+function demoSession(): TTodaySession {
     return {
         id: 'ses-1',
         session_date: '2026-10-01',
@@ -172,10 +182,10 @@ function demoSession(): Record<string, unknown> {
 }
 
 function mountRecruitmentIndex(
-    periods: Record<string, unknown>[],
-    queues: Record<string, unknown>[],
-    sessions: Record<string, unknown>[],
-): VueWrapper {
+    periods: TPeriodRow[],
+    queues: TActionQueue[],
+    sessions: TTodaySession[],
+): VueWrapper<InstanceType<typeof RecruitmentIndex>> {
     return mount(RecruitmentIndex, {
         props: {
             summary: demoSummary(queues, sessions),
@@ -201,7 +211,7 @@ function mountRecruitmentIndex(
                 ConfirmationModal: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 async function typePeriodSearch(wrapper: VueWrapper, text: string): Promise<void> {

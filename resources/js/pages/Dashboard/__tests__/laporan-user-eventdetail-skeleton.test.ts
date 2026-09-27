@@ -65,7 +65,10 @@ function demoIEvent(id: string, title: string): IEvent {
     }
 }
 
-function fullLaporanProps(): Record<string, unknown> {
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TLaporanProps = InstanceType<typeof LaporanPage>['$props']
+
+function fullLaporanProps(): TLaporanProps {
     return {
         globalSummary: { total_events: 5, total_submissions: 120, total_attendance_records: 80 },
         event: demoIEvent('ev-1', 'Acara'),
@@ -89,9 +92,16 @@ function fullLaporanProps(): Record<string, unknown> {
     }
 }
 
-function mountLaporan(props: Record<string, unknown>): VueWrapper {
+function mountLaporan(
+    props: Partial<TLaporanProps>,
+): VueWrapper<InstanceType<typeof LaporanPage>> {
     return mount(LaporanPage, {
-        props: props as unknown as Record<string, never>,
+        props: {
+            globalSummary: props.globalSummary,
+            event: props.event,
+            exports: props.exports,
+            eventReporting: props.eventReporting,
+        },
         global: {
             stubs: {
                 KpiCard: true,
@@ -105,12 +115,22 @@ function mountLaporan(props: Record<string, unknown>): VueWrapper {
                 Label: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function mountUserIndex(props: Record<string, unknown>): VueWrapper {
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TUserIndexProps = InstanceType<typeof UserIndex>['$props']
+
+function mountUserIndex(
+    props: Partial<TUserIndexProps>,
+): VueWrapper<InstanceType<typeof UserIndex>> {
     return mount(UserIndex, {
-        props: props as unknown as Record<string, never>,
+        props: {
+            stats: props.stats,
+            upcomingEvents: props.upcomingEvents,
+            pendingInvitations: props.pendingInvitations ?? [],
+            calendarEvents: props.calendarEvents,
+        },
         global: {
             stubs: {
                 KpiCard: true,
@@ -123,10 +143,10 @@ function mountUserIndex(props: Record<string, unknown>): VueWrapper {
                 Button: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
-function fullUserProps(): Record<string, unknown> {
+function fullUserProps(): TUserIndexProps {
     return {
         stats: {
             eventsJoined: 3,
@@ -140,15 +160,20 @@ function fullUserProps(): Record<string, unknown> {
     }
 }
 
-function mountEventDetail(props: Record<string, unknown>): VueWrapper {
+/** Tipe props diturunkan dari komponen agar fixture tak menduplikasi bentuk. */
+type TEventDetailProps = InstanceType<typeof EventDetailPage>['$props']
+
+function mountEventDetail(
+    props: TEventDetailProps,
+): VueWrapper<InstanceType<typeof EventDetailPage>> {
     return mount(EventDetailPage, {
-        props: props as unknown as Record<string, never>,
+        props,
         global: {
             stubs: {
                 SeoHead: true,
             },
         },
-    }) as unknown as VueWrapper
+    })
 }
 
 beforeEach(() => {
@@ -244,7 +269,7 @@ describe('EventDetail publik skeleton (M2 Task 7)', () => {
     })
 
     it('event belum ada → skeleton hero + info + CTA, tanpa crash', async () => {
-        const wrapper = mountEventDetail({ memberPortalEventUrl: '/portal' })
+        const wrapper = mountEventDetail({ event: undefined, memberPortalEventUrl: '/portal' })
         try {
             await nextTick()
 
