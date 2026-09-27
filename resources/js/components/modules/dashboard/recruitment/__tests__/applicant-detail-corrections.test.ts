@@ -144,7 +144,7 @@ function mountContent(): VueWrapper {
                 CardContent: true,
                 Checkbox: true,
                 Label: true,
-                SimpleSelect: true,
+                SearchableSelect: true,
                 Tabs: true,
                 TabsContent: true,
                 TabsList: true,

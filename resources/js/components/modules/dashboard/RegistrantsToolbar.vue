@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { Search } from 'lucide-vue-next'
 import { REGISTRANTS_TAB_ITEMS } from '@/lib/registrantsUi'
 
@@ -19,7 +19,7 @@ const props = defineProps<{
     forms: { id: string; title: string }[]
 }>()
 
-const formFilterOptions = computed<SimpleSelectOption[]>(() => [
+const formFilterOptions = computed<SearchableSelectOption[]>(() => [
     { value: 'all', label: 'Semua formulir' },
     ...props.forms.map((f) => ({ value: f.id, label: f.title })),
 ])
@@ -63,7 +63,7 @@ const formFilterOptions = computed<SimpleSelectOption[]>(() => [
                     <Label for="registrants-form-filter" class="text-xs font-semibold text-muted-foreground">
                         Formulir
                     </Label>
-                    <SimpleSelect
+                    <SearchableSelect
                         v-model="activeFormFilter"
                         :options="formFilterOptions"
                         id="registrants-form-filter"

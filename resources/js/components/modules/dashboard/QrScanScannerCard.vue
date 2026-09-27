@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { Camera, ShieldAlert } from 'lucide-vue-next'
 
 const props = defineProps<{
@@ -17,7 +17,7 @@ const props = defineProps<{
     permissionError: string
 }>()
 
-const cameraOptions = computed<SimpleSelectOption[]>(() =>
+const cameraOptions = computed<SearchableSelectOption[]>(() =>
     props.cameras.map((camera) => ({ value: camera.id, label: camera.label })),
 )
 
@@ -39,7 +39,7 @@ defineEmits<{
             </div>
 
             <div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
-                <SimpleSelect
+                <SearchableSelect
                     :model-value="selectedCameraId"
                     :options="cameraOptions"
                     id="scanner-camera-select"

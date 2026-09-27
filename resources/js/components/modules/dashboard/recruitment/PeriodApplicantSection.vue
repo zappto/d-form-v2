@@ -15,7 +15,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { ArrowRight, Check, X } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
-import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { CometSpinner } from '@/components/ui/comet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/error-message'
@@ -123,12 +123,12 @@ const semester = ref<string>('')
 const perPage = ref<number>(20)
 const currentPage = ref<number>(1)
 
-const divisionSelectOptions = computed<SimpleSelectOption[]>(() => [
+const divisionSelectOptions = computed<SearchableSelectOption[]>(() => [
     { value: '', label: 'Semua divisi' },
     ...props.divisionOptions.map((division) => ({ value: division.id, label: division.name })),
 ])
 
-const queueSelectOptions = computed<SimpleSelectOption[]>(() =>
+const queueSelectOptions = computed<SearchableSelectOption[]>(() =>
     QUEUE_OPTIONS.map((option) => {
         const count =
             option.key === '' ? (props.queueCounts.all ?? 0) : (props.queueCounts[option.key] ?? 0)
@@ -139,13 +139,13 @@ const queueSelectOptions = computed<SimpleSelectOption[]>(() =>
     }),
 )
 
-const stageSelectOptions = computed<SimpleSelectOption[]>(() => [
+const stageSelectOptions = computed<SearchableSelectOption[]>(() => [
     { value: '', label: 'Semua tahap' },
     ...props.stageOptions.map((option) => ({ value: option.value, label: option.label })),
 ])
 
-const semesterSelectOptions = computed<SimpleSelectOption[]>(() => {
-    const options: SimpleSelectOption[] = [
+const semesterSelectOptions = computed<SearchableSelectOption[]>(() => {
+    const options: SearchableSelectOption[] = [
         { value: '', label: 'Semua semester' },
         ...(props.semesterOptions ?? []).map((option) => ({ value: option.value, label: option.label })),
     ]
@@ -222,7 +222,7 @@ const pagedRows = computed<ApplicationRow[]>(() => {
     return filteredRows.value.slice(start, start + perPage.value)
 })
 
-const perPageOptions = computed<SimpleSelectOption[]>(() =>
+const perPageOptions = computed<SearchableSelectOption[]>(() =>
     [5, 10, 20, 50].map((size) => ({ value: String(size), label: `${size} / halaman` })),
 )
 
@@ -404,7 +404,7 @@ function submitReject(): void {
         <div class="flex flex-wrap items-end gap-3">
             <Input v-model="search" placeholder="Cari nama, NIM, nomor pendaftaran..." class="max-w-xs" />
             <div class="flex min-w-0 flex-col gap-1.5">
-                <SimpleSelect
+                <SearchableSelect
                     v-model="divisionId"
                     :options="divisionSelectOptions"
                     id="filter-divisi"
@@ -413,7 +413,7 @@ function submitReject(): void {
                 />
             </div>
             <div class="flex min-w-0 flex-col gap-1.5">
-                <SimpleSelect
+                <SearchableSelect
                     v-model="queueModel"
                     :options="queueSelectOptions"
                     id="filter-antrean"
@@ -422,7 +422,7 @@ function submitReject(): void {
                 />
             </div>
             <div v-if="!queue" class="flex min-w-0 flex-col gap-1.5">
-                <SimpleSelect
+                <SearchableSelect
                     v-model="stage"
                     :options="stageSelectOptions"
                     id="filter-tahap"
@@ -431,7 +431,7 @@ function submitReject(): void {
                 />
             </div>
             <div class="flex min-w-0 flex-col gap-1.5">
-                <SimpleSelect
+                <SearchableSelect
                     v-model="semester"
                     :options="semesterSelectOptions"
                     id="filter-semester"
@@ -582,7 +582,7 @@ function submitReject(): void {
                 <p class="text-muted-foreground">
                     Menampilkan {{ rangeStart }}–{{ rangeEnd }} dari {{ totalCount }} applicant
                 </p>
-                <SimpleSelect
+                <SearchableSelect
                     v-model="perPageModel"
                     :options="perPageOptions"
                     id="per-halaman"

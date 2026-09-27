@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { CometSpinner } from '@/components/ui/comet'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { SimpleSelect } from '@/components/ui/simple-select'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
     Dialog,
@@ -1179,7 +1179,7 @@ const defaultTab = computed(() => {
                 <form class="space-y-4" @submit.prevent="submitScreening">
                     <div class="space-y-2">
                         <Label for="reason">Alasan</Label>
-                        <SimpleSelect
+                        <SearchableSelect
                             id="reason"
                             v-model="screeningForm.reason"
                             :options="screeningReasonOptions"
