@@ -10,7 +10,7 @@ import {
     phaseLabel,
     resolvePeriodPhase,
     statusLabel,
-    type PeriodPhaseInput,
+    type IPeriodPhaseInput,
 } from '../resources/js/lib/recruitmentPeriodPhase.ts'
 
 let failures = 0
@@ -25,7 +25,7 @@ function check(label: string, actual: unknown, expected: unknown): void {
 
 const NOW = new Date('2026-06-15T12:00:00+07:00')
 
-function input(overrides: Partial<PeriodPhaseInput>): PeriodPhaseInput {
+function input(overrides: Partial<IPeriodPhaseInput>): IPeriodPhaseInput {
     return {
         status: 'open',
         registrationOpensAt: null,

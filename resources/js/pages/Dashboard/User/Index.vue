@@ -19,7 +19,7 @@ import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardLayout });
 
-interface ITProps {
+interface IProps {
     stats:
         | {
               eventsJoined: number;
@@ -45,7 +45,7 @@ interface ITProps {
         | undefined;
 }
 
-const props = defineProps<ITProps>();
+const props = defineProps<IProps>();
 
 /** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */
 const statsReady = computed<boolean>(() => props.stats !== undefined);

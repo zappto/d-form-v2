@@ -18,7 +18,7 @@ export interface INavLink {
     readonly href: string;
 }
 
-export interface IntegrationLogo {
+export interface IIntegrationLogo {
     readonly name: string;
     readonly category: string;
 }
