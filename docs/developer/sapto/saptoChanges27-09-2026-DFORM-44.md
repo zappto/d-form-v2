@@ -1,6 +1,6 @@
 # Sapto Changes — 27 September 2026 (DFORM-44 Chore)
 
-Lanjutan dari [`saptoChanges27-09-2026-DFORM-43.md`](./saptoChanges27-09-2026-DFORM-43.md). Pola sama: **satu tanggal, per-commit, tiap baris tertaut ke Issue**. Ticket Jira: **DFORM-44** — `[Chore] Normalisasi prettier repo-wide + gate anti-regresi`. Basis commit: `20b6235` (`refactor(skeleton,DFORM-43): 3 halaman pakai KpiCardSkeleton (K)`). F0 + gate + 4 batch sapuan = **6 commit atomik**; HEAD saat dokumen ini ditulis `8e25a41` (batch 4).
+Lanjutan dari [`saptoChanges27-09-2026-DFORM-43.md`](./saptoChanges27-09-2026-DFORM-43.md). Pola sama: **satu tanggal, per-commit, tiap baris tertaut ke Issue**. Ticket Jira: **DFORM-44** — `[Chore] Normalisasi prettier repo-wide + gate anti-regresi`. Basis commit: `20b6235` (`refactor(skeleton,DFORM-43): 3 halaman pakai KpiCardSkeleton (K)`). F0 + gate + 4 batch sapuan + perluasan trigger `main` = **7 commit atomik**; HEAD saat dokumen ini ditulis `8c5a01b` (perluasan trigger gate).
 
 **DFORM-44 tidak mengubah perilaku aplikasi.** Seluruh perubahan batch adalah **reformat mekanis** (whitespace + urutan kelas Tailwind) tanpa perubahan logika, markup, atau prop; sisanya 2 perubahan konfigurasi/CI. Yang perlu dibaca dari dokumen ini adalah *urutan kerja*, *keputusan scope*, dan *gate anti-regresi* yang ditinggalkan.
 
@@ -10,6 +10,7 @@ Lanjutan dari [`saptoChanges27-09-2026-DFORM-43.md`](./saptoChanges27-09-2026-DF
 2. **F0 (`770bfd1`)** menambahkan `"tailwindStylesheet": "./resources/css/app.css"` ke `.prettierrc` — **wajib lebih dulu**, karena tanpa opsi itu plugin memakai urutan kelas *fallback* dan sapuan berisiko harus diulang.
 3. **Gate anti-regresi (`e7df201`)**: workflow formatting dijadikan **blocking** (hapus `continue-on-error`) + scope disempitkan ke js/css, plus `.githooks/pre-commit` **nol-dependensi** untuk lokal.
 4. **Sapuan 4 batch = 412 file**: `components/ui` 167, `components/modules` 108, `pages` 72, core-js 65.
+5. **Trigger gate diperluas ke `main` (`8c5a01b`)**: gate blocking dari `e7df201` sebelumnya hanya terpicu pada push/PR ke `dev` dan `temp`, sementara branch aktif repo adalah `main` — jadi gate tidak pernah dieksekusi di branch sehari-hari. Kini `code_formatting.yml` dan `frontend_typecheck.yml` sama-sama terpicu pada **push dan pull_request ke `main`, `dev`, `temp`**.
 
 ## Timeline Perubahan
 
@@ -23,8 +24,9 @@ Lanjutan dari [`saptoChanges27-09-2026-DFORM-43.md`](./saptoChanges27-09-2026-DF
 | 19:52 | `896415b` | zappto | DFORM-44 | style(modules): sapuan prettier batch 2 — `components/modules` (108 file) |
 | 19:52 | `56c5865` | zappto | DFORM-44 | style(pages): sapuan prettier batch 3 — `pages` (72 file) |
 | 19:55 | `8e25a41` | zappto | DFORM-44 | style(core-js): sapuan prettier batch 4 — lib/hooks/types/layouts/css (65 file) |
+| 20:06 | `8c5a01b` | zappto | DFORM-44 | ci(gate): jalankan gate format & typecheck juga di branch `main` |
 
-Sumber SHA/waktu: reflog `.git/logs/HEAD` (epoch `+0700`). Enam commit DFORM-44 **tidak seluruhnya berurutan**: di antaranya terselip commit ticket lain (DFORM-46 doc `4fd2909`/`ded16c8`, changelog DFORM-42 `d39bfd2`, DFORM-43 `7ffad14`, DFORM-45 `530ac69`) — jadi `770bfd1` bukan parent langsung `e7df201`. `8e25a41` = HEAD.
+Sumber SHA/waktu: reflog `.git/logs/HEAD` (epoch `+0700`). Tujuh commit DFORM-44 **tidak seluruhnya berurutan**: di antaranya terselip commit ticket lain (DFORM-46 doc `4fd2909`/`ded16c8`, changelog DFORM-42 `d39bfd2`, DFORM-43 `7ffad14`, DFORM-45 `530ac69`, changelog DFORM-44 `189296b`, DFORM-46 refactor types `a2f28a6`) — jadi `770bfd1` bukan parent langsung `e7df201`, dan `8c5a01b` bukan anak langsung `8e25a41`. `8c5a01b` = HEAD saat dokumen ini diperbarui.
 
 ## Per-commit
 
@@ -58,6 +60,14 @@ Sumber SHA/waktu: reflog `.git/logs/HEAD` (epoch `+0700`). Enam commit DFORM-44 
 - Rincian dari brief: lib 22, lib/__tests__ 2, hooks 16, hooks/__tests__ 6, types 8, layouts 4, components/core 3, components/seo 1, resources/css/app.css 1. **Rincian ini berjumlah 63, sedangkan pesan commit/scope menyebut 65** → 2 file tidak terperinci (lihat Verifikasi).
 - Jira: DFORM-44.
 
+#### `8c5a01b` ci(gate,DFORM-44): jalankan gate format & typecheck juga di branch `main`
+
+- Masalah: gate blocking yang dipasang di `e7df201` hanya terpicu pada push/PR ke `dev` dan `temp`, sementara **branch aktif repo adalah `main`** — jadi gate tidak pernah dieksekusi di branch sehari-hari. Ini meniadakan manfaat gate.
+- Perubahan (2 file, 4 insertion) — diverifikasi read-only langsung ke kedua file: blok `on.push.branches` dan `on.pull_request.branches` di `.github/workflows/code_formatting.yml` dan `.github/workflows/frontend_typecheck.yml` kini berisi **`main`, `dev`, `temp`** (sebelumnya hanya `dev`, `temp`). Empat blok (2 file × push+PR) masing-masing bertambah satu baris `- main` → 4 insertion.
+- **Cakupan trigger gate (final)**: kedua workflow terpicu pada **push** dan **pull_request** ke **`main`, `dev`, `temp`**. Langkah prettier js/css (`npx prettier --check "resources/js/**/*.{vue,ts}" "resources/css/**/*.css"`) tetap **blocking** (tanpa `continue-on-error`), dan job `typecheck` (`npm run typecheck`) juga **blocking**; sebaliknya langkah **Laravel Pint** (`./vendor/bin/pint --test`) **tetap** `continue-on-error: true` (non-blocking). Jadi DFORM-44 hanya mem-blocking-kan prettier js/css + typecheck, **bukan** Pint.
+- Alasan keputusan: sejalan dengan komentar di header workflow itu sendiri ("Hanya jalankan pada push ke branch utama (misalnya main atau master)"); user menambahkan `main` alih-alih mengganti branch aktif.
+- Jira: DFORM-44.
+
 ## Keputusan & koreksi
 
 1. **Baseline 404 → 411.** `npx prettier --check "resources/js/**/*.{vue,ts}"` merah pada **404 file** sebelum config diperbaiki dan **411 file** sesudahnya. Artinya bukan satu akar tunggal: (a) mayoritas file punya urutan kelas yang beda dari kanonik plugin v4; (b) sebagian file memang belum pernah diformat (mis. `Profile.vue` sempat punya `const` tanpa titik koma). **Konsekuensi desain: sapuan dijalankan SEKALI dengan config final, bukan dua kali.**
@@ -74,10 +84,10 @@ Sumber SHA/waktu: reflog `.git/logs/HEAD` (epoch `+0700`). Enam commit DFORM-44 
 
 ## Verifikasi
 
-> Catatan kejujuran: penulis dokumen ini **tidak punya shell**, jadi tidak bisa menjalankan `prettier`, `vitest`, `eslint`, `podman`, atau `git show --stat`. Yang **sudah diverifikasi langsung ke tree**: isi `.prettierrc`, isi `.github/workflows/code_formatting.yml`, dan isi `.githooks/pre-commit`. Semua SHA/pesan/waktu commit diverifikasi dari reflog `.git/logs/HEAD`. Sisanya ditandai **"dari brief"**.
+> Catatan kejujuran: penulis dokumen ini **tidak punya shell**, jadi tidak bisa menjalankan `prettier`, `vitest`, `eslint`, `podman`, atau `git show --stat`. Yang **sudah diverifikasi langsung ke tree**: isi `.prettierrc`, isi `.github/workflows/code_formatting.yml` dan `.github/workflows/frontend_typecheck.yml`, dan isi `.githooks/pre-commit`. Semua SHA/pesan/waktu commit diverifikasi dari reflog `.git/logs/HEAD`. Sisanya ditandai **"dari brief"**.
 
-- **Config** (diverifikasi langsung): `.prettierrc` memuat `"tailwindStylesheet": "./resources/css/app.css"`; workflow Prettier tanpa `continue-on-error` dan scope-nya `resources/js/**/*.{vue,ts}` + `resources/css/**/*.css`; `.githooks/pre-commit` ada dan isinya sesuai deskripsi (filter staged js/css, nol dependensi).
-- **Commit** (diverifikasi dari reflog): keenam SHA/pesan/waktu DFORM-44 seperti tabel; `8e25a41` = HEAD; urutan commit non-kontigu karena terselip commit ticket lain.
+- **Config** (diverifikasi langsung): `.prettierrc` memuat `"tailwindStylesheet": "./resources/css/app.css"`; workflow Prettier tanpa `continue-on-error` dan scope-nya `resources/js/**/*.{vue,ts}` + `resources/css/**/*.css`; kedua workflow (`code_formatting.yml`, `frontend_typecheck.yml`) mencantumkan `main`, `dev`, `temp` pada `on.push` dan `on.pull_request`, dan job `typecheck` tanpa `continue-on-error`; `.githooks/pre-commit` ada dan isinya sesuai deskripsi (filter staged js/css, nol dependensi).
+- **Commit** (diverifikasi dari reflog): ketujuh SHA/pesan/waktu DFORM-44 seperti tabel; `8c5a01b` = HEAD; urutan commit non-kontigu karena terselip commit ticket lain (termasuk `189296b` changelog DFORM-44 dan `a2f28a6` DFORM-46).
 - **Dari brief (belum diverifikasi independen, tanpa shell)**: angka baseline 404/411/524, cakupan 412 file, rincian batch 4, hasil **vitest 58 file / 386 tes hijau** per batch, eslint exit 0, build container (`podman exec -w /app d_form_app npm run build`) exit 0, penutup `npx prettier --check "resources/js/**/*.{vue,ts}" "resources/css/**/*.css"` → *"All matched files use Prettier code style!"*.
 - **Uji gate (dari brief)**: file probe berformat buruk **DITOLAK**; tanpa berkas js/css yang di-stage → exit 0 (lolos).
 - **Tiga selisih angka — sudah diselesaikan dengan bukti git** (dilaporkan jujur dulu oleh penulis dokumen, lalu ditutup orchestrator, bukan dibiarkan menggantung):
