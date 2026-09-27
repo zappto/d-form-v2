@@ -26,11 +26,11 @@ import {
 } from '@/components/modules/builder/optionImage';
 import { mergeSentHeader, stripBlankRequiredKeys } from '@/lib/autosaveHeader';
 import { AUTOSAVE_DEBOUNCE_MS } from '@/lib/debounce';
-import { readXsrfToken } from '@/lib/inertiaRequest';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import { toFormMetadataPayload, type IFormRegistrationMetadata } from '@/types/form';
 import type { BackendField, BuilderField } from '@/types/form-builder';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
+import { useInertiaRequest } from './useInertiaRequest';
 
 /** State builder langsung yang dibaca hook tiap save; sumber tetap milik halaman. */
 export interface IBuilderAutosaveState {
@@ -235,6 +235,7 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
     const lastSentFields = ref<BackendField[] | null>(null);
     const lastHydratedFormId = ref<string | null>(null);
     const lastCleanSnapshot = ref<string | null>(null);
+    const { readXsrfToken } = useInertiaRequest();
 
     /** Snapshot autosave saat ini dari state live halaman. */
     function snapshot(): string {

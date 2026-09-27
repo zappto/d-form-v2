@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { readXsrfToken, sendFormAnswerReview } from '@/lib/inertiaRequest';
+import { useInertiaRequest } from '../useInertiaRequest';
+
+const { readXsrfToken, sendFormAnswerReview } = useInertiaRequest();
 
 describe('readXsrfToken', () => {
     afterEach(() => {

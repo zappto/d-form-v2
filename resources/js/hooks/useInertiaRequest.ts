@@ -10,8 +10,21 @@ export interface IReviewRequestResult {
     body: IReviewResponseBody | null;
 }
 
+/** Argumen kirim status review jawaban; `method` dinormalkan ke uppercase di dalam request. */
+export interface ISendFormAnswerReviewArgs {
+    url: string;
+    method: string;
+    reviewStatus: 'accepted' | 'rejected';
+}
+
+/** Kontrak hook akses request Inertia: baca token CSRF + kirim review jawaban. */
+export interface IUseInertiaRequestResult {
+    readXsrfToken: () => string | null;
+    sendFormAnswerReview: (args: ISendFormAnswerReviewArgs) => Promise<IReviewRequestResult>;
+}
+
 /** Token CSRF Laravel dari cookie XSRF-TOKEN; null bila cookie belum ada. */
-export function readXsrfToken(): string | null {
+function readXsrfToken(): string | null {
     const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
     const encoded = match?.[1];
     return encoded ? decodeURIComponent(encoded) : null;
@@ -23,11 +36,7 @@ function isReviewResponseBody(value: unknown): value is IReviewResponseBody {
 }
 
 /** Kirim status review jawaban (accept/reject) dengan CSRF cookie; dipakai kedua halaman review. */
-export async function sendFormAnswerReview(args: {
-    url: string;
-    method: string;
-    reviewStatus: 'accepted' | 'rejected';
-}): Promise<IReviewRequestResult> {
+async function sendFormAnswerReview(args: ISendFormAnswerReviewArgs): Promise<IReviewRequestResult> {
     const token = readXsrfToken();
     const response = await fetch(args.url, {
         method: args.method.toUpperCase(),
@@ -47,4 +56,9 @@ export async function sendFormAnswerReview(args: {
         status: response.status,
         body: isReviewResponseBody(rawBody) ? rawBody : null,
     };
+}
+
+/** Hook akses request Inertia berbasis cookie CSRF; sediakan pembaca token + pengirim review jawaban. */
+export function useInertiaRequest(): IUseInertiaRequestResult {
+    return { readXsrfToken, sendFormAnswerReview };
 }

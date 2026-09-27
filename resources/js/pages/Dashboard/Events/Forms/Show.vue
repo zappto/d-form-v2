@@ -41,7 +41,7 @@ import {
 } from '@/lib/formSubmissionsUi';
 import { parseApiErrorMessage, showErrorToast, showHttpErrorToast } from '@/lib/error-message';
 import { isFileUploadTypeName } from '@/lib/formFieldKind';
-import { sendFormAnswerReview } from '@/lib/inertiaRequest';
+import { useInertiaRequest } from '@/hooks/useInertiaRequest';
 import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard/Events/Forms/FormAnswerReviewController';
 import FormAnswerDetailSheet from '@/components/modules/dashboard/FormAnswerDetailSheet.vue';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
@@ -63,6 +63,7 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
+const { sendFormAnswerReview } = useInertiaRequest();
 
 /** Baca tab dari query string agar deep-link ?tab=jawaban bekerja saat refresh/back. */
 function tabFromQuery(): TShowTab {
