@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { ImageUp, RefreshCw, X } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import { useBannerFilePicker } from '@/hooks/useBannerFilePicker';
 
 /** Tipe MIME yang diterima picker banner; selaras batas backend `banner_file`. */
@@ -61,7 +62,7 @@ const frameClass = computed<string>(() =>
     cn(
         'border-border bg-card overflow-hidden rounded-2xl border shadow-sm transition-[border-color,box-shadow] duration-200',
         isDragging.value && 'border-primary/60 ring-primary/15 ring-2',
-        props.invalid && 'border-destructive/70 bg-red-50 dark:bg-red-500/10'
+        fieldInvalidClass(props.invalid)
     )
 );
 
@@ -69,7 +70,7 @@ const dropZoneClass = computed<string>(() =>
     cn(
         'border-border bg-muted/25 overflow-hidden rounded-xl border-2 transition-colors',
         isDragging.value && 'border-primary/60 bg-primary/5',
-        props.invalid && 'border-destructive/70 bg-red-50 dark:bg-red-500/10'
+        fieldInvalidClass(props.invalid)
     )
 );
 
@@ -209,10 +210,9 @@ function onDrop(event: DragEvent): void {
                         </Button>
                         <Button
                             radius="icon"
-                            variant="ghost"
+                            variant="destructive-ghost"
                             size="icon-sm"
                             type="button"
-                            class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                             aria-label="Hapus banner"
                             @click="removeFile"
                         >
@@ -235,9 +235,8 @@ function onDrop(event: DragEvent): void {
                 <Button
                     type="button"
                     radius="icon"
-                    variant="ghost"
+                    variant="destructive-ghost"
                     size="icon-sm"
-                    class="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                     aria-label="Hapus banner"
                     @click="removeFile"
                 >

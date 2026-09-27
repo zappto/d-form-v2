@@ -292,12 +292,7 @@ const currentIndex = computed(() => (step.value === 'forms' ? 1 : 0));
                 <div class="flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
                     <EventWizardStepper :steps="steps" :active-index="currentIndex" />
                     <div class="flex shrink-0 items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            class="border-destructive/30 text-destructive hover:bg-destructive/10"
-                            @click="showCancelModal = true"
-                        >
+                        <Button variant="destructive-outline" size="sm" @click="showCancelModal = true">
                             Batalkan
                         </Button>
                         <Button size="sm" class="shrink-0" @click="goToForms"> Lanjutkan </Button>
@@ -317,13 +312,7 @@ const currentIndex = computed(() => (step.value === 'forms' ? 1 : 0));
                 <div class="flex flex-wrap items-center gap-2">
                     <Button variant="outline" @click="goBackToEvent">Kembali ke event</Button>
                     <Button variant="outline" @click="skipWizard">Lewati</Button>
-                    <Button
-                        variant="outline"
-                        class="border-destructive/30 text-destructive hover:bg-destructive/10"
-                        @click="showCancelModal = true"
-                    >
-                        Batalkan
-                    </Button>
+                    <Button variant="destructive-outline" @click="showCancelModal = true"> Batalkan </Button>
                     <Button :disabled="finishing" :aria-busy="finishing" @click="finishWizard">
                         <CometSpinner v-if="finishing" :size="16" />
                         {{ finishing ? 'Menyimpan...' : 'Selesai' }}

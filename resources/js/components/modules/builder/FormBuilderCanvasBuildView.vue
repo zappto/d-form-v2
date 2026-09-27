@@ -437,9 +437,8 @@ const showDropChrome = computed(
                                                 </Button>
                                                 <Button
                                                     radius="icon"
-                                                    variant="ghost"
+                                                    variant="destructive-ghost"
                                                     size="icon-sm"
-                                                    class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                     aria-label="Hapus field"
                                                     @click="$emit('deleteField', field.id)"
                                                 >

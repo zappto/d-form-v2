@@ -210,10 +210,9 @@ function handleLogout(): void {
                 </Link>
 
                 <Button
-                    variant="ghost"
+                    variant="destructive-ghost"
                     size="sm"
                     aria-label="Keluar"
-                    class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive shadow-none transition-colors duration-150 hover:shadow-none"
                     @click="router.post(logout().url)"
                 >
                     <LogOut class="size-4" />

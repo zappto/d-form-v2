@@ -273,9 +273,8 @@ function confirmDelete(): void {
                                         </Button>
                                         <Button
                                             v-if="canDelete(row)"
-                                            variant="ghost"
+                                            variant="destructive-ghost"
                                             size="icon-sm"
-                                            class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                             :aria-label="`Hapus ${row.name}`"
                                             @click="startDelete(row)"
                                         >

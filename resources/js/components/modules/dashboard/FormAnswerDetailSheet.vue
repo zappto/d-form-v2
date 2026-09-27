@@ -205,8 +205,8 @@ const answerSections = computed(() => {
                         </Button>
                         <Button
                             type="button"
-                            variant="outline"
-                            class="h-10 flex-1 gap-1.5 border-destructive/35 text-sm font-medium text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            variant="destructive-outline"
+                            class="h-10 flex-1 gap-1.5 text-sm font-medium"
                             :disabled="isSubmissionReviewing(submission.id)"
                             @click="emit('review', { action: 'reject', submission })"
                         >

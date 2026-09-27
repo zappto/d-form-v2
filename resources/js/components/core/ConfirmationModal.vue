@@ -9,6 +9,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { buttonVariants } from '@/components/ui/button'
 import { CometSpinner } from '@/components/ui/comet'
 
 defineProps<{
@@ -40,7 +41,7 @@ const emit = defineEmits<{
                     {{ cancelText ?? 'Cancel' }}
                 </AlertDialogCancel>
                 <AlertDialogAction
-                    :class="variant === 'destructive' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive/30' : ''"
+                    :class="variant === 'destructive' ? buttonVariants({ variant: 'destructive' }) : ''"
                     :disabled="loading"
                     :aria-busy="loading"
                     @click="emit('confirm')"

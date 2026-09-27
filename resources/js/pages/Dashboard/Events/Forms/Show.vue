@@ -806,10 +806,9 @@ function rejectLabel(submission: IFormSubmission): string {
                                                 <TooltipTrigger as-child>
                                                     <Button
                                                         type="button"
-                                                        variant="ghost"
+                                                        variant="destructive-ghost"
                                                         radius="icon"
                                                         size="icon-sm"
-                                                        class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                         :aria-label="`${rejectLabel(submission)} jawaban dari ${submission.user?.name ?? 'pengirim'}`"
                                                         :disabled="isSubmissionReviewing(submission.id)"
                                                         @click="submitSubmissionReview('reject', submission)"

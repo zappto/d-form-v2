@@ -200,9 +200,9 @@ defineEmits<{
             <CardContent class="flex flex-col gap-2 pt-0">
                 <Button
                     v-if="!event.deleted_at"
-                    variant="outline"
+                    variant="destructive-outline"
                     size="sm"
-                    class="border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive w-full justify-start"
+                    class="w-full justify-start"
                     @click="$emit('openArchive')"
                 >
                     <Trash2 class="mr-2 size-4" />Archive event

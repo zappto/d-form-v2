@@ -224,9 +224,9 @@ function submissionsHref(formId: string): string {
                                 </Link>
                             </Button>
                             <Button
-                                variant="outline"
+                                variant="destructive-outline"
                                 size="sm"
-                                class="inline-flex h-11 w-full items-center justify-center gap-1.5 border-destructive/25 bg-background/80 px-3 text-xs font-medium text-destructive hover:border-destructive/35 hover:bg-destructive/10 hover:text-destructive sm:h-9 sm:min-w-0"
+                                class="inline-flex h-11 w-full items-center justify-center gap-1.5 bg-background/80 px-3 text-xs font-medium sm:h-9 sm:min-w-0"
                                 @click="startDelete(form)"
                             >
                                 <Trash2 class="size-3.5 shrink-0" aria-hidden="true" />

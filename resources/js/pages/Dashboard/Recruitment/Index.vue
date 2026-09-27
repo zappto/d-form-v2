@@ -415,9 +415,8 @@ onMounted(() => {
                                 </Button>
                                 <Button
                                     v-if="period.can_delete"
-                                    variant="ghost"
+                                    variant="destructive-ghost"
                                     size="sm"
-                                    class="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                     @click="startDelete(period)"
                                 >
                                     <Trash2 class="mr-1.5 size-4" aria-hidden="true" />
