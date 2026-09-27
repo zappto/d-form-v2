@@ -10,9 +10,9 @@ import {
     readOptionImagePathsFromResponse,
     resolveOptionImagePreviewSrc,
 } from '../optionImage';
-import type { BackendField, BuilderField } from '@/types/form-builder';
+import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 
-function optionField(fieldId: string, optionId: string, extra: Record<string, unknown> = {}): BuilderField {
+function optionField(fieldId: string, optionId: string, extra: Partial<IFieldOptionEntry> = {}): BuilderField {
     return {
         id: fieldId,
         type: 'checkbox',
@@ -44,7 +44,7 @@ describe('option image upload (base64 → file storage)', () => {
                 imagePreviewUrl: 'blob:preview',
             }),
         ]);
-        const choices = rows[0].metadata.optionChoices as Array<Record<string, unknown>>;
+        const choices = rows[0].metadata.optionChoices as IFieldOptionEntry[];
         expect(choices[0].imageUrl).toBe('');
         // File mentah tak ikut serialisasi.
         expect(JSON.stringify(rows)).not.toContain('data:');
@@ -54,7 +54,7 @@ describe('option image upload (base64 → file storage)', () => {
 
     it('tanpa file pending berperilaku seperti sekarang (path utuh)', () => {
         const rows = toBackendFields([optionField('f1', 'o1')]);
-        const choices = rows[0].metadata.optionChoices as Array<Record<string, unknown>>;
+        const choices = rows[0].metadata.optionChoices as IFieldOptionEntry[];
         expect(choices[0].imageUrl).toBe('forms/options/old.jpg');
         expect(hasPendingOptionImageFiles([optionField('f1', 'o1')])).toBe(false);
         expect(pendingOptionImagesSnapshotKey([optionField('f1', 'o1')])).toBeNull();

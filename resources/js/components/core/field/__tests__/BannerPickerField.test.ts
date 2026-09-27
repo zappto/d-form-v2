@@ -22,7 +22,9 @@ function stubBlobUrls(revoked: string[]): void {
     });
 }
 
-function mountField(props: Record<string, unknown> = {}): ReturnType<typeof mount> {
+type TBannerPickerProps = InstanceType<typeof BannerPickerField>['$props'];
+
+function mountField(props: Partial<TBannerPickerProps> = {}): ReturnType<typeof mount> {
     return mount(BannerPickerField, { props: { file: null, ...props } });
 }
 

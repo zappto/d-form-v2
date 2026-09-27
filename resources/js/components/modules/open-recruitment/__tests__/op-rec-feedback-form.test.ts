@@ -18,14 +18,14 @@ config.global.renderStubDefaultSlot = true;
  */
 
 const { formHolder, postMock } = vi.hoisted(() => ({
-    formHolder: { state: null as Record<string, unknown> | null },
-    postMock: vi.fn(),
+    formHolder: { state: null as IFormStateHolder | null },
+    postMock: vi.fn<(url: string, options?: InertiaMutationOptions) => void>(),
 }));
 
 vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
     return {
-        useForm: (initial: Record<string, unknown>) => {
+        useForm: <T extends object>(initial: T) => {
             const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
@@ -37,7 +37,7 @@ vi.mock('@inertiajs/vue3', async () => {
                 }),
                 clearErrors: vi.fn(),
             });
-            formHolder.state = state as unknown as Record<string, unknown>;
+            formHolder.state = state;
             return state;
         },
     };
@@ -49,6 +49,11 @@ vi.mock('@/lib/error-message', () => ({
     showErrorToast: vi.fn(),
     showFlashToast: vi.fn(),
 }));
+
+/** Irisan state form yang diintip test (proses submit) — tipe konkret, bukan peta longgar. */
+interface IFormStateHolder {
+    processing: boolean;
+}
 
 interface InertiaMutationOptions {
     preserveScroll?: boolean;
@@ -68,7 +73,7 @@ function lastPostOptions(): InertiaMutationOptions {
 function mountForm(): VueWrapper {
     return mount(OpRecFeedbackForm, {
         props: { storeUrl: '/recruitment/track/feedback' },
-    }) as unknown as VueWrapper;
+    });
 }
 
 function submitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
@@ -83,8 +88,8 @@ beforeEach(() => {
     vi.clearAllMocks();
     lastOptions = undefined;
     postMock.mockReset();
-    postMock.mockImplementation((...args: unknown[]) => {
-        lastOptions = args[1] as InertiaMutationOptions | undefined;
+    postMock.mockImplementation((_url, options) => {
+        lastOptions = options;
         const state = formHolder.state;
         if (state) state.processing = true;
         return undefined;

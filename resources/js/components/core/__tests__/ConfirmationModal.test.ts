@@ -10,7 +10,9 @@ import ConfirmationModal from '../ConfirmationModal.vue';
  * - swap teks mengikuti variant ('Menghapus...' bila destructive, 'Menyimpan...' bila default)
  */
 
-function mountModal(props: Record<string, unknown>) {
+type TConfirmationModalProps = InstanceType<typeof ConfirmationModal>['$props'];
+
+function mountModal(props: Partial<TConfirmationModalProps>) {
     const wrapper = mount(ConfirmationModal, {
         props: {
             open: true,
