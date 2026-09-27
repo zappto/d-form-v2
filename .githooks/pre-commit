@@ -1,0 +1,12 @@
+#!/bin/sh
+# Gate format lokal (DFORM-44): cek prettier hanya pada berkas js/css yang di-stage.
+# Aktifkan sekali per klon: git config core.hooksPath .githooks
+# Scope sengaja sama dengan gate CI: resources/js/**/*.{vue,ts} + resources/css/**/*.css.
+set -e
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^resources/(js/.*\.(ts|vue)|css/.*\.css)$' || true)
+if [ -z "$staged" ]; then
+    exit 0
+fi
+
+echo "$staged" | xargs npx prettier --check

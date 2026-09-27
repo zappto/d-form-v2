@@ -65,10 +65,12 @@ jobs:
               # Jika tidak, ganti dengan: npm install -g prettier
               run: npm install
 
-            - name: 💅 Run Prettier (HTML, CSS, JS, Blade Formatting)
-              run: npx prettier --check .
-              continue-on-error: true
-              # Perintah ini akan memformat semua file yang didukung oleh Prettier in-place
+            - name: 💅 Run Prettier (js/css proyek)
+              # DFORM-44: gate ini BLOCKING (sebelumnya continue-on-error sehingga tak pernah
+              # menggagalkan build). Scope sengaja disempitkan ke area yang sudah dinormalisasi:
+              # resources/js/**/*.{vue,ts} + resources/css/**/*.css. Area lain (docs, blade, aset
+              # JSON di public/lotties) belum dinormalisasi dan tidak digerbang di sini.
+              run: npx prettier --check "resources/js/**/*.{vue,ts}" "resources/css/**/*.css"
 
             # --- COMMIT & PUSH BALIK PERUBAHAN ---
             # - name: ⚙️ Check for changes and Commit
