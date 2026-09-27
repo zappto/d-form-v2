@@ -3,7 +3,7 @@
  * dipakai untuk meta description / JSON-LD teks.
  */
 export function stripHtmlToText(html: string | null, maxLength = 320): string {
-    if (html === null || html === '') {
+    if (html == null || html === '') {
         return '';
     }
     let text = html
@@ -22,7 +22,7 @@ export function stripHtmlToText(html: string | null, maxLength = 320): string {
 
 /** True bila HTML mengandung teks bermakna (tag & `&nbsp;` dibuang); dipakai untuk menyembunyikan zona kosong. */
 export function hasMeaningfulHtmlText(html: string | null): boolean {
-    if (html === null || html === '') {
+    if (html == null || html === '') {
         return false;
     }
     const text = html
