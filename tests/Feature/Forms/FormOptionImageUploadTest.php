@@ -4,6 +4,7 @@ namespace Tests\Feature\Forms;
 
 use App\Models\Event;
 use App\Models\Form;
+use App\Models\FormField;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -183,5 +184,41 @@ class FormOptionImageUploadTest extends TestCase
             }
         }
         $this->assertTrue($hasOptionError, 'Expected validation error for option_images, got: '.json_encode($errors));
+    }
+
+    public function test_option_image_replace_deletes_old_file(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $event = Event::factory()->create();
+        $form = Form::factory()->create(['event_id' => $event->id]);
+        $path = $this->fieldSavePath($event, $form);
+        $fieldId = (string) Str::uuid();
+        $optionId = (string) Str::uuid();
+
+        $oldPath = 'forms/options/old.jpg';
+        Storage::disk('public')->put($oldPath, 'x');
+        $row = $this->checkboxRow($fieldId, $optionId, $oldPath);
+        FormField::factory()->create([
+            'id' => $fieldId,
+            'form_id' => $form->id,
+            'metadata' => $row['metadata'],
+        ]);
+
+        $response = $this->actingAs($admin)->post($path, [
+            'fields' => json_encode([$this->checkboxRow($fieldId, $optionId, '')]),
+            'deleted_ids' => json_encode([]),
+            'option_images' => [$fieldId => [$optionId => UploadedFile::fake()->image('baru.jpg', 800, 800)]],
+        ], [
+            'Accept' => 'application/json',
+            'X-Requested-With' => 'XMLHttpRequest',
+        ]);
+
+        $response->assertOk()->assertJson(['ok' => true]);
+        Storage::disk('public')->assertMissing($oldPath);
+        $storedMap = $response->json('option_images');
+        $storedPath = is_array($storedMap) ? ($storedMap["{$fieldId}:{$optionId}"] ?? null) : null;
+        $this->assertIsString($storedPath);
+        Storage::disk('public')->assertExists($storedPath);
     }
 }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\EventFormVisibility;
 use App\Enums\FormPurpose;
+use App\Observers\FormObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[ObservedBy(FormObserver::class)]
 class Form extends Model
 {
     /** @use HasFactory<\Database\Factories\FormFactory> */

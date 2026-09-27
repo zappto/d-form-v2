@@ -4,6 +4,8 @@ namespace App\Models\Recruitment;
 
 use App\Enums\Recruitment\ApplicationResult;
 use App\Enums\Recruitment\ApplicationStage;
+use App\Observers\RecruitmentApplicationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+#[ObservedBy(RecruitmentApplicationObserver::class)]
 class RecruitmentApplication extends Model
 {
     /** @use HasFactory<\Database\Factories\Recruitment\RecruitmentApplicationFactory> */

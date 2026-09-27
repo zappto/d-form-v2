@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Event;
 use App\Models\Form;
+use App\Support\StorageJanitor;
 use Illuminate\Support\Facades\Cache;
 
 class EventObserver
@@ -64,9 +65,21 @@ class EventObserver
     /**
      * Handle the Event "force deleted" event.
      */
+    /**
+     * Force-delete forms anak DULU supaya observer mereka jalan dan FK aman.
+     * (forceDeleted sudah terlambat: baris induk terhapus duluan.)
+     */
+    public function forceDeleting(Event $event): void
+    {
+        $event->forms()->withTrashed()->get()->each(function (Form $form): void {
+            $form->forceDelete();
+        });
+    }
+
+    /** Hapus banner event. Anak sudah di-force-delete di forceDeleting (FK aman). */
     public function forceDeleted(Event $event): void
     {
-        //
+        StorageJanitor::deletePublic($event->banner);
     }
 
     private function invalidateEventListCache(): void

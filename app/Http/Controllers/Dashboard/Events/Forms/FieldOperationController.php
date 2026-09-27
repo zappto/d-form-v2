@@ -8,6 +8,7 @@ use App\Models\Form;
 use App\Models\FormField;
 use App\Models\Event;
 use App\Support\FormFieldTypeMapping;
+use App\Support\StorageJanitor;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -59,6 +60,7 @@ class FieldOperationController extends Controller
             if (is_array($optionImageFiles) && $optionImageFiles !== []) {
                 $storedOptionPaths = $this->storeOptionImageFiles($optionImageFiles);
                 if ($storedOptionPaths !== []) {
+                    $this->deleteReplacedOptionImages($form, $storedOptionPaths);
                     $rows = $this->applyStoredOptionImagePaths($rows, $storedOptionPaths);
                 }
             }
@@ -293,6 +295,45 @@ class FieldOperationController extends Controller
         }
 
         return $stored;
+    }
+
+    /**
+     * Hapus imageUrl lama yang digantikan file baru (pola storeBannerFile).
+     * Key map "fieldId:optionId" → cari opsi yang sama di metadata DB;
+     * lewati bila kosong/sama/base64/URL (guard milik StorageJanitor).
+     *
+     * @param  array<string, string>  $storedMap
+     */
+    private function deleteReplacedOptionImages(Form $form, array $storedMap): void
+    {
+        foreach ($storedMap as $key => $storedPath) {
+            if (! is_string($key) || ! is_string($storedPath) || $storedPath === '') {
+                continue;
+            }
+            $parts = explode(':', $key, 2);
+            if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
+                continue;
+            }
+            [$fieldId, $optionId] = $parts;
+            $field = $form->formFields()->where('id', $fieldId)->first();
+            if ($field === null) {
+                continue;
+            }
+            $metadata = $field->metadata;
+            $meta = $metadata instanceof \Illuminate\Support\Collection ? $metadata->all() : (array) $metadata;
+            $choices = $meta['optionChoices'] ?? [];
+            $choices = $choices instanceof \Illuminate\Support\Collection ? $choices->all() : (array) $choices;
+            foreach ($choices as $choice) {
+                $row = $choice instanceof \Illuminate\Support\Collection ? $choice->all() : (array) $choice;
+                if (($row['id'] ?? null) !== $optionId) {
+                    continue;
+                }
+                $previous = $row['imageUrl'] ?? null;
+                if (is_string($previous) && $previous !== '' && $previous !== $storedPath) {
+                    StorageJanitor::deletePublic($previous);
+                }
+            }
+        }
     }
 
     /**

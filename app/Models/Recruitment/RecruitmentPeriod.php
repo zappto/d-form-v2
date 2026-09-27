@@ -3,6 +3,10 @@
 namespace App\Models\Recruitment;
 
 use App\Enums\Recruitment\RecruitmentPeriodStatus;
+use App\Models\User;
+use App\Observers\RecruitmentPeriodObserver;
+use App\Policies\Recruitment\RecruitmentPeriodPolicy;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,9 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\User;
-use App\Policies\Recruitment\RecruitmentPeriodPolicy;
 
+#[ObservedBy(RecruitmentPeriodObserver::class)]
 #[UsePolicy(RecruitmentPeriodPolicy::class)]
 class RecruitmentPeriod extends Model
 {
