@@ -30,6 +30,16 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     default: { template: '<div data-testid="empty-state"><slot /></div>' },
 }))
 
+// Kalender Admin Dashboard kini konsumen data nyata (Mx-D); assert props tanpa
+// memuat dependency berat (Dialog/Card/dummyData).
+vi.mock('@/components/modules/dashboard/EventCalendar.vue', () => ({
+    default: {
+        name: 'EventCalendar',
+        props: { events: { type: Array, default: () => [] } },
+        template: '<div data-testid="event-calendar" :data-count="events.length" />',
+    },
+}))
+
 function demoScanResult(): ScanResult {
     return {
         name: 'Budi Santoso',
@@ -77,10 +87,8 @@ function mountDashboardIndex(props: Record<string, unknown>): VueWrapper {
             stubs: {
                 KpiCard: true,
                 RecentEventsCard: true,
-                MiniCalendar: true,
                 RegistrationChart: true,
                 CategoryChart: true,
-                EventCalendar: true,
             },
         },
     }) as unknown as VueWrapper
@@ -89,6 +97,9 @@ function mountDashboardIndex(props: Record<string, unknown>): VueWrapper {
 function fullDashboardProps(): Record<string, unknown> {
     return {
         recentEvents: [],
+        calendarEvents: [
+            { id: 'ev-1', title: 'Acara', start_date: '2026-10-01', end_date: null, category: 'rkt', href: '/admin/events/ev-1' },
+        ],
         stats: demoStats(),
         adminCharts: { registrationTrend: [], categoryBreakdown: [] },
     }
@@ -220,9 +231,26 @@ describe('Dashboard/Index skeleton (M2 Task 6)', () => {
             expect(wrapper.find('.recent-skeleton').exists()).toBe(true)
             expect(wrapper.findAll('.chart-skeleton')).toHaveLength(2)
 
-            // Kalender tanpa props selalu tampil.
+            // Kalender data nyata selalu tampil; section duplikat 'Linimasa acara' dihapus (Mx-D).
             expect(wrapper.text()).toContain('Aktivitas & kalender')
-            expect(wrapper.text()).toContain('Linimasa acara')
+            expect(wrapper.find('[data-testid="event-calendar"]').exists()).toBe(true)
+            expect(wrapper.text()).not.toContain('Linimasa acara')
+            expect(wrapper.find('[data-testid="mini-calendar"]').exists()).toBe(false)
+        } finally {
+            wrapper.unmount()
+        }
+    })
+
+    it('kalender memakai calendarEvents & kalender dummy tidak dirender (Mx-D)', async () => {
+        const wrapper = mountDashboardIndex(fullDashboardProps())
+        try {
+            await nextTick()
+
+            const calendar = wrapper.find('[data-testid="event-calendar"]')
+            expect(calendar.exists()).toBe(true)
+            expect(calendar.attributes('data-count')).toBe('1')
+            expect(wrapper.find('[data-testid="mini-calendar"]').exists()).toBe(false)
+            expect(wrapper.text()).not.toContain('Linimasa acara')
         } finally {
             wrapper.unmount()
         }

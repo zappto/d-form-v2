@@ -78,16 +78,13 @@ class MemberDashboardController extends Controller
             }
         }
 
-        $calendarEvents = $events->map(function (Event $event) {
-            return [
-                'id' => $event->id,
-                'title' => $event->title,
-                'start_date' => $event->start_date,
-                'end_date' => $event->end_date,
-                'category' => $event->category,
-                'href' => route('dashboard.user.events.show', ['event_segment' => $event->slug], false),
-            ];
-        })->values()->all();
+        $calendarEvents = $events
+            ->map(fn (Event $event) => $this->eventService->eventToCalendarArray(
+                $event,
+                route('dashboard.user.events.show', ['event_segment' => $event->slug], false),
+            ))
+            ->values()
+            ->all();
 
         return inertia('Dashboard/User/Index', [
             'stats' => [

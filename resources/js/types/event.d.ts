@@ -25,6 +25,17 @@ declare global {
         pending_team_invitation_url?: string | null
     }
 
+    /** Entri kalender dashboard (bentuk ringkas event: tanggal + tujuan href). */
+    interface ICalendarEvent {
+        id: string | number
+        title: string
+        start_date: string
+        end_date: string | null
+        category: string | string[] | null
+        location?: string | null
+        href: string
+    }
+
     interface IForm {
         id: string
         title: string

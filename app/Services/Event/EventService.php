@@ -211,6 +211,23 @@ class EventService
         );
     }
 
+    /**
+     * Bentuk satu event untuk kalender dashboard (id/title/tanggal/kategori + href tujuan).
+     *
+     * @return array<string, mixed>
+     */
+    public function eventToCalendarArray(Event $event, string $href): array
+    {
+        return [
+            'id' => $event->id,
+            'title' => $event->title,
+            'start_date' => $event->start_date,
+            'end_date' => $event->end_date,
+            'category' => $event->category,
+            'href' => $href,
+        ];
+    }
+
     private function rememberList(string $key, \Closure $callback): mixed
     {
         try {

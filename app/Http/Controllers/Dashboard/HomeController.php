@@ -33,6 +33,14 @@ class HomeController extends Controller
             ->values()
             ->all();
 
+        $calendarEvents = $allEvents
+            ->map(fn (Event $e) => $this->eventService->eventToCalendarArray(
+                $e,
+                route('dashboard.events.show', ['event' => $e]),
+            ))
+            ->values()
+            ->all();
+
         $total = $allEvents->count();
         $closed = $allEvents->filter(
             fn (Event $e) => $this->eventService->registrationStatus($e) === EventRegistrationStatus::Closed
@@ -52,6 +60,7 @@ class HomeController extends Controller
 
         return inertia('Dashboard/Index', [
             'recentEvents' => $recentEvents,
+            'calendarEvents' => $calendarEvents,
             'stats' => $stats,
             'adminCharts' => $adminCharts,
         ]);

@@ -10,18 +10,8 @@ import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData';
 import { formatDisplayDate } from '@/lib/format';
 import { toCategoryList, primaryCategory } from '@/lib/eventCategories';
 
-interface CalendarEvent {
-    id: string | number
-    title: string
-    start_date: string
-    end_date: string | null
-    category: string | string[] | null
-    location?: string | null
-    href: string
-}
-
 interface Props {
-    events?: CalendarEvent[]
+    events?: ICalendarEvent[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -35,7 +25,7 @@ const filterCategory = ref('all');
 const viewMode = ref<'month' | 'week'>('month');
 const currentWeekStart = ref(getWeekStart(today));
 
-const selectedEvent = ref<CalendarEvent | null>(null);
+const selectedEvent = ref<ICalendarEvent | null>(null);
 const showEventDialog = ref(false);
 
 const monthNamesId = [
@@ -94,7 +84,7 @@ function goToday() {
     currentWeekStart.value = getWeekStart(today);
 }
 
-function onEventClick(event: CalendarEvent) {
+function onEventClick(event: ICalendarEvent) {
     selectedEvent.value = event;
     showEventDialog.value = true;
 }
@@ -103,10 +93,10 @@ function toDateStr(d: Date): string {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-type CalendarEventWithEnd = CalendarEvent & { end_date: string }
+type TCalendarEventWithEnd = ICalendarEvent & { end_date: string }
 
-const filteredEvents = computed<CalendarEventWithEnd[]>(() => {
-    let events = props.events.filter((e): e is CalendarEventWithEnd => !!e.start_date && !!e.end_date);
+const filteredEvents = computed<TCalendarEventWithEnd[]>(() => {
+    let events = props.events.filter((e): e is TCalendarEventWithEnd => !!e.start_date && !!e.end_date);
     if (filterCategory.value !== 'all')
         events = events.filter((e) => toCategoryList(e.category).includes(filterCategory.value));
     return events;
@@ -117,7 +107,7 @@ const calendarWeeks = computed(() => {
     const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
     const prevMonthDays = new Date(currentYear.value, currentMonth.value, 0).getDate();
 
-    const cells: { day: number; date: Date; isCurrentMonth: boolean; isToday: boolean; events: CalendarEvent[] }[] =
+    const cells: { day: number; date: Date; isCurrentMonth: boolean; isToday: boolean; events: ICalendarEvent[] }[] =
         [];
 
     for (let i = firstDay - 1; i >= 0; i--) {

@@ -4,7 +4,6 @@ import { Head } from '@inertiajs/vue3';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import KpiCard from '@/components/modules/dashboard/KpiCard.vue';
 import RecentEventsCard from '@/components/modules/dashboard/RecentEventsCard.vue';
-import MiniCalendar from '@/components/modules/dashboard/MiniCalendar.vue';
 import RegistrationChart from '@/components/modules/dashboard/RegistrationChart.vue';
 import CategoryChart from '@/components/modules/dashboard/CategoryChart.vue';
 import EventCalendar from '@/components/modules/dashboard/EventCalendar.vue';
@@ -17,6 +16,7 @@ defineOptions({ layout: DashboardLayout });
 
 const props = defineProps<{
     recentEvents: IEvent[] | undefined;
+    calendarEvents: ICalendarEvent[] | undefined;
     stats:
         | {
               totalEvents: number;
@@ -118,7 +118,7 @@ onMounted(() => {
                         :event-base-href="routes.admin.events.index"
                     />
                 </div>
-                <MiniCalendar />
+                <EventCalendar :events="calendarEvents" />
             </div>
         </section>
 
@@ -148,11 +148,6 @@ onMounted(() => {
                 />
                 <CategoryChart :breakdown="adminCharts.categoryBreakdown" />
             </div>
-        </section>
-
-        <section class="space-y-4">
-            <h2 class="font-display text-base font-bold tracking-tight text-foreground">Linimasa acara</h2>
-            <EventCalendar />
         </section>
     </div>
 </template>
