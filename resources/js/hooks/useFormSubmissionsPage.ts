@@ -35,6 +35,11 @@ function readXsrfToken(): string | null {
     return m?.[1] ? decodeURIComponent(m[1]) : null;
 }
 
+/** True bila body respons review berupa objek JSON (batas eksternal `res.json()`). */
+function isSubmissionReviewBody(value: unknown): value is { message?: string } {
+    return typeof value === 'object' && value !== null;
+}
+
 function submissionRows(paginator: ISubmissionPaginator | undefined): IFormSubmission[] {
     return paginator?.data ?? [];
 }
@@ -190,7 +195,9 @@ export function useFormSubmissionsPage(props: {
                     body: JSON.stringify({ review_status }),
                 });
 
-                const body = (await res.json().catch(() => ({}))) as { message?: string };
+                // Body respons HTTP (batas eksternal `res.json()`); `unknown` disempitkan predikat objek.
+                const rawBody: unknown = await res.json().catch(() => ({}));
+                const body = isSubmissionReviewBody(rawBody) ? rawBody : undefined;
 
                 if (!res.ok) {
                     showHttpErrorToast(res.status, body, {

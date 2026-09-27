@@ -77,6 +77,11 @@ interface IGlobalScanErrorBody {
     errors?: Record<string, string[]>;
 }
 
+/** True bila body error scan berupa objek JSON (batas eksternal `error.response.data`). */
+function isGlobalScanErrorBody(value: unknown): value is IGlobalScanErrorBody {
+    return typeof value === 'object' && value !== null;
+}
+
 function resolveDeskId(): string {
     try {
         const existing = sessionStorage.getItem(DESK_STORAGE_KEY);
@@ -259,7 +264,9 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;
-                const body = error.response?.data as IGlobalScanErrorBody | undefined;
+                // Body error (batas eksternal `error.response.data`); `unknown` disempitkan predikat objek.
+                const rawBody: unknown = error.response?.data;
+                const body = isGlobalScanErrorBody(rawBody) ? rawBody : undefined;
 
                 if (status === 409) {
                     const kind = mapEnvelopeKind(body?.type);

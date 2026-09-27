@@ -66,6 +66,22 @@ const INERTIA_INTERNAL_KEYS: ReadonlySet<string> = new Set([
 /** Nilai mentah sumber form sebelum penyaringan; method internal dibuang saat iterasi. */
 type TRawFormValues = Record<string, TFormFillAnswerValue>;
 
+/** Bentuk Inertia `useForm` yang relevan: `.data()` mengembalikan peta jawaban mentah. */
+interface IFormDataProvider {
+    data: () => TRawFormValues;
+}
+
+/** True bila value menyediakan method `.data()` (Inertia asli); mock tanpa `.data()` memakai salinan properti. */
+function isFormDataProvider(value: unknown): value is IFormDataProvider {
+    return typeof value === 'object' && value !== null && 'data' in value && typeof value.data === 'function';
+}
+
+/** Salin properti enumerable sumber apa pun persis seperti spread objek (`{ ...form }`). */
+function copyFormValues(value: unknown): TRawFormValues {
+    const target: TRawFormValues = {};
+    return Object.assign(target, value);
+}
+
 /**
  * Ambil isian responden dari Inertia useForm apa adanya:
  * - pakai `.data()` bila tersedia (Inertia asli),
@@ -74,17 +90,14 @@ type TRawFormValues = Record<string, TFormFillAnswerValue>;
  */
 export function snapshotRespondentValues(form: unknown): TFormFillAnswerMap {
     let src: TRawFormValues;
-    if (typeof form === 'object' && form !== null && 'data' in form && typeof form.data === 'function') {
+    if (isFormDataProvider(form)) {
         try {
-            // `as` Inertia useForm: batas eksternal `unknown`; `.data()` mengembalikan peta jawaban mentah.
-            src = (form as { data: () => TRawFormValues }).data();
+            src = form.data();
         } catch {
-            // `as` fallback: `.data()` gagal, form tetap objek mentah.
-            src = { ...(form as TRawFormValues) };
+            src = copyFormValues(form);
         }
     } else {
-        // `as` fallback: mock tanpa `.data()`, nilai dipetakan langsung ke peta jawaban.
-        src = { ...(form as TRawFormValues) };
+        src = copyFormValues(form);
     }
     const values: TFormFillAnswerMap = {};
     for (const [key, value] of Object.entries(src)) {

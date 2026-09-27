@@ -112,13 +112,18 @@ interface IChangedFieldsRequest<GObject extends object, GKey extends keyof GObje
     fields: Record<GKey, true>;
 }
 
+/** True bila `key` kunci string milik `object`; menyempitkan hasil `Object.keys` tanpa cast. */
+function isKeyOf<GObject extends object>(object: GObject, key: string): key is Extract<keyof GObject, string> {
+    return key in object;
+}
+
 /** Ambil key yang nilainya berbeda antara current dan sent (satu objek argumen, maks dua param). */
 function pickChangedFields<GObject extends object, GKey extends keyof GObject>(
     request: IChangedFieldsRequest<GObject, GKey>
 ): Partial<GObject> {
     const diff: Partial<GObject> = {};
-    // Object.keys selalu string[] di TS; cast sempit ini satu-satunya cara iterasi runtime.
-    for (const key of Object.keys(request.fields) as GKey[]) {
+    for (const key of Object.keys(request.fields)) {
+        if (!isKeyOf(request.fields, key)) continue;
         if (headerValueChanged(request.current[key], request.sent[key])) {
             diff[key] = request.current[key];
         }

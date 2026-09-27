@@ -13,7 +13,7 @@ import { Banknote, CalendarDays, Clock, MapPin } from 'lucide-vue-next';
 
 /** Data turunan (kuota, status, progres) dan aksi arsip/pulihkan/publish halaman detail event dashboard. */
 export function useDashboardEventShowPage(event: IEvent, forms: { id: string; title: string }[]) {
-    const previewRegistrants = [] as IRegistrant[];
+    const previewRegistrants: IRegistrant[] = [];
     const totalRegistrants = event.registered_count;
 
     const showDeleteModal = ref(false);
