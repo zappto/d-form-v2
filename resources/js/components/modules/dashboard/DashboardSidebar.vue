@@ -47,14 +47,14 @@ const canScheduleRecruitmentInterviews = computed(() => user.value?.can_schedule
 const canViewMyRecruitmentInterviews = computed(() => user.value?.can_view_my_recruitment_interviews === true);
 const canViewRecruitmentActivity = computed(() => user.value?.can_view_recruitment_activity === true);
 const isInterviewerOnly = computed(() => user.value?.is_recruitment_interviewer_only === true);
-const canScanGlobal = computed(() => user.value?.can_manage_events === true || user.value?.can_scan_recruitment_attendance === true);
+const canScanGlobal = computed(
+    () => user.value?.can_manage_events === true || user.value?.can_scan_recruitment_attendance === true
+);
 
 const currentPath = computed(() => page.url);
 
 /** Beranda penyelenggara vs portal peserta — URL terpisah, sama-sama “Beranda” di UI. */
-const mainNavItems = computed(() => [
-    { label: 'Beranda', href: routes.dashboard.index, icon: LayoutDashboard },
-]);
+const mainNavItems = computed(() => [{ label: 'Beranda', href: routes.dashboard.index, icon: LayoutDashboard }]);
 
 const managementItems = computed(() => {
     const items: { label: string; href: string; icon: typeof CalendarDays }[] = [];
@@ -72,7 +72,11 @@ const managementItems = computed(() => {
     }
 
     if (canAccessRecruitment.value && isInterviewerOnly.value) {
-        items.push({ label: 'Interview OpRec', href: routes.admin.recruitment.myInterviews.index, icon: ClipboardCheck });
+        items.push({
+            label: 'Interview OpRec',
+            href: routes.admin.recruitment.myInterviews.index,
+            icon: ClipboardCheck,
+        });
     }
     // Rekrutmen untuk non-interviewer dirender sebagai parent collapsible
     // di bawah (showRecruitmentParent), bukan flat item di sini.
@@ -80,12 +84,12 @@ const managementItems = computed(() => {
     if (!canManageEvents.value && !canAccessRecruitment.value) {
         items.push(
             { label: 'Acara diikuti', href: routes.member.joined, icon: CalendarCheck2 },
-            { label: 'Jelajah acara', href: routes.member.browse, icon: Compass },
+            { label: 'Jelajah acara', href: routes.member.browse, icon: Compass }
         );
     } else if (!canManageEvents.value && canAccessRecruitment.value) {
         items.push(
             { label: 'Acara diikuti', href: routes.member.joined, icon: CalendarCheck2 },
-            { label: 'Jelajah acara', href: routes.member.browse, icon: Compass },
+            { label: 'Jelajah acara', href: routes.member.browse, icon: Compass }
         );
     }
 
@@ -124,9 +128,7 @@ const recruitmentSettingsItems = computed(() => {
 const showRecruitmentSettings = computed(() => recruitmentSettingsItems.value.length > 0);
 /** FLATTEN: gabung ops + settings jadi satu level sublist di bawah parent Rekrutmen. */
 const recruitmentSubItems = computed(() => [...recruitmentOpsItems.value, ...recruitmentSettingsItems.value]);
-const showRecruitmentParent = computed(
-    () => recruitmentOpsItems.value.length > 0 || showRecruitmentSettings.value,
-);
+const showRecruitmentParent = computed(() => recruitmentOpsItems.value.length > 0 || showRecruitmentSettings.value);
 
 const recruitmentOpen = ref(false);
 
@@ -149,7 +151,7 @@ watch(
             recruitmentOpen.value = true;
         }
     },
-    { immediate: true },
+    { immediate: true }
 );
 
 function closeMobileIfNeeded() {
@@ -161,27 +163,27 @@ const sidebarLogoSrc = `/${encodeURIComponent('DForm 1.png')}`;
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="sidebar" class="border-sidebar-border bg-sidebar overflow-x-hidden border-r">
+    <Sidebar collapsible="icon" variant="sidebar" class="overflow-x-hidden border-r border-sidebar-border bg-sidebar">
         <SidebarHeader class="gap-0 overflow-hidden border-b border-sidebar-border/50 p-0">
             <Link
                 :href="routes.dashboard.index"
-                class="hover:bg-sidebar-accent/25 flex w-full min-w-0 items-center overflow-hidden px-4 py-3.5 transition-colors"
+                class="flex w-full min-w-0 items-center overflow-hidden px-4 py-3.5 transition-colors hover:bg-sidebar-accent/25"
                 @click="closeMobileIfNeeded"
             >
                 <img
                     :src="sidebarLogoSrc"
                     alt="DForm"
-                    class="h-auto max-h-9 w-full max-w-full object-contain object-center select-none group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:max-h-8 group-data-[collapsible=icon]:max-w-8 group-data-[collapsible=icon]:object-contain"
+                    class="h-auto max-h-9 w-full max-w-full object-contain object-center select-none group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:max-h-8 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:max-w-8 group-data-[collapsible=icon]:object-contain"
                     width="160"
                     height="40"
                 />
             </Link>
         </SidebarHeader>
 
-        <SidebarContent class="flex-1 overflow-x-hidden px-2.5 pb-3 pt-3">
+        <SidebarContent class="flex-1 overflow-x-hidden px-2.5 pt-3 pb-3">
             <SidebarGroup class="p-0">
                 <SidebarGroupLabel
-                    class="text-sidebar-foreground/45 mb-2 px-2 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                    class="mb-2 px-2 text-[10px] font-semibold tracking-[0.14em] text-sidebar-foreground/45 uppercase"
                 >
                     Menu utama
                 </SidebarGroupLabel>
@@ -204,11 +206,11 @@ const sidebarLogoSrc = `/${encodeURIComponent('DForm 1.png')}`;
                 </SidebarGroupContent>
             </SidebarGroup>
 
-            <SidebarSeparator class="bg-sidebar-border/60 my-3 opacity-80" />
+            <SidebarSeparator class="my-3 bg-sidebar-border/60 opacity-80" />
 
             <SidebarGroup class="p-0">
                 <SidebarGroupLabel
-                    class="text-sidebar-foreground/45 mb-2 px-2 text-[10px] font-semibold tracking-[0.14em] uppercase"
+                    class="mb-2 px-2 text-[10px] font-semibold tracking-[0.14em] text-sidebar-foreground/45 uppercase"
                 >
                     Kelola
                 </SidebarGroupLabel>
@@ -250,7 +252,7 @@ const sidebarLogoSrc = `/${encodeURIComponent('DForm 1.png')}`;
                                         class="h-auto min-h-9 gap-2 rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors"
                                         :class="
                                             isActive(item.href)
-                                                ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-xs'
+                                                ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground shadow-xs'
                                                 : undefined
                                         "
                                     >
@@ -265,9 +267,7 @@ const sidebarLogoSrc = `/${encodeURIComponent('DForm 1.png')}`;
                     </SidebarMenu>
                 </SidebarGroupContent>
             </SidebarGroup>
-
         </SidebarContent>
-
 
         <SidebarRail />
     </Sidebar>

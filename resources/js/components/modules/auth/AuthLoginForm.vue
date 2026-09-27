@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { useForm, Link } from '@inertiajs/vue3'
-import { AuthSubmitButton } from '@/components/core/button'
-import { AuthField } from '@/components/core/field'
-import { store as login } from '@/actions/App/Http/Controllers/Auth/LoginController'
-import { index as forgotPasswordPage } from '@/actions/App/Http/Controllers/Auth/ForgotPasswordController'
-import { index as registerPage } from '@/actions/App/Http/Controllers/Auth/RegisterController'
-import { getFieldError, handleInertiaFormErrors } from '@/lib/error-message'
+import { useForm, Link } from '@inertiajs/vue3';
+import { AuthSubmitButton } from '@/components/core/button';
+import { AuthField } from '@/components/core/field';
+import { store as login } from '@/actions/App/Http/Controllers/Auth/LoginController';
+import { index as forgotPasswordPage } from '@/actions/App/Http/Controllers/Auth/ForgotPasswordController';
+import { index as registerPage } from '@/actions/App/Http/Controllers/Auth/RegisterController';
+import { getFieldError, handleInertiaFormErrors } from '@/lib/error-message';
 
-const form = useForm({ email: '', password: '' }).dontRemember('password')
+const form = useForm({ email: '', password: '' }).dontRemember('password');
 
 function submit(): void {
     form.submit(login(), {
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal masuk' })
+            handleInertiaFormErrors(errors, { title: 'Gagal masuk' });
         },
-    })
+    });
 }
 </script>
 

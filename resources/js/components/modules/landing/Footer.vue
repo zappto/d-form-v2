@@ -34,7 +34,7 @@ const mapEmbedUrl =
 </script>
 
 <template>
-    <footer class="border-border/20 bg-muted/20 border-t">
+    <footer class="border-t border-border/20 bg-muted/20">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
             <div class="grid gap-8 py-10 sm:gap-10 sm:py-14 lg:grid-cols-[1fr_1.1fr] lg:gap-16 lg:py-20">
                 <div class="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(18rem,0.9fr)] lg:grid-cols-1 lg:gap-8">
@@ -42,29 +42,33 @@ const mapEmbedUrl =
                         <a :href="routes.home" class="inline-flex items-center gap-2.5">
                             <img src="/public/DForm%201.png" alt="DOSCOM" class="h-8 w-auto sm:h-9" />
                         </a>
-                        <p class="text-muted-foreground mt-4 max-w-xl text-sm leading-relaxed sm:max-w-xs sm:text-[0.9375rem]">
+                        <p
+                            class="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:max-w-xs sm:text-[0.9375rem]"
+                        >
                             Platform sederhana untuk mengelola pendaftaran acara dari satu tempat. Dibangun oleh Doscom,
                             Universitas Dian Nuswantoro.
                         </p>
 
                         <div class="mt-6 flex flex-col gap-3.5">
-                            <div class="text-muted-foreground flex items-start gap-2.5 text-sm leading-relaxed">
-                                <MapPin class="text-primary/70 mt-0.5 size-4 shrink-0" />
+                            <div class="flex items-start gap-2.5 text-sm leading-relaxed text-muted-foreground">
+                                <MapPin class="mt-0.5 size-4 shrink-0 text-primary/70" />
                                 <span>Gedung D, Universitas Dian Nuswantoro, Jl. Nakula I No.5-11, Semarang</span>
                             </div>
-                            <div class="text-muted-foreground flex min-w-0 items-center gap-2.5 text-sm">
-                                <Mail class="text-primary/70 size-4 shrink-0" />
-                                <a href="mailto:doscom.go@gmail.com" class="hover:text-primary break-all transition-colors"
+                            <div class="flex min-w-0 items-center gap-2.5 text-sm text-muted-foreground">
+                                <Mail class="size-4 shrink-0 text-primary/70" />
+                                <a
+                                    href="mailto:doscom.go@gmail.com"
+                                    class="break-all transition-colors hover:text-primary"
                                     >doscom.go@gmail.com</a
                                 >
                             </div>
-                            <div class="text-muted-foreground flex items-center gap-2.5 text-sm">
-                                <Globe class="text-primary/70 size-4 shrink-0" />
+                            <div class="flex items-center gap-2.5 text-sm text-muted-foreground">
+                                <Globe class="size-4 shrink-0 text-primary/70" />
                                 <a
                                     href="https://doscom.org"
                                     target="_blank"
                                     rel="noopener"
-                                    class="hover:text-primary transition-colors"
+                                    class="transition-colors hover:text-primary"
                                     >doscom.org</a
                                 >
                             </div>
@@ -73,7 +77,9 @@ const mapEmbedUrl =
 
                     <div class="grid grid-cols-1 gap-6 min-[420px]:grid-cols-2 sm:grid-cols-3 md:gap-8 lg:grid-cols-3">
                         <div v-for="group in linkGroups" :key="group.title">
-                            <p class="text-foreground/50 mb-3 text-[0.75rem] font-semibold tracking-[0.14em] uppercase sm:mb-4">
+                            <p
+                                class="mb-3 text-[0.75rem] font-semibold tracking-[0.14em] text-foreground/50 uppercase sm:mb-4"
+                            >
                                 {{ group.title }}
                             </p>
                             <ul class="flex flex-col gap-2">
@@ -82,7 +88,7 @@ const mapEmbedUrl =
                                         :href="item.href"
                                         :target="'external' in item ? '_blank' : undefined"
                                         :rel="'external' in item ? 'noopener' : undefined"
-                                        class="text-muted-foreground hover:text-primary text-sm leading-relaxed transition-colors duration-150"
+                                        class="text-sm leading-relaxed text-muted-foreground transition-colors duration-150 hover:text-primary"
                                     >
                                         {{ item.label }}
                                     </a>
@@ -92,7 +98,7 @@ const mapEmbedUrl =
                     </div>
                 </div>
 
-                <div class="border-border/30 overflow-hidden rounded-[1.5rem] border shadow-sm sm:rounded-2xl">
+                <div class="overflow-hidden rounded-[1.5rem] border border-border/30 shadow-sm sm:rounded-2xl">
                     <iframe
                         :src="mapEmbedUrl"
                         width="100%"
@@ -109,11 +115,13 @@ const mapEmbedUrl =
 
             <Separator class="opacity-30" />
 
-            <div class="flex flex-col items-start justify-between gap-2 py-5 sm:flex-row sm:items-center sm:gap-3 sm:py-7">
-                <p class="text-muted-foreground text-[0.75rem] leading-relaxed">
+            <div
+                class="flex flex-col items-start justify-between gap-2 py-5 sm:flex-row sm:items-center sm:gap-3 sm:py-7"
+            >
+                <p class="text-[0.75rem] leading-relaxed text-muted-foreground">
                     &copy; {{ new Date().getFullYear() }} DForm — Doscom, Universitas Dian Nuswantoro
                 </p>
-                <p class="text-muted-foreground/60 text-[0.75rem] leading-relaxed">Semarang, Indonesia</p>
+                <p class="text-[0.75rem] leading-relaxed text-muted-foreground/60">Semarang, Indonesia</p>
             </div>
         </div>
     </footer>

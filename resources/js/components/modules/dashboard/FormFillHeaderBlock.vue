@@ -1,11 +1,11 @@
 <script setup lang="ts">
 defineProps<{
-    formTitle: string
-    formDescription: string
-    formHasDescription: boolean
-    formBannerImageSrc: string
-    formBannerCaption: string
-}>()
+    formTitle: string;
+    formDescription: string;
+    formHasDescription: boolean;
+    formBannerImageSrc: string;
+    formBannerCaption: string;
+}>();
 </script>
 
 <template>
@@ -29,8 +29,12 @@ defineProps<{
         </div>
 
         <div class="mb-5 rounded-2xl border border-border bg-card p-4 text-center shadow-sm">
-            <h1 class="font-display text-balance text-4xl font-bold tracking-[-0.035em] text-foreground">{{ formTitle }}</h1>
-            <p v-if="formHasDescription" class="mt-3 text-sm leading-relaxed text-muted-foreground">{{ formDescription }}</p>
+            <h1 class="font-display text-4xl font-bold tracking-[-0.035em] text-balance text-foreground">
+                {{ formTitle }}
+            </h1>
+            <p v-if="formHasDescription" class="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {{ formDescription }}
+            </p>
         </div>
     </div>
 </template>

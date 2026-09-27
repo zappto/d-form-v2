@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Link, useForm } from '@inertiajs/vue3'
-import { Check, Circle } from 'lucide-vue-next'
-import { AuthField } from '@/components/core/field'
-import { AuthSubmitButton } from '@/components/core/button'
-import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController'
-import { store as register } from '@/actions/App/Http/Controllers/Auth/RegisterController'
-import { getFieldError, handleInertiaFormErrors, showErrorToast } from '@/lib/error-message'
-import type { PasswordRule, PasswordStrength } from '@/types/auth'
+import { computed } from 'vue';
+import { Link, useForm } from '@inertiajs/vue3';
+import { Check, Circle } from 'lucide-vue-next';
+import { AuthField } from '@/components/core/field';
+import { AuthSubmitButton } from '@/components/core/button';
+import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
+import { store as register } from '@/actions/App/Http/Controllers/Auth/RegisterController';
+import { getFieldError, handleInertiaFormErrors, showErrorToast } from '@/lib/error-message';
+import type { PasswordRule, PasswordStrength } from '@/types/auth';
 
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
-}).dontRemember('password', 'password_confirmation')
+}).dontRemember('password', 'password_confirmation');
 
 const rules = computed<PasswordRule[]>(() => [
     { label: 'At least 8 characters', met: form.password.length >= 8 },
@@ -24,19 +24,19 @@ const rules = computed<PasswordRule[]>(() => [
         label: 'Passwords match',
         met: form.password.length > 0 && form.password === form.password_confirmation,
     },
-])
+]);
 
 const strengthPercent = computed<number>(() => {
-    const met = rules.value.filter((r) => r.met).length
-    return Math.round((met / rules.value.length) * 100)
-})
+    const met = rules.value.filter((r) => r.met).length;
+    return Math.round((met / rules.value.length) * 100);
+});
 
 const strengthKind = computed<PasswordStrength>(() => {
-    if (strengthPercent.value <= 25) return 'weak'
-    if (strengthPercent.value <= 50) return 'fair'
-    if (strengthPercent.value <= 75) return 'good'
-    return 'strong'
-})
+    if (strengthPercent.value <= 25) return 'weak';
+    if (strengthPercent.value <= 50) return 'fair';
+    if (strengthPercent.value <= 75) return 'good';
+    return 'strong';
+});
 
 const strengthLabel = computed<string>(() => {
     const map: Record<PasswordStrength, string> = {
@@ -44,9 +44,9 @@ const strengthLabel = computed<string>(() => {
         fair: 'Fair',
         good: 'Good',
         strong: 'Strong',
-    }
-    return map[strengthKind.value]
-})
+    };
+    return map[strengthKind.value];
+});
 
 const strengthBarClass = computed<string>(() => {
     const map: Record<PasswordStrength, string> = {
@@ -54,9 +54,9 @@ const strengthBarClass = computed<string>(() => {
         fair: 'bg-warning',
         good: 'bg-primary',
         strong: 'bg-success',
-    }
-    return map[strengthKind.value]
-})
+    };
+    return map[strengthKind.value];
+});
 
 const strengthBadgeClass = computed<string>(() => {
     const map: Record<PasswordStrength, string> = {
@@ -64,25 +64,25 @@ const strengthBadgeClass = computed<string>(() => {
         fair: 'border-warning/30 bg-warning/15 text-warning-foreground',
         good: 'border-primary/25 bg-primary/10 text-primary',
         strong: 'border-success/25 bg-success/10 text-success',
-    }
-    return map[strengthKind.value]
-})
+    };
+    return map[strengthKind.value];
+});
 
 function submit(): void {
     if (form.password.length < 8) {
-        showErrorToast('Password must be at least 8 characters.')
-        return
+        showErrorToast('Password must be at least 8 characters.');
+        return;
     }
     if (form.password !== form.password_confirmation) {
-        showErrorToast('Password does not match')
-        return
+        showErrorToast('Password does not match');
+        return;
     }
 
     form.submit(register(), {
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal mendaftar' })
+            handleInertiaFormErrors(errors, { title: 'Gagal mendaftar' });
         },
-    })
+    });
 }
 </script>
 
@@ -90,9 +90,7 @@ function submit(): void {
     <div>
         <div class="mb-8">
             <h1 class="font-display text-3xl font-bold tracking-[-0.03em] text-foreground">Create account</h1>
-            <p class="mt-2 text-sm text-muted-foreground">
-                Start building forms in under a minute.
-            </p>
+            <p class="mt-2 text-sm text-muted-foreground">Start building forms in under a minute.</p>
         </div>
 
         <form @submit.prevent="submit" class="space-y-4">
@@ -138,7 +136,10 @@ function submit(): void {
                 leave-from-class="opacity-100"
                 leave-to-class="-translate-y-1 opacity-0"
             >
-                <div v-if="form.password.length > 0" class="space-y-2.5 rounded-xl border border-border bg-muted/30 p-3">
+                <div
+                    v-if="form.password.length > 0"
+                    class="space-y-2.5 rounded-xl border border-border bg-muted/30 p-3"
+                >
                     <div class="flex items-center gap-3">
                         <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
                             <div

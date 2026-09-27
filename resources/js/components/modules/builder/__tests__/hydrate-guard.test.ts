@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest'
-import { buildUnloadPayload, shouldSkipHydrate } from '../autosaveGuard'
-import type { FormBannerState } from '../formBanner'
-import { defaultFormBannerState } from '../formBanner'
-import { toBackendFields } from '../fieldMapping'
-import type { BuilderField } from '@/types/form-builder'
+import { describe, expect, it } from 'vitest';
+import { buildUnloadPayload, shouldSkipHydrate } from '../autosaveGuard';
+import type { FormBannerState } from '../formBanner';
+import { defaultFormBannerState } from '../formBanner';
+import { toBackendFields } from '../fieldMapping';
+import type { BuilderField } from '@/types/form-builder';
 
 function builder(id: string, order?: number): BuilderField {
     return {
@@ -17,11 +17,11 @@ function builder(id: string, order?: number): BuilderField {
         options: [],
         metadata: {},
         ...(order !== undefined ? { order } : {}),
-    }
+    };
 }
 
 function banner(): FormBannerState {
-    return defaultFormBannerState()
+    return defaultFormBannerState();
 }
 
 describe('hydrate guard (Fase 1-B)', () => {
@@ -33,9 +33,9 @@ describe('hydrate guard (Fase 1-B)', () => {
                 lastCleanSnapshot: null,
                 currentSnapshot: '{"a":1}',
                 hasPendingBannerFile: false,
-            }),
-        ).toBe(false)
-    })
+            })
+        ).toBe(false);
+    });
 
     it('id berubah → hydrate normal walau snapshot kotor', () => {
         expect(
@@ -45,12 +45,12 @@ describe('hydrate guard (Fase 1-B)', () => {
                 lastCleanSnapshot: '{"a":1}',
                 currentSnapshot: '{"a":2}',
                 hasPendingBannerFile: false,
-            }),
-        ).toBe(false)
-    })
+            })
+        ).toBe(false);
+    });
 
     it('id sama + bersih → hydrate normal', () => {
-        const snap = '{"a":1}'
+        const snap = '{"a":1}';
         expect(
             shouldSkipHydrate({
                 lastHydratedId: 'form-1',
@@ -58,9 +58,9 @@ describe('hydrate guard (Fase 1-B)', () => {
                 lastCleanSnapshot: snap,
                 currentSnapshot: snap,
                 hasPendingBannerFile: false,
-            }),
-        ).toBe(false)
-    })
+            })
+        ).toBe(false);
+    });
 
     it('id sama + kotor → lewati hydrate', () => {
         expect(
@@ -70,12 +70,12 @@ describe('hydrate guard (Fase 1-B)', () => {
                 lastCleanSnapshot: '{"a":1}',
                 currentSnapshot: '{"a":2}',
                 hasPendingBannerFile: false,
-            }),
-        ).toBe(true)
-    })
+            })
+        ).toBe(true);
+    });
 
     it('id sama + bersih tapi banner pending → lewati (bannerFile=null jangan buang file)', () => {
-        const snap = '{"a":1}'
+        const snap = '{"a":1}';
         expect(
             shouldSkipHydrate({
                 lastHydratedId: 'form-1',
@@ -83,37 +83,35 @@ describe('hydrate guard (Fase 1-B)', () => {
                 lastCleanSnapshot: snap,
                 currentSnapshot: snap,
                 hasPendingBannerFile: true,
-            }),
-        ).toBe(true)
-    })
-})
+            })
+        ).toBe(true);
+    });
+});
 
 describe('unload payload (Fase 1-A, pure)', () => {
     it('bersih → null (tak perlu beacon)', () => {
-        const prev = toBackendFields([builder('a', 1000)])
+        const prev = toBackendFields([builder('a', 1000)]);
         const payload = buildUnloadPayload({
             canvasFields: [builder('a', 1000)],
             banner: banner(),
             lastSent: prev,
-        })
-        expect(payload).toBeNull()
-    })
+        });
+        expect(payload).toBeNull();
+    });
 
     it('kotor → full fields + deleted_ids terkini', () => {
-        const prev = toBackendFields([builder('a', 1000), builder('gone', 2000)])
+        const prev = toBackendFields([builder('a', 1000), builder('gone', 2000)]);
         const payload = buildUnloadPayload({
             canvasFields: [builder('a', 1000), builder('b')],
             banner: banner(),
             lastSent: prev,
-        })
-        expect(payload).not.toBeNull()
-        expect(payload?.deleted_ids).toEqual(['gone'])
-        expect(payload?.fields.map((f) => f.id).sort()).toEqual(['a', 'b'])
-    })
+        });
+        expect(payload).not.toBeNull();
+        expect(payload?.deleted_ids).toEqual(['gone']);
+        expect(payload?.fields.map((f) => f.id).sort()).toEqual(['a', 'b']);
+    });
 
     it('steady-empty → null', () => {
-        expect(
-            buildUnloadPayload({ canvasFields: [], banner: banner(), lastSent: [] }),
-        ).toBeNull()
-    })
-})
+        expect(buildUnloadPayload({ canvasFields: [], banner: banner(), lastSent: [] })).toBeNull();
+    });
+});

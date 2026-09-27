@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, type Component } from 'vue'
-import { useEditor, EditorContent } from '@tiptap/vue-3'
-import { StarterKit } from '@tiptap/starter-kit'
-import { Underline } from '@tiptap/extension-underline'
-import { TextAlign } from '@tiptap/extension-text-align'
-import { Highlight } from '@tiptap/extension-highlight'
-import { Link } from '@tiptap/extension-link'
-import { Image } from '@tiptap/extension-image'
-import { Placeholder } from '@tiptap/extension-placeholder'
-import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table'
-import { TextStyle, Color } from '@tiptap/extension-text-style'
-import { Typography } from '@tiptap/extension-typography'
-import { Button } from '@/components/ui/button'
+import { ref, type Component } from 'vue';
+import { useEditor, EditorContent } from '@tiptap/vue-3';
+import { StarterKit } from '@tiptap/starter-kit';
+import { Underline } from '@tiptap/extension-underline';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { Highlight } from '@tiptap/extension-highlight';
+import { Link } from '@tiptap/extension-link';
+import { Image } from '@tiptap/extension-image';
+import { Placeholder } from '@tiptap/extension-placeholder';
+import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { TextStyle, Color } from '@tiptap/extension-text-style';
+import { Typography } from '@tiptap/extension-typography';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -20,9 +20,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     Bold,
     Italic,
@@ -45,37 +45,37 @@ import {
     Undo,
     Redo,
     Minus,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
-const props = defineProps<{ modelValue?: string }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const props = defineProps<{ modelValue?: string }>();
+const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
 
 /** Normalisasi input URL agar valid untuk TipTap (tambah https:// bila perlu). */
 function normalizeUrl(input: string): string | null {
-    const raw = input.trim()
-    if (!raw) return null
-    let candidate = raw
+    const raw = input.trim();
+    if (!raw) return null;
+    let candidate = raw;
     if (candidate.startsWith('//')) {
-        candidate = `https:${candidate}`
+        candidate = `https:${candidate}`;
     } else if (!/^[a-z][a-z0-9+.-]*:/i.test(candidate)) {
-        candidate = `https://${candidate}`
+        candidate = `https://${candidate}`;
     }
     try {
-        return new URL(candidate).href
+        return new URL(candidate).href;
     } catch {
-        return null
+        return null;
     }
 }
 
-const linkDialogOpen = ref(false)
-const linkUrlDraft = ref('')
-const linkTextDraft = ref('')
-const linkHasSelection = ref(false)
-const linkUrlError = ref('')
+const linkDialogOpen = ref(false);
+const linkUrlDraft = ref('');
+const linkTextDraft = ref('');
+const linkHasSelection = ref(false);
+const linkUrlError = ref('');
 
-const imageDialogOpen = ref(false)
-const imageUrlDraft = ref('')
-const imageUrlError = ref('')
+const imageDialogOpen = ref(false);
+const imageUrlDraft = ref('');
+const imageUrlError = ref('');
 
 const editor = useEditor({
     content: props.modelValue ?? '',
@@ -98,44 +98,43 @@ const editor = useEditor({
     onUpdate: ({ editor: e }) => emit('update:modelValue', e.getHTML()),
     editorProps: {
         attributes: {
-            class:
-                'dform-rich-text dform-tiptap-editor ProseMirror w-full max-w-none px-4 py-4 focus:outline-none',
+            class: 'dform-rich-text dform-tiptap-editor ProseMirror w-full max-w-none px-4 py-4 focus:outline-none',
         },
     },
-})
+});
 
 function openLinkDialog(): void {
-    const e = editor.value
-    if (!e) return
-    linkUrlError.value = ''
-    const { from, to } = e.state.selection
-    linkHasSelection.value = from !== to
-    const attrs = e.getAttributes('link')
-    const href = typeof attrs.href === 'string' ? attrs.href : ''
-    linkUrlDraft.value = href
+    const e = editor.value;
+    if (!e) return;
+    linkUrlError.value = '';
+    const { from, to } = e.state.selection;
+    linkHasSelection.value = from !== to;
+    const attrs = e.getAttributes('link');
+    const href = typeof attrs.href === 'string' ? attrs.href : '';
+    linkUrlDraft.value = href;
     if (from !== to) {
-        linkTextDraft.value = e.state.doc.textBetween(from, to, '')
+        linkTextDraft.value = e.state.doc.textBetween(from, to, '');
     } else {
-        linkTextDraft.value = ''
+        linkTextDraft.value = '';
     }
-    linkDialogOpen.value = true
+    linkDialogOpen.value = true;
 }
 
 function confirmLink(): void {
-    const e = editor.value
-    if (!e) return
-    const href = normalizeUrl(linkUrlDraft.value)
+    const e = editor.value;
+    if (!e) return;
+    const href = normalizeUrl(linkUrlDraft.value);
     if (!href) {
-        linkUrlError.value = 'Masukkan URL yang valid (mis. contoh.com atau https://…).'
-        return
+        linkUrlError.value = 'Masukkan URL yang valid (mis. contoh.com atau https://…).';
+        return;
     }
-    linkUrlError.value = ''
-    const { from, to } = e.state.selection
-    const hasSelection = from !== to
+    linkUrlError.value = '';
+    const { from, to } = e.state.selection;
+    const hasSelection = from !== to;
     if (hasSelection) {
-        e.chain().focus().setLink({ href }).run()
+        e.chain().focus().setLink({ href }).run();
     } else {
-        const label = linkTextDraft.value.trim() || href
+        const label = linkTextDraft.value.trim() || href;
         e.chain()
             .focus()
             .insertContent({
@@ -143,38 +142,38 @@ function confirmLink(): void {
                 text: label,
                 marks: [{ type: 'link', attrs: { href } }],
             })
-            .run()
+            .run();
     }
-    linkDialogOpen.value = false
+    linkDialogOpen.value = false;
 }
 
 function openImageDialog(): void {
-    imageUrlError.value = ''
-    imageUrlDraft.value = ''
-    imageDialogOpen.value = true
+    imageUrlError.value = '';
+    imageUrlDraft.value = '';
+    imageDialogOpen.value = true;
 }
 
 function confirmImage(): void {
-    const src = normalizeUrl(imageUrlDraft.value)
+    const src = normalizeUrl(imageUrlDraft.value);
     if (!src) {
-        imageUrlError.value = 'Masukkan URL gambar yang valid.'
-        return
+        imageUrlError.value = 'Masukkan URL gambar yang valid.';
+        return;
     }
-    imageUrlError.value = ''
-    editor.value?.chain().focus().setImage({ src }).run()
-    imageDialogOpen.value = false
+    imageUrlError.value = '';
+    editor.value?.chain().focus().setImage({ src }).run();
+    imageDialogOpen.value = false;
 }
 
 function addTable(): void {
-    editor.value?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+    editor.value?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
 }
 
 type ToolbarTool = {
-    icon: Component
-    title: string
-    action: () => void
-    active: () => boolean
-}
+    icon: Component;
+    title: string;
+    action: () => void;
+    active: () => boolean;
+};
 
 const toolbarGroups: ToolbarTool[][] = [
     [
@@ -315,7 +314,7 @@ const toolbarGroups: ToolbarTool[][] = [
             active: () => false,
         },
     ],
-]
+];
 </script>
 
 <template>
@@ -329,15 +328,12 @@ const toolbarGroups: ToolbarTool[][] = [
             aria-label="Toolbar editor deskripsi"
         >
             <template v-for="(group, gIdx) in toolbarGroups" :key="gIdx">
+                <div v-if="gIdx > 0" class="hidden h-6 w-px bg-border/80 sm:block" aria-hidden="true" />
                 <div
-                    v-if="gIdx > 0"
-                    class="hidden h-6 w-px bg-border/80 sm:block"
-                    aria-hidden="true"
-                />
-                <div
-                    class="flex flex-wrap items-center gap-0.5 rounded-xl bg-background/75 p-0.5 ring-1 ring-border/55 shadow-inner backdrop-blur-sm"
+                    class="flex flex-wrap items-center gap-0.5 rounded-xl bg-background/75 p-0.5 shadow-inner ring-1 ring-border/55 backdrop-blur-sm"
                 >
-                    <Button radius="icon"
+                    <Button
+                        radius="icon"
                         v-for="(tool, tIdx) in group"
                         :key="tIdx"
                         type="button"
@@ -346,9 +342,9 @@ const toolbarGroups: ToolbarTool[][] = [
                         :title="tool.title"
                         class="size-8 text-muted-foreground transition-[color,background-color,box-shadow] duration-150 hover:bg-muted/90 hover:text-foreground"
                         :class="{
- 'bg-primary !text-primary-foreground shadow-md ring-1 ring-primary/30 hover:bg-primary hover:!text-primary-foreground':
- tool.active(),
- }"
+                            'bg-primary !text-primary-foreground shadow-md ring-1 ring-primary/30 hover:bg-primary hover:!text-primary-foreground':
+                                tool.active(),
+                        }"
                         @click="tool.action()"
                     >
                         <component :is="tool.icon" class="size-3.5" stroke-width="2" />

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Clock } from 'lucide-vue-next'
+import { Clock } from 'lucide-vue-next';
 
 defineProps<{
-    pendingCount: number
-    activeStatusTab: 'all' | 'pending' | 'accepted' | 'rejected'
-}>()
+    pendingCount: number;
+    activeStatusTab: 'all' | 'pending' | 'accepted' | 'rejected';
+}>();
 </script>
 
 <template>
@@ -20,10 +20,12 @@ defineProps<{
         </div>
         <div class="min-w-0 flex-1">
             <p class="text-sm font-medium text-foreground">
-                {{ pendingCount === 1 ? 'Satu pendaftar menunggu' : `${pendingCount} pendaftar menunggu` }} keputusan review.
+                {{ pendingCount === 1 ? 'Satu pendaftar menunggu' : `${pendingCount} pendaftar menunggu` }} keputusan
+                review.
             </p>
             <p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-                Gunakan tab <span class="font-medium text-foreground">Menunggu</span> di bagian filter untuk hanya menampilkan entri tersebut.
+                Gunakan tab <span class="font-medium text-foreground">Menunggu</span> di bagian filter untuk hanya
+                menampilkan entri tersebut.
             </p>
         </div>
     </div>

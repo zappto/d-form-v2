@@ -1,52 +1,47 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
-import axios from 'axios'
-import { ref } from 'vue'
-import { AuthField } from '@/components/core/field'
-import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/ui/spinner'
-import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController'
-import { toast } from 'vue-sonner'
-import { routes } from '@/lib/routes'
-import {
-    getFieldError,
-    handleInertiaFormErrors,
-    humanizeErrorMessage,
-    showErrorToast,
-} from '@/lib/error-message'
+import { Link } from '@inertiajs/vue3';
+import axios from 'axios';
+import { ref } from 'vue';
+import { AuthField } from '@/components/core/field';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
+import { toast } from 'vue-sonner';
+import { routes } from '@/lib/routes';
+import { getFieldError, handleInertiaFormErrors, humanizeErrorMessage, showErrorToast } from '@/lib/error-message';
 
-const PASSWORD_RESET_LINK_URL = routes.auth.passwordResetLink
+const PASSWORD_RESET_LINK_URL = routes.auth.passwordResetLink;
 
-const email = ref('')
-const emailError = ref<string | undefined>()
-const processing = ref(false)
+const email = ref('');
+const emailError = ref<string | undefined>();
+const processing = ref(false);
 
 async function submit(): Promise<void> {
     if (processing.value) {
-        return
+        return;
     }
 
-    emailError.value = undefined
-    processing.value = true
+    emailError.value = undefined;
+    processing.value = true;
 
     try {
         const { data } = await axios.post<{ message: string }>(PASSWORD_RESET_LINK_URL, {
             email: email.value,
-        })
-        toast.success(humanizeErrorMessage(data.message))
+        });
+        toast.success(humanizeErrorMessage(data.message));
     } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 422) {
-            const errors = error.response.data?.errors as Record<string, string[]> | undefined
+            const errors = error.response.data?.errors as Record<string, string[]> | undefined;
             if (errors) {
-                handleInertiaFormErrors(errors, { title: 'Gagal mengirim tautan reset' })
-                emailError.value = getFieldError(errors, 'email')
+                handleInertiaFormErrors(errors, { title: 'Gagal mengirim tautan reset' });
+                emailError.value = getFieldError(errors, 'email');
             }
-            return
+            return;
         }
 
-        showErrorToast('Unable to send reset link. Please try again.')
+        showErrorToast('Unable to send reset link. Please try again.');
     } finally {
-        processing.value = false
+        processing.value = false;
     }
 }
 </script>

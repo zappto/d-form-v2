@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue';
 import {
     GripVertical,
     BarChart3,
@@ -10,14 +10,14 @@ import {
     Palette,
     Clock,
     Users,
-} from 'lucide-vue-next'
-import type { Component } from 'vue'
+} from 'lucide-vue-next';
+import type { Component } from 'vue';
 
 interface Feature {
-    title: string
-    desc: string
-    icon: Component
-    accent?: boolean
+    title: string;
+    desc: string;
+    icon: Component;
+    accent?: boolean;
 }
 
 const features: Feature[] = [
@@ -67,17 +67,22 @@ const features: Feature[] = [
         desc: 'Undang anggota tim sebagai admin atau moderator acara. Kolaborasi lebih efisien dalam mengelola peserta.',
         icon: Users,
     },
-]
+];
 
-const visible = ref(false)
+const visible = ref(false);
 onMounted(() => {
     const obs = new IntersectionObserver(
-        ([e]) => { if (e?.isIntersecting) { visible.value = true; obs.disconnect() } },
-        { threshold: 0.08 },
-    )
-    const el = document.getElementById('section-features')
-    if (el) obs.observe(el)
-})
+        ([e]) => {
+            if (e?.isIntersecting) {
+                visible.value = true;
+                obs.disconnect();
+            }
+        },
+        { threshold: 0.08 }
+    );
+    const el = document.getElementById('section-features');
+    if (el) obs.observe(el);
+});
 </script>
 
 <template>
@@ -85,17 +90,17 @@ onMounted(() => {
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
- 'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
- ]"
+                    'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
+                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                ]"
             >
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Fitur Unggulan</p>
+                <p class="text-xs font-semibold tracking-[0.2em] text-primary uppercase">Fitur Unggulan</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                     Semua yang Anda butuhkan, tidak lebih
                 </h2>
-                <p class="mt-3 max-w-lg mx-auto text-base leading-relaxed text-muted-foreground">
-                    Dirancang khusus untuk penyelenggara acara kampus dan organisasi —
-                    fokus pada kemudahan, bukan kompleksitas.
+                <p class="mx-auto mt-3 max-w-lg text-base leading-relaxed text-muted-foreground">
+                    Dirancang khusus untuk penyelenggara acara kampus dan organisasi — fokus pada kemudahan, bukan
+                    kompleksitas.
                 </p>
             </div>
 
@@ -104,19 +109,19 @@ onMounted(() => {
                     v-for="(feat, i) in features"
                     :key="feat.title"
                     :class="[
- 'group rounded-2xl border border-border/40 bg-muted/20 p-6 transition-all duration-400 hover:border-primary/20 hover:bg-muted/40',
- feat.accent ? 'sm:col-span-2 lg:col-span-1 ring-1 ring-primary/10 bg-primary/[0.03]' : '',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
- ]"
+                        'group rounded-2xl border border-border/40 bg-muted/20 p-6 transition-all duration-400 hover:border-primary/20 hover:bg-muted/40',
+                        feat.accent ? 'bg-primary/[0.03] ring-1 ring-primary/10 sm:col-span-2 lg:col-span-1' : '',
+                        visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
+                    ]"
                     :style="{ transitionDelay: `${80 + i * 50}ms` }"
                 >
                     <div
                         :class="[
- 'mb-4 flex size-10 items-center justify-center rounded-xl transition-colors duration-200',
- feat.accent
- ? 'bg-primary text-primary-foreground'
- : 'bg-primary/10 text-primary group-hover:bg-primary/15',
- ]"
+                            'mb-4 flex size-10 items-center justify-center rounded-xl transition-colors duration-200',
+                            feat.accent
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-primary/10 text-primary group-hover:bg-primary/15',
+                        ]"
                     >
                         <component :is="feat.icon" class="size-5" />
                     </div>

@@ -77,9 +77,9 @@ defineEmits<{
 
 <template>
     <aside class="flex min-w-0 flex-col gap-5 xl:sticky xl:top-20 xl:self-start">
-        <Card :class="['border-border/60 rounded-2xl', cardShadow]">
+        <Card :class="['rounded-2xl border-border/60', cardShadow]">
             <CardHeader class="pb-3">
-                <CardTitle class="text-muted-foreground text-[0.8125rem] font-semibold tracking-[0.1em] uppercase"
+                <CardTitle class="text-[0.8125rem] font-semibold tracking-[0.1em] text-muted-foreground uppercase"
                     >Manage event</CardTitle
                 >
             </CardHeader>
@@ -107,13 +107,13 @@ defineEmits<{
             </CardContent>
         </Card>
 
-        <Card :class="['border-border/60 rounded-2xl', cardShadow]">
+        <Card :class="['rounded-2xl border-border/60', cardShadow]">
             <CardHeader class="pb-1">
                 <div class="flex items-center justify-between">
-                    <CardTitle class="text-muted-foreground text-[0.8125rem] font-semibold tracking-[0.1em] uppercase"
+                    <CardTitle class="text-[0.8125rem] font-semibold tracking-[0.1em] text-muted-foreground uppercase"
                         >Forms</CardTitle
                     >
-                    <span class="text-foreground text-sm leading-none font-semibold tabular-nums">{{
+                    <span class="text-sm leading-none font-semibold text-foreground tabular-nums">{{
                         props.forms.length
                     }}</span>
                 </div>
@@ -121,12 +121,12 @@ defineEmits<{
             <CardContent class="flex flex-col gap-2 pt-0">
                 <!-- Empty state -->
                 <div v-if="props.forms.length === 0" class="flex flex-col gap-1.5">
-                    <p class="text-muted-foreground px-1 py-0.5 text-xs">Belum ada form untuk event ini.</p>
+                    <p class="px-1 py-0.5 text-xs text-muted-foreground">Belum ada form untuk event ini.</p>
                     <Link
                         :href="routes.admin.events.forms.create(props.event.id)"
-                        class="border-primary/30 bg-primary/5 text-primary hover:border-primary/50 hover:bg-primary/10 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-3 text-sm font-semibold transition-colors"
+                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-3 py-3 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-primary/10"
                     >
-                        <Plus class="text-primary size-4" /> Buat form pertama
+                        <Plus class="size-4 text-primary" /> Buat form pertama
                     </Link>
                 </div>
 
@@ -135,21 +135,21 @@ defineEmits<{
                         <div
                             v-for="form in visibleForms"
                             :key="form.id"
-                            class="group border-border/50 bg-muted/30 hover:border-border/80 hover:bg-muted/50 flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 transition-colors"
+                            class="group flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/30 px-2.5 py-1.5 transition-colors hover:border-border/80 hover:bg-muted/50"
                         >
                             <Link
                                 :href="routes.admin.events.forms.show(props.event.id, form.id)"
                                 class="flex min-w-0 flex-1 items-center gap-2 py-0.5"
                             >
-                                <FileText class="text-muted-foreground size-3.5 shrink-0" />
-                                <span class="text-foreground truncate text-xs font-medium">{{ form.title }}</span>
+                                <FileText class="size-3.5 shrink-0 text-muted-foreground" />
+                                <span class="truncate text-xs font-medium text-foreground">{{ form.title }}</span>
                             </Link>
                             <div
                                 class="flex shrink-0 items-center gap-0.5 opacity-60 transition-opacity group-hover:opacity-100 focus-within:opacity-100"
                             >
                                 <Link
                                     :href="routes.admin.events.forms.show(props.event.id, form.id)"
-                                    class="text-muted-foreground hover:text-primary focus-visible:bg-background focus-visible:text-primary focus-visible:ring-ring/30 inline-flex size-7 items-center justify-center rounded-md transition-colors outline-none hover:bg-transparent focus-visible:ring-[3px]"
+                                    class="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:bg-transparent hover:text-primary focus-visible:bg-background focus-visible:text-primary focus-visible:ring-[3px] focus-visible:ring-ring/30"
                                     :aria-label="`Detail form ${form.title}`"
                                 >
                                     <Eye class="size-3.5" />
@@ -157,7 +157,7 @@ defineEmits<{
                                 <Button
                                     variant="ghost"
                                     size="icon-sm"
-                                    class="text-muted-foreground hover:text-destructive focus-visible:text-destructive size-7 shadow-none hover:bg-transparent"
+                                    class="size-7 text-muted-foreground shadow-none hover:bg-transparent hover:text-destructive focus-visible:text-destructive"
                                     :aria-label="`Hapus form ${form.title}`"
                                     @click="startDelete(form)"
                                 >
@@ -171,7 +171,7 @@ defineEmits<{
                         v-if="hiddenCount > 0"
                         variant="ghost"
                         size="sm"
-                        class="text-muted-foreground hover:text-foreground w-full justify-center text-xs"
+                        class="w-full justify-center text-xs text-muted-foreground hover:text-foreground"
                         @click="showAllForms = !showAllForms"
                     >
                         <span v-if="!showAllForms">Lihat {{ hiddenCount }} form lainnya</span>
@@ -183,17 +183,17 @@ defineEmits<{
                     <!-- Dashed CTA -->
                     <Link
                         :href="routes.admin.events.forms.create(props.event.id)"
-                        class="border-primary/30 bg-primary/5 text-primary hover:border-primary/50 hover:bg-primary/10 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm font-semibold transition-colors"
+                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-3 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary/50 hover:bg-primary/10"
                     >
-                        <Plus class="text-primary size-4" /> Tambah form
+                        <Plus class="size-4 text-primary" /> Tambah form
                     </Link>
                 </template>
             </CardContent>
         </Card>
 
-        <Card :class="['border-border/60 rounded-2xl', cardShadow]">
+        <Card :class="['rounded-2xl border-border/60', cardShadow]">
             <CardHeader class="pb-3">
-                <CardTitle class="text-muted-foreground text-[0.8125rem] font-semibold tracking-[0.1em] uppercase"
+                <CardTitle class="text-[0.8125rem] font-semibold tracking-[0.1em] text-muted-foreground uppercase"
                     >Lifecycle</CardTitle
                 >
             </CardHeader>
@@ -223,7 +223,7 @@ defineEmits<{
                     {{ isDraft ? 'Publish event' : 'Move to draft' }}
                 </Button>
                 <Separator class="my-1" />
-                <p class="text-muted-foreground px-1 text-[11px] leading-relaxed">
+                <p class="px-1 text-[11px] leading-relaxed text-muted-foreground">
                     Archiving hides this event from the public but keeps all registrant data safe. You can restore it
                     anytime.
                 </p>
@@ -239,7 +239,11 @@ defineEmits<{
             :loading="isDeleting"
             @confirm="confirmDelete"
             @cancel="cancelDelete"
-            @update:open="(v) => { if (!isDeleting) showDeleteModal = v }"
+            @update:open="
+                (v) => {
+                    if (!isDeleting) showDeleteModal = v;
+                }
+            "
         />
     </aside>
 </template>

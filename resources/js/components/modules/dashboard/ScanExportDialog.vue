@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { computed, ref, watch } from 'vue'
+import type { Component } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
     Dialog,
     DialogContent,
@@ -8,111 +8,113 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { FileSpreadsheet, FileText } from 'lucide-vue-next'
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { FileSpreadsheet, FileText } from 'lucide-vue-next';
 
 export type ScanExportTarget = {
-    id: string
-    label: string
-    kind: 'event' | 'oprec'
-}
+    id: string;
+    label: string;
+    kind: 'event' | 'oprec';
+};
 
-export type ScanExportFormat = 'csv' | 'xlsx'
+export type ScanExportFormat = 'csv' | 'xlsx';
 
 const props = defineProps<{
-    open: boolean
-    options: ScanExportTarget[]
-    format: ScanExportFormat
-}>()
+    open: boolean;
+    options: ScanExportTarget[];
+    format: ScanExportFormat;
+}>();
 
 const emit = defineEmits<{
-    'update:open': [value: boolean]
-    confirm: [targets: ScanExportTarget[]]
-}>()
+    'update:open': [value: boolean];
+    confirm: [targets: ScanExportTarget[]];
+}>();
 
-const query = ref('')
-const selectedIds = ref<string[]>([])
+const query = ref('');
+const selectedIds = ref<string[]>([]);
 
 const filteredOptions = computed<ScanExportTarget[]>(() => {
-    const needle = query.value.trim().toLowerCase()
+    const needle = query.value.trim().toLowerCase();
     if (needle.length === 0) {
-        return props.options
+        return props.options;
     }
 
-    return props.options.filter((option) => `${option.label} ${option.kind}`.toLowerCase().includes(needle))
-})
+    return props.options.filter((option) => `${option.label} ${option.kind}`.toLowerCase().includes(needle));
+});
 
-const selectedCount = computed<number>(() => selectedIds.value.length)
+const selectedCount = computed<number>(() => selectedIds.value.length);
 
 const allVisibleSelected = computed<boolean>(
-    () => filteredOptions.value.length > 0 && filteredOptions.value.every((option) => selectedIds.value.includes(option.id)),
-)
+    () =>
+        filteredOptions.value.length > 0 &&
+        filteredOptions.value.every((option) => selectedIds.value.includes(option.id))
+);
 
-const formatLabel = computed<string>(() => (props.format === 'xlsx' ? 'Excel (XLSX)' : 'CSV'))
+const formatLabel = computed<string>(() => (props.format === 'xlsx' ? 'Excel (XLSX)' : 'CSV'));
 
-const formatIcon = computed<Component>(() => (props.format === 'xlsx' ? FileSpreadsheet : FileText))
+const formatIcon = computed<Component>(() => (props.format === 'xlsx' ? FileSpreadsheet : FileText));
 
 const confirmLabel = computed<string>(() => {
-    const count = selectedCount.value
+    const count = selectedCount.value;
     if (count === 0) {
-        return `Unduh ${formatLabel.value}`
+        return `Unduh ${formatLabel.value}`;
     }
 
     return count === 1
         ? `Unduh 1 file ${props.format.toUpperCase()}`
-        : `Unduh ${count} file ${props.format.toUpperCase()}`
-})
+        : `Unduh ${count} file ${props.format.toUpperCase()}`;
+});
 
 watch(
     () => props.open,
     (open) => {
         if (open) {
-            query.value = ''
-            selectedIds.value = []
+            query.value = '';
+            selectedIds.value = [];
         }
-    },
-)
+    }
+);
 
 function isSelected(id: string): boolean {
-    return selectedIds.value.includes(id)
+    return selectedIds.value.includes(id);
 }
 
 function toggle(id: string, checked: boolean): void {
     if (checked) {
         if (!selectedIds.value.includes(id)) {
-            selectedIds.value = [...selectedIds.value, id]
+            selectedIds.value = [...selectedIds.value, id];
         }
 
-        return
+        return;
     }
 
-    selectedIds.value = selectedIds.value.filter((value) => value !== id)
+    selectedIds.value = selectedIds.value.filter((value) => value !== id);
 }
 
 function toggleAllVisible(checked: boolean): void {
-    const visibleIds = filteredOptions.value.map((option) => option.id)
+    const visibleIds = filteredOptions.value.map((option) => option.id);
 
     if (checked) {
-        selectedIds.value = Array.from(new Set([...selectedIds.value, ...visibleIds]))
+        selectedIds.value = Array.from(new Set([...selectedIds.value, ...visibleIds]));
 
-        return
+        return;
     }
 
-    selectedIds.value = selectedIds.value.filter((id) => !visibleIds.includes(id))
+    selectedIds.value = selectedIds.value.filter((id) => !visibleIds.includes(id));
 }
 
 function onConfirm(): void {
-    const targets = props.options.filter((option) => selectedIds.value.includes(option.id))
+    const targets = props.options.filter((option) => selectedIds.value.includes(option.id));
     if (targets.length === 0) {
-        return
+        return;
     }
 
-    emit('confirm', targets)
-    emit('update:open', false)
+    emit('confirm', targets);
+    emit('update:open', false);
 }
 </script>
 
@@ -133,16 +135,16 @@ function onConfirm(): void {
                 <div class="flex items-center justify-between gap-2">
                     <button
                         type="button"
-                        class="text-primary text-xs font-medium hover:underline"
+                        class="text-xs font-medium text-primary hover:underline"
                         @click="toggleAllVisible(!allVisibleSelected)"
                     >
                         {{ allVisibleSelected ? 'Batalkan pilih semua' : 'Pilih semua' }}
                     </button>
-                    <span class="text-muted-foreground text-xs">{{ selectedCount }} acara dipilih</span>
+                    <span class="text-xs text-muted-foreground">{{ selectedCount }} acara dipilih</span>
                 </div>
 
                 <div
-                    class="border-border/70 max-h-64 space-y-1 overflow-y-auto rounded-xl border p-1.5"
+                    class="max-h-64 space-y-1 overflow-y-auto rounded-xl border border-border/70 p-1.5"
                     role="group"
                     aria-label="Daftar acara"
                 >
@@ -152,7 +154,7 @@ function onConfirm(): void {
                         role="checkbox"
                         :aria-checked="isSelected(option.id)"
                         tabindex="0"
-                        class="hover:bg-muted/50 focus-visible:ring-ring/30 flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 outline-none focus-visible:ring-[3px]"
+                        class="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 outline-none hover:bg-muted/50 focus-visible:ring-[3px] focus-visible:ring-ring/30"
                         @click="toggle(option.id, !isSelected(option.id))"
                         @keydown.space.prevent="toggle(option.id, !isSelected(option.id))"
                         @keydown.enter.prevent="toggle(option.id, !isSelected(option.id))"
@@ -172,7 +174,7 @@ function onConfirm(): void {
                         <span class="min-w-0 flex-1 truncate text-sm" :title="option.label">{{ option.label }}</span>
                     </div>
 
-                    <p v-if="filteredOptions.length === 0" class="text-muted-foreground px-2 py-6 text-center text-sm">
+                    <p v-if="filteredOptions.length === 0" class="px-2 py-6 text-center text-sm text-muted-foreground">
                         Tidak ada acara yang cocok.
                     </p>
                 </div>

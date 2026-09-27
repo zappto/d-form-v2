@@ -1,25 +1,40 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { BuilderField, FieldOptionEntry } from '@/types/form-builder'
-import { resolveOptionImagePreviewSrc, revokeOptionImagePreviewUrl } from '@/components/modules/builder/optionImage'
-import { Switch } from '@/components/ui/switch'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
+import { computed, ref } from 'vue';
+import type { BuilderField, FieldOptionEntry } from '@/types/form-builder';
+import { resolveOptionImagePreviewSrc, revokeOptionImagePreviewUrl } from '@/components/modules/builder/optionImage';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import {
-    Type, AlignLeft, Mail, Phone, Hash, ChevronDown, SquareCheck, CircleDot,
-    ImagePlus, Upload, Calendar, Clock, Star,
-    Heading as HeadingIcon, TextCursorInput, Minus, Plus, X,
-} from 'lucide-vue-next'
+    Type,
+    AlignLeft,
+    Mail,
+    Phone,
+    Hash,
+    ChevronDown,
+    SquareCheck,
+    CircleDot,
+    ImagePlus,
+    Upload,
+    Calendar,
+    Clock,
+    Star,
+    Heading as HeadingIcon,
+    TextCursorInput,
+    Minus,
+    Plus,
+    X,
+} from 'lucide-vue-next';
 
 const props = defineProps<{
-    field: BuilderField
-}>()
+    field: BuilderField;
+}>();
 
 const emit = defineEmits<{
-    (event: 'update:field', field: BuilderField): void
-}>()
+    (event: 'update:field', field: BuilderField): void;
+}>();
 
 const TYPE_CONFIG = {
     short_text: { icon: Type, label: 'Teks pendek', accent: '#2563eb' },
@@ -38,27 +53,27 @@ const TYPE_CONFIG = {
     heading: { icon: HeadingIcon, label: 'Judul', accent: '#1a1a2e' },
     paragraph: { icon: TextCursorInput, label: 'Paragraf', accent: '#6b7280' },
     divider: { icon: Minus, label: 'Garis pemisah', accent: '#9ca3af' },
-}
+};
 
-const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text)
+const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text);
 
 // --- helpers to mutate without losing reactivity ---
 function update<K extends keyof BuilderField>(key: K, value: BuilderField[K]) {
-    emit('update:field', { ...props.field, [key]: value })
+    emit('update:field', { ...props.field, [key]: value });
 }
 function updateMeta(key: string, value: unknown) {
-    const meta = { ...(props.field.metadata || {}) }
-    meta[key] = value
-    emit('update:field', { ...props.field, metadata: meta })
+    const meta = { ...(props.field.metadata || {}) };
+    meta[key] = value;
+    emit('update:field', { ...props.field, metadata: meta });
 }
 
 // --- option list helpers (for checkbox / radio / dropdown) ---
-const newOption = ref('')
+const newOption = ref('');
 
 function optionRows(): FieldOptionEntry[] {
-    const raw = props.field.options
-    if (!Array.isArray(raw)) return []
-    const rows = raw as FieldOptionEntry[]
+    const raw = props.field.options;
+    if (!Array.isArray(raw)) return [];
+    const rows = raw as FieldOptionEntry[];
     // Dropdown is intentionally text-only to avoid unstable image option rendering.
     if (props.field.type === 'dropdown') {
         return rows.map((row) => ({
@@ -66,103 +81,100 @@ function optionRows(): FieldOptionEntry[] {
             type: 'text',
             imageUrl: '',
             label: String(row.label ?? ''),
-        }))
+        }));
     }
-    return rows
+    return rows;
 }
 
 function emitOptions(next: FieldOptionEntry[]) {
-    emit('update:field', { ...props.field, options: next })
+    emit('update:field', { ...props.field, options: next });
 }
 
 function addOption() {
-    const text = newOption.value
-    emitOptions([...optionRows(), { id: crypto.randomUUID(), type: 'text', label: text, imageUrl: '', imageFile: null, imagePreviewUrl: '' }])
-    newOption.value = ''
+    const text = newOption.value;
+    emitOptions([
+        ...optionRows(),
+        { id: crypto.randomUUID(), type: 'text', label: text, imageUrl: '', imageFile: null, imagePreviewUrl: '' },
+    ]);
+    newOption.value = '';
 }
 
 function removeOption(index: number) {
-    const opts = [...optionRows()]
-    const removed = opts[index]
-    revokeOptionImagePreviewUrl(removed?.imagePreviewUrl)
-    opts.splice(index, 1)
-    emitOptions(opts)
+    const opts = [...optionRows()];
+    const removed = opts[index];
+    revokeOptionImagePreviewUrl(removed?.imagePreviewUrl);
+    opts.splice(index, 1);
+    emitOptions(opts);
 }
 
 function toggleOptionType(index: number) {
-    if (props.field.type === 'dropdown') return
-    const opts = [...optionRows()]
-    const cur = opts[index]
-    revokeOptionImagePreviewUrl(cur.imagePreviewUrl)
-    opts[index] = { ...cur, type: cur.type === 'text' ? 'image' : 'text', imageFile: null, imagePreviewUrl: '' }
-    emitOptions(opts)
+    if (props.field.type === 'dropdown') return;
+    const opts = [...optionRows()];
+    const cur = opts[index];
+    revokeOptionImagePreviewUrl(cur.imagePreviewUrl);
+    opts[index] = { ...cur, type: cur.type === 'text' ? 'image' : 'text', imageFile: null, imagePreviewUrl: '' };
+    emitOptions(opts);
 }
 
 function setOptionLabel(index: number, label: string) {
-    const opts = [...optionRows()]
-    opts[index] = { ...opts[index], label: String(label ?? '') }
-    emitOptions(opts)
+    const opts = [...optionRows()];
+    opts[index] = { ...opts[index], label: String(label ?? '') };
+    emitOptions(opts);
 }
 
 function setOptionImageUrl(index: number, url: string) {
-    const opts = [...optionRows()]
-    const cur = opts[index]
+    const opts = [...optionRows()];
+    const cur = opts[index];
     // URL manual eksplisit → file pending dibuang (preview dicabut).
-    revokeOptionImagePreviewUrl(cur.imagePreviewUrl)
-    opts[index] = { ...cur, imageUrl: url.trim(), imageFile: null, imagePreviewUrl: '' }
-    emitOptions(opts)
+    revokeOptionImagePreviewUrl(cur.imagePreviewUrl);
+    opts[index] = { ...cur, imageUrl: url.trim(), imageFile: null, imagePreviewUrl: '' };
+    emitOptions(opts);
 }
 
 function onOptionImageFile(index: number, event: Event) {
-    const input = event.target as HTMLInputElement
-    const file = input.files?.[0]
-    input.value = ''
-    if (!file || !file.type.startsWith('image/')) return
-    const opts = [...optionRows()]
-    const cur = opts[index]
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !file.type.startsWith('image/')) return;
+    const opts = [...optionRows()];
+    const cur = opts[index];
     // Simpan File mentah untuk upload multipart; preview via object URL.
     // JANGAN base64 ke state — DB hanya menyimpan path hasil upload.
-    revokeOptionImagePreviewUrl(cur.imagePreviewUrl)
-    const objectUrl = URL.createObjectURL(file)
-    opts[index] = { ...cur, imageFile: file, imagePreviewUrl: objectUrl }
-    emitOptions(opts)
+    revokeOptionImagePreviewUrl(cur.imagePreviewUrl);
+    const objectUrl = URL.createObjectURL(file);
+    opts[index] = { ...cur, imageFile: file, imagePreviewUrl: objectUrl };
+    emitOptions(opts);
 }
 
 function optionPreviewSrc(opt: FieldOptionEntry): string {
-    return resolveOptionImagePreviewSrc(opt)
+    return resolveOptionImagePreviewSrc(opt);
 }
 
 const hasPlaceholder = computed(() =>
-    ['short_text', 'long_text', 'email', 'phone', 'number'].includes(props.field.type),
-)
-const hasOptions = computed(() =>
-    ['dropdown', 'checkbox', 'radio'].includes(props.field.type),
-)
-const isContent = computed(() =>
-    ['heading', 'paragraph', 'divider'].includes(props.field.type),
-)
+    ['short_text', 'long_text', 'email', 'phone', 'number'].includes(props.field.type)
+);
+const hasOptions = computed(() => ['dropdown', 'checkbox', 'radio'].includes(props.field.type));
+const isContent = computed(() => ['heading', 'paragraph', 'divider'].includes(props.field.type));
 function onMaxLengthInput(v: string | number) {
-    const t = String(v ?? '').trim()
+    const t = String(v ?? '').trim();
     if (t === '') {
-        const meta = { ...(props.field.metadata || {}) }
-        delete meta.maxLength
-        emit('update:field', { ...props.field, metadata: meta })
-        return
+        const meta = { ...(props.field.metadata || {}) };
+        delete meta.maxLength;
+        emit('update:field', { ...props.field, metadata: meta });
+        return;
     }
-    const n = parseInt(t, 10)
-    if (!Number.isFinite(n) || n < 1) return
-    updateMeta('maxLength', Math.min(n, 100_000))
+    const n = parseInt(t, 10);
+    if (!Number.isFinite(n) || n < 1) return;
+    updateMeta('maxLength', Math.min(n, 100_000));
 }
 
 function maxLengthInputDisplay(): string {
-    const raw = props.field.metadata?.maxLength
-    if (raw == null || raw === '') return ''
-    const n = Number(raw)
-    return Number.isFinite(n) && n > 0 ? String(Math.floor(n)) : ''
+    const raw = props.field.metadata?.maxLength;
+    if (raw == null || raw === '') return '';
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? String(Math.floor(n)) : '';
 }
-const hasAdvancedFlags = computed(
-    () => !['heading', 'paragraph', 'divider', 'banner'].includes(props.field.type),
-)
+const hasAdvancedFlags = computed(() => !['heading', 'paragraph', 'divider', 'banner'].includes(props.field.type));
 </script>
 
 <template>
@@ -234,7 +246,9 @@ const hasAdvancedFlags = computed(
                 class="h-11 text-sm"
                 @update:model-value="onMaxLengthInput"
             />
-            <p class="text-xs text-muted-foreground">Kosongkan jika tidak dibatasi. Pengisi tidak bisa melebihi nilai ini.</p>
+            <p class="text-xs text-muted-foreground">
+                Kosongkan jika tidak dibatasi. Pengisi tidak bisa melebihi nilai ini.
+            </p>
         </div>
 
         <!-- Content text (heading / paragraph) -->
@@ -282,13 +296,19 @@ const hasAdvancedFlags = computed(
             />
             <p class="text-[10px] text-muted-foreground">Pisahkan dengan koma (tanpa titik di depan).</p>
             <div v-if="field.type === 'image_upload'" class="flex flex-wrap gap-1.5">
-                <span class="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                <span
+                    class="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary"
+                >
                     4:3
                 </span>
-                <span class="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                <span
+                    class="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
+                >
                     1200 x 900
                 </span>
-                <span class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                <span
+                    class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300"
+                >
                     area tengah aman
                 </span>
             </div>
@@ -313,7 +333,7 @@ const hasAdvancedFlags = computed(
                     <div class="flex items-start gap-2">
                         <div class="flex min-w-0 flex-1 flex-col gap-2">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                <span class="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                                     Opsi {{ i + 1 }} — {{ opt.type === 'text' ? 'teks' : 'gambar' }}
                                 </span>
                                 <button
@@ -339,11 +359,7 @@ const hasAdvancedFlags = computed(
                                     v-if="optionPreviewSrc(opt)"
                                     class="h-20 w-full overflow-hidden rounded-lg border border-border bg-card"
                                 >
-                                    <img
-                                        :src="optionPreviewSrc(opt)"
-                                        alt=""
-                                        class="size-full object-cover"
-                                    />
+                                    <img :src="optionPreviewSrc(opt)" alt="" class="size-full object-cover" />
                                 </div>
                                 <Input
                                     :model-value="opt.imageUrl"
@@ -352,10 +368,14 @@ const hasAdvancedFlags = computed(
                                     @update:model-value="(v) => setOptionImageUrl(i, String(v ?? ''))"
                                 />
                                 <div class="flex flex-wrap gap-1.5">
-                                    <span class="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                    <span
+                                        class="rounded-full border border-primary/20 bg-primary/8 px-2 py-0.5 text-[10px] font-semibold text-primary"
+                                    >
                                         1:1
                                     </span>
-                                    <span class="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                    <span
+                                        class="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
+                                    >
                                         800 x 800
                                     </span>
                                 </div>
@@ -409,20 +429,25 @@ const hasAdvancedFlags = computed(
         <div v-if="hasAdvancedFlags" class="mt-2 space-y-4">
             <hr class="app-divider" />
             <p class="text-sm font-semibold text-foreground">Lanjutan</p>
-            <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
+            <div
+                class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3"
+            >
                 <div class="min-w-0">
                     <Label class="text-sm font-medium">Anggota tim bisa ubah (lampiran)</Label>
-                    <p class="text-xs text-muted-foreground">Untuk alur tim: undangan bisa mengubah field ini saat konfirmasi.</p>
+                    <p class="text-xs text-muted-foreground">
+                        Untuk alur tim: undangan bisa mengubah field ini saat konfirmasi.
+                    </p>
                 </div>
-                <Switch
-                    :model-value="!!field.is_append"
-                    @update:model-value="(v) => update('is_append', Boolean(v))"
-                />
+                <Switch :model-value="!!field.is_append" @update:model-value="(v) => update('is_append', Boolean(v))" />
             </div>
-            <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
+            <div
+                class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3"
+            >
                 <div class="min-w-0">
                     <Label class="text-sm font-medium">Duplikat per peserta (paket / bundle)</Label>
-                    <p class="text-xs text-muted-foreground">Ulang field ini untuk setiap anggota tambahan pada pendaftaran paket.</p>
+                    <p class="text-xs text-muted-foreground">
+                        Ulang field ini untuk setiap anggota tambahan pada pendaftaran paket.
+                    </p>
                 </div>
                 <Switch
                     :model-value="field.metadata?.duplicatable === true"
@@ -434,15 +459,14 @@ const hasAdvancedFlags = computed(
         <!-- Required toggle (not for content types) -->
         <div v-if="!isContent" class="mt-2">
             <hr class="app-divider mb-5" />
-            <div class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
+            <div
+                class="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 px-4 py-3"
+            >
                 <div>
                     <Label class="text-sm font-medium">Wajib diisi</Label>
                     <p class="text-xs text-muted-foreground">Pengguna harus mengisi field ini</p>
                 </div>
-                <Switch
-                    :model-value="!!field.required"
-                    @update:model-value="(v) => update('required', Boolean(v))"
-                />
+                <Switch :model-value="!!field.required" @update:model-value="(v) => update('required', Boolean(v))" />
             </div>
         </div>
     </div>

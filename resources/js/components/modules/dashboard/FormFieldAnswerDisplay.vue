@@ -1,239 +1,233 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
-import { Button } from '@/components/ui/button'
-import { getFormFieldOptionRows, formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions'
-import { readFieldMetadata } from '@/lib/formFieldMetadata'
-import { cn } from '@/lib/utils'
-import {
-    Download,
-    FileText,
-    FileImage,
-    ExternalLink,
-    Maximize2,
-    Image as ImageIcon,
-    X,
-} from 'lucide-vue-next'
+import { computed, onUnmounted, ref, watch } from 'vue';
+import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import { Button } from '@/components/ui/button';
+import { getFormFieldOptionRows, formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions';
+import { readFieldMetadata } from '@/lib/formFieldMetadata';
+import { cn } from '@/lib/utils';
+import { Download, FileText, FileImage, ExternalLink, Maximize2, Image as ImageIcon, X } from 'lucide-vue-next';
 
 const props = defineProps<{
     /** When null, file detection uses a light heuristic (e.g. form-uploads paths). */
-    field: IFormField | null
-    value: unknown
-}>()
+    field: IFormField | null;
+    value: unknown;
+}>();
 
-const lightboxUrl = ref<string | null>(null)
+const lightboxUrl = ref<string | null>(null);
 
 function onEscapeClose(e: KeyboardEvent): void {
     if (e.key === 'Escape') {
-        closeLightbox()
+        closeLightbox();
     }
 }
 
 function closeLightbox(): void {
-    lightboxUrl.value = null
+    lightboxUrl.value = null;
 }
 
 function openLightbox(url: string): void {
-    lightboxUrl.value = url
+    lightboxUrl.value = url;
 }
 
 watch(lightboxUrl, (v) => {
     if (v) {
-        window.addEventListener('keydown', onEscapeClose)
+        window.addEventListener('keydown', onEscapeClose);
     } else {
-        window.removeEventListener('keydown', onEscapeClose)
+        window.removeEventListener('keydown', onEscapeClose);
     }
-})
+});
 
 onUnmounted(() => {
-    window.removeEventListener('keydown', onEscapeClose)
-})
+    window.removeEventListener('keydown', onEscapeClose);
+});
 
 function plainText(): string {
-    const v = props.value
+    const v = props.value;
     if (v == null || v === '') {
-        return '—'
+        return '—';
     }
     if (Array.isArray(v)) {
-        return v.length ? v.map(String).join(', ') : '—'
+        return v.length ? v.map(String).join(', ') : '—';
     }
-    return String(v)
+    return String(v);
 }
 
 const publicFileUrl = computed((): string | null => {
     if (typeof props.value !== 'string') {
-        return null
+        return null;
     }
-    const t = props.value.trim()
+    const t = props.value.trim();
     if (!t) {
-        return null
+        return null;
     }
-    const norm = normalizeBannerSrc(t)
+    const norm = normalizeBannerSrc(t);
     if (!norm) {
-        return null
+        return null;
     }
-    return norm
-})
+    return norm;
+});
 
 function isImageHref(href: string): boolean {
-    const path = (href.split('?')[0] ?? '').toLowerCase()
-    return /\.(jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(path)
+    const path = (href.split('?')[0] ?? '').toLowerCase();
+    return /\.(jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(path);
 }
 
 function isPdfHref(href: string): boolean {
-    const path = (href.split('?')[0] ?? '').toLowerCase()
-    return path.endsWith('.pdf')
+    const path = (href.split('?')[0] ?? '').toLowerCase();
+    return path.endsWith('.pdf');
 }
 
 function basenameFromHref(href: string | null): string {
     if (!href) {
-        return 'berkas'
+        return 'berkas';
     }
     try {
-        const path = new URL(href, window.location.origin).pathname
-        const last = path.split('/').filter(Boolean).pop() ?? 'berkas'
-        return decodeURIComponent(last) || 'berkas'
+        const path = new URL(href, window.location.origin).pathname;
+        const last = path.split('/').filter(Boolean).pop() ?? 'berkas';
+        return decodeURIComponent(last) || 'berkas';
     } catch {
-        const seg = href.split('/').filter(Boolean).pop() ?? 'berkas'
+        const seg = href.split('/').filter(Boolean).pop() ?? 'berkas';
         try {
-            return decodeURIComponent(seg) || 'berkas'
+            return decodeURIComponent(seg) || 'berkas';
         } catch {
-            return seg || 'berkas'
+            return seg || 'berkas';
         }
     }
 }
 
-const storedFileLabel = computed(() => basenameFromHref(publicFileUrl.value))
+const storedFileLabel = computed(() => basenameFromHref(publicFileUrl.value));
 
 const treatsAsFile = computed((): boolean => {
     if (!props.field) {
         if (typeof props.value !== 'string') {
-            return false
+            return false;
         }
-        const s = props.value.trim()
-        return s.startsWith('form-uploads/') || /^https?:\/\//i.test(s) || s.startsWith('/storage/')
+        const s = props.value.trim();
+        return s.startsWith('form-uploads/') || /^https?:\/\//i.test(s) || s.startsWith('/storage/');
     }
     if (formFieldApiType(props.field) === 'fileUpload') {
-        return true
+        return true;
     }
-    const bt = formFieldBuilderType(props.field)
-    return bt === 'file_upload' || bt === 'image_upload' || bt === 'fileUpload'
-})
+    const bt = formFieldBuilderType(props.field);
+    return bt === 'file_upload' || bt === 'image_upload' || bt === 'fileUpload';
+});
 
 const preferImagePreview = computed((): boolean => {
     if (!publicFileUrl.value) {
-        return false
+        return false;
     }
     if (!props.field) {
-        return isImageHref(publicFileUrl.value)
+        return isImageHref(publicFileUrl.value);
     }
-    const bt = formFieldBuilderType(props.field)
+    const bt = formFieldBuilderType(props.field);
     if (bt === 'image_upload') {
-        return true
+        return true;
     }
-    return isImageHref(publicFileUrl.value)
-})
+    return isImageHref(publicFileUrl.value);
+});
 
 const isPdfPreview = computed((): boolean => {
     if (!publicFileUrl.value) {
-        return false
+        return false;
     }
-    return isPdfHref(publicFileUrl.value)
-})
+    return isPdfHref(publicFileUrl.value);
+});
 
 const attachmentCardClass = cn(
     'overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm',
-    'ring-1 ring-black/[0.04] dark:ring-white/[0.06]',
-)
+    'ring-1 ring-black/[0.04] dark:ring-white/[0.06]'
+);
 
 const attachmentToolbarClass = cn(
     'flex flex-col gap-3 border-b border-border/40 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5',
-    'bg-gradient-to-b from-muted/[0.35] to-card/80',
-)
+    'bg-gradient-to-b from-muted/[0.35] to-card/80'
+);
 
 function openFileInNewTab(url: string): void {
-    window.open(url, '_blank', 'noopener,noreferrer')
+    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 const isMultipleChoice = computed((): boolean => {
     if (!props.field) {
-        return false
+        return false;
     }
-    const meta = readFieldMetadata(props.field)
-    const bt = formFieldBuilderType(props.field)
-    return props.field.type === 'checkbox' || (props.field.type === 'select' && Boolean(meta.is_multiple)) || bt === 'checkbox'
-})
+    const meta = readFieldMetadata(props.field);
+    const bt = formFieldBuilderType(props.field);
+    return (
+        props.field.type === 'checkbox' ||
+        (props.field.type === 'select' && Boolean(meta.is_multiple)) ||
+        bt === 'checkbox'
+    );
+});
 
 const isRadioLike = computed((): boolean => {
     if (!props.field) {
-        return false
+        return false;
     }
-    const bt = formFieldBuilderType(props.field)
-    return props.field.type === 'radio' || bt === 'radio' || bt === 'yes_no'
-})
+    const bt = formFieldBuilderType(props.field);
+    return props.field.type === 'radio' || bt === 'radio' || bt === 'yes_no';
+});
 
 const isSelectSingle = computed((): boolean => {
     if (!props.field) {
-        return false
+        return false;
     }
-    return props.field.type === 'select' && !isMultipleChoice.value
-})
+    return props.field.type === 'select' && !isMultipleChoice.value;
+});
 
 const matchedOptionRows = computed(() => {
     if (!props.field) {
-        return []
+        return [];
     }
-    const rows = getFormFieldOptionRows(props.field)
-    const v = props.value
+    const rows = getFormFieldOptionRows(props.field);
+    const v = props.value;
     if (Array.isArray(v)) {
-        const set = new Set(v.map(String))
-        return rows.filter((r) => set.has(r.label))
+        const set = new Set(v.map(String));
+        return rows.filter((r) => set.has(r.label));
     }
     if (typeof v === 'string' && v !== '') {
-        return rows.filter((r) => r.label === v)
+        return rows.filter((r) => r.label === v);
     }
-    return []
-})
+    return [];
+});
 
-const showChoiceMedia = computed(
-    () => isMultipleChoice.value || isRadioLike.value || isSelectSingle.value,
-)
+const showChoiceMedia = computed(() => isMultipleChoice.value || isRadioLike.value || isSelectSingle.value);
 
 async function downloadStoredFile(url: string, suggestedName: string): Promise<void> {
-    const name = suggestedName || basenameFromHref(url)
+    const name = suggestedName || basenameFromHref(url);
     try {
-        const res = await fetch(url, { credentials: 'same-origin' })
+        const res = await fetch(url, { credentials: 'same-origin' });
         if (!res.ok) {
-            throw new Error('fetch failed')
+            throw new Error('fetch failed');
         }
-        const blob = await res.blob()
-        const href = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = href
-        a.download = name
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(href)
+        const blob = await res.blob();
+        const href = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = href;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(href);
     } catch {
-        const a = document.createElement('a')
-        a.href = url
-        a.download = name
-        a.target = '_blank'
-        a.rel = 'noopener noreferrer'
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
     }
 }
 
 /** Label singkat jenis lampiran untuk toolbar */
 const attachmentKindLabel = computed((): string => {
-    if (!publicFileUrl.value) return 'Berkas'
-    if (preferImagePreview.value) return 'Gambar'
-    if (isPdfPreview.value) return 'PDF'
-    return 'Berkas'
-})
+    if (!publicFileUrl.value) return 'Berkas';
+    if (preferImagePreview.value) return 'Gambar';
+    if (isPdfPreview.value) return 'PDF';
+    return 'Berkas';
+});
 </script>
 
 <template>
@@ -271,7 +265,7 @@ const attachmentKindLabel = computed((): string => {
                 </div>
                 <button
                     type="button"
-                    class="group relative w-full bg-muted/20 p-4 text-left transition-colors hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    class="group relative w-full bg-muted/20 p-4 text-left transition-colors hover:bg-muted/35 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                     @click="openLightbox(publicFileUrl)"
                 >
                     <img
@@ -340,9 +334,7 @@ const attachmentKindLabel = computed((): string => {
 
             <!-- Berkas lain: kartu kompak satu baris aksi -->
             <div v-else :class="attachmentCardClass">
-                <div
-                    class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-5"
-                >
+                <div class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-5">
                     <div class="flex min-w-0 flex-1 items-center gap-3">
                         <div
                             class="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary"
@@ -398,14 +390,17 @@ const attachmentKindLabel = computed((): string => {
                     class="size-11 shrink-0 rounded-lg border border-border object-cover"
                     loading="lazy"
                 />
-                <span v-else class="flex size-11 shrink-0 items-center justify-center rounded-full bg-muted/50 text-muted-foreground">
+                <span
+                    v-else
+                    class="flex size-11 shrink-0 items-center justify-center rounded-full bg-muted/50 text-muted-foreground"
+                >
                     <ImageIcon class="size-5" aria-hidden="true" />
                 </span>
-                <span class="text-sm font-medium leading-snug text-foreground">{{ row.label }}</span>
+                <span class="text-sm leading-snug font-medium text-foreground">{{ row.label }}</span>
             </li>
         </ul>
 
-        <p v-else class="whitespace-pre-wrap text-[0.875rem] leading-[1.6] text-foreground">
+        <p v-else class="text-[0.875rem] leading-[1.6] whitespace-pre-wrap text-foreground">
             {{ plainText() }}
         </p>
 
@@ -418,12 +413,15 @@ const attachmentKindLabel = computed((): string => {
                 aria-label="Pratinjau gambar"
                 @click.self="closeLightbox"
             >
-                <div class="absolute top-0 right-0 left-0 z-10 flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
+                <div
+                    class="absolute top-0 right-0 left-0 z-10 flex items-center justify-between gap-3 px-4 py-3 sm:px-6"
+                >
                     <p class="min-w-0 flex-1 truncate text-xs font-medium text-white/80">
                         <span class="hidden sm:inline">Pratinjau lampiran · ketuk luar gambar atau tutup</span>
                         <span class="sm:hidden">Pratinjau</span>
                     </p>
-                    <Button radius="icon"
+                    <Button
+                        radius="icon"
                         type="button"
                         variant="secondary"
                         size="icon-sm"

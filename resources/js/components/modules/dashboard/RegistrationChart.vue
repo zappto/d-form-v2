@@ -23,7 +23,7 @@ const props = withDefaults(
     defineProps<{
         points?: { label: string; count: number }[];
     }>(),
-    { points: () => [] },
+    { points: () => [] }
 );
 
 const { isDark } = useChartTheme();
@@ -107,7 +107,9 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
     <Card
         class="overflow-hidden rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]"
     >
-        <CardHeader class="flex flex-row flex-wrap items-center justify-between gap-4 border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
+        <CardHeader
+            class="flex flex-row flex-wrap items-center justify-between gap-4 border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6"
+        >
             <div class="flex min-w-0 items-center gap-3">
                 <div
                     class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary shadow-inner"
@@ -118,7 +120,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
                     <CardTitle class="font-display text-lg font-bold tracking-[-0.02em] md:text-xl">
                         Tren pengajuan
                     </CardTitle>
-                    <p class="text-muted-foreground font-display mt-0.5 text-2xl font-bold tabular-nums tracking-tight">
+                    <p class="mt-0.5 font-display text-2xl font-bold tracking-tight text-muted-foreground tabular-nums">
                         {{ total.toLocaleString('id-ID') }}
                     </p>
                 </div>
@@ -127,7 +129,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
         <CardContent class="p-4 sm:p-5">
             <div
                 v-if="points.length === 0 || total === 0"
-                class="text-muted-foreground/90 flex min-h-[15rem] items-center justify-center rounded-xl bg-muted/20 text-sm font-medium"
+                class="flex min-h-[15rem] items-center justify-center rounded-xl bg-muted/20 text-sm font-medium text-muted-foreground/90"
             >
                 Tidak ada data
             </div>

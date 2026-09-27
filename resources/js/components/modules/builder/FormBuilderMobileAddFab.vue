@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { Plus } from 'lucide-vue-next'
+import { Plus } from 'lucide-vue-next';
 
 defineEmits<{
-    click: []
-}>()
+    click: [];
+}>();
 </script>
 
 <template>
     <button
         type="button"
-        class="bg-primary text-primary-foreground hover:bg-primary/92 fixed right-5 bottom-6 z-40 inline-flex size-14 items-center justify-center shadow-sm transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden"
+        class="fixed right-5 bottom-6 z-40 inline-flex size-14 items-center justify-center bg-primary text-primary-foreground shadow-sm transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-primary/92 lg:hidden"
         aria-label="Add field"
         @click="$emit('click')"
     >

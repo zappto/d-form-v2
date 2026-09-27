@@ -1,89 +1,87 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import { SheetDescription, SheetTitle } from '@/components/ui/sheet'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import ApplicantDetailContent, { type ApplicationDetail } from './ApplicantDetailContent.vue'
-import FormSheet from './FormSheet.vue'
-import { applicantAllowsTrackingResend, userAllowsTrackingResend } from '@/lib/recruitmentApplicantCapabilities'
-import useAuth from '@/hooks/useAuth'
-import { CheckCircle2, Mail, Trophy, XCircle } from 'lucide-vue-next'
+import { computed, ref } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { SheetDescription, SheetTitle } from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import ApplicantDetailContent, { type ApplicationDetail } from './ApplicantDetailContent.vue';
+import FormSheet from './FormSheet.vue';
+import { applicantAllowsTrackingResend, userAllowsTrackingResend } from '@/lib/recruitmentApplicantCapabilities';
+import useAuth from '@/hooks/useAuth';
+import { CheckCircle2, Mail, Trophy, XCircle } from 'lucide-vue-next';
 
 const props = withDefaults(
     defineProps<{
-        application: ApplicationDetail | null
-        loading: boolean
-        reasonOptions?: { value: string; label: string }[]
-        divisionOptions?: { id: string; name: string; code: string }[]
-        membershipTypeOptions?: { value: string; label: string }[]
-        editable?: boolean
+        application: ApplicationDetail | null;
+        loading: boolean;
+        reasonOptions?: { value: string; label: string }[];
+        divisionOptions?: { id: string; name: string; code: string }[];
+        membershipTypeOptions?: { value: string; label: string }[];
+        editable?: boolean;
     }>(),
     {
         reasonOptions: () => [],
         divisionOptions: () => [],
         membershipTypeOptions: () => [],
         editable: false,
-    },
-)
+    }
+);
 
-const emit = defineEmits<{ close: []; submitted: [] }>()
+const emit = defineEmits<{ close: []; submitted: [] }>();
 
-const page = usePage()
-const user = useAuth(page.props)
+const page = usePage();
+const user = useAuth(page.props);
 const canScreen = computed(
-    () => (props.application?.can_screen ?? false) && user.value?.can_screen_recruitment_applications === true,
-)
+    () => (props.application?.can_screen ?? false) && user.value?.can_screen_recruitment_applications === true
+);
 const canVerify = computed(
-    () => (props.application?.can_verify ?? false) && user.value?.can_screen_recruitment_applications === true,
-)
+    () => (props.application?.can_verify ?? false) && user.value?.can_screen_recruitment_applications === true
+);
 const canDecideFinal = computed(
-    () =>
-        (props.application?.can_decide_final ?? false) &&
-        user.value?.can_decide_recruitment_final === true,
-)
+    () => (props.application?.can_decide_final ?? false) && user.value?.can_decide_recruitment_final === true
+);
 const canResendTracking = computed(() => {
-    const application = props.application
+    const application = props.application;
     if (!application) {
-        return false
+        return false;
     }
 
-    return applicantAllowsTrackingResend(application) && userAllowsTrackingResend(user.value)
-})
+    return applicantAllowsTrackingResend(application) && userAllowsTrackingResend(user.value);
+});
 
-const contentRef = ref<InstanceType<typeof ApplicantDetailContent> | null>(null)
+const contentRef = ref<InstanceType<typeof ApplicantDetailContent> | null>(null);
 
 const sheetOpen = computed<boolean>({
     get: () => props.application !== null,
     set: (value: boolean) => {
-        if (!value) emit('close')
+        if (!value) emit('close');
     },
-})
+});
 
 function openScreening(action: 'revision' | 'reject') {
-    contentRef.value?.openScreeningModal(action)
+    contentRef.value?.openScreeningModal(action);
 }
 
 function openFinal(action: 'accept' | 'reject') {
-    contentRef.value?.openFinalModal(action)
+    contentRef.value?.openFinalModal(action);
 }
 
 function verifyRegistration() {
-    contentRef.value?.verifyApplication()
+    contentRef.value?.verifyApplication();
 }
 
 function passScreening() {
-    contentRef.value?.passApplication()
+    contentRef.value?.passApplication();
 }
 
 function resendTracking() {
-    contentRef.value?.requestResendTracking()
+    contentRef.value?.requestResendTracking();
 }
 
 function handleSubmitted() {
-    emit('submitted')
-    emit('close')
+    emit('submitted');
+    emit('close');
 }
 </script>
 
@@ -94,7 +92,7 @@ function handleSubmitted() {
                 <Skeleton v-if="application && loading" class="h-5 w-2/3" />
                 <template v-else>{{ application?.full_name ?? 'Detail peserta' }}</template>
             </SheetTitle>
-            <SheetDescription class="text-muted-foreground truncate text-xs">
+            <SheetDescription class="truncate text-xs text-muted-foreground">
                 <Skeleton v-if="application && loading" class="h-3 w-1/2" />
                 <template v-else>{{ application?.registration_number }} · {{ application?.nim }}</template>
             </SheetDescription>
@@ -104,12 +102,7 @@ function handleSubmitted() {
                     <Badge variant="outline">{{ application.result_label }}</Badge>
                 </div>
                 <div v-if="editable" class="flex flex-wrap items-center gap-2">
-                    <Button
-                        v-if="canResendTracking"
-                        size="sm"
-                        variant="outline"
-                        @click="resendTracking"
-                    >
+                    <Button v-if="canResendTracking" size="sm" variant="outline" @click="resendTracking">
                         <Mail class="mr-2 size-4" />
                         Kirim ulang tracking
                     </Button>

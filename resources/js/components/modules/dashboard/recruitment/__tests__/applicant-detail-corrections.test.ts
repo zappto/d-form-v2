@@ -1,13 +1,11 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
-import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils'
-import ApplicantDetailContent, {
-    type ApplicationDetail,
-} from '../ApplicantDetailContent.vue'
-import { showErrorToast, showFlashToast } from '@/lib/error-message'
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { nextTick } from 'vue';
+import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
+import ApplicantDetailContent, { type ApplicationDetail } from '../ApplicantDetailContent.vue';
+import { showErrorToast, showFlashToast } from '@/lib/error-message';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
-config.global.renderStubDefaultSlot = true
+config.global.renderStubDefaultSlot = true;
 
 /**
  * Spec §3.2/§3.4, Task 7: review koreksi (setujui/tolak) —
@@ -23,10 +21,10 @@ config.global.renderStubDefaultSlot = true
 const { formHolder, postMock } = vi.hoisted(() => ({
     formHolder: { state: null as Record<string, unknown> | null },
     postMock: vi.fn(),
-}))
+}));
 
 vi.mock('@inertiajs/vue3', async () => {
-    const { reactive } = await import('vue')
+    const { reactive } = await import('vue');
     return {
         router: {
             post: vi.fn(),
@@ -47,48 +45,48 @@ vi.mock('@inertiajs/vue3', async () => {
             },
         }),
         useForm: (initial: Record<string, unknown>) => {
-            const errors = reactive<Record<string, string>>({})
+            const errors = reactive<Record<string, string>>({});
             const state = reactive({
                 ...initial,
                 errors,
                 processing: false,
                 post: postMock,
                 reset: vi.fn(() => {
-                    Object.assign(state, initial)
+                    Object.assign(state, initial);
                 }),
                 clearErrors: vi.fn(),
-            })
-            formHolder.state = state as unknown as Record<string, unknown>
-            return state
+            });
+            formHolder.state = state as unknown as Record<string, unknown>;
+            return state;
         },
-    }
-})
+    };
+});
 
 vi.mock('@/lib/error-message', () => ({
     humanizeErrorMessage: (message: string): string => message,
     showErrorToast: vi.fn(),
     showFlashToast: vi.fn(),
-}))
+}));
 
 vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}))
+}));
 
 interface InertiaMutationOptions {
-    preserveScroll?: boolean
-    onSuccess?: () => void
-    onError?: () => void
-    onFinish?: () => void
+    preserveScroll?: boolean;
+    onSuccess?: () => void;
+    onError?: () => void;
+    onFinish?: () => void;
 }
 
-let lastUrl: string | undefined
-let lastOptions: InertiaMutationOptions | undefined
+let lastUrl: string | undefined;
+let lastOptions: InertiaMutationOptions | undefined;
 
 function lastPostCall(): { url: string; options: InertiaMutationOptions } {
-    expect(postMock).toHaveBeenCalled()
-    expect(lastUrl).toBeDefined()
-    expect(lastOptions).toBeDefined()
-    return { url: lastUrl as string, options: lastOptions as InertiaMutationOptions }
+    expect(postMock).toHaveBeenCalled();
+    expect(lastUrl).toBeDefined();
+    expect(lastOptions).toBeDefined();
+    return { url: lastUrl as string, options: lastOptions as InertiaMutationOptions };
 }
 
 function demoApplication(): ApplicationDetail {
@@ -133,7 +131,7 @@ function demoApplication(): ApplicationDetail {
         can_verify: false,
         can_decide_final: false,
         can_resend_tracking: false,
-    }
+    };
 }
 
 function mountContent(): VueWrapper<InstanceType<typeof ApplicantDetailContent>> {
@@ -158,190 +156,184 @@ function mountContent(): VueWrapper<InstanceType<typeof ApplicantDetailContent>>
                 DialogTitle: true,
             },
         },
-    })
+    });
 }
 
-function correctionButton(
-    wrapper: VueWrapper,
-    idle: string,
-    busy: string,
-): DOMWrapper<HTMLButtonElement> {
-    const found = wrapper
-        .findAll('button')
-        .find((b) => b.text().includes(idle) || b.text().includes(busy))
-    if (!found) throw new Error(`tombol koreksi (${idle}/${busy}) tidak ditemukan`)
-    return found as DOMWrapper<HTMLButtonElement>
+function correctionButton(wrapper: VueWrapper, idle: string, busy: string): DOMWrapper<HTMLButtonElement> {
+    const found = wrapper.findAll('button').find((b) => b.text().includes(idle) || b.text().includes(busy));
+    if (!found) throw new Error(`tombol koreksi (${idle}/${busy}) tidak ditemukan`);
+    return found as DOMWrapper<HTMLButtonElement>;
 }
 
 function approveButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
-    return correctionButton(wrapper, 'Setujui', 'Menyimpan...')
+    return correctionButton(wrapper, 'Setujui', 'Menyimpan...');
 }
 
 function rejectButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
-    return correctionButton(wrapper, 'Tolak', 'Menolak...')
+    return correctionButton(wrapper, 'Tolak', 'Menolak...');
 }
 
 beforeEach(() => {
-    vi.clearAllMocks()
-    lastUrl = undefined
-    lastOptions = undefined
-    postMock.mockReset()
+    vi.clearAllMocks();
+    lastUrl = undefined;
+    lastOptions = undefined;
+    postMock.mockReset();
     postMock.mockImplementation((...args: unknown[]) => {
-        lastUrl = args[0] as string
-        lastOptions = args[1] as InertiaMutationOptions | undefined
-        const state = formHolder.state
-        if (state) state.processing = true
-        return undefined
-    })
-})
+        lastUrl = args[0] as string;
+        lastOptions = args[1] as InertiaMutationOptions | undefined;
+        const state = formHolder.state;
+        if (state) state.processing = true;
+        return undefined;
+    });
+});
 
 function finishProcessing(): void {
-    const state = formHolder.state
-    if (state) state.processing = false
+    const state = formHolder.state;
+    if (state) state.processing = false;
 }
 
 describe('ApplicantDetailContent koreksi (Task 7)', () => {
     it("setujui → sibuk (spinner + 'Menyimpan...' + disabled + aria-busy) + POST approve", async () => {
-        const wrapper = mountContent()
+        const wrapper = mountContent();
         try {
-            expect(approveButton(wrapper).attributes('disabled')).toBeUndefined()
+            expect(approveButton(wrapper).attributes('disabled')).toBeUndefined();
 
-            await approveButton(wrapper).trigger('click')
-            await nextTick()
+            await approveButton(wrapper).trigger('click');
+            await nextTick();
 
-            expect(postMock).toHaveBeenCalledTimes(1)
-            expect(lastPostCall().url).toContain('cor-1')
+            expect(postMock).toHaveBeenCalledTimes(1);
+            expect(lastPostCall().url).toContain('cor-1');
 
-            const btn = approveButton(wrapper)
-            expect(btn.attributes('disabled')).not.toBeUndefined()
-            expect(btn.attributes('aria-busy')).toBe('true')
-            expect(btn.find('[role="status"]').exists()).toBe(true)
-            expect(btn.text()).toContain('Menyimpan...')
-            expect(btn.text()).not.toContain('…')
+            const btn = approveButton(wrapper);
+            expect(btn.attributes('disabled')).not.toBeUndefined();
+            expect(btn.attributes('aria-busy')).toBe('true');
+            expect(btn.find('[role="status"]').exists()).toBe(true);
+            expect(btn.text()).toContain('Menyimpan...');
+            expect(btn.text()).not.toContain('…');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('setujui sukses → toast sukses manual + tombol pulih', async () => {
-        const wrapper = mountContent()
+        const wrapper = mountContent();
         try {
-            await approveButton(wrapper).trigger('click')
-            await nextTick()
+            await approveButton(wrapper).trigger('click');
+            await nextTick();
 
-            lastPostCall().options.onSuccess?.()
-            lastPostCall().options.onFinish?.()
-            finishProcessing()
-            await nextTick()
+            lastPostCall().options.onSuccess?.();
+            lastPostCall().options.onFinish?.();
+            finishProcessing();
+            await nextTick();
 
             expect(showFlashToast).toHaveBeenCalledWith({
                 type: 'success',
                 message: 'Permintaan koreksi disetujui.',
-            })
+            });
 
-            const btn = approveButton(wrapper)
-            expect(btn.attributes('disabled')).toBeUndefined()
-            expect(btn.attributes('aria-busy')).toBe('false')
-            expect(btn.find('[role="status"]').exists()).toBe(false)
-            expect(btn.text()).toContain('Setujui')
+            const btn = approveButton(wrapper);
+            expect(btn.attributes('disabled')).toBeUndefined();
+            expect(btn.attributes('aria-busy')).toBe('false');
+            expect(btn.find('[role="status"]').exists()).toBe(false);
+            expect(btn.text()).toContain('Setujui');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('setujui gagal → showErrorToast + tombol pulih', async () => {
-        const wrapper = mountContent()
+        const wrapper = mountContent();
         try {
-            await approveButton(wrapper).trigger('click')
-            await nextTick()
+            await approveButton(wrapper).trigger('click');
+            await nextTick();
 
-            lastPostCall().options.onError?.()
-            lastPostCall().options.onFinish?.()
-            await nextTick()
+            lastPostCall().options.onError?.();
+            lastPostCall().options.onFinish?.();
+            await nextTick();
 
-            expect(showErrorToast).toHaveBeenCalledWith('Gagal menyetujui permintaan koreksi.')
-            expect(showFlashToast).not.toHaveBeenCalled()
+            expect(showErrorToast).toHaveBeenCalledWith('Gagal menyetujui permintaan koreksi.');
+            expect(showFlashToast).not.toHaveBeenCalled();
 
-            finishProcessing()
-            await nextTick()
-            expect(approveButton(wrapper).attributes('disabled')).toBeUndefined()
+            finishProcessing();
+            await nextTick();
+            expect(approveButton(wrapper).attributes('disabled')).toBeUndefined();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it("tolak → sibuk (spinner + 'Menolak...' + disabled + aria-busy) + POST reject", async () => {
-        const wrapper = mountContent()
+        const wrapper = mountContent();
         try {
-            await rejectButton(wrapper).trigger('click')
-            await nextTick()
+            await rejectButton(wrapper).trigger('click');
+            await nextTick();
 
-            expect(postMock).toHaveBeenCalledTimes(1)
-            expect(lastPostCall().url).toContain('cor-1')
+            expect(postMock).toHaveBeenCalledTimes(1);
+            expect(lastPostCall().url).toContain('cor-1');
 
-            const btn = rejectButton(wrapper)
-            expect(btn.attributes('disabled')).not.toBeUndefined()
-            expect(btn.attributes('aria-busy')).toBe('true')
-            expect(btn.find('[role="status"]').exists()).toBe(true)
-            expect(btn.text()).toContain('Menolak...')
+            const btn = rejectButton(wrapper);
+            expect(btn.attributes('disabled')).not.toBeUndefined();
+            expect(btn.attributes('aria-busy')).toBe('true');
+            expect(btn.find('[role="status"]').exists()).toBe(true);
+            expect(btn.text()).toContain('Menolak...');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('tolak sukses → toast sukses manual + tombol pulih', async () => {
-        const wrapper = mountContent()
+        const wrapper = mountContent();
         try {
-            await rejectButton(wrapper).trigger('click')
-            await nextTick()
+            await rejectButton(wrapper).trigger('click');
+            await nextTick();
 
-            lastPostCall().options.onSuccess?.()
-            lastPostCall().options.onFinish?.()
-            finishProcessing()
-            await nextTick()
+            lastPostCall().options.onSuccess?.();
+            lastPostCall().options.onFinish?.();
+            finishProcessing();
+            await nextTick();
 
             expect(showFlashToast).toHaveBeenCalledWith({
                 type: 'success',
                 message: 'Permintaan koreksi ditolak.',
-            })
-            expect(rejectButton(wrapper).text()).toContain('Tolak')
+            });
+            expect(rejectButton(wrapper).text()).toContain('Tolak');
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('tolak gagal → showErrorToast + tombol pulih', async () => {
-        const wrapper = mountContent()
+        const wrapper = mountContent();
         try {
-            await rejectButton(wrapper).trigger('click')
-            await nextTick()
+            await rejectButton(wrapper).trigger('click');
+            await nextTick();
 
-            lastPostCall().options.onError?.()
-            lastPostCall().options.onFinish?.()
-            await nextTick()
+            lastPostCall().options.onError?.();
+            lastPostCall().options.onFinish?.();
+            await nextTick();
 
-            expect(showErrorToast).toHaveBeenCalledWith('Gagal menolak permintaan koreksi.')
-            expect(showFlashToast).not.toHaveBeenCalled()
+            expect(showErrorToast).toHaveBeenCalledWith('Gagal menolak permintaan koreksi.');
+            expect(showFlashToast).not.toHaveBeenCalled();
 
-            finishProcessing()
-            await nextTick()
-            expect(rejectButton(wrapper).attributes('disabled')).toBeUndefined()
+            finishProcessing();
+            await nextTick();
+            expect(rejectButton(wrapper).attributes('disabled')).toBeUndefined();
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
+    });
 
     it('klik ganda saat sibuk → hanya satu request', async () => {
-        const wrapper = mountContent()
+        const wrapper = mountContent();
         try {
-            await approveButton(wrapper).trigger('click')
-            await nextTick()
-            await approveButton(wrapper).trigger('click')
-            await nextTick()
+            await approveButton(wrapper).trigger('click');
+            await nextTick();
+            await approveButton(wrapper).trigger('click');
+            await nextTick();
 
-            expect(postMock).toHaveBeenCalledTimes(1)
+            expect(postMock).toHaveBeenCalledTimes(1);
         } finally {
-            wrapper.unmount()
+            wrapper.unmount();
         }
-    })
-})
+    });
+});

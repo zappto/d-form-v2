@@ -33,7 +33,7 @@ withDefaults(
             <SheetHeader v-if="$slots.header || title || description" :class="FORM_SHEET_HEADER_CLASS">
                 <slot name="header">
                     <SheetTitle v-if="title" class="truncate text-base">{{ title }}</SheetTitle>
-                    <SheetDescription v-if="description" class="text-muted-foreground truncate text-xs">
+                    <SheetDescription v-if="description" class="truncate text-xs text-muted-foreground">
                         {{ description }}
                     </SheetDescription>
                 </slot>

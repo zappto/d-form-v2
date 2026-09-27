@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { AlertCircle, CheckCircle2 } from 'lucide-vue-next'
-import { routes } from '@/lib/routes'
+import { Link } from '@inertiajs/vue3';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, CheckCircle2 } from 'lucide-vue-next';
+import { routes } from '@/lib/routes';
 
 defineProps<{
-    eventId: string
-    title: string
-    body: string
-    success?: boolean
-    primaryActionHref?: string | null
-    primaryActionLabel?: string
-}>()
+    eventId: string;
+    title: string;
+    body: string;
+    success?: boolean;
+    primaryActionHref?: string | null;
+    primaryActionLabel?: string;
+}>();
 </script>
 
 <template>

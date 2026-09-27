@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { optionLabel } from '@/components/modules/builder/fieldMapping'
-import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage'
-import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
-import type { BuilderField, FieldOptionEntry } from '@/types/form-builder'
+import { computed } from 'vue';
+import { optionLabel } from '@/components/modules/builder/fieldMapping';
+import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage';
+import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
+import type { BuilderField, FieldOptionEntry } from '@/types/form-builder';
 import {
     Type,
     AlignLeft,
@@ -25,30 +25,30 @@ import {
     Trash2,
     Copy,
     GripVertical,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
 const props = withDefaults(
     defineProps<{
-        field: BuilderField
-        isSelected?: boolean
+        field: BuilderField;
+        isSelected?: boolean;
     }>(),
-    { isSelected: false },
-)
+    { isSelected: false }
+);
 
 const emit = defineEmits<{
-    (event: 'select'): void
-    (event: 'delete'): void
-    (event: 'duplicate'): void
-    (event: 'updateField', field: BuilderField): void
-    (event: 'manage'): void
-}>()
+    (event: 'select'): void;
+    (event: 'delete'): void;
+    (event: 'duplicate'): void;
+    (event: 'updateField', field: BuilderField): void;
+    (event: 'manage'): void;
+}>();
 
 /** Gabung perubahan parsial ke salinan field — kartu selalu kirim objek baru (immutable). */
 function patch(partial: Partial<BuilderField>): void {
-    emit('updateField', { ...props.field, ...partial })
+    emit('updateField', { ...props.field, ...partial });
 }
 
-const hasOptions = computed(() => ['dropdown', 'checkbox', 'radio'].includes(props.field.type))
+const hasOptions = computed(() => ['dropdown', 'checkbox', 'radio'].includes(props.field.type));
 
 const TYPE_CONFIG = {
     short_text: { icon: Type, label: 'Teks pendek', tone: 'neutral' },
@@ -67,7 +67,7 @@ const TYPE_CONFIG = {
     heading: { icon: HeadingIcon, label: 'Judul', tone: 'neutral' },
     paragraph: { icon: TextCursorInput, label: 'Paragraf', tone: 'neutral' },
     divider: { icon: Minus, label: 'Pemisah', tone: 'neutral' },
-} as const
+} as const;
 
 /** Aksen kecil per kategori field — berbasis tone token proyek, bukan warna acak. */
 const FIELD_TONE_CLASSES: Record<'neutral' | 'info' | 'primary' | 'success' | 'warning', string> = {
@@ -76,39 +76,39 @@ const FIELD_TONE_CLASSES: Record<'neutral' | 'info' | 'primary' | 'success' | 'w
     primary: 'text-primary',
     success: 'text-success',
     warning: 'text-warning',
-}
+};
 
-const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text)
+const config = computed(() => TYPE_CONFIG[props.field.type as keyof typeof TYPE_CONFIG] || TYPE_CONFIG.short_text);
 
 /** Petunjuk di kanvas bila admin belum mengisi placeholder — hanya tampilan, bukan nilai tersimpan. */
 function canvasPlaceholder(f: BuilderField): string {
-    const custom = String(f.placeholder ?? '').trim()
-    if (custom) return custom
+    const custom = String(f.placeholder ?? '').trim();
+    if (custom) return custom;
     const byType: Record<string, string> = {
         short_text: 'Ketik jawaban singkat…',
         long_text: 'Tulis jawaban di sini…',
         email: 'nama@email.com',
         phone: 'Nomor WhatsApp / telepon',
         number: 'Masukkan angka',
-    }
-    return byType[f.type] ?? 'Ketik di sini…'
+    };
+    return byType[f.type] ?? 'Ketik di sini…';
 }
 
-const filledStars = computed(() => props.field.metadata?.maxStars ?? 5)
+const filledStars = computed(() => props.field.metadata?.maxStars ?? 5);
 
 const choiceOptions = computed((): FieldOptionEntry[] => {
-    const raw = props.field.options
-    if (Array.isArray(raw) && raw.length > 0) return raw as FieldOptionEntry[]
+    const raw = props.field.options;
+    if (Array.isArray(raw) && raw.length > 0) return raw as FieldOptionEntry[];
     return ['Option 1', 'Option 2', 'Option 3'].map((label) => ({
         id: label.toLowerCase().replace(/\s+/g, '-'),
         type: 'text',
         label,
-    }))
-})
+    }));
+});
 
 function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
-    const src = resolveOptionImagePreviewSrc(entry)
-    return src !== '' ? src : undefined
+    const src = resolveOptionImagePreviewSrc(entry);
+    return src !== '' ? src : undefined;
 }
 </script>
 
@@ -116,15 +116,18 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
     <div
         class="group relative cursor-pointer rounded-2xl border transition-[border-color,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         :class="[
- isSelected
- ? 'border-primary bg-primary/[0.04] shadow-md ring-2 ring-primary/20'
- : 'border-border bg-card shadow-sm hover:border-primary/35 hover:shadow-md',
- ]"
+            isSelected
+                ? 'border-primary bg-primary/[0.04] shadow-md ring-2 ring-primary/20'
+                : 'border-border bg-card shadow-sm hover:border-primary/35 hover:shadow-md',
+        ]"
         @click="emit('select')"
     >
         <!-- Type badge + actions bar -->
         <div class="group/head flex items-center gap-2.5 px-4 pt-3.5 sm:px-5">
-            <GripVertical class="hidden size-3.5 cursor-grab text-muted-foreground/40 transition-colors group-hover:text-muted-foreground/80 lg:block" aria-hidden="true" />
+            <GripVertical
+                class="hidden size-3.5 cursor-grab text-muted-foreground/40 transition-colors group-hover:text-muted-foreground/80 lg:block"
+                aria-hidden="true"
+            />
             <span
                 class="inline-flex items-center gap-2 rounded-lg border px-1.5 py-1.5"
                 :class="
@@ -142,7 +145,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                 />
             </span>
             <span
-                class="text-muted-foreground min-w-0 truncate text-[11px] font-semibold tracking-wide"
+                class="min-w-0 truncate text-[11px] font-semibold tracking-wide text-muted-foreground"
                 :class="isSelected ? '' : 'text-muted-foreground/85'"
             >
                 {{ config.label }}
@@ -154,7 +157,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                 >
                     <button
                         type="button"
-                        class="text-muted-foreground hover:text-primary focus-visible:text-primary inline-flex size-7 items-center justify-center rounded-md transition-colors outline-none hover:bg-transparent focus-visible:ring-ring/30 focus-visible:ring-[3px]"
+                        class="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:bg-transparent hover:text-primary focus-visible:text-primary focus-visible:ring-[3px] focus-visible:ring-ring/30"
                         :title="hasOptions ? 'Kelola opsi' : 'Pengaturan'"
                         :aria-label="hasOptions ? 'Kelola opsi' : 'Pengaturan field'"
                         @click.stop="emit('manage')"
@@ -163,7 +166,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     </button>
                     <button
                         type="button"
-                        class="text-muted-foreground hover:text-primary focus-visible:text-primary inline-flex size-7 items-center justify-center rounded-md transition-colors outline-none hover:bg-transparent focus-visible:ring-ring/30 focus-visible:ring-[3px]"
+                        class="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:bg-transparent hover:text-primary focus-visible:text-primary focus-visible:ring-[3px] focus-visible:ring-ring/30"
                         title="Gandakan"
                         aria-label="Gandakan field"
                         @click.stop="emit('duplicate')"
@@ -172,7 +175,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     </button>
                     <button
                         type="button"
-                        class="text-muted-foreground hover:text-destructive focus-visible:text-destructive inline-flex size-7 items-center justify-center rounded-md transition-colors outline-none hover:bg-transparent focus-visible:ring-ring/30 focus-visible:ring-[3px]"
+                        class="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:bg-transparent hover:text-destructive focus-visible:text-destructive focus-visible:ring-[3px] focus-visible:ring-ring/30"
                         title="Hapus"
                         aria-label="Hapus field"
                         @click.stop="emit('delete')"
@@ -190,7 +193,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                 <input
                     :value="field.label"
                     :placeholder="field.required ? 'Label pertanyaan' : 'Label pertanyaan (opsional)'"
-                    class="font-display w-full border-0 border-b border-transparent bg-transparent p-0 text-[15px] font-semibold tracking-tight text-foreground transition-colors duration-200 outline-none placeholder:text-muted-foreground/50 focus:border-primary/60 group-hover/label:border-border"
+                    class="w-full border-0 border-b border-transparent bg-transparent p-0 font-display text-[15px] font-semibold tracking-tight text-foreground transition-colors duration-200 outline-none group-hover/label:border-border placeholder:text-muted-foreground/50 focus:border-primary/60"
                     @input="patch({ label: ($event.target as HTMLInputElement).value })"
                 />
                 <span v-if="field.required" class="text-destructive">*</span>
@@ -266,11 +269,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                                 v-if="opt.type === 'image' && choiceImageSrc(opt)"
                                 class="size-10 shrink-0 overflow-hidden rounded-md border border-border"
                             >
-                                <img
-                                    :src="choiceImageSrc(opt)"
-                                    alt=""
-                                    class="size-full object-cover"
-                                />
+                                <img :src="choiceImageSrc(opt)" alt="" class="size-full object-cover" />
                             </div>
                             <span v-else>{{ optionLabel(opt) }}</span>
                         </div>
@@ -287,12 +286,11 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                         <div
                             class="flex size-4 shrink-0 items-center justify-center rounded border border-input bg-card"
                         ></div>
-                        <div v-if="opt.type === 'image' && choiceImageSrc(opt)" class="size-12 shrink-0 overflow-hidden rounded-md border border-border">
-                            <img
-                                :src="choiceImageSrc(opt)"
-                                alt=""
-                                class="size-full object-cover"
-                            />
+                        <div
+                            v-if="opt.type === 'image' && choiceImageSrc(opt)"
+                            class="size-12 shrink-0 overflow-hidden rounded-md border border-border"
+                        >
+                            <img :src="choiceImageSrc(opt)" alt="" class="size-full object-cover" />
                         </div>
                         <span v-else>{{ optionLabel(opt) }}</span>
                     </label>
@@ -308,12 +306,11 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                         <div
                             class="flex size-4 shrink-0 items-center justify-center rounded-full border border-input bg-card"
                         ></div>
-                        <div v-if="opt.type === 'image' && choiceImageSrc(opt)" class="size-12 shrink-0 overflow-hidden rounded-full border border-border">
-                            <img
-                                :src="choiceImageSrc(opt)"
-                                alt=""
-                                class="size-full object-cover"
-                            />
+                        <div
+                            v-if="opt.type === 'image' && choiceImageSrc(opt)"
+                            class="size-12 shrink-0 overflow-hidden rounded-full border border-border"
+                        >
+                            <img :src="choiceImageSrc(opt)" alt="" class="size-full object-cover" />
                         </div>
                         <span v-else>{{ optionLabel(opt) }}</span>
                     </label>
@@ -324,15 +321,15 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                     v-else-if="field.type === 'image_upload'"
                     class="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/20 py-6"
                 >
-                    <div
-                        class="mb-2 flex size-10 items-center justify-center rounded-full bg-primary/8 text-primary"
-                    >
+                    <div class="mb-2 flex size-10 items-center justify-center rounded-full bg-primary/8 text-primary">
                         <ImagePlus class="size-5" />
                     </div>
                     <p class="text-xs font-semibold text-muted-foreground">Ketuk atau jatuhkan gambar di sini</p>
                     <p class="mt-0.5 text-[10px] text-muted-foreground/60">PNG, JPG hingga 5 MB</p>
                     <div class="mt-2 flex flex-wrap justify-center gap-1">
-                        <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">4:3</span>
+                        <span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+                            >4:3</span
+                        >
                         <span class="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
                             >tengah</span
                         >
@@ -354,10 +351,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                 </div>
 
                 <!-- Date -->
-                <div
-                    v-else-if="field.type === 'date'"
-                    class="rounded-xl border border-border/70 bg-muted/20 p-1.5"
-                >
+                <div v-else-if="field.type === 'date'" class="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                     <input
                         type="text"
                         readonly
@@ -369,10 +363,7 @@ function choiceImageSrc(entry: FieldOptionEntry): string | undefined {
                 </div>
 
                 <!-- Time -->
-                <div
-                    v-else-if="field.type === 'time'"
-                    class="rounded-xl border border-border/70 bg-muted/20 p-1.5"
-                >
+                <div v-else-if="field.type === 'time'" class="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                     <input
                         type="text"
                         readonly

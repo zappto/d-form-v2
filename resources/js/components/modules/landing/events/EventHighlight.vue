@@ -1,29 +1,34 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { MapPin, Users, ArrowRight } from 'lucide-vue-next'
-import { routes } from '@/lib/routes'
-import { eventCardBannerContainerClass } from '@/lib/eventBannerAspect'
-import { eventStatusUi } from '@/lib/eventShowUi'
-import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'
+import { ref, onMounted, computed } from 'vue';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { MapPin, Users, ArrowRight } from 'lucide-vue-next';
+import { routes } from '@/lib/routes';
+import { eventCardBannerContainerClass } from '@/lib/eventBannerAspect';
+import { eventStatusUi } from '@/lib/eventShowUi';
+import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 
 const props = defineProps<{
-    events: IEvent[]
-}>()
+    events: IEvent[];
+}>();
 
-const visible = ref(false)
+const visible = ref(false);
 onMounted(() => {
     const obs = new IntersectionObserver(
-        ([e]) => { if (e?.isIntersecting) { visible.value = true; obs.disconnect() } },
-        { threshold: 0.1 },
-    )
-    const el = document.getElementById('event-highlight')
-    if (el) obs.observe(el)
-})
+        ([e]) => {
+            if (e?.isIntersecting) {
+                visible.value = true;
+                obs.disconnect();
+            }
+        },
+        { threshold: 0.1 }
+    );
+    const el = document.getElementById('event-highlight');
+    if (el) obs.observe(el);
+});
 
-const featured = computed(() => props.events.slice(0, 3))
+const featured = computed(() => props.events.slice(0, 3));
 </script>
 
 <template>
@@ -31,16 +36,17 @@ const featured = computed(() => props.events.slice(0, 3))
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
- 'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
- ]"
+                    'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
+                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                ]"
             >
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Sorotan</p>
+                <p class="text-xs font-semibold tracking-[0.2em] text-primary uppercase">Sorotan</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                     Acara yang sedang berlangsung
                 </h2>
-                <p class="mt-3 mx-auto max-w-lg text-base leading-relaxed text-muted-foreground">
-                    Beberapa acara pilihan yang saat ini membuka pendaftaran. Jangan lewatkan kesempatan untuk bergabung.
+                <p class="mx-auto mt-3 max-w-lg text-base leading-relaxed text-muted-foreground">
+                    Beberapa acara pilihan yang saat ini membuka pendaftaran. Jangan lewatkan kesempatan untuk
+                    bergabung.
                 </p>
             </div>
 
@@ -49,9 +55,9 @@ const featured = computed(() => props.events.slice(0, 3))
                     v-for="(ev, i) in featured"
                     :key="ev.id"
                     :class="[
- 'group gap-0 overflow-hidden border-border/40 p-0 transition-all duration-500 hover:border-primary/25 hover:shadow-sm',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
- ]"
+                        'group gap-0 overflow-hidden border-border/40 p-0 transition-all duration-500 hover:border-primary/25 hover:shadow-sm',
+                        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+                    ]"
                     :style="{ transitionDelay: `${100 + i * 80}ms` }"
                 >
                     <div :class="eventCardBannerContainerClass()">
@@ -64,14 +70,19 @@ const featured = computed(() => props.events.slice(0, 3))
                         </div>
                         <Badge
                             variant="outline"
-                            :class="['absolute top-3 right-3 z-[1] text-[10px] backdrop-blur-sm', eventStatusUi(ev.registration_status).tone]"
+                            :class="[
+                                'absolute top-3 right-3 z-[1] text-[10px] backdrop-blur-sm',
+                                eventStatusUi(ev.registration_status).tone,
+                            ]"
                         >
                             {{ eventStatusUi(ev.registration_status).label }}
                         </Badge>
                     </div>
 
                     <CardContent class="p-5">
-                        <h3 class="text-base font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                        <h3
+                            class="line-clamp-2 text-base font-semibold text-foreground transition-colors group-hover:text-primary"
+                        >
                             {{ ev.title }}
                         </h3>
 
@@ -86,13 +97,11 @@ const featured = computed(() => props.events.slice(0, 3))
                             </span>
                         </div>
 
-                        <Button
-                            as-child
-                            variant="outline"
-                            size="sm"
-                            class="mt-4 h-9 w-full text-xs font-medium"
-                        >
-                            <a :href="routes.landing.events.show(ev.slug)" class="inline-flex items-center justify-center gap-1.5">
+                        <Button as-child variant="outline" size="sm" class="mt-4 h-9 w-full text-xs font-medium">
+                            <a
+                                :href="routes.landing.events.show(ev.slug)"
+                                class="inline-flex items-center justify-center gap-1.5"
+                            >
                                 Lihat Detail
                                 <ArrowRight class="size-3.5" />
                             </a>

@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ArrowUpRight } from 'lucide-vue-next'
-import { formatDisplayDate } from '@/lib/format'
-import { routes } from '@/lib/routes'
-import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue'
-import { userAvatarSeed } from '@/lib/userAvatarFallback'
+import { Link } from '@inertiajs/vue3';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowUpRight } from 'lucide-vue-next';
+import { formatDisplayDate } from '@/lib/format';
+import { routes } from '@/lib/routes';
+import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
+import { userAvatarSeed } from '@/lib/userAvatarFallback';
 
 defineProps<{
-    eventId: string
-    totalRegistrants: number
-    previewRegistrants: IRegistrant[]
-    cardShadow: string
-}>()
+    eventId: string;
+    totalRegistrants: number;
+    previewRegistrants: IRegistrant[];
+    cardShadow: string;
+}>();
 </script>
 
 <template>
@@ -21,9 +21,11 @@ defineProps<{
         <CardHeader class="pb-3">
             <div class="flex items-center justify-between">
                 <div>
-                    <CardTitle class="text-[13px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Recent registrants</CardTitle>
+                    <CardTitle class="text-[13px] font-semibold tracking-[0.1em] text-muted-foreground uppercase"
+                        >Recent registrants</CardTitle
+                    >
                     <p class="mt-1 text-xs text-muted-foreground">
-                        <span class="font-medium tabular-nums text-foreground">{{ totalRegistrants }}</span>
+                        <span class="font-medium text-foreground tabular-nums">{{ totalRegistrants }}</span>
                         {{ totalRegistrants === 1 ? 'person has' : 'people have' }} signed up so far.
                     </p>
                 </div>
@@ -57,16 +59,16 @@ defineProps<{
                     <div class="flex shrink-0 items-center gap-3">
                         <span
                             :class="[
- 'inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10.5px] font-medium capitalize',
- reg.status === 'accepted' && 'bg-success/10 text-success',
- reg.status === 'pending' && 'bg-warning/15 text-warning-foreground',
- reg.status === 'rejected' && 'bg-destructive/10 text-destructive',
- ]"
+                                'inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10.5px] font-medium capitalize',
+                                reg.status === 'accepted' && 'bg-success/10 text-success',
+                                reg.status === 'pending' && 'bg-warning/15 text-warning-foreground',
+                                reg.status === 'rejected' && 'bg-destructive/10 text-destructive',
+                            ]"
                         >
                             <span class="size-1.5 rounded-full bg-current" />
                             {{ reg.status }}
                         </span>
-                        <span class="hidden text-[11px] tabular-nums text-muted-foreground sm:inline">
+                        <span class="hidden text-[11px] text-muted-foreground tabular-nums sm:inline">
                             {{ formatDisplayDate(reg.submitted_at) }}
                         </span>
                     </div>

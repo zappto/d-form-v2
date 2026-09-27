@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useForm } from '@inertiajs/vue3'
-import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { CometSpinner } from '@/components/ui/comet'
-import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
-import { readFormError } from '@/lib/formErrors'
+import { computed } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { CometSpinner } from '@/components/ui/comet';
+import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+import { readFormError } from '@/lib/formErrors';
 
 const props = defineProps<{
-    storeUrl: string
-    compact?: boolean
-}>()
+    storeUrl: string;
+    compact?: boolean;
+}>();
 
 const emit = defineEmits<{
-    success: []
-    cancel: []
-}>()
+    success: [];
+    cancel: [];
+}>();
 
 const ratingFields = [
     { key: 'rating_registration_ease', label: 'Kemudahan pendaftaran' },
@@ -24,7 +24,7 @@ const ratingFields = [
     { key: 'rating_tracking_ease', label: 'Kemudahan portal tracking' },
     { key: 'rating_interview_experience', label: 'Pengalaman interview' },
     { key: 'rating_staff_service', label: 'Pelayanan panitia' },
-] as const
+] as const;
 
 const form = useForm({
     rating_registration_ease: '',
@@ -33,18 +33,18 @@ const form = useForm({
     rating_interview_experience: '',
     rating_staff_service: '',
     feedback_text: '',
-})
+});
 
-const feedbackError = computed(() => readFormError(form.errors, 'feedback'))
+const feedbackError = computed(() => readFormError(form.errors, 'feedback'));
 
 function applyFeedbackDraftValues(draft: unknown): void {
-    if (typeof draft !== 'object' || draft === null) return
-    const values = (draft as { values?: unknown }).values
-    if (typeof values !== 'object' || values === null) return
+    if (typeof draft !== 'object' || draft === null) return;
+    const values = (draft as { values?: unknown }).values;
+    if (typeof values !== 'object' || values === null) return;
     for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
-        if (!(key in form)) continue
+        if (!(key in form)) continue;
         if (typeof value === 'string') {
-            ;(form as unknown as Record<string, unknown>)[key] = value
+            (form as unknown as Record<string, unknown>)[key] = value;
         }
     }
 }
@@ -53,22 +53,22 @@ const { clear: clearFeedbackDraft } = useDraftRestore({
     snapshot: () => buildValuesDraftSnapshot(form),
     storageKey: 'dform:track-feedback',
     restoreIntoForm: applyFeedbackDraftValues,
-})
+});
 
 function submit(): void {
-    if (form.processing) return
+    if (form.processing) return;
     form.post(props.storeUrl, {
         preserveScroll: true,
         onSuccess: () => {
-            clearFeedbackDraft()
-            form.reset()
-            showFlashToast({ type: 'success', message: 'Terima kasih! Feedback kamu telah kami terima.' })
-            emit('success')
+            clearFeedbackDraft();
+            form.reset();
+            showFlashToast({ type: 'success', message: 'Terima kasih! Feedback kamu telah kami terima.' });
+            emit('success');
         },
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal mengirim feedback' })
+            handleInertiaFormErrors(errors, { title: 'Gagal mengirim feedback' });
         },
-    })
+    });
 }
 </script>
 
@@ -84,13 +84,13 @@ function submit(): void {
             <select
                 :id="field.key"
                 v-model="form[field.key]"
-                class="border-input bg-background h-9 w-full rounded-md border px-3 text-sm sm:max-w-[120px]"
+                class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm sm:max-w-[120px]"
                 required
             >
                 <option value="" disabled>1–5</option>
                 <option v-for="n in 5" :key="n" :value="String(n)">{{ n }}</option>
             </select>
-            <p v-if="form.errors[field.key]" class="text-destructive text-xs sm:col-span-2">
+            <p v-if="form.errors[field.key]" class="text-xs text-destructive sm:col-span-2">
                 {{ form.errors[field.key] }}
             </p>
         </div>
@@ -101,24 +101,25 @@ function submit(): void {
                 id="feedback_text"
                 v-model="form.feedback_text"
                 rows="3"
-                class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 placeholder="Ceritakan pengalamanmu..."
             />
         </div>
 
-        <p v-if="feedbackError" class="text-destructive text-sm">{{ feedbackError }}</p>
+        <p v-if="feedbackError" class="text-sm text-destructive">{{ feedbackError }}</p>
 
         <div class="flex flex-wrap gap-2 pt-1">
-            <Button
-                type="submit"
-                size="sm"
-                :disabled="form.processing"
-                :aria-busy="form.processing"
-            >
+            <Button type="submit" size="sm" :disabled="form.processing" :aria-busy="form.processing">
                 <CometSpinner v-if="form.processing" :size="16" />
                 {{ form.processing ? 'Mengirim...' : 'Kirim feedback' }}
             </Button>
-            <Button v-if="$attrs.onCancel !== undefined" type="button" variant="ghost" size="sm" @click="emit('cancel')">
+            <Button
+                v-if="$attrs.onCancel !== undefined"
+                type="button"
+                variant="ghost"
+                size="sm"
+                @click="emit('cancel')"
+            >
                 Batal
             </Button>
         </div>

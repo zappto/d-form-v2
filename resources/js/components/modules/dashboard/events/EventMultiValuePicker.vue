@@ -28,7 +28,7 @@ const props = withDefaults(
         placeholder: 'Cari atau ketik lalu Enter',
         required: false,
         shaking: false,
-    },
+    }
 );
 
 const model = defineModel<string>({ default: '' });
@@ -37,17 +37,12 @@ const maxTagsEff = computed(() => props.maxTags ?? Number.POSITIVE_INFINITY);
 </script>
 
 <template>
-    <div
-        :class="[
-            'flex flex-col gap-2',
-            shaking ? 'animate-shake' : '',
-        ]"
-    >
+    <div :class="['flex flex-col gap-2', shaking ? 'animate-shake' : '']">
         <div class="space-y-1">
             <Label :for="id" class="text-sm font-medium">
                 {{ label }}<span v-if="required" class="text-destructive"> *</span>
             </Label>
-            <p v-if="description" class="text-muted-foreground text-xs leading-snug">
+            <p v-if="description" class="text-xs leading-snug text-muted-foreground">
                 {{ description }}
             </p>
         </div>
@@ -62,6 +57,6 @@ const maxTagsEff = computed(() => props.maxTags ?? Number.POSITIVE_INFINITY);
             :error="!!error"
         />
 
-        <p v-if="error" class="text-destructive text-xs">{{ error }}</p>
+        <p v-if="error" class="text-xs text-destructive">{{ error }}</p>
     </div>
 </template>

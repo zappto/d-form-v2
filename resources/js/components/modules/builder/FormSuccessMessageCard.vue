@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { MessageSquareCheck } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue'
+import { computed } from 'vue';
+import { MessageSquareCheck } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
+import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
 
 /**
  * Zona konfirmasi "Pesan setelah submit" ala Google Forms — segmen terakhir dari
@@ -11,30 +11,33 @@ import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue
  * bermakna (mis. form tersimpan dimuat kembali). Tombol "Hapus" mengosongkan
  * konten + menyembunyikan zona via emit `remove`.
  */
-const successContent = defineModel<string>('successContent', { required: true })
+const successContent = defineModel<string>('successContent', { required: true });
 
 const props = defineProps<{
-    show: boolean
-}>()
+    show: boolean;
+}>();
 
 defineEmits<{
-    remove: []
-}>()
+    remove: [];
+}>();
 
 function hasMeaningfulContent(html: string): boolean {
-    if (!html) return false
-    const text = html.replace(/<[^>]*>/g, '').replace(/&nbsp;/gi, ' ').trim()
-    return text !== ''
+    if (!html) return false;
+    const text = html
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/gi, ' ')
+        .trim();
+    return text !== '';
 }
 
-const visible = computed(() => props.show || hasMeaningfulContent(successContent.value))
+const visible = computed(() => props.show || hasMeaningfulContent(successContent.value));
 </script>
 
 <template>
-    <div v-if="visible" class="border-border/70 border-t">
+    <div v-if="visible" class="border-t border-border/70">
         <div class="flex items-center gap-2 border-b border-border/70 px-5 py-3.5 sm:px-7">
-            <MessageSquareCheck class="text-muted-foreground size-4" aria-hidden="true" />
-            <h2 class="text-foreground text-sm font-semibold tracking-[-0.01em]">Pesan setelah submit</h2>
+            <MessageSquareCheck class="size-4 text-muted-foreground" aria-hidden="true" />
+            <h2 class="text-sm font-semibold tracking-[-0.01em] text-foreground">Pesan setelah submit</h2>
             <div class="ml-auto">
                 <Button variant="ghost" size="sm" @click="$emit('remove')">Hapus</Button>
             </div>

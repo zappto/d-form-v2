@@ -1,4 +1,4 @@
-import type { BuilderField } from '@/types/form-builder'
+import type { BuilderField } from '@/types/form-builder';
 
 /**
  * New canvas fields (create + edit form) — matches the builder palette / toBackendField mapping.
@@ -11,7 +11,7 @@ export function createFormBuilderField(type: FormBuilderType, label: string): Bu
         rating: { metadata: { maxStars: 5 } },
         heading: { metadata: { content: 'Section Heading' } },
         paragraph: { metadata: { content: 'Description text goes here...' } },
-    }
+    };
     const base: BuilderField = {
         id: crypto.randomUUID(),
         type,
@@ -23,6 +23,6 @@ export function createFormBuilderField(type: FormBuilderType, label: string): Bu
         options: [],
         metadata: {},
         is_append: false,
-    }
-    return { ...base, ...(defaults[type] || {}) }
+    };
+    return { ...base, ...(defaults[type] || {}) };
 }

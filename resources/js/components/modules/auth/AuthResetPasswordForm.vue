@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { Link, useForm } from '@inertiajs/vue3'
-import { AuthSubmitButton } from '@/components/core/button'
-import { AuthField } from '@/components/core/field'
-import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController'
-import { store as resetPassword } from '@/actions/App/Http/Controllers/Auth/ResetPasswordController'
-import { getFieldError, handleInertiaFormErrors, showErrorToast } from '@/lib/error-message'
+import { Link, useForm } from '@inertiajs/vue3';
+import { AuthSubmitButton } from '@/components/core/button';
+import { AuthField } from '@/components/core/field';
+import { index as loginPage } from '@/actions/App/Http/Controllers/Auth/LoginController';
+import { store as resetPassword } from '@/actions/App/Http/Controllers/Auth/ResetPasswordController';
+import { getFieldError, handleInertiaFormErrors, showErrorToast } from '@/lib/error-message';
 
 const props = defineProps<{
-    token: string
-    email: string
-}>()
+    token: string;
+    email: string;
+}>();
 
 const form = useForm({
     email: props.email,
     password: '',
     password_confirmation: '',
-}).dontRemember('password', 'password_confirmation')
+}).dontRemember('password', 'password_confirmation');
 
 function submit(): void {
     if (form.password.length < 8) {
-        showErrorToast('Password must be at least 8 characters.')
-        return
+        showErrorToast('Password must be at least 8 characters.');
+        return;
     }
     if (form.password !== form.password_confirmation) {
-        showErrorToast('Password does not match.')
-        return
+        showErrorToast('Password does not match.');
+        return;
     }
 
     form.submit(resetPassword(props.token), {
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal mengatur ulang kata sandi' })
+            handleInertiaFormErrors(errors, { title: 'Gagal mengatur ulang kata sandi' });
         },
-    })
+    });
 }
 </script>
 

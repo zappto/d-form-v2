@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue';
 import {
     GripVertical,
     BarChart3,
@@ -13,14 +13,14 @@ import {
     Eye,
     ToggleRight,
     FileText,
-} from 'lucide-vue-next'
-import type { Component } from 'vue'
+} from 'lucide-vue-next';
+import type { Component } from 'vue';
 
 interface Feature {
-    title: string
-    desc: string
-    icon: Component
-    highlight?: boolean
+    title: string;
+    desc: string;
+    icon: Component;
+    highlight?: boolean;
 }
 
 const features: Feature[] = [
@@ -85,17 +85,22 @@ const features: Feature[] = [
         desc: 'Buat laporan komprehensif tentang pelaksanaan acara, data peserta, dan statistik pendaftaran untuk dokumentasi.',
         icon: FileText,
     },
-]
+];
 
-const visible = ref(false)
+const visible = ref(false);
 onMounted(() => {
     const obs = new IntersectionObserver(
-        ([e]) => { if (e?.isIntersecting) { visible.value = true; obs.disconnect() } },
-        { threshold: 0.06 },
-    )
-    const el = document.getElementById('features-grid')
-    if (el) obs.observe(el)
-})
+        ([e]) => {
+            if (e?.isIntersecting) {
+                visible.value = true;
+                obs.disconnect();
+            }
+        },
+        { threshold: 0.06 }
+    );
+    const el = document.getElementById('features-grid');
+    if (el) obs.observe(el);
+});
 </script>
 
 <template>
@@ -103,17 +108,17 @@ onMounted(() => {
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
- 'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
- ]"
+                    'mx-auto mb-14 max-w-2xl text-center transition-all duration-500',
+                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                ]"
             >
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Keunggulan</p>
+                <p class="text-xs font-semibold tracking-[0.2em] text-primary uppercase">Keunggulan</p>
                 <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                     Fitur lengkap untuk setiap kebutuhan
                 </h2>
-                <p class="mt-3 mx-auto max-w-lg text-base leading-relaxed text-muted-foreground">
-                    Dari pembuatan formulir hingga pelaporan — semua fitur dirancang agar penyelenggara
-                    bisa fokus pada acara, bukan pada tools.
+                <p class="mx-auto mt-3 max-w-lg text-base leading-relaxed text-muted-foreground">
+                    Dari pembuatan formulir hingga pelaporan — semua fitur dirancang agar penyelenggara bisa fokus pada
+                    acara, bukan pada tools.
                 </p>
             </div>
 
@@ -122,21 +127,21 @@ onMounted(() => {
                     v-for="(feat, i) in features"
                     :key="feat.title"
                     :class="[
- 'group rounded-2xl border p-6 transition-all duration-400',
- feat.highlight
- ? 'border-primary/25 bg-primary/[0.04] ring-1 ring-primary/10 hover:bg-primary/[0.06]'
- : 'border-border/40 bg-muted/20 hover:border-primary/20 hover:bg-muted/40',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
- ]"
+                        'group rounded-2xl border p-6 transition-all duration-400',
+                        feat.highlight
+                            ? 'border-primary/25 bg-primary/[0.04] ring-1 ring-primary/10 hover:bg-primary/[0.06]'
+                            : 'border-border/40 bg-muted/20 hover:border-primary/20 hover:bg-muted/40',
+                        visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0',
+                    ]"
                     :style="{ transitionDelay: `${60 + i * 40}ms` }"
                 >
                     <div
                         :class="[
- 'mb-4 flex size-10 items-center justify-center rounded-xl transition-colors duration-200',
- feat.highlight
- ? 'bg-primary text-primary-foreground'
- : 'bg-primary/10 text-primary group-hover:bg-primary/15',
- ]"
+                            'mb-4 flex size-10 items-center justify-center rounded-xl transition-colors duration-200',
+                            feat.highlight
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-primary/10 text-primary group-hover:bg-primary/15',
+                        ]"
                     >
                         <component :is="feat.icon" class="size-5" />
                     </div>

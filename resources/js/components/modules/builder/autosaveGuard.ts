@@ -1,7 +1,7 @@
-import type { BackendField, BuilderField } from '@/types/form-builder'
-import { diffBackendFields, type DirtyFieldsDiff } from '@/components/modules/builder/dirtyFields'
-import { toBackendFields } from '@/components/modules/builder/fieldMapping'
-import { prependFormBannerToBackendPayload, type FormBannerState } from '@/components/modules/builder/formBanner'
+import type { BackendField, BuilderField } from '@/types/form-builder';
+import { diffBackendFields, type DirtyFieldsDiff } from '@/components/modules/builder/dirtyFields';
+import { toBackendFields } from '@/components/modules/builder/fieldMapping';
+import { prependFormBannerToBackendPayload, type FormBannerState } from '@/components/modules/builder/formBanner';
 
 /**
  * Guard hydrate anti-timpa (Fase 1-B): lewati hydrate bila draft id SAMA dan
@@ -11,22 +11,22 @@ import { prependFormBannerToBackendPayload, type FormBannerState } from '@/compo
  * (bannerFile=null) dianggap kotor walau snapshot string kebetulan sama.
  */
 export function shouldSkipHydrate(args: {
-    lastHydratedId: string | null
-    currentId: string
-    lastCleanSnapshot: string | null
-    currentSnapshot: string
-    hasPendingBannerFile: boolean
+    lastHydratedId: string | null;
+    currentId: string;
+    lastCleanSnapshot: string | null;
+    currentSnapshot: string;
+    hasPendingBannerFile: boolean;
 }): boolean {
-    if (args.lastHydratedId === null) return false
-    if (args.lastHydratedId !== args.currentId) return false
-    if (args.lastCleanSnapshot === null) return false
-    if (args.hasPendingBannerFile) return true
-    return args.currentSnapshot !== args.lastCleanSnapshot
+    if (args.lastHydratedId === null) return false;
+    if (args.lastHydratedId !== args.currentId) return false;
+    if (args.lastCleanSnapshot === null) return false;
+    if (args.hasPendingBannerFile) return true;
+    return args.currentSnapshot !== args.lastCleanSnapshot;
 }
 
 export interface UnloadBeaconPayload {
-    fields: BackendField[]
-    deleted_ids: string[]
+    fields: BackendField[];
+    deleted_ids: string[];
 }
 
 /**
@@ -35,14 +35,14 @@ export interface UnloadBeaconPayload {
  * Pure + testable; pengiriman via navigator.sendBeacon ada di halaman.
  */
 export function buildUnloadPayload(args: {
-    canvasFields: BuilderField[]
-    banner: FormBannerState
-    lastSent: BackendField[] | null
+    canvasFields: BuilderField[];
+    banner: FormBannerState;
+    lastSent: BackendField[] | null;
 }): UnloadBeaconPayload | null {
-    const merged = prependFormBannerToBackendPayload(args.canvasFields, args.banner)
-    const backend = toBackendFields(merged, args.lastSent)
-    const diff: DirtyFieldsDiff = diffBackendFields(backend, args.lastSent)
-    if (backend.length === 0 && diff.deletedIds.length === 0) return null
-    if (!diff.hasChanges) return null
-    return { fields: backend, deleted_ids: diff.deletedIds }
+    const merged = prependFormBannerToBackendPayload(args.canvasFields, args.banner);
+    const backend = toBackendFields(merged, args.lastSent);
+    const diff: DirtyFieldsDiff = diffBackendFields(backend, args.lastSent);
+    if (backend.length === 0 && diff.deletedIds.length === 0) return null;
+    if (!diff.hasChanges) return null;
+    return { fields: backend, deleted_ids: diff.deletedIds };
 }

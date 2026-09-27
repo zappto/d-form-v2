@@ -1,41 +1,41 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
-import { useForm } from '@inertiajs/vue3'
-import FormSheet from './FormSheet.vue'
-import { Button } from '@/components/ui/button'
-import { CometSpinner } from '@/components/ui/comet'
-import { DatePicker } from '@/components/ui/date-picker'
-import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
-import { cn } from '@/lib/utils'
-import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
-import { routes } from '@/lib/routes'
-import { handleInertiaFormErrors } from '@/lib/error-message'
+import { computed, watch } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import FormSheet from './FormSheet.vue';
+import { Button } from '@/components/ui/button';
+import { CometSpinner } from '@/components/ui/comet';
+import { DatePicker } from '@/components/ui/date-picker';
+import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import { cn } from '@/lib/utils';
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
+import { routes } from '@/lib/routes';
+import { handleInertiaFormErrors } from '@/lib/error-message';
 
 export interface InterviewDivisionChoice {
-    id: string
-    name: string
-    code: string
+    id: string;
+    name: string;
+    code: string;
 }
 
 const props = defineProps<{
-    open: boolean
-    periodId: string
-    divisions: InterviewDivisionChoice[]
-}>()
+    open: boolean;
+    periodId: string;
+    divisions: InterviewDivisionChoice[];
+}>();
 
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{ close: [] }>();
 
 const sheetOpen = computed<boolean>({
     get: () => props.open,
     set: (value: boolean) => {
-        if (!value) emit('close')
+        if (!value) emit('close');
     },
-})
+});
 
 const form = useForm({
     recruitment_period_id: '',
@@ -47,7 +47,7 @@ const form = useForm({
     room: '',
     notes: '',
     is_active: true,
-})
+});
 
 const divisionOptions = computed<SearchableSelectOption[]>(() =>
     props.divisions.map((division) => ({
@@ -55,8 +55,8 @@ const divisionOptions = computed<SearchableSelectOption[]>(() =>
         label: division.name,
         sublabel: division.code,
         initials: division.code.slice(0, 2).toUpperCase(),
-    })),
-)
+    }))
+);
 
 const canSubmit = computed<boolean>(
     () =>
@@ -66,38 +66,38 @@ const canSubmit = computed<boolean>(
         form.ends_at.length > 0 &&
         form.location.trim().length > 0 &&
         form.room.trim().length > 0 &&
-        !form.processing,
-)
+        !form.processing
+);
 
 watch(
     () => props.open,
     (isOpen: boolean) => {
         if (isOpen) {
-            form.clearErrors()
-            form.recruitment_period_id = props.periodId
+            form.clearErrors();
+            form.recruitment_period_id = props.periodId;
 
-            return
+            return;
         }
 
-        form.reset()
-        form.clearErrors()
-    },
-)
+        form.reset();
+        form.clearErrors();
+    }
+);
 
 function submit(): void {
-    if (!canSubmit.value) return
+    if (!canSubmit.value) return;
 
     form.post(routes.admin.recruitment.interviewSessions.store, {
         preserveScroll: true,
         onSuccess: () => {
             // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
             // dari flash `toast` server (RecruitmentInterviewSessionController::store).
-            emit('close')
+            emit('close');
         },
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal membuat sesi interview' })
+            handleInertiaFormErrors(errors, { title: 'Gagal membuat sesi interview' });
         },
-    })
+    });
 }
 </script>
 
@@ -109,9 +109,7 @@ function submit(): void {
     >
         <template #footer>
             <div class="flex gap-2">
-                <Button variant="outline" type="button" class="flex-1" @click="emit('close')">
-                    Batal
-                </Button>
+                <Button variant="outline" type="button" class="flex-1" @click="emit('close')"> Batal </Button>
                 <Button
                     type="submit"
                     form="interview-session-create-form"

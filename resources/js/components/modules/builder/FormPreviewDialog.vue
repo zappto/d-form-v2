@@ -1,110 +1,110 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { X, Star, Upload, ImagePlus, Send } from 'lucide-vue-next'
-import { optionLabel, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping'
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner'
-import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage'
-import PageHeader from '@/components/modules/dashboard/PageHeader.vue'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Textarea } from '@/components/ui/textarea'
-import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
-import { Checkbox } from '@/components/ui/checkbox'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
+import { computed, ref, watch } from 'vue';
+import { X, Star, Upload, ImagePlus, Send } from 'lucide-vue-next';
+import { optionLabel, type FieldOptionEntry } from '@/components/modules/builder/fieldMapping';
+import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage';
+import PageHeader from '@/components/modules/dashboard/PageHeader.vue';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Textarea } from '@/components/ui/textarea';
+import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
+import { Checkbox } from '@/components/ui/checkbox';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 
 /** Mirrors canvas builder field shape used by Show/Create with unknown metadata values. */
 export interface FormPreviewField {
-    id: string
-    type: string
-    label: string
-    description?: string
-    required?: boolean
-    placeholder?: string
-    options?: FieldOptionEntry[]
-    metadata?: Record<string, unknown>
+    id: string;
+    type: string;
+    label: string;
+    description?: string;
+    required?: boolean;
+    placeholder?: string;
+    options?: FieldOptionEntry[];
+    metadata?: Record<string, unknown>;
 }
 
 const props = defineProps<{
-    open: boolean
-    title?: string
-    description?: string
-    formBannerUrl?: string
-    formBannerCaption?: string
-    fields?: FormPreviewField[]
-}>()
+    open: boolean;
+    title?: string;
+    description?: string;
+    formBannerUrl?: string;
+    formBannerCaption?: string;
+    fields?: FormPreviewField[];
+}>();
 
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{ close: [] }>();
 
-const fieldsSafe = computed(() => props.fields ?? [])
+const fieldsSafe = computed(() => props.fields ?? []);
 
-const bannerResolved = computed(() => normalizeBannerSrc(props.formBannerUrl || ''))
+const bannerResolved = computed(() => normalizeBannerSrc(props.formBannerUrl || ''));
 
-const bannerCaptionTrim = computed(() => (props.formBannerCaption || '').trim())
+const bannerCaptionTrim = computed(() => (props.formBannerCaption || '').trim());
 
-const titleText = computed(() => props.title || 'Untitled form')
+const titleText = computed(() => props.title || 'Untitled form');
 
-const hasFormDescription = computed(() => Boolean((props.description || '').trim()))
+const hasFormDescription = computed(() => Boolean((props.description || '').trim()));
 
 // Local non-persisted state so stars / radii feel interactive (preview only)
-const ratingSelection = ref<Record<string, number>>({})
+const ratingSelection = ref<Record<string, number>>({});
 
 watch(
     () => props.open,
     (open) => {
-        if (!open) return
-        const next: Record<string, number> = { ...ratingSelection.value }
+        if (!open) return;
+        const next: Record<string, number> = { ...ratingSelection.value };
         for (const f of fieldsSafe.value) {
             if (f.type === 'rating' && next[f.id] === undefined) {
-                next[f.id] = 0
+                next[f.id] = 0;
             }
         }
-        ratingSelection.value = next
-    },
-)
+        ratingSelection.value = next;
+    }
+);
 
 function metaString(field: FormPreviewField, key: string): string {
-    const v = field.metadata?.[key]
-    return typeof v === 'string' ? v : ''
+    const v = field.metadata?.[key];
+    return typeof v === 'string' ? v : '';
 }
 
 function metaNumber(field: FormPreviewField, key: string, fallback: number): number {
-    const v = field.metadata?.[key]
-    return typeof v === 'number' && !Number.isNaN(v) ? v : fallback
+    const v = field.metadata?.[key];
+    return typeof v === 'number' && !Number.isNaN(v) ? v : fallback;
 }
 
 function optionEntries(field: FormPreviewField): FieldOptionEntry[] {
-    const raw = field.options
-    if (!Array.isArray(raw)) return []
-    return raw.map(opt => {
-        if (typeof opt === 'object' && opt !== null) return opt as FieldOptionEntry
-        return { id: crypto.randomUUID(), type: 'text', label: String(opt) } as FieldOptionEntry
-    })
+    const raw = field.options;
+    if (!Array.isArray(raw)) return [];
+    return raw.map((opt) => {
+        if (typeof opt === 'object' && opt !== null) return opt as FieldOptionEntry;
+        return { id: crypto.randomUUID(), type: 'text', label: String(opt) } as FieldOptionEntry;
+    });
 }
 
 function dropdownOptions(field: FormPreviewField): SearchableSelectOption[] {
     return optionEntries(field).map((opt, oi) => ({
         value: String(opt.id || `option-${oi}`),
         label: optionLabel(opt),
-    }))
+    }));
 }
 
 function choiceThumb(entry: FieldOptionEntry): string {
-    return resolveOptionImagePreviewSrc(entry)
+    return resolveOptionImagePreviewSrc(entry);
 }
 
 function hasChoiceImage(entry: FieldOptionEntry): boolean {
-    return choiceThumb(entry) !== ''
+    return choiceThumb(entry) !== '';
 }
 
 function optKey(opt: FieldOptionEntry, i: number): string {
-    return `${opt.id || i}`
+    return `${opt.id || i}`;
 }
 
 function ratingStars(field: FormPreviewField): number[] {
-    const n = Math.min(Math.max(metaNumber(field, 'maxStars', 5), 1), 10)
-    return Array.from({ length: n }, (_, i) => i + 1)
+    const n = Math.min(Math.max(metaNumber(field, 'maxStars', 5), 1), 10);
+    return Array.from({ length: n }, (_, i) => i + 1);
 }
 </script>
 
@@ -118,10 +118,7 @@ function ratingStars(field: FormPreviewField): number[] {
                 aria-modal="true"
                 aria-label="Form respondent preview"
             >
-                <div
-                    class="absolute inset-0 bg-foreground/40 backdrop-blur-[2px]"
-                    @click="emit('close')"
-                />
+                <div class="absolute inset-0 bg-foreground/40 backdrop-blur-[2px]" @click="emit('close')" />
 
                 <div
                     class="relative z-10 flex max-h-[min(92vh,880px)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
@@ -130,13 +127,13 @@ function ratingStars(field: FormPreviewField): number[] {
                     <div
                         class="flex shrink-0 items-start justify-between gap-3 border-b border-border bg-gradient-to-r from-muted/60 via-card to-primary/5 px-4 py-3 sm:px-5"
                     >
-                        <div class="flex w-full h-full items-start ">
-                            <p class=" text-base font-extrabold uppercase tracking-wider text-muted-foreground">
+                        <div class="flex h-full w-full items-start">
+                            <p class="text-base font-extrabold tracking-wider text-muted-foreground uppercase">
                                 Respondent preview
                             </p>
-                           
                         </div>
-                        <Button radius="icon"
+                        <Button
+                            radius="icon"
                             variant="ghost"
                             size="icon"
                             class="size-9 shrink-0 border border-transparent hover:border-border hover:bg-muted/60"
@@ -172,10 +169,15 @@ function ratingStars(field: FormPreviewField): number[] {
 
                             <PageHeader :title="titleText" :subtitle="description || undefined" />
 
-                            <div v-if="fieldsSafe.length === 0" class="app-surface-soft rounded-2xl py-12 text-center" :class="hasFormDescription ? 'mt-6' : 'mt-3'">
+                            <div
+                                v-if="fieldsSafe.length === 0"
+                                class="app-surface-soft rounded-2xl py-12 text-center"
+                                :class="hasFormDescription ? 'mt-6' : 'mt-3'"
+                            >
                                 <p class="text-sm font-semibold text-foreground">No questions yet</p>
-                                <p class="mt-1.5 max-w-sm mx-auto text-xs leading-relaxed text-muted-foreground">
-                                    Add fields from the canvas — they’ll show up here exactly as respondents will see them.
+                                <p class="mx-auto mt-1.5 max-w-sm text-xs leading-relaxed text-muted-foreground">
+                                    Add fields from the canvas — they’ll show up here exactly as respondents will see
+                                    them.
                                 </p>
                             </div>
 
@@ -214,18 +216,27 @@ function ratingStars(field: FormPreviewField): number[] {
 
                                     <!-- Answer fields — Card shell like Fill.vue -->
                                     <Card v-else class="rounded-2xl border border-border shadow-xs">
-                                        <CardHeader class="pb-2 pt-4">
-                                            <CardTitle class="flex items-start gap-1 text-sm font-semibold text-foreground">
+                                        <CardHeader class="pt-4 pb-2">
+                                            <CardTitle
+                                                class="flex items-start gap-1 text-sm font-semibold text-foreground"
+                                            >
                                                 {{ field.label }}
                                                 <span v-if="field.required" class="text-destructive">*</span>
                                             </CardTitle>
-                                            <p v-if="field.description" class="text-xs leading-relaxed text-muted-foreground">
+                                            <p
+                                                v-if="field.description"
+                                                class="text-xs leading-relaxed text-muted-foreground"
+                                            >
                                                 {{ field.description }}
                                             </p>
                                         </CardHeader>
-                                        <CardContent class="pb-4 pt-0">
+                                        <CardContent class="pt-0 pb-4">
                                             <Input
-                                                v-if="['short_text', 'email', 'phone', 'number', 'time'].includes(field.type)"
+                                                v-if="
+                                                    ['short_text', 'email', 'phone', 'number', 'time'].includes(
+                                                        field.type
+                                                    )
+                                                "
                                                 :type="
                                                     field.type === 'short_text'
                                                         ? 'text'
@@ -256,10 +267,12 @@ function ratingStars(field: FormPreviewField): number[] {
                                                     :options="dropdownOptions(field)"
                                                     placeholder="Choose an option"
                                                     disabled
-                                                    class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm disabled:opacity-90"
+                                                    class="h-10 w-full border-border/80 bg-background/80 text-xs disabled:opacity-90 sm:text-sm"
                                                     aria-label="Choose an option"
                                                 />
-                                                <div class="space-y-1.5 rounded-xl border border-border/70 bg-muted/20 p-2">
+                                                <div
+                                                    class="space-y-1.5 rounded-xl border border-border/70 bg-muted/20 p-2"
+                                                >
                                                     <div
                                                         v-for="(opt, oi) in optionEntries(field)"
                                                         :key="`dropdown-preview-${optKey(opt, oi)}`"
@@ -283,7 +296,10 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         :name="`preview_${field.id}`"
                                                         tabindex="-1"
                                                     />
-                                                    <div v-if="opt.type === 'image' && hasChoiceImage(opt)" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
+                                                    <div
+                                                        v-if="opt.type === 'image' && hasChoiceImage(opt)"
+                                                        class="size-16 shrink-0 overflow-hidden rounded-md border border-border"
+                                                    >
                                                         <img
                                                             :src="choiceThumb(opt)"
                                                             alt=""
@@ -305,7 +321,10 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         disabled
                                                         class="pointer-events-none opacity-80"
                                                     />
-                                                    <div v-if="opt.type === 'image' && hasChoiceImage(opt)" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
+                                                    <div
+                                                        v-if="opt.type === 'image' && hasChoiceImage(opt)"
+                                                        class="size-16 shrink-0 overflow-hidden rounded-md border border-border"
+                                                    >
                                                         <img
                                                             :src="choiceThumb(opt)"
                                                             alt=""
@@ -330,20 +349,22 @@ function ratingStars(field: FormPreviewField): number[] {
                                                         v-for="star in ratingStars(field)"
                                                         :key="`${field.id}_${star}`"
                                                         type="button"
-                                                        class=" p-1 transition"
+                                                        class="p-1 transition"
                                                         @click.stop="ratingSelection[field.id] = star"
                                                     >
                                                         <Star
                                                             class="size-7"
                                                             :class="
- (ratingSelection[field.id] ?? 0) >= star
- ? 'fill-amber-400 text-amber-400'
- : 'text-muted-foreground/40'
- "
+                                                                (ratingSelection[field.id] ?? 0) >= star
+                                                                    ? 'fill-amber-400 text-amber-400'
+                                                                    : 'text-muted-foreground/40'
+                                                            "
                                                         />
                                                     </button>
                                                 </div>
-                                                <p class="text-xs text-muted-foreground">Tap a star to preview the highlight.</p>
+                                                <p class="text-xs text-muted-foreground">
+                                                    Tap a star to preview the highlight.
+                                                </p>
                                             </div>
 
                                             <div
@@ -386,9 +407,7 @@ function ratingStars(field: FormPreviewField): number[] {
                                 class="flex flex-wrap items-center justify-end gap-3 border-t border-border"
                                 :class="hasFormDescription ? 'mt-8 pt-6' : 'mt-5 pt-5'"
                             >
-                                <Button variant="outline" type="button" disabled class="opacity-70">
-                                    Cancel
-                                </Button>
+                                <Button variant="outline" type="button" disabled class="opacity-70"> Cancel </Button>
                                 <Button type="button" disabled class="gap-2 opacity-90">
                                     <Send class="size-4" />
                                     Submit

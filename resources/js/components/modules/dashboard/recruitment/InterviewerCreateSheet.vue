@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useForm } from '@inertiajs/vue3'
-import FormSheet from './FormSheet.vue'
-import { Button } from '@/components/ui/button'
-import { CometSpinner } from '@/components/ui/comet'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
-import { routes } from '@/lib/routes'
-import { handleInertiaFormErrors } from '@/lib/error-message'
-import { Eye, EyeOff } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import FormSheet from './FormSheet.vue';
+import { Button } from '@/components/ui/button';
+import { CometSpinner } from '@/components/ui/comet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import { routes } from '@/lib/routes';
+import { handleInertiaFormErrors } from '@/lib/error-message';
+import { Eye, EyeOff } from 'lucide-vue-next';
 
 export interface InterviewerDivisionChoice {
-    id: string
-    name: string
-    code: string
+    id: string;
+    name: string;
+    code: string;
 }
 
 const props = withDefaults(
     defineProps<{
-        open: boolean
-        divisions: InterviewerDivisionChoice[]
-        initialDivisionId?: string
+        open: boolean;
+        divisions: InterviewerDivisionChoice[];
+        initialDivisionId?: string;
     }>(),
-    { initialDivisionId: '' },
-)
+    { initialDivisionId: '' }
+);
 
-const emit = defineEmits<{ close: []; created: [email: string] }>()
+const emit = defineEmits<{ close: []; created: [email: string] }>();
 
 const sheetOpen = computed<boolean>({
     get: () => props.open,
     set: (value: boolean) => {
-        if (!value) emit('close')
+        if (!value) emit('close');
     },
-})
+});
 
 const form = useForm({
     name: '',
@@ -41,21 +41,21 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     recruitment_division_id: '',
-})
+});
 
-const showPassword = ref<boolean>(false)
-const showPasswordConfirmation = ref<boolean>(false)
+const showPassword = ref<boolean>(false);
+const showPasswordConfirmation = ref<boolean>(false);
 
 type InterviewerRoutes = {
-    assign: string
-    unassign: (id: string) => string
-    store?: string
-}
+    assign: string;
+    unassign: (id: string) => string;
+    store?: string;
+};
 
-const interviewerRoutes = computed<InterviewerRoutes>(() => routes.admin.recruitment.interviewers)
+const interviewerRoutes = computed<InterviewerRoutes>(() => routes.admin.recruitment.interviewers);
 
 /** Selaras dengan kontrak backend lane paralel; fallback dipakai sampai helper store mendarat. */
-const storeUrl = computed<string>(() => interviewerRoutes.value.store ?? '/admin/recruitment/interviewers')
+const storeUrl = computed<string>(() => interviewerRoutes.value.store ?? '/admin/recruitment/interviewers');
 
 const divisionOptions = computed<SearchableSelectOption[]>(() =>
     props.divisions.map((d) => ({
@@ -63,8 +63,8 @@ const divisionOptions = computed<SearchableSelectOption[]>(() =>
         label: d.name,
         sublabel: d.code,
         initials: d.code.slice(0, 2).toUpperCase(),
-    })),
-)
+    }))
+);
 
 const canSubmit = computed<boolean>(() => {
     return (
@@ -74,40 +74,40 @@ const canSubmit = computed<boolean>(() => {
         form.password_confirmation.length > 0 &&
         form.recruitment_division_id.length > 0 &&
         !form.processing
-    )
-})
+    );
+});
 
 watch(
     () => props.open,
     (isOpen: boolean) => {
         if (isOpen) {
-            form.clearErrors()
+            form.clearErrors();
             if (form.recruitment_division_id === '' && props.initialDivisionId !== '') {
-                form.recruitment_division_id = props.initialDivisionId
+                form.recruitment_division_id = props.initialDivisionId;
             }
         } else {
-            form.reset()
-            form.clearErrors()
-            showPassword.value = false
-            showPasswordConfirmation.value = false
+            form.reset();
+            form.clearErrors();
+            showPassword.value = false;
+            showPasswordConfirmation.value = false;
         }
-    },
-)
+    }
+);
 
 function submit(): void {
-    if (!canSubmit.value) return
+    if (!canSubmit.value) return;
     form.post(storeUrl.value, {
         preserveScroll: true,
         onSuccess: () => {
             // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
             // dari flash `toast` server (RecruitmentDivisionController::storeInterviewer).
-            emit('created', form.email)
-            emit('close')
+            emit('created', form.email);
+            emit('close');
         },
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal menambah interviewer' })
+            handleInertiaFormErrors(errors, { title: 'Gagal menambah interviewer' });
         },
-    })
+    });
 }
 </script>
 
@@ -119,9 +119,7 @@ function submit(): void {
     >
         <template #footer>
             <div class="flex gap-2">
-                <Button variant="outline" type="button" class="flex-1" @click="emit('close')">
-                    Batal
-                </Button>
+                <Button variant="outline" type="button" class="flex-1" @click="emit('close')"> Batal </Button>
                 <Button
                     type="submit"
                     form="interviewer-create-form"

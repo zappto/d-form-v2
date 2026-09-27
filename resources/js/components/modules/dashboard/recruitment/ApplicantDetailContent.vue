@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { router, useForm, usePage } from '@inertiajs/vue3'
-import { toast } from 'vue-sonner'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { CometSpinner } from '@/components/ui/comet'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { SearchableSelect } from '@/components/ui/searchable-select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { computed, ref, watch } from 'vue';
+import { router, useForm, usePage } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { CometSpinner } from '@/components/ui/comet';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     Dialog,
     DialogContent,
@@ -16,12 +16,12 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog'
-import { formatBytes, formatSubmissionDateTime } from '@/lib/format'
-import { routes } from '@/lib/routes'
-import { showErrorToast, showFlashToast } from '@/lib/error-message'
-import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
-import useAuth from '@/hooks/useAuth'
+} from '@/components/ui/dialog';
+import { formatBytes, formatSubmissionDateTime } from '@/lib/format';
+import { routes } from '@/lib/routes';
+import { showErrorToast, showFlashToast } from '@/lib/error-message';
+import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
+import useAuth from '@/hooks/useAuth';
 import {
     CheckCircle2,
     ClipboardCheck,
@@ -33,122 +33,122 @@ import {
     Trophy,
     User,
     XCircle,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
-type FinalAction = 'accept' | 'reject' | null
+type FinalAction = 'accept' | 'reject' | null;
 
-type ScreeningAction = 'revision' | 'reject' | null
+type ScreeningAction = 'revision' | 'reject' | null;
 
 interface ScreeningRow {
-    id: string
-    decision: string
-    decision_label: string
-    reason: string | null
-    reason_label: string | null
-    notes: string | null
-    acted_at: string | null
-    actor: { id: string; name: string } | null
+    id: string;
+    decision: string;
+    decision_label: string;
+    reason: string | null;
+    reason_label: string | null;
+    notes: string | null;
+    acted_at: string | null;
+    actor: { id: string; name: string } | null;
 }
 
 interface ActivityRow {
-    id: string
-    action: string
-    old_values: Record<string, unknown> | null
-    new_values: Record<string, unknown> | null
-    created_at: string | null
-    actor: { id: string; name: string } | null
+    id: string;
+    action: string;
+    old_values: Record<string, unknown> | null;
+    new_values: Record<string, unknown> | null;
+    created_at: string | null;
+    actor: { id: string; name: string } | null;
 }
 
 interface CorrectionRow {
-    id: string
-    status: string
-    status_label: string
-    request_message: string
-    review_notes: string | null
-    reviewed_at: string | null
-    completed_at: string | null
-    reviewer: { id: string; name: string } | null
+    id: string;
+    status: string;
+    status_label: string;
+    request_message: string;
+    review_notes: string | null;
+    reviewed_at: string | null;
+    completed_at: string | null;
+    reviewer: { id: string; name: string } | null;
 }
 
 interface EvaluationDetail {
-    speaking_score: number
-    technical_score: number
-    attitude_score: number
-    recommendation: string
-    recommendation_label: string
-    notes: string | null
-    is_locked: boolean
-    evaluated_at: string | null
-    evaluator: { id: string; name: string } | null
+    speaking_score: number;
+    technical_score: number;
+    attitude_score: number;
+    recommendation: string;
+    recommendation_label: string;
+    notes: string | null;
+    is_locked: boolean;
+    evaluated_at: string | null;
+    evaluator: { id: string; name: string } | null;
 }
 
 interface FinalDecisionDetail {
-    membership_type: string | null
-    membership_type_label: string | null
-    final_division: { id: string; name: string; code: string } | null
-    internal_reason: string | null
-    public_message: string | null
-    decided_at: string | null
-    decider: { id: string; name: string } | null
+    membership_type: string | null;
+    membership_type_label: string | null;
+    final_division: { id: string; name: string; code: string } | null;
+    internal_reason: string | null;
+    public_message: string | null;
+    decided_at: string | null;
+    decider: { id: string; name: string } | null;
 }
 
 export interface ApplicationDetail {
-    id: string
-    registration_number: string
-    full_name: string
-    nim: string
-    semester: number
-    phone: string
-    personal_email: string
-    student_email: string
-    instagram_username: string
-    stage: string
-    stage_label: string
-    result: string
-    result_label: string
-    is_verified: boolean
-    revision_required: boolean
-    submitted_at: string | null
-    period: { id: string; name: string } | null
-    primary_division: { id: string; name: string; code: string } | null
-    secondary_division: { id: string; name: string; code: string } | null
+    id: string;
+    registration_number: string;
+    full_name: string;
+    nim: string;
+    semester: number;
+    phone: string;
+    personal_email: string;
+    student_email: string;
+    instagram_username: string;
+    stage: string;
+    stage_label: string;
+    result: string;
+    result_label: string;
+    is_verified: boolean;
+    revision_required: boolean;
+    submitted_at: string | null;
+    period: { id: string; name: string } | null;
+    primary_division: { id: string; name: string; code: string } | null;
+    secondary_division: { id: string; name: string; code: string } | null;
     document: {
-        cv_original_name: string
-        cv_mime: string
-        cv_size_bytes: number
-        portfolio_type: string
-        portfolio_url: string | null
-        portfolio_original_name: string | null
-        portfolio_mime: string | null
-        portfolio_size_bytes: number | null
-        instagram_follow_original_name: string | null
-        instagram_follow_mime: string | null
-        instagram_follow_size_bytes: number | null
-        twibbon_url: string | null
-        has_cv_file: boolean
-        has_portfolio_file: boolean
-        has_instagram_follow_file: boolean
-    } | null
-    screenings: ScreeningRow[]
-    activity_logs: ActivityRow[]
-    correction_requests: CorrectionRow[]
-    evaluation: EvaluationDetail | null
-    final_decision: FinalDecisionDetail | null
-    can_screen: boolean
-    can_verify: boolean
-    can_decide_final: boolean
-    can_resend_tracking: boolean
+        cv_original_name: string;
+        cv_mime: string;
+        cv_size_bytes: number;
+        portfolio_type: string;
+        portfolio_url: string | null;
+        portfolio_original_name: string | null;
+        portfolio_mime: string | null;
+        portfolio_size_bytes: number | null;
+        instagram_follow_original_name: string | null;
+        instagram_follow_mime: string | null;
+        instagram_follow_size_bytes: number | null;
+        twibbon_url: string | null;
+        has_cv_file: boolean;
+        has_portfolio_file: boolean;
+        has_instagram_follow_file: boolean;
+    } | null;
+    screenings: ScreeningRow[];
+    activity_logs: ActivityRow[];
+    correction_requests: CorrectionRow[];
+    evaluation: EvaluationDetail | null;
+    final_decision: FinalDecisionDetail | null;
+    can_screen: boolean;
+    can_verify: boolean;
+    can_decide_final: boolean;
+    can_resend_tracking: boolean;
 }
 
 const props = withDefaults(
     defineProps<{
-        application: ApplicationDetail
-        screeningReasonOptions?: { value: string; label: string }[]
-        divisionOptions?: { id: string; name: string; code: string }[]
-        membershipTypeOptions?: { value: string; label: string }[]
-        readonly?: boolean
-        hideRevisionAction?: boolean
-        hideActions?: boolean
+        application: ApplicationDetail;
+        screeningReasonOptions?: { value: string; label: string }[];
+        divisionOptions?: { id: string; name: string; code: string }[];
+        membershipTypeOptions?: { value: string; label: string }[];
+        readonly?: boolean;
+        hideRevisionAction?: boolean;
+        hideActions?: boolean;
     }>(),
     {
         screeningReasonOptions: () => [],
@@ -157,75 +157,77 @@ const props = withDefaults(
         readonly: false,
         hideRevisionAction: false,
         hideActions: false,
-    },
-)
+    }
+);
 
-const page = usePage()
-const user = useAuth(page.props)
+const page = usePage();
+const user = useAuth(page.props);
 
-const emit = defineEmits<{ submitted: [] }>()
+const emit = defineEmits<{ submitted: [] }>();
 
 const canScreen = computed(
-    () => props.application.can_screen && user.value?.can_screen_recruitment_applications === true,
-)
-const canVerify = computed(() => props.application.can_verify && user.value?.can_screen_recruitment_applications === true)
-const canReviewCorrections = computed(() => user.value?.can_review_recruitment_corrections === true)
+    () => props.application.can_screen && user.value?.can_screen_recruitment_applications === true
+);
+const canVerify = computed(
+    () => props.application.can_verify && user.value?.can_screen_recruitment_applications === true
+);
+const canReviewCorrections = computed(() => user.value?.can_review_recruitment_corrections === true);
 const canDecideFinal = computed(
-    () => props.application.can_decide_final && user.value?.can_decide_recruitment_final === true,
-)
+    () => props.application.can_decide_final && user.value?.can_decide_recruitment_final === true
+);
 
 const correctionReviewForm = useForm({
     review_notes: '',
-})
+});
 
-const reviewingCorrectionId = ref<string | null>(null)
+const reviewingCorrectionId = ref<string | null>(null);
 
-const screeningModalOpen = ref(false)
-const screeningAction = ref<ScreeningAction>(null)
+const screeningModalOpen = ref(false);
+const screeningAction = ref<ScreeningAction>(null);
 
-const confirmOpen = ref(false)
-const confirmAction = ref<'verify' | 'pass' | 'reject' | 'resend_tracking' | null>(null)
+const confirmOpen = ref(false);
+const confirmAction = ref<'verify' | 'pass' | 'reject' | 'resend_tracking' | null>(null);
 
-const finalModalOpen = ref(false)
-const finalAction = ref<FinalAction>(null)
+const finalModalOpen = ref(false);
+const finalAction = ref<FinalAction>(null);
 
 const screeningForm = useForm({
     reason: '',
     notes: '',
     public_message: '',
     sections: [] as string[],
-})
+});
 
 const revisionSectionOptions: { value: string; label: string }[] = [
     { value: 'data_diri', label: 'Data diri' },
     { value: 'divisi', label: 'Divisi' },
     { value: 'cv', label: 'CV' },
     { value: 'portfolio', label: 'Portofolio' },
-]
+];
 
 function toggleRevisionSection(value: string, checked: boolean) {
-    screeningForm.sections = toggleCheckboxSelection(screeningForm.sections, value, checked)
+    screeningForm.sections = toggleCheckboxSelection(screeningForm.sections, value, checked);
 }
 
 const finalAcceptForm = useForm({
     membership_type: '',
     final_division_id: props.application.primary_division?.id ?? '',
-})
+});
 
 const finalRejectForm = useForm({
     internal_reason: '',
     public_message: '',
-})
+});
 
 function openScreeningModal(action: ScreeningAction) {
-    screeningAction.value = action
-    screeningForm.reset()
-    screeningForm.clearErrors()
-    screeningModalOpen.value = true
+    screeningAction.value = action;
+    screeningForm.reset();
+    screeningForm.clearErrors();
+    screeningModalOpen.value = true;
 }
 
 function openRevisionModal() {
-    openScreeningModal('revision')
+    openScreeningModal('revision');
 }
 
 defineExpose({
@@ -236,24 +238,24 @@ defineExpose({
     passApplication,
     requestResendTracking,
     resendTrackingApplication,
-})
+});
 
 function submitScreening() {
     if (screeningAction.value === 'revision') {
         screeningForm.post(routes.admin.recruitment.applications.screening.revision(props.application.id), {
             preserveScroll: true,
             onSuccess: () => {
-                screeningModalOpen.value = false
-                toast.success('Permintaan revisi telah dikirim.')
-                emit('submitted')
+                screeningModalOpen.value = false;
+                toast.success('Permintaan revisi telah dikirim.');
+                emit('submitted');
             },
             onError: () => showErrorToast('Gagal mengirim permintaan revisi.'),
-        })
-        return
+        });
+        return;
     }
 
     if (screeningAction.value === 'reject') {
-        requestConfirm('reject')
+        requestConfirm('reject');
     }
 }
 
@@ -261,84 +263,84 @@ function postScreeningReject() {
     screeningForm.post(routes.admin.recruitment.applications.screening.reject(props.application.id), {
         preserveScroll: true,
         onSuccess: () => {
-            screeningModalOpen.value = false
-            toast.success('Applicant ditolak pada tahap screening.')
-            emit('submitted')
+            screeningModalOpen.value = false;
+            toast.success('Applicant ditolak pada tahap screening.');
+            emit('submitted');
         },
         onError: () => showErrorToast('Gagal menolak applicant.'),
-    })
+    });
 }
 
 function requestConfirm(action: 'verify' | 'pass' | 'reject' | 'resend_tracking') {
-    confirmAction.value = action
-    confirmOpen.value = true
+    confirmAction.value = action;
+    confirmOpen.value = true;
 }
 
 function requestResendTracking() {
-    requestConfirm('resend_tracking')
+    requestConfirm('resend_tracking');
 }
 
 function executeConfirmed() {
-    const action = confirmAction.value
-    confirmOpen.value = false
+    const action = confirmAction.value;
+    confirmOpen.value = false;
 
     if (action === 'verify') {
-        verifyApplication()
-        return
+        verifyApplication();
+        return;
     }
 
     if (action === 'pass') {
-        passApplication()
-        return
+        passApplication();
+        return;
     }
 
     if (action === 'reject') {
-        postScreeningReject()
-        return
+        postScreeningReject();
+        return;
     }
 
     if (action === 'resend_tracking') {
-        resendTrackingApplication()
+        resendTrackingApplication();
     }
 }
 
 const confirmTitle = computed(() => {
-    if (confirmAction.value === 'verify') return 'Verifikasi pendaftaran'
-    if (confirmAction.value === 'pass') return 'Loloskan applicant'
-    if (confirmAction.value === 'reject') return 'Tolak applicant'
-    if (confirmAction.value === 'resend_tracking') return 'Kirim ulang informasi tracking'
-    return 'Konfirmasi'
-})
+    if (confirmAction.value === 'verify') return 'Verifikasi pendaftaran';
+    if (confirmAction.value === 'pass') return 'Loloskan applicant';
+    if (confirmAction.value === 'reject') return 'Tolak applicant';
+    if (confirmAction.value === 'resend_tracking') return 'Kirim ulang informasi tracking';
+    return 'Konfirmasi';
+});
 
 const confirmQuestion = computed(() => {
-    const who = `${props.application.full_name} (${props.application.registration_number})`
+    const who = `${props.application.full_name} (${props.application.registration_number})`;
 
-    if (confirmAction.value === 'verify') return `Verifikasi pendaftaran ${who}?`
-    if (confirmAction.value === 'pass') return `Loloskan ${who} ke tahap berikutnya?`
-    if (confirmAction.value === 'reject') return `Tolak ${who}?`
+    if (confirmAction.value === 'verify') return `Verifikasi pendaftaran ${who}?`;
+    if (confirmAction.value === 'pass') return `Loloskan ${who} ke tahap berikutnya?`;
+    if (confirmAction.value === 'reject') return `Tolak ${who}?`;
     if (confirmAction.value === 'resend_tracking') {
-        return `Kirim ulang email tracking ke ${props.application.personal_email}?`
+        return `Kirim ulang email tracking ke ${props.application.personal_email}?`;
     }
-    return ''
-})
+    return '';
+});
 
 const confirmConsequence = computed(() => {
-    if (confirmAction.value === 'pass') return 'Applicant lanjut ke tahap interview.'
-    if (confirmAction.value === 'reject') return 'Applicant tidak lanjut ke tahap berikutnya.'
+    if (confirmAction.value === 'pass') return 'Applicant lanjut ke tahap interview.';
+    if (confirmAction.value === 'reject') return 'Applicant tidak lanjut ke tahap berikutnya.';
     if (confirmAction.value === 'resend_tracking') {
-        return 'Token tracking lama tidak berlaku lagi. Email konfirmasi pendaftaran akan dikirim dengan token baru.'
+        return 'Token tracking lama tidak berlaku lagi. Email konfirmasi pendaftaran akan dikirim dengan token baru.';
     }
-    return ''
-})
+    return '';
+});
 
 function openFinalModal(action: FinalAction) {
-    finalAction.value = action
-    finalAcceptForm.reset()
-    finalRejectForm.reset()
-    finalAcceptForm.final_division_id = props.application.primary_division?.id ?? ''
-    finalAcceptForm.clearErrors()
-    finalRejectForm.clearErrors()
-    finalModalOpen.value = true
+    finalAction.value = action;
+    finalAcceptForm.reset();
+    finalRejectForm.reset();
+    finalAcceptForm.final_division_id = props.application.primary_division?.id ?? '';
+    finalAcceptForm.clearErrors();
+    finalRejectForm.clearErrors();
+    finalModalOpen.value = true;
 }
 
 function submitFinalDecision() {
@@ -346,25 +348,25 @@ function submitFinalDecision() {
         finalAcceptForm.post(routes.admin.recruitment.applications.final.accept(props.application.id), {
             preserveScroll: true,
             onSuccess: () => {
-                finalModalOpen.value = false
-                toast.success('Applicant diterima. Email hasil telah dikirim.')
-                emit('submitted')
+                finalModalOpen.value = false;
+                toast.success('Applicant diterima. Email hasil telah dikirim.');
+                emit('submitted');
             },
             onError: () => showErrorToast('Gagal menyimpan keputusan final.'),
-        })
-        return
+        });
+        return;
     }
 
     if (finalAction.value === 'reject') {
         finalRejectForm.post(routes.admin.recruitment.applications.final.reject(props.application.id), {
             preserveScroll: true,
             onSuccess: () => {
-                finalModalOpen.value = false
-                toast.success('Applicant ditolak. Email hasil telah dikirim.')
-                emit('submitted')
+                finalModalOpen.value = false;
+                toast.success('Applicant ditolak. Email hasil telah dikirim.');
+                emit('submitted');
             },
             onError: () => showErrorToast('Gagal menyimpan keputusan final.'),
-        })
+        });
     }
 }
 
@@ -375,12 +377,12 @@ function passApplication() {
         {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Applicant lolos screening.')
-                emit('submitted')
+                toast.success('Applicant lolos screening.');
+                emit('submitted');
             },
             onError: () => showErrorToast('Gagal meloloskan applicant.'),
-        },
-    )
+        }
+    );
 }
 
 function verifyApplication() {
@@ -390,12 +392,12 @@ function verifyApplication() {
         {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Pendaftaran berhasil diverifikasi.')
-                emit('submitted')
+                toast.success('Pendaftaran berhasil diverifikasi.');
+                emit('submitted');
             },
             onError: () => showErrorToast('Gagal memverifikasi pendaftaran.'),
-        },
-    )
+        }
+    );
 }
 
 function resendTrackingApplication() {
@@ -405,44 +407,44 @@ function resendTrackingApplication() {
         {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Informasi tracking telah dikirim ulang ke applicant.')
-                emit('submitted')
+                toast.success('Informasi tracking telah dikirim ulang ke applicant.');
+                emit('submitted');
             },
             onError: () => showErrorToast('Gagal mengirim ulang informasi tracking.'),
-        },
-    )
+        }
+    );
 }
 
 function approveCorrection(correctionId: string): void {
-    if (reviewingCorrectionId.value !== null) return
-    reviewingCorrectionId.value = correctionId
+    if (reviewingCorrectionId.value !== null) return;
+    reviewingCorrectionId.value = correctionId;
     correctionReviewForm.post(routes.admin.recruitment.corrections.approve(correctionId), {
         preserveScroll: true,
         onSuccess: () => {
-            correctionReviewForm.reset()
-            showFlashToast({ type: 'success', message: 'Permintaan koreksi disetujui.' })
+            correctionReviewForm.reset();
+            showFlashToast({ type: 'success', message: 'Permintaan koreksi disetujui.' });
         },
         onError: () => showErrorToast('Gagal menyetujui permintaan koreksi.'),
         onFinish: () => {
-            reviewingCorrectionId.value = null
+            reviewingCorrectionId.value = null;
         },
-    })
+    });
 }
 
 function rejectCorrection(correctionId: string): void {
-    if (reviewingCorrectionId.value !== null) return
-    reviewingCorrectionId.value = correctionId
+    if (reviewingCorrectionId.value !== null) return;
+    reviewingCorrectionId.value = correctionId;
     correctionReviewForm.post(routes.admin.recruitment.corrections.reject(correctionId), {
         preserveScroll: true,
         onSuccess: () => {
-            correctionReviewForm.reset()
-            showFlashToast({ type: 'success', message: 'Permintaan koreksi ditolak.' })
+            correctionReviewForm.reset();
+            showFlashToast({ type: 'success', message: 'Permintaan koreksi ditolak.' });
         },
         onError: () => showErrorToast('Gagal menolak permintaan koreksi.'),
         onFinish: () => {
-            reviewingCorrectionId.value = null
+            reviewingCorrectionId.value = null;
         },
-    })
+    });
 }
 
 const activityActionLabels: Record<string, string> = {
@@ -466,92 +468,90 @@ const activityActionLabels: Record<string, string> = {
     'final.reject': 'Tidak lolos seleksi akhir',
     'attendance.check_in': 'Absensi interview tercatat',
     'interview.no_show': 'Tidak hadir interview',
-}
+};
 
 function activityActionLabel(action: string): string {
-    const label = activityActionLabels[action]
-    if (label) return label
+    const label = activityActionLabels[action];
+    if (label) return label;
 
-    const pretty = action.replace(/[._-]+/g, ' ').trim()
-    if (pretty === '') return action
+    const pretty = action.replace(/[._-]+/g, ' ').trim();
+    if (pretty === '') return action;
 
-    return pretty.charAt(0).toUpperCase() + pretty.slice(1)
+    return pretty.charAt(0).toUpperCase() + pretty.slice(1);
 }
 
 function formatActivityTime(value: string | null): string {
-    if (!value) return ''
+    if (!value) return '';
 
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return ''
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
 
-    return formatSubmissionDateTime(value)
+    return formatSubmissionDateTime(value);
 }
 
-const instagramHandle = computed<string>(() =>
-    props.application.instagram_username.replace(/^@+/, '').trim(),
-)
-const instagramUrl = computed<string>(() => `https://instagram.com/${instagramHandle.value}`)
+const instagramHandle = computed<string>(() => props.application.instagram_username.replace(/^@+/, '').trim());
+const instagramUrl = computed<string>(() => `https://instagram.com/${instagramHandle.value}`);
 
 const cvDownloadUrl = computed<string>(() =>
-    routes.admin.recruitment.applications.document(props.application.id, 'cv'),
-)
+    routes.admin.recruitment.applications.document(props.application.id, 'cv')
+);
 const cvPreviewUrl = computed<string>(() =>
-    routes.admin.recruitment.applications.document(props.application.id, 'cv', true),
-)
+    routes.admin.recruitment.applications.document(props.application.id, 'cv', true)
+);
 const portfolioDownloadUrl = computed<string>(() =>
-    routes.admin.recruitment.applications.document(props.application.id, 'portfolio'),
-)
+    routes.admin.recruitment.applications.document(props.application.id, 'portfolio')
+);
 const portfolioPreviewUrl = computed<string>(() =>
-    routes.admin.recruitment.applications.document(props.application.id, 'portfolio', true),
-)
+    routes.admin.recruitment.applications.document(props.application.id, 'portfolio', true)
+);
 const instagramFollowDownloadUrl = computed<string>(() =>
-    routes.admin.recruitment.applications.document(props.application.id, 'instagram_follow'),
-)
+    routes.admin.recruitment.applications.document(props.application.id, 'instagram_follow')
+);
 const instagramFollowPreviewUrl = computed<string>(() =>
-    routes.admin.recruitment.applications.document(props.application.id, 'instagram_follow', true),
-)
+    routes.admin.recruitment.applications.document(props.application.id, 'instagram_follow', true)
+);
 
-const cvPreviewLoading = ref<boolean>(true)
-const cvPreviewFailed = ref<boolean>(false)
-const portfolioPreviewLoading = ref<boolean>(true)
-const portfolioPreviewFailed = ref<boolean>(false)
-const instagramFollowPreviewFailed = ref<boolean>(false)
+const cvPreviewLoading = ref<boolean>(true);
+const cvPreviewFailed = ref<boolean>(false);
+const portfolioPreviewLoading = ref<boolean>(true);
+const portfolioPreviewFailed = ref<boolean>(false);
+const instagramFollowPreviewFailed = ref<boolean>(false);
 
 function resetDocumentPreview(): void {
-    cvPreviewLoading.value = true
-    cvPreviewFailed.value = false
-    portfolioPreviewLoading.value = true
-    portfolioPreviewFailed.value = false
-    instagramFollowPreviewFailed.value = false
+    cvPreviewLoading.value = true;
+    cvPreviewFailed.value = false;
+    portfolioPreviewLoading.value = true;
+    portfolioPreviewFailed.value = false;
+    instagramFollowPreviewFailed.value = false;
 }
 
 watch(
     () => props.application.id,
-    () => resetDocumentPreview(),
-)
+    () => resetDocumentPreview()
+);
 
 const modalTitle = computed(() => {
-    if (screeningAction.value === 'revision') return 'Minta revisi'
-    if (screeningAction.value === 'reject') return 'Tolak applicant'
-    return 'Keputusan screening'
-})
+    if (screeningAction.value === 'revision') return 'Minta revisi';
+    if (screeningAction.value === 'reject') return 'Tolak applicant';
+    return 'Keputusan screening';
+});
 
 const finalModalTitle = computed(() => {
-    if (finalAction.value === 'accept') return 'Terima applicant'
-    if (finalAction.value === 'reject') return 'Tolak applicant (final)'
-    return 'Keputusan final'
-})
+    if (finalAction.value === 'accept') return 'Terima applicant';
+    if (finalAction.value === 'reject') return 'Tolak applicant (final)';
+    return 'Keputusan final';
+});
 
 const defaultTab = computed(() => {
-    const { stage, revision_required, correction_requests } = props.application
-    const hasPendingCorrection = correction_requests.some((c) => c.status === 'pending')
+    const { stage, revision_required, correction_requests } = props.application;
+    const hasPendingCorrection = correction_requests.some((c) => c.status === 'pending');
 
-    if (revision_required || hasPendingCorrection) return 'screening'
-    if (stage === 'submitted' || stage === 'screening') return 'screening'
-    if (stage === 'final_review' || stage === 'completed') return 'final'
+    if (revision_required || hasPendingCorrection) return 'screening';
+    if (stage === 'submitted' || stage === 'screening') return 'screening';
+    if (stage === 'final_review' || stage === 'completed') return 'final';
 
-    return 'profile'
-})
+    return 'profile';
+});
 </script>
 
 <template>
@@ -568,7 +568,12 @@ const defaultTab = computed(() => {
                 <Trophy class="mr-2 size-4" />
                 Terima
             </Button>
-            <Button v-if="canScreen && !hideRevisionAction" size="sm" variant="outline" @click="openScreeningModal('revision')">
+            <Button
+                v-if="canScreen && !hideRevisionAction"
+                size="sm"
+                variant="outline"
+                @click="openScreeningModal('revision')"
+            >
                 Revisi
             </Button>
             <Button v-if="canScreen" size="sm" variant="destructive" @click="openScreeningModal('reject')">
@@ -597,7 +602,7 @@ const defaultTab = computed(() => {
 
         <Tabs :default-value="defaultTab" class="w-full">
             <TabsList
-                class="flex h-auto w-full items-center justify-start gap-6 overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-none border-0 border-b border-border bg-transparent p-0 text-muted-foreground [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                class="flex h-auto w-full items-center justify-start gap-6 overflow-x-auto overflow-y-hidden rounded-none border-0 border-b border-border bg-transparent p-0 whitespace-nowrap text-muted-foreground [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
                 <TabsTrigger
                     value="profile"
@@ -610,21 +615,30 @@ const defaultTab = computed(() => {
                     value="screening"
                     class="group -mb-px shrink-0 gap-2 rounded-none border-0 border-b-2 border-transparent bg-transparent px-1 py-2.5 text-sm font-medium shadow-none hover:text-foreground data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
-                    <ClipboardCheck class="size-4 shrink-0 opacity-60 group-data-[state=active]:opacity-100" aria-hidden="true" />
+                    <ClipboardCheck
+                        class="size-4 shrink-0 opacity-60 group-data-[state=active]:opacity-100"
+                        aria-hidden="true"
+                    />
                     <span>Screening</span>
                 </TabsTrigger>
                 <TabsTrigger
                     value="final"
                     class="group -mb-px shrink-0 gap-2 rounded-none border-0 border-b-2 border-transparent bg-transparent px-1 py-2.5 text-sm font-medium shadow-none hover:text-foreground data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
-                    <Trophy class="size-4 shrink-0 opacity-60 group-data-[state=active]:opacity-100" aria-hidden="true" />
+                    <Trophy
+                        class="size-4 shrink-0 opacity-60 group-data-[state=active]:opacity-100"
+                        aria-hidden="true"
+                    />
                     <span>Final</span>
                 </TabsTrigger>
                 <TabsTrigger
                     value="history"
                     class="group -mb-px shrink-0 gap-2 rounded-none border-0 border-b-2 border-transparent bg-transparent px-1 py-2.5 text-sm font-medium shadow-none hover:text-foreground data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
-                    <History class="size-4 shrink-0 opacity-60 group-data-[state=active]:opacity-100" aria-hidden="true" />
+                    <History
+                        class="size-4 shrink-0 opacity-60 group-data-[state=active]:opacity-100"
+                        aria-hidden="true"
+                    />
                     <span>Riwayat</span>
                 </TabsTrigger>
             </TabsList>
@@ -633,47 +647,45 @@ const defaultTab = computed(() => {
                 <Card class="rounded-2xl border-border/70">
                     <CardContent class="space-y-5 p-6">
                         <div class="space-y-3">
-                            <p class="text-muted-foreground text-sm font-semibold uppercase tracking-wide">
+                            <p class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
                                 Detail pendaftaran
                             </p>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div v-if="!readonly">
-                                    <p class="text-muted-foreground text-xs uppercase">NIM</p>
+                                    <p class="text-xs text-muted-foreground uppercase">NIM</p>
                                     <p class="font-medium">{{ application.nim }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Semester</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Semester</p>
                                     <p class="font-medium">{{ application.semester }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Divisi utama</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Divisi utama</p>
                                     <p class="font-medium">{{ application.primary_division?.name ?? '—' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Divisi cadangan</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Divisi cadangan</p>
                                     <p class="font-medium">{{ application.secondary_division?.name ?? '—' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Periode</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Periode</p>
                                     <p class="font-medium">{{ application.period?.name ?? '—' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Hasil</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Hasil</p>
                                     <p class="font-medium">{{ application.result_label }}</p>
                                 </div>
                             </div>
                         </div>
                         <div class="space-y-3 border-t border-border/60 pt-5">
-                            <p class="text-muted-foreground text-sm font-semibold uppercase tracking-wide">
-                                Kontak
-                            </p>
+                            <p class="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Kontak</p>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Telepon</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Telepon</p>
                                     <p class="font-medium">{{ application.phone }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Instagram</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Instagram</p>
                                     <a
                                         v-if="instagramHandle"
                                         :href="instagramUrl"
@@ -687,11 +699,11 @@ const defaultTab = computed(() => {
                                     <p v-else class="font-medium">—</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Email pribadi</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Email pribadi</p>
                                     <p class="font-medium">{{ application.personal_email }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-muted-foreground text-xs uppercase">Email kampus</p>
+                                    <p class="text-xs text-muted-foreground uppercase">Email kampus</p>
                                     <p class="font-medium">{{ application.student_email }}</p>
                                 </div>
                             </div>
@@ -706,10 +718,10 @@ const defaultTab = computed(() => {
                             <div class="space-y-3 pb-5">
                                 <div class="flex flex-wrap items-center justify-between gap-3">
                                     <div class="flex items-center gap-3">
-                                        <FileText class="text-muted-foreground size-5" />
+                                        <FileText class="size-5 text-muted-foreground" />
                                         <div>
                                             <p class="font-medium">{{ application.document.cv_original_name }}</p>
-                                            <p class="text-muted-foreground text-xs">
+                                            <p class="text-xs text-muted-foreground">
                                                 CV · {{ formatBytes(application.document.cv_size_bytes) }}
                                             </p>
                                         </div>
@@ -724,12 +736,7 @@ const defaultTab = computed(() => {
                                                 Unduh CV
                                             </a>
                                         </Button>
-                                        <Button
-                                            v-if="!cvPreviewFailed"
-                                            as-child
-                                            variant="ghost"
-                                            size="sm"
-                                        >
+                                        <Button v-if="!cvPreviewFailed" as-child variant="ghost" size="sm">
                                             <a :href="cvPreviewUrl" target="_blank" rel="noopener">
                                                 <ExternalLink class="mr-2 size-4" />
                                                 Buka di tab baru
@@ -748,7 +755,10 @@ const defaultTab = computed(() => {
                                         class="h-80 w-full bg-white"
                                         loading="lazy"
                                         @load="cvPreviewLoading = false"
-                                        @error="cvPreviewFailed = true; cvPreviewLoading = false"
+                                        @error="
+                                            cvPreviewFailed = true;
+                                            cvPreviewLoading = false;
+                                        "
                                     />
                                     <div
                                         v-if="cvPreviewLoading && !cvPreviewFailed"
@@ -756,18 +766,17 @@ const defaultTab = computed(() => {
                                         aria-live="polite"
                                     >
                                         <div
-                                            class="border-muted-foreground/30 border-t-foreground h-8 w-8 animate-spin rounded-full border-2"
+                                            class="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground"
                                             aria-hidden="true"
                                         />
-                                        <p class="text-muted-foreground text-sm">Memuat pratinjau CV…</p>
+                                        <p class="text-sm text-muted-foreground">Memuat pratinjau CV…</p>
                                     </div>
                                     <div
                                         v-if="cvPreviewFailed"
                                         class="flex flex-col items-center justify-center gap-3 p-6 text-center"
                                     >
-                                        <p class="text-muted-foreground text-sm">
-                                            Pratinjau tidak dapat dimuat. Gunakan tombol unduh untuk membuka
-                                            berkas.
+                                        <p class="text-sm text-muted-foreground">
+                                            Pratinjau tidak dapat dimuat. Gunakan tombol unduh untuk membuka berkas.
                                         </p>
                                         <Button as-child variant="outline" size="sm">
                                             <a :href="cvDownloadUrl">
@@ -782,14 +791,17 @@ const defaultTab = computed(() => {
                             <div class="space-y-3 pt-5">
                                 <p class="text-sm font-semibold">Portfolio</p>
                                 <div
-                                    v-if="application.document.portfolio_type === 'url' && application.document.portfolio_url"
+                                    v-if="
+                                        application.document.portfolio_type === 'url' &&
+                                        application.document.portfolio_url
+                                    "
                                     class="flex flex-wrap items-center justify-between gap-3"
                                 >
                                     <a
                                         :href="application.document.portfolio_url"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="text-primary inline-flex min-w-0 max-w-full items-center gap-2 text-sm underline-offset-4 hover:underline"
+                                        class="inline-flex max-w-full min-w-0 items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
                                     >
                                         <ExternalLink class="size-4 shrink-0" aria-hidden="true" />
                                         <span class="truncate">{{ application.document.portfolio_url }}</span>
@@ -808,14 +820,14 @@ const defaultTab = computed(() => {
                                 <div v-else-if="application.document.has_portfolio_file" class="space-y-3">
                                     <div class="flex flex-wrap items-center justify-between gap-3">
                                         <div class="flex items-center gap-3">
-                                            <FileText class="text-muted-foreground size-5" />
+                                            <FileText class="size-5 text-muted-foreground" />
                                             <div>
                                                 <p class="text-sm font-medium">
                                                     {{ application.document.portfolio_original_name }}
                                                 </p>
                                                 <p
                                                     v-if="application.document.portfolio_size_bytes"
-                                                    class="text-muted-foreground text-xs"
+                                                    class="text-xs text-muted-foreground"
                                                 >
                                                     Portfolio ·
                                                     {{ formatBytes(application.document.portfolio_size_bytes) }}
@@ -829,12 +841,7 @@ const defaultTab = computed(() => {
                                                     Unduh portfolio
                                                 </a>
                                             </Button>
-                                            <Button
-                                                v-if="!portfolioPreviewFailed"
-                                                as-child
-                                                variant="ghost"
-                                                size="sm"
-                                            >
+                                            <Button v-if="!portfolioPreviewFailed" as-child variant="ghost" size="sm">
                                                 <a :href="portfolioPreviewUrl" target="_blank" rel="noopener">
                                                     <ExternalLink class="mr-2 size-4" />
                                                     Buka di tab baru
@@ -850,7 +857,10 @@ const defaultTab = computed(() => {
                                             class="h-80 w-full bg-white"
                                             loading="lazy"
                                             @load="portfolioPreviewLoading = false"
-                                            @error="portfolioPreviewFailed = true; portfolioPreviewLoading = false"
+                                            @error="
+                                                portfolioPreviewFailed = true;
+                                                portfolioPreviewLoading = false;
+                                            "
                                         />
                                         <div
                                             v-if="portfolioPreviewLoading && !portfolioPreviewFailed"
@@ -858,20 +868,17 @@ const defaultTab = computed(() => {
                                             aria-live="polite"
                                         >
                                             <div
-                                                class="border-muted-foreground/30 border-t-foreground h-8 w-8 animate-spin rounded-full border-2"
+                                                class="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground"
                                                 aria-hidden="true"
                                             />
-                                            <p class="text-muted-foreground text-sm">
-                                                Memuat pratinjau portfolio…
-                                            </p>
+                                            <p class="text-sm text-muted-foreground">Memuat pratinjau portfolio…</p>
                                         </div>
                                         <div
                                             v-if="portfolioPreviewFailed"
                                             class="flex flex-col items-center justify-center gap-3 p-6 text-center"
                                         >
-                                            <p class="text-muted-foreground text-sm">
-                                                Pratinjau tidak dapat dimuat. Gunakan tombol unduh untuk membuka
-                                                berkas.
+                                            <p class="text-sm text-muted-foreground">
+                                                Pratinjau tidak dapat dimuat. Gunakan tombol unduh untuk membuka berkas.
                                             </p>
                                             <Button as-child variant="outline" size="sm">
                                                 <a :href="portfolioDownloadUrl">
@@ -882,26 +889,23 @@ const defaultTab = computed(() => {
                                         </div>
                                     </div>
                                 </div>
-                                <p v-else class="text-muted-foreground mt-1 text-sm">Tidak ada portfolio (opsional).</p>
+                                <p v-else class="mt-1 text-sm text-muted-foreground">Tidak ada portfolio (opsional).</p>
                             </div>
 
                             <div class="space-y-3 pt-5">
                                 <p class="text-sm font-semibold">Bukti Follow Instagram</p>
-                                <div
-                                    v-if="application.document.has_instagram_follow_file"
-                                    class="space-y-3"
-                                >
+                                <div v-if="application.document.has_instagram_follow_file" class="space-y-3">
                                     <div class="flex flex-wrap items-center justify-between gap-3">
                                         <div>
                                             <p class="text-sm font-medium">
                                                 {{
-                                                    application.document.instagram_follow_original_name
-                                                        ?? 'Bukti follow'
+                                                    application.document.instagram_follow_original_name ??
+                                                    'Bukti follow'
                                                 }}
                                             </p>
                                             <p
                                                 v-if="application.document.instagram_follow_size_bytes"
-                                                class="text-muted-foreground text-xs"
+                                                class="text-xs text-muted-foreground"
                                             >
                                                 Screenshot ·
                                                 {{ formatBytes(application.document.instagram_follow_size_bytes) }}
@@ -915,11 +919,7 @@ const defaultTab = computed(() => {
                                                 </a>
                                             </Button>
                                             <Button as-child variant="ghost" size="sm">
-                                                <a
-                                                    :href="instagramFollowPreviewUrl"
-                                                    target="_blank"
-                                                    rel="noopener"
-                                                >
+                                                <a :href="instagramFollowPreviewUrl" target="_blank" rel="noopener">
                                                     <ExternalLink class="mr-2 size-4" />
                                                     Buka di tab baru
                                                 </a>
@@ -931,7 +931,7 @@ const defaultTab = computed(() => {
                                             v-show="!instagramFollowPreviewFailed"
                                             :src="instagramFollowPreviewUrl"
                                             alt="Bukti follow Instagram"
-                                            class="max-h-80 w-full object-contain bg-white"
+                                            class="max-h-80 w-full bg-white object-contain"
                                             loading="lazy"
                                             @error="instagramFollowPreviewFailed = true"
                                         />
@@ -939,7 +939,7 @@ const defaultTab = computed(() => {
                                             v-if="instagramFollowPreviewFailed"
                                             class="flex flex-col items-center justify-center gap-3 p-6 text-center"
                                         >
-                                            <p class="text-muted-foreground text-sm">
+                                            <p class="text-sm text-muted-foreground">
                                                 Pratinjau tidak dapat dimuat. Gunakan tombol unduh.
                                             </p>
                                             <Button as-child variant="outline" size="sm">
@@ -951,17 +951,20 @@ const defaultTab = computed(() => {
                                         </div>
                                     </div>
                                 </div>
-                                <p v-else class="text-muted-foreground text-sm">Belum diunggah.</p>
+                                <p v-else class="text-sm text-muted-foreground">Belum diunggah.</p>
                             </div>
 
                             <div class="space-y-3 pt-5">
                                 <p class="text-sm font-semibold">Link Twibbon</p>
-                                <div v-if="application.document.twibbon_url" class="flex flex-wrap items-center justify-between gap-3">
+                                <div
+                                    v-if="application.document.twibbon_url"
+                                    class="flex flex-wrap items-center justify-between gap-3"
+                                >
                                     <a
                                         :href="application.document.twibbon_url"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="text-primary inline-flex min-w-0 max-w-full items-center gap-2 text-sm underline-offset-4 hover:underline"
+                                        class="inline-flex max-w-full min-w-0 items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
                                     >
                                         <ExternalLink class="size-4 shrink-0" aria-hidden="true" />
                                         <span class="truncate">{{ application.document.twibbon_url }}</span>
@@ -977,10 +980,10 @@ const defaultTab = computed(() => {
                                         </a>
                                     </Button>
                                 </div>
-                                <p v-else class="text-muted-foreground text-sm">Belum diisi.</p>
+                                <p v-else class="text-sm text-muted-foreground">Belum diisi.</p>
                             </div>
                         </div>
-                        <p v-else class="text-muted-foreground text-sm">Dokumen belum tersedia.</p>
+                        <p v-else class="text-sm text-muted-foreground">Dokumen belum tersedia.</p>
                     </CardContent>
                 </Card>
             </TabsContent>
@@ -997,17 +1000,17 @@ const defaultTab = computed(() => {
                             <div class="flex flex-wrap items-start justify-between gap-2">
                                 <div>
                                     <p class="font-medium">{{ screening.decision_label }}</p>
-                                    <p v-if="screening.reason_label" class="text-muted-foreground text-sm">
+                                    <p v-if="screening.reason_label" class="text-sm text-muted-foreground">
                                         {{ screening.reason_label }}
                                     </p>
                                 </div>
-                                <p class="text-muted-foreground text-xs">
+                                <p class="text-xs text-muted-foreground">
                                     {{ screening.actor?.name ?? 'Staff' }}
                                 </p>
                             </div>
                             <p v-if="screening.notes" class="mt-2 text-sm">{{ screening.notes }}</p>
                         </div>
-                        <p v-if="application.screenings.length === 0" class="text-muted-foreground text-sm">
+                        <p v-if="application.screenings.length === 0" class="text-sm text-muted-foreground">
                             Belum ada keputusan screening.
                         </p>
                     </CardContent>
@@ -1023,12 +1026,12 @@ const defaultTab = computed(() => {
                         >
                             <div class="flex flex-wrap items-start justify-between gap-2">
                                 <p class="font-medium">{{ correction.status_label }}</p>
-                                <p v-if="correction.reviewer" class="text-muted-foreground text-xs">
+                                <p v-if="correction.reviewer" class="text-xs text-muted-foreground">
                                     {{ correction.reviewer.name }}
                                 </p>
                             </div>
                             <p class="mt-2 text-sm">{{ correction.request_message }}</p>
-                            <p v-if="correction.review_notes" class="text-muted-foreground mt-2 text-sm">
+                            <p v-if="correction.review_notes" class="mt-2 text-sm text-muted-foreground">
                                 Catatan: {{ correction.review_notes }}
                             </p>
                             <div
@@ -1056,7 +1059,7 @@ const defaultTab = computed(() => {
                                 </Button>
                             </div>
                         </div>
-                        <p v-if="application.correction_requests.length === 0" class="text-muted-foreground text-sm">
+                        <p v-if="application.correction_requests.length === 0" class="text-sm text-muted-foreground">
                             Belum ada permintaan koreksi.
                         </p>
                     </CardContent>
@@ -1069,15 +1072,15 @@ const defaultTab = computed(() => {
                         <p class="text-sm font-semibold">Evaluasi interviewer</p>
                         <div class="grid gap-3 sm:grid-cols-3">
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Speaking</p>
+                                <p class="text-xs text-muted-foreground uppercase">Speaking</p>
                                 <p class="font-medium">{{ application.evaluation.speaking_score }}/10</p>
                             </div>
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Technical</p>
+                                <p class="text-xs text-muted-foreground uppercase">Technical</p>
                                 <p class="font-medium">{{ application.evaluation.technical_score }}/10</p>
                             </div>
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Attitude</p>
+                                <p class="text-xs text-muted-foreground uppercase">Attitude</p>
                                 <p class="font-medium">{{ application.evaluation.attitude_score }}/10</p>
                             </div>
                         </div>
@@ -1085,10 +1088,10 @@ const defaultTab = computed(() => {
                             Rekomendasi:
                             <span class="font-medium">{{ application.evaluation.recommendation_label }}</span>
                         </p>
-                        <p v-if="application.evaluation.notes" class="text-muted-foreground text-sm">
+                        <p v-if="application.evaluation.notes" class="text-sm text-muted-foreground">
                             {{ application.evaluation.notes }}
                         </p>
-                        <p class="text-muted-foreground text-xs">
+                        <p class="text-xs text-muted-foreground">
                             {{ application.evaluation.evaluator?.name ?? 'Interviewer' }}
                             · {{ application.evaluation.is_locked ? 'Terkunci' : 'Draft' }}
                         </p>
@@ -1100,23 +1103,23 @@ const defaultTab = computed(() => {
                         <p class="text-sm font-semibold">Keputusan final</p>
                         <div v-if="application.final_decision.membership_type_label" class="grid gap-3 sm:grid-cols-2">
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Keanggotaan</p>
+                                <p class="text-xs text-muted-foreground uppercase">Keanggotaan</p>
                                 <p class="font-medium">{{ application.final_decision.membership_type_label }}</p>
                             </div>
                             <div>
-                                <p class="text-muted-foreground text-xs uppercase">Divisi penempatan</p>
+                                <p class="text-xs text-muted-foreground uppercase">Divisi penempatan</p>
                                 <p class="font-medium">{{ application.final_decision.final_division?.name ?? '—' }}</p>
                             </div>
                         </div>
                         <div v-if="application.final_decision.internal_reason">
-                            <p class="text-muted-foreground text-xs uppercase">Alasan internal</p>
+                            <p class="text-xs text-muted-foreground uppercase">Alasan internal</p>
                             <p class="text-sm">{{ application.final_decision.internal_reason }}</p>
                         </div>
                         <div v-if="application.final_decision.public_message">
-                            <p class="text-muted-foreground text-xs uppercase">Pesan applicant</p>
+                            <p class="text-xs text-muted-foreground uppercase">Pesan applicant</p>
                             <p class="text-sm">{{ application.final_decision.public_message }}</p>
                         </div>
-                        <p class="text-muted-foreground text-xs">
+                        <p class="text-xs text-muted-foreground">
                             {{ application.final_decision.decider?.name ?? 'Staff' }}
                         </p>
                     </CardContent>
@@ -1137,7 +1140,7 @@ const defaultTab = computed(() => {
 
                 <p
                     v-if="!application.evaluation && !application.final_decision && !canDecideFinal"
-                    class="text-muted-foreground text-sm"
+                    class="text-sm text-muted-foreground"
                 >
                     Belum ada data final review.
                 </p>
@@ -1151,15 +1154,16 @@ const defaultTab = computed(() => {
                             :key="log.id"
                             class="flex gap-3 rounded-xl border p-4"
                         >
-                            <History class="text-muted-foreground mt-0.5 size-4 shrink-0" />
+                            <History class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                             <div class="min-w-0 flex-1">
                                 <p class="font-medium">{{ activityActionLabel(log.action) }}</p>
-                                <p class="text-muted-foreground text-xs">
-                                    {{ log.actor?.name ?? 'Sistem' }} · {{ formatActivityTime(log.created_at) || 'Waktu tidak tercatat' }}
+                                <p class="text-xs text-muted-foreground">
+                                    {{ log.actor?.name ?? 'Sistem' }} ·
+                                    {{ formatActivityTime(log.created_at) || 'Waktu tidak tercatat' }}
                                 </p>
                             </div>
                         </div>
-                        <p v-if="application.activity_logs.length === 0" class="text-muted-foreground text-sm">
+                        <p v-if="application.activity_logs.length === 0" class="text-sm text-muted-foreground">
                             Belum ada aktivitas tercatat.
                         </p>
                     </CardContent>
@@ -1186,7 +1190,7 @@ const defaultTab = computed(() => {
                             placeholder="Pilih alasan"
                             :invalid="!!screeningForm.errors.reason"
                         />
-                        <p v-if="screeningForm.errors.reason" class="text-destructive text-xs">
+                        <p v-if="screeningForm.errors.reason" class="text-xs text-destructive">
                             {{ screeningForm.errors.reason }}
                         </p>
                     </div>
@@ -1201,12 +1205,14 @@ const defaultTab = computed(() => {
                             >
                                 <Checkbox
                                     :model-value="isCheckboxOptionSelected(screeningForm.sections, opt.value)"
-                                    @update:model-value="(v: boolean | 'indeterminate') => toggleRevisionSection(opt.value, v === true)"
+                                    @update:model-value="
+                                        (v: boolean | 'indeterminate') => toggleRevisionSection(opt.value, v === true)
+                                    "
                                 />
                                 {{ opt.label }}
                             </label>
                         </div>
-                        <p v-if="screeningForm.errors.sections" class="text-destructive text-xs">
+                        <p v-if="screeningForm.errors.sections" class="text-xs text-destructive">
                             {{ screeningForm.errors.sections }}
                         </p>
                     </div>
@@ -1219,20 +1225,17 @@ const defaultTab = computed(() => {
                             id="notes"
                             v-model="screeningForm.notes"
                             rows="3"
-                            class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             :placeholder="
                                 screeningAction === 'revision'
                                     ? 'Tulis catatan perbaikan untuk applicant...'
                                     : 'Catatan internal untuk tim...'
                             "
                         />
-                        <p
-                            v-if="screeningAction === 'revision'"
-                            class="text-muted-foreground text-xs"
-                        >
+                        <p v-if="screeningAction === 'revision'" class="text-xs text-muted-foreground">
                             Catatan ini dikirim ke applicant lewat email.
                         </p>
-                        <p v-if="screeningForm.errors.notes" class="text-destructive text-xs">
+                        <p v-if="screeningForm.errors.notes" class="text-xs text-destructive">
                             {{ screeningForm.errors.notes }}
                         </p>
                     </div>
@@ -1243,20 +1246,17 @@ const defaultTab = computed(() => {
                             id="public_message"
                             v-model="screeningForm.public_message"
                             rows="2"
-                            class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                     </div>
 
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="screeningModalOpen = false">
-                            Batal
-                        </Button>
+                        <Button type="button" variant="outline" @click="screeningModalOpen = false"> Batal </Button>
                         <Button
                             type="submit"
                             :disabled="
                                 screeningForm.processing ||
-                                (screeningAction === 'revision' &&
-                                    screeningForm.sections.length === 0)
+                                (screeningAction === 'revision' && screeningForm.sections.length === 0)
                             "
                             :variant="screeningAction === 'reject' ? 'destructive' : 'default'"
                         >
@@ -1281,9 +1281,7 @@ const defaultTab = computed(() => {
                 </p>
 
                 <DialogFooter>
-                    <Button type="button" variant="outline" @click="confirmOpen = false">
-                        Batal
-                    </Button>
+                    <Button type="button" variant="outline" @click="confirmOpen = false"> Batal </Button>
                     <Button
                         type="button"
                         :variant="confirmAction === 'reject' ? 'destructive' : 'default'"
@@ -1310,29 +1308,21 @@ const defaultTab = computed(() => {
                     </DialogDescription>
                 </DialogHeader>
 
-                <form
-                    v-if="finalAction === 'accept'"
-                    class="space-y-4"
-                    @submit.prevent="submitFinalDecision"
-                >
+                <form v-if="finalAction === 'accept'" class="space-y-4" @submit.prevent="submitFinalDecision">
                     <div class="space-y-2">
                         <Label for="membership_type">Tipe keanggotaan</Label>
                         <select
                             id="membership_type"
                             v-model="finalAcceptForm.membership_type"
-                            class="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+                            class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                             required
                         >
                             <option value="" disabled>Pilih tipe</option>
-                            <option
-                                v-for="opt in membershipTypeOptions"
-                                :key="opt.value"
-                                :value="opt.value"
-                            >
+                            <option v-for="opt in membershipTypeOptions" :key="opt.value" :value="opt.value">
                                 {{ opt.label }}
                             </option>
                         </select>
-                        <p v-if="finalAcceptForm.errors.membership_type" class="text-destructive text-xs">
+                        <p v-if="finalAcceptForm.errors.membership_type" class="text-xs text-destructive">
                             {{ finalAcceptForm.errors.membership_type }}
                         </p>
                     </div>
@@ -1342,7 +1332,7 @@ const defaultTab = computed(() => {
                         <select
                             id="final_division_id"
                             v-model="finalAcceptForm.final_division_id"
-                            class="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+                            class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                             required
                         >
                             <option value="" disabled>Pilih divisi</option>
@@ -1350,36 +1340,28 @@ const defaultTab = computed(() => {
                                 {{ div.name }}
                             </option>
                         </select>
-                        <p v-if="finalAcceptForm.errors.final_division_id" class="text-destructive text-xs">
+                        <p v-if="finalAcceptForm.errors.final_division_id" class="text-xs text-destructive">
                             {{ finalAcceptForm.errors.final_division_id }}
                         </p>
                     </div>
 
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="finalModalOpen = false">
-                            Batal
-                        </Button>
-                        <Button type="submit" :disabled="finalAcceptForm.processing">
-                            Simpan keputusan
-                        </Button>
+                        <Button type="button" variant="outline" @click="finalModalOpen = false"> Batal </Button>
+                        <Button type="submit" :disabled="finalAcceptForm.processing"> Simpan keputusan </Button>
                     </DialogFooter>
                 </form>
 
-                <form
-                    v-else-if="finalAction === 'reject'"
-                    class="space-y-4"
-                    @submit.prevent="submitFinalDecision"
-                >
+                <form v-else-if="finalAction === 'reject'" class="space-y-4" @submit.prevent="submitFinalDecision">
                     <div class="space-y-2">
                         <Label for="internal_reason">Alasan internal</Label>
                         <textarea
                             id="internal_reason"
                             v-model="finalRejectForm.internal_reason"
                             rows="3"
-                            class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             required
                         />
-                        <p v-if="finalRejectForm.errors.internal_reason" class="text-destructive text-xs">
+                        <p v-if="finalRejectForm.errors.internal_reason" class="text-xs text-destructive">
                             {{ finalRejectForm.errors.internal_reason }}
                         </p>
                     </div>
@@ -1390,23 +1372,17 @@ const defaultTab = computed(() => {
                             id="final_public_message"
                             v-model="finalRejectForm.public_message"
                             rows="3"
-                            class="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             required
                         />
-                        <p v-if="finalRejectForm.errors.public_message" class="text-destructive text-xs">
+                        <p v-if="finalRejectForm.errors.public_message" class="text-xs text-destructive">
                             {{ finalRejectForm.errors.public_message }}
                         </p>
                     </div>
 
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="finalModalOpen = false">
-                            Batal
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="destructive"
-                            :disabled="finalRejectForm.processing"
-                        >
+                        <Button type="button" variant="outline" @click="finalModalOpen = false"> Batal </Button>
+                        <Button type="submit" variant="destructive" :disabled="finalRejectForm.processing">
                             Tolak applicant
                         </Button>
                     </DialogFooter>

@@ -24,7 +24,7 @@ const props = withDefaults(
         scanBusy: false,
         logExpanded: false,
         logQuery: '',
-    },
+    }
 );
 
 const registrationCodeInput = defineModel<string>('registrationCodeInput', { required: true });
@@ -124,10 +124,10 @@ function onSubmitManual(): void {
 
 <template>
     <div class="flex flex-col gap-5">
-        <Card class="border-border/70 rounded-2xl border">
+        <Card class="rounded-2xl border border-border/70">
             <CardHeader class="pb-3">
                 <CardTitle class="text-base font-semibold">Input Manual</CardTitle>
-                <p class="text-muted-foreground text-xs">
+                <p class="text-xs text-muted-foreground">
                     Isi kode registrasi peserta, mis.
                     <span class="font-mono text-[11px]">OPREC-2026-00001</span>
                     atau kode registrasi event, lalu tekan Proses check-in.
@@ -137,7 +137,7 @@ function onSubmitManual(): void {
                 <div class="grid gap-2">
                     <Input
                         v-model="registrationCodeInput"
-                        class="placeholder:normal-case uppercase"
+                        class="uppercase placeholder:normal-case"
                         placeholder="OPREC-2026-00001 atau kode registrasi event"
                         :disabled="scanBusy"
                         @keydown.enter.prevent="onSubmitManual"
@@ -150,7 +150,7 @@ function onSubmitManual(): void {
             </CardContent>
         </Card>
 
-        <Card class="border-border/70 rounded-2xl border">
+        <Card class="rounded-2xl border border-border/70">
             <CardHeader class="pb-3">
                 <CardTitle class="text-base font-semibold">Hasil Scan Terakhir</CardTitle>
             </CardHeader>
@@ -178,17 +178,17 @@ function onSubmitManual(): void {
                         </div>
                     </div>
                 </div>
-                <div v-else-if="scanResult" :class="['fade-up rounded-xl p-3', SCAN_STATUS_THEME[scanResult.status].bg]">
+                <div
+                    v-else-if="scanResult"
+                    :class="['fade-up rounded-xl p-3', SCAN_STATUS_THEME[scanResult.status].bg]"
+                >
                     <div class="flex items-start gap-3">
                         <component
                             :is="SCAN_STATUS_THEME[scanResult.status].icon"
                             :class="['mt-0.5 size-5', SCAN_STATUS_THEME[scanResult.status].class]"
                         />
                         <div class="min-w-0 flex-1">
-                            <div
-                                v-if="hasEventContext(scanResult)"
-                                class="mb-1.5 flex items-center gap-2"
-                            >
+                            <div v-if="hasEventContext(scanResult)" class="mb-1.5 flex items-center gap-2">
                                 <Badge
                                     variant="outline"
                                     :class="['shrink-0 text-[11px]', kindBadgeClass(scanResult.eventKind)]"
@@ -196,21 +196,21 @@ function onSubmitManual(): void {
                                     {{ kindLabel(scanResult.eventKind) }}
                                 </Badge>
                                 <p
-                                    class="text-muted-foreground min-w-0 flex-1 truncate text-xs font-medium"
+                                    class="min-w-0 flex-1 truncate text-xs font-medium text-muted-foreground"
                                     :title="eventTitleOf(scanResult)"
                                 >
                                     {{ eventTitleOf(scanResult) }}
                                 </p>
                             </div>
-                            <p class="text-foreground text-sm font-semibold">{{ scanResult.name }}</p>
-                            <p class="text-muted-foreground text-xs">{{ heroIdentifier(scanResult) }}</p>
+                            <p class="text-sm font-semibold text-foreground">{{ scanResult.name }}</p>
+                            <p class="text-xs text-muted-foreground">{{ heroIdentifier(scanResult) }}</p>
                             <div class="mt-2 flex flex-wrap items-center gap-2">
                                 <Badge variant="outline" :class="SCAN_STATUS_THEME[scanResult.status].class">
                                     {{ SCAN_STATUS_THEME[scanResult.status].label }}
                                 </Badge>
                                 <Badge variant="outline">{{ sourceLabel(scanResult.source) }}</Badge>
                             </div>
-                            <p class="text-muted-foreground mt-2 truncate text-xs">
+                            <p class="mt-2 truncate text-xs text-muted-foreground">
                                 Raw code: {{ scanResult.rawCode }}
                             </p>
                         </div>
@@ -218,14 +218,14 @@ function onSubmitManual(): void {
                 </div>
                 <div
                     v-else
-                    class="border-border/80 bg-muted/20 text-muted-foreground rounded-xl border border-dashed px-3 py-6 text-center text-sm"
+                    class="rounded-xl border border-dashed border-border/80 bg-muted/20 px-3 py-6 text-center text-sm text-muted-foreground"
                 >
                     {{ heroEmptyMessage }}
                 </div>
             </CardContent>
         </Card>
 
-        <Card class="border-border/70 rounded-2xl border">
+        <Card class="rounded-2xl border border-border/70">
             <CardHeader class="pb-3">
                 <div class="flex items-center justify-between gap-3">
                     <CardTitle class="text-base font-semibold">Riwayat Scan</CardTitle>
@@ -256,14 +256,14 @@ function onSubmitManual(): void {
                         <div
                             v-for="entry in filteredHistory"
                             :key="entry.id"
-                            class="border-border/70 bg-background rounded-xl border px-3 py-2.5"
+                            class="rounded-xl border border-border/70 bg-background px-3 py-2.5"
                         >
                             <div class="flex items-center justify-between gap-3">
                                 <div class="min-w-0">
-                                    <p class="text-foreground truncate text-sm font-medium">{{ entry.name }}</p>
-                                    <p class="text-muted-foreground truncate text-xs">{{ entry.email }}</p>
+                                    <p class="truncate text-sm font-medium text-foreground">{{ entry.name }}</p>
+                                    <p class="truncate text-xs text-muted-foreground">{{ entry.email }}</p>
                                 </div>
-                                <span class="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
+                                <span class="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
                                     <Clock3 class="size-3.5" />
                                     {{ entry.time }}
                                 </span>
@@ -271,7 +271,7 @@ function onSubmitManual(): void {
 
                             <p
                                 v-if="hasEventContext(entry)"
-                                class="text-muted-foreground mt-1.5 flex min-w-0 items-center gap-1.5 truncate text-xs"
+                                class="mt-1.5 flex min-w-0 items-center gap-1.5 truncate text-xs text-muted-foreground"
                                 :title="eventTitleOf(entry)"
                             >
                                 <span
@@ -295,7 +295,7 @@ function onSubmitManual(): void {
                     </div>
                     <p
                         v-else
-                        class="border-border/80 text-muted-foreground rounded-xl border border-dashed px-3 py-8 text-center text-sm"
+                        class="rounded-xl border border-dashed border-border/80 px-3 py-8 text-center text-sm text-muted-foreground"
                     >
                         {{ emptyLogMessage }}
                     </p>
@@ -303,7 +303,7 @@ function onSubmitManual(): void {
                 <button
                     v-else
                     type="button"
-                    class="border-border/80 text-muted-foreground hover:bg-muted/40 w-full rounded-xl border border-dashed px-3 py-6 text-center text-sm transition-colors"
+                    class="w-full rounded-xl border border-dashed border-border/80 px-3 py-6 text-center text-sm text-muted-foreground transition-colors hover:bg-muted/40"
                     @click="onToggleLog"
                 >
                     Log disembunyikan agar fokus scan. Buka saat ada komplain ({{ scanHistory.length }}).

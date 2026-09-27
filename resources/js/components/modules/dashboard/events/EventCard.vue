@@ -20,7 +20,7 @@ const props = withDefaults(
         showPrice?: boolean;
         alertBadge?: string | null;
     }>(),
-    { canManage: false, showPrice: true, alertBadge: null },
+    { canManage: false, showPrice: true, alertBadge: null }
 );
 
 const emit = defineEmits<{ delete: [event: IEvent] }>();
@@ -97,7 +97,7 @@ useEventListener('keydown', (e) => {
 
 <template>
     <div
-        class="border-border/60 bg-card hover:border-border/80 relative flex h-full min-w-0 flex-col gap-3 rounded-2xl border p-4 shadow-[0_2px_8px_-4px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.04)] transition-colors duration-150 hover:shadow-[0_4px_16px_-6px_rgb(0_0_0/0.08)] sm:p-5"
+        class="relative flex h-full min-w-0 flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-[0_2px_8px_-4px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.04)] transition-colors duration-150 hover:border-border/80 hover:shadow-[0_4px_16px_-6px_rgb(0_0_0/0.08)] sm:p-5"
     >
         <!-- Header row: badge kategori + alert + kebab (di luar Link) -->
         <div class="relative flex items-center justify-between gap-3">
@@ -125,20 +125,25 @@ useEventListener('keydown', (e) => {
                     <Badge
                         v-if="categoryTokens.length > 1"
                         variant="secondary"
-                        class="dark:bg-background/90 border-0 bg-white/90 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm"
+                        class="border-0 bg-white/90 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm dark:bg-background/90"
                     >
                         +{{ categoryTokens.length - 1 }}
                     </Badge>
                 </template>
             </div>
 
-            <Button radius="icon"
+            <Button
+                radius="icon"
                 v-if="canManage"
                 variant="ghost"
                 size="icon-sm"
                 aria-label="Menu acara"
-                class="border-border/60 relative size-8 shrink-0 cursor-pointer border bg-white/90 shadow-sm backdrop-blur-sm transition-colors duration-150 hover:bg-white"
-                :ref="(el) => { triggerRef = el as HTMLElement | null }"
+                class="relative size-8 shrink-0 cursor-pointer border border-border/60 bg-white/90 shadow-sm backdrop-blur-sm transition-colors duration-150 hover:bg-white"
+                :ref="
+                    (el) => {
+                        triggerRef = el as HTMLElement | null;
+                    }
+                "
                 @click.stop="toggleMenu"
             >
                 <MoreVertical class="size-4 shrink-0 stroke-[1.75]" />
@@ -154,31 +159,35 @@ useEventListener('keydown', (e) => {
             >
                 <div
                     v-if="canManage && openMenuId === event.id"
-                    :ref="(el) => { menuRef = el as HTMLElement | null }"
-                    class="border-border bg-popover text-popover-foreground absolute top-10 right-0 z-[20] min-w-48 overflow-hidden rounded-xl border p-1 shadow-sm"
+                    :ref="
+                        (el) => {
+                            menuRef = el as HTMLElement | null;
+                        }
+                    "
+                    class="absolute top-10 right-0 z-[20] min-w-48 overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-sm"
                 >
                     <button
                         type="button"
-                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none"
+                        class="relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         @click="menuAction(openEdit)"
                     >
                         <SquarePen class="mr-2 size-4 shrink-0 stroke-[1.75]" />Edit acara
                     </button>
                     <button
                         type="button"
-                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none"
+                        class="relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         @click="menuAction(openExport)"
                     >
                         <Download class="mr-2 size-4 shrink-0 stroke-[1.75]" />Export data
                     </button>
                     <button
                         type="button"
-                        class="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none"
+                        class="relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         @click="menuAction(openForms)"
                     >
                         <FileStack class="mr-2 size-4 shrink-0 stroke-[1.75]" />Kelola formulir
                     </button>
-                    <div class="bg-border my-1 h-px" />
+                    <div class="my-1 h-px bg-border" />
                     <Button
                         variant="destructive-ghost"
                         type="button"
@@ -192,51 +201,49 @@ useEventListener('keydown', (e) => {
         </div>
 
         <!-- Banner bersih (di luar Link — tidak redirect) -->
-        <div class="bg-muted relative aspect-[16/7] w-full overflow-hidden rounded-xl">
-            <EventBannerImage
-                :src="event.banner_url"
-                :alt="event.title"
-                img-class="size-full object-cover"
-            />
+        <div class="relative aspect-[16/7] w-full overflow-hidden rounded-xl bg-muted">
+            <EventBannerImage :src="event.banner_url" :alt="event.title" img-class="size-full object-cover" />
         </div>
 
         <!-- Konten: hanya ini yang redirect ke detail -->
         <Link
             :href="href"
-            class="focus-visible:ring-ring block min-w-0 flex-1 rounded-b-xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            class="block min-w-0 flex-1 rounded-b-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
         >
             <div class="flex h-full flex-col gap-2.5">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-foreground min-w-0 flex-1 truncate text-sm leading-snug font-semibold tracking-tight">
+                    <h3
+                        class="min-w-0 flex-1 truncate text-sm leading-snug font-semibold tracking-tight text-foreground"
+                    >
                         {{ event.title }}
                     </h3>
                     <Badge
                         variant="outline"
                         :class="[
                             'shrink-0 px-2.5 py-1 text-xs font-medium whitespace-nowrap',
- eventStatusUi(event.registration_status).tone,
- ]"
+                            eventStatusUi(event.registration_status).tone,
+                        ]"
                     >
                         {{ eventStatusUi(event.registration_status).label }}
                     </Badge>
                 </div>
 
-                <div class="text-muted-foreground flex items-center gap-1.5 text-xs leading-snug sm:text-[13px]">
-                    <CalendarDays class="text-primary/70 mt-0.5 size-3.5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                <div class="flex items-center gap-1.5 text-xs leading-snug text-muted-foreground sm:text-[13px]">
+                    <CalendarDays class="mt-0.5 size-3.5 shrink-0 stroke-[1.75] text-primary/70" aria-hidden="true" />
                     <span class="leading-snug">
                         {{ formatDisplayDate(event.start_date) }} — {{ formatDisplayDate(event.end_date) }}
                     </span>
                 </div>
 
-                <div class="text-muted-foreground flex items-center gap-1.5 text-xs leading-snug sm:text-[13px]">
-                    <MapPin class="text-primary/70 mt-0.5 size-3.5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                <div class="flex items-center gap-1.5 text-xs leading-snug text-muted-foreground sm:text-[13px]">
+                    <MapPin class="mt-0.5 size-3.5 shrink-0 stroke-[1.75] text-primary/70" aria-hidden="true" />
                     <span class="line-clamp-1 leading-snug">{{ event.location }}</span>
                 </div>
 
-                <div class="border-border/60 mt-auto flex items-center justify-between gap-3 border-t pt-3 text-xs">
+                <div class="mt-auto flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-xs">
                     <div class="flex min-w-0 items-center gap-3">
-                        <span class="text-muted-foreground flex items-center gap-1.5">
-                            <Users class="text-muted-foreground size-3.5 shrink-0 stroke-[1.75]" aria-hidden="true" />
+                        <span class="flex items-center gap-1.5 text-muted-foreground">
+                            <Users class="size-3.5 shrink-0 stroke-[1.75] text-muted-foreground" aria-hidden="true" />
                             <span class="font-medium tabular-nums">
                                 {{ event.registered_count }}/{{ event.quota }}
                             </span>
@@ -244,10 +251,10 @@ useEventListener('keydown', (e) => {
                         <Progress
                             :model-value="Math.min(event.registered_count, Math.max(event.quota, 1))"
                             :max="Math.max(event.quota, 1)"
-                            class="bg-muted/70 h-1.5 min-w-0 flex-1"
+                            class="h-1.5 min-w-0 flex-1 bg-muted/70"
                         />
                     </div>
-                    <span v-if="showPrice" class="text-foreground shrink-0 font-medium tabular-nums">
+                    <span v-if="showPrice" class="shrink-0 font-medium text-foreground tabular-nums">
                         {{ formatPriceIdr(event.price) }}
                     </span>
                 </div>

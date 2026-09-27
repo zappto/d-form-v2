@@ -56,7 +56,7 @@ const resolvedSrc = computed(() => {
         />
         <div
             v-else
-            class="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-2 text-center"
+            class="absolute inset-0 flex flex-col items-center justify-center gap-1.5 px-2 text-center text-muted-foreground"
         >
             <ImageOff class="size-6 shrink-0 opacity-50" :stroke-width="1.8" aria-hidden="true" />
             <span class="text-[10px] leading-tight font-medium">No banner</span>

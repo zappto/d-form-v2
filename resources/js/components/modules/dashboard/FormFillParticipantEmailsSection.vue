@@ -1,179 +1,177 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props -- ctx.answerForm is Inertia useForm */
-import { computed, onBeforeUnmount, ref, watch, type UnwrapNestedRefs } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
-import type { FormFillPageContext } from '@/hooks/useFormFillPage'
-import { CheckCircle2, ChevronDown, Loader2, UserRound, XCircle } from 'lucide-vue-next'
-import { routes } from '@/lib/routes'
-import { humanizeErrorMessage } from '@/lib/error-message'
-import { formatDisplayDate } from '@/lib/format'
+import { computed, onBeforeUnmount, ref, watch, type UnwrapNestedRefs } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import type { FormFillPageContext } from '@/hooks/useFormFillPage';
+import { CheckCircle2, ChevronDown, Loader2, UserRound, XCircle } from 'lucide-vue-next';
+import { routes } from '@/lib/routes';
+import { humanizeErrorMessage } from '@/lib/error-message';
+import { formatDisplayDate } from '@/lib/format';
 
-const CHECK_EMAIL_URL = routes.member.checkEmail
-const DEBOUNCE_MS = 1000
+const CHECK_EMAIL_URL = routes.member.checkEmail;
+const DEBOUNCE_MS = 1000;
 
 /** Trailing debounce: one independent timer per slot so multiple fields don’t cancel each other. */
 function createPerSlotTrailingDebounce(
     delayMs: number,
-    run: (slot: number) => void,
+    run: (slot: number) => void
 ): {
-    schedule: (slot: number) => void
-    cancel: (slot: number) => void
-    cancelAll: () => void
+    schedule: (slot: number) => void;
+    cancel: (slot: number) => void;
+    cancelAll: () => void;
 } {
-    const timers = new Map<number, ReturnType<typeof setTimeout>>()
+    const timers = new Map<number, ReturnType<typeof setTimeout>>();
     return {
         schedule(slot: number) {
-            const prev = timers.get(slot)
+            const prev = timers.get(slot);
             if (prev !== undefined) {
-                clearTimeout(prev)
+                clearTimeout(prev);
             }
             timers.set(
                 slot,
                 setTimeout(() => {
-                    timers.delete(slot)
-                    run(slot)
-                }, delayMs),
-            )
+                    timers.delete(slot);
+                    run(slot);
+                }, delayMs)
+            );
         },
         cancel(slot: number) {
-            const t = timers.get(slot)
+            const t = timers.get(slot);
             if (t !== undefined) {
-                clearTimeout(t)
-                timers.delete(slot)
+                clearTimeout(t);
+                timers.delete(slot);
             }
         },
         cancelAll() {
             for (const t of timers.values()) {
-                clearTimeout(t)
+                clearTimeout(t);
             }
-            timers.clear()
+            timers.clear();
         },
-    }
+    };
 }
 
-type CheckStatus = 'idle' | 'loading' | 'found' | 'valid' | 'not_found' | 'invalid' | 'error'
+type CheckStatus = 'idle' | 'loading' | 'found' | 'valid' | 'not_found' | 'invalid' | 'error';
 
 interface FoundUser {
-    name: string
-    email: string
-    created_at: string
+    name: string;
+    email: string;
+    created_at: string;
 }
 
 const props = defineProps<{
-    ctx: UnwrapNestedRefs<FormFillPageContext>
-}>()
+    ctx: UnwrapNestedRefs<FormFillPageContext>;
+}>();
 
-const page = usePage()
-const currentUserEmail = computed(() => (page.props as Props).auth?.user?.email?.trim().toLowerCase() ?? '')
+const page = usePage();
+const currentUserEmail = computed(() => (page.props as Props).auth?.user?.email?.trim().toLowerCase() ?? '');
 
-const expandedBySlot = ref<Record<number, boolean>>({})
-const statusBySlot = ref<Record<number, CheckStatus>>({})
-const foundUserBySlot = ref<Record<number, FoundUser | undefined>>({})
-const helperBySlot = ref<Record<number, string>>({})
+const expandedBySlot = ref<Record<number, boolean>>({});
+const statusBySlot = ref<Record<number, CheckStatus>>({});
+const foundUserBySlot = ref<Record<number, FoundUser | undefined>>({});
+const helperBySlot = ref<Record<number, string>>({});
 
 /** Debounced email verification — waits `DEBOUNCE_MS` after the last keystroke per slot. */
 const debouncedEmailCheck = createPerSlotTrailingDebounce(DEBOUNCE_MS, (slot) => {
-    void runEmailCheck(slot)
-})
+    void runEmailCheck(slot);
+});
 
-const abortBySlot = new Map<number, AbortController>()
+const abortBySlot = new Map<number, AbortController>();
 
-const memberSlots = computed(() => props.ctx.memberSlots)
-const registrationMode = computed(() => props.ctx.registrationMode)
-const isBundleMode = computed(() => registrationMode.value === 'bundle')
+const memberSlots = computed(() => props.ctx.memberSlots);
+const registrationMode = computed(() => props.ctx.registrationMode);
+const isBundleMode = computed(() => registrationMode.value === 'bundle');
 
-const sectionTitle = computed(() =>
-    isBundleMode.value ? 'Participant emails' : 'Team member emails',
-)
+const sectionTitle = computed(() => (isBundleMode.value ? 'Participant emails' : 'Team member emails'));
 
 const sectionHint = computed(() =>
     isBundleMode.value
         ? 'Enter a valid email for each participant. They will receive their ticket by email.'
-        : 'We verify each teammate’s email before registration is sent.',
-)
+        : 'We verify each teammate’s email before registration is sent.'
+);
 
 watch(
     memberSlots,
     (n) => {
-        const next = { ...expandedBySlot.value }
+        const next = { ...expandedBySlot.value };
         for (let s = 1; s <= n; s++) {
             if (next[s] === undefined) {
-                next[s] = n <= 1 || s === 1
+                next[s] = n <= 1 || s === 1;
             }
         }
-        expandedBySlot.value = next
+        expandedBySlot.value = next;
     },
-    { immediate: true },
-)
+    { immediate: true }
+);
 
 function isExpanded(slot: number): boolean {
-    const v = expandedBySlot.value[slot]
+    const v = expandedBySlot.value[slot];
     if (v !== undefined) {
-        return v
+        return v;
     }
-    return memberSlots.value <= 1 || slot === 1
+    return memberSlots.value <= 1 || slot === 1;
 }
 
 function toggleSlot(slot: number) {
-    expandedBySlot.value = { ...expandedBySlot.value, [slot]: !isExpanded(slot) }
+    expandedBySlot.value = { ...expandedBySlot.value, [slot]: !isExpanded(slot) };
 }
 
 function emailAt(slot: number): string {
-    return String((props.ctx.answerForm.team_member_emails as string[] | undefined)?.[slot - 1] ?? '')
+    return String((props.ctx.answerForm.team_member_emails as string[] | undefined)?.[slot - 1] ?? '');
 }
 
 function setTeamEmail(slot: number, value: string) {
-    const n = memberSlots.value
-    const arr = [...((props.ctx.answerForm.team_member_emails as string[]) ?? [])]
+    const n = memberSlots.value;
+    const arr = [...((props.ctx.answerForm.team_member_emails as string[]) ?? [])];
     while (arr.length < n) {
-        arr.push('')
+        arr.push('');
     }
-    arr[slot - 1] = value
-    props.ctx.answerForm.team_member_emails = arr
+    arr[slot - 1] = value;
+    props.ctx.answerForm.team_member_emails = arr;
 }
 
 function validEmailFormat(s: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim())
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
 }
 
 function setCheckState(slot: number, status: CheckStatus, found?: FoundUser, helper?: string) {
-    statusBySlot.value = { ...statusBySlot.value, [slot]: status }
+    statusBySlot.value = { ...statusBySlot.value, [slot]: status };
     if (arguments.length >= 3) {
-        foundUserBySlot.value = { ...foundUserBySlot.value, [slot]: found }
+        foundUserBySlot.value = { ...foundUserBySlot.value, [slot]: found };
     }
     if (arguments.length >= 4) {
-        helperBySlot.value = { ...helperBySlot.value, [slot]: helper ?? '' }
+        helperBySlot.value = { ...helperBySlot.value, [slot]: helper ?? '' };
     }
 }
 
 async function runEmailCheck(slot: number) {
-    const raw = emailAt(slot).trim()
-    abortBySlot.get(slot)?.abort()
+    const raw = emailAt(slot).trim();
+    abortBySlot.get(slot)?.abort();
 
     if (!raw) {
-        setCheckState(slot, 'idle', undefined, '')
-        return
+        setCheckState(slot, 'idle', undefined, '');
+        return;
     }
     if (!validEmailFormat(raw)) {
-        setCheckState(slot, 'invalid', undefined, humanizeErrorMessage('Enter a valid email address.'))
-        return
+        setCheckState(slot, 'invalid', undefined, humanizeErrorMessage('Enter a valid email address.'));
+        return;
     }
 
-    const selfEmail = currentUserEmail.value
+    const selfEmail = currentUserEmail.value;
     if (selfEmail && raw.toLowerCase() === selfEmail) {
-        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.')
-        return
+        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.');
+        return;
     }
 
-    const controller = new AbortController()
-    abortBySlot.set(slot, controller)
-    setCheckState(slot, 'loading')
+    const controller = new AbortController();
+    abortBySlot.set(slot, controller);
+    setCheckState(slot, 'loading');
 
     try {
-        const url = `${CHECK_EMAIL_URL}?${new URLSearchParams({ email: raw }).toString()}`
+        const url = `${CHECK_EMAIL_URL}?${new URLSearchParams({ email: raw }).toString()}`;
         const res = await fetch(url, {
             credentials: 'same-origin',
             signal: controller.signal,
@@ -181,15 +179,15 @@ async function runEmailCheck(slot: number) {
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
             },
-        })
+        });
         const body = (await res.json()) as {
-            exists?: boolean
-            message?: string
-            data?: FoundUser
-        }
+            exists?: boolean;
+            message?: string;
+            data?: FoundUser;
+        };
 
         if (controller.signal.aborted) {
-            return
+            return;
         }
 
         if (!res.ok) {
@@ -197,112 +195,111 @@ async function runEmailCheck(slot: number) {
                 slot,
                 'error',
                 undefined,
-                humanizeErrorMessage((body.message as string | undefined) || 'Could not verify this email.'),
-            )
-            return
+                humanizeErrorMessage((body.message as string | undefined) || 'Could not verify this email.')
+            );
+            return;
         }
 
         if (body.exists && body.data) {
-            setCheckState(slot, 'found', body.data, humanizeErrorMessage(body.message ?? ''))
+            setCheckState(slot, 'found', body.data, humanizeErrorMessage(body.message ?? ''));
         } else {
             setCheckState(
                 slot,
                 'not_found',
                 undefined,
-                humanizeErrorMessage(body.message ?? 'No account exists for this email.'),
-            )
+                humanizeErrorMessage(body.message ?? 'No account exists for this email.')
+            );
         }
     } catch (e) {
         if ((e as Error).name === 'AbortError') {
-            return
+            return;
         }
-        setCheckState(slot, 'error', undefined, humanizeErrorMessage('Could not verify this email. Try again.'))
+        setCheckState(slot, 'error', undefined, humanizeErrorMessage('Could not verify this email. Try again.'));
     }
 }
 
 function scheduleCheck(slot: number) {
-    const raw = emailAt(slot).trim()
+    const raw = emailAt(slot).trim();
     if (!raw) {
-        abortBySlot.get(slot)?.abort()
-        debouncedEmailCheck.cancel(slot)
-        setCheckState(slot, 'idle', undefined, '')
-        return
+        abortBySlot.get(slot)?.abort();
+        debouncedEmailCheck.cancel(slot);
+        setCheckState(slot, 'idle', undefined, '');
+        return;
     }
     if (!validEmailFormat(raw)) {
-        abortBySlot.get(slot)?.abort()
-        debouncedEmailCheck.cancel(slot)
-        setCheckState(slot, 'invalid', undefined, humanizeErrorMessage('Enter a valid email address.'))
-        return
+        abortBySlot.get(slot)?.abort();
+        debouncedEmailCheck.cancel(slot);
+        setCheckState(slot, 'invalid', undefined, humanizeErrorMessage('Enter a valid email address.'));
+        return;
     }
-    const selfEmail = currentUserEmail.value
+    const selfEmail = currentUserEmail.value;
     if (selfEmail && raw.toLowerCase() === selfEmail) {
-        abortBySlot.get(slot)?.abort()
-        debouncedEmailCheck.cancel(slot)
-        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.')
-        return
+        abortBySlot.get(slot)?.abort();
+        debouncedEmailCheck.cancel(slot);
+        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.');
+        return;
     }
 
     if (isBundleMode.value) {
-        abortBySlot.get(slot)?.abort()
-        debouncedEmailCheck.cancel(slot)
+        abortBySlot.get(slot)?.abort();
+        debouncedEmailCheck.cancel(slot);
         setCheckState(
             slot,
             'valid',
             undefined,
-            humanizeErrorMessage('Participant will receive their ticket by email.'),
-        )
-        return
+            humanizeErrorMessage('Participant will receive their ticket by email.')
+        );
+        return;
     }
 
-    debouncedEmailCheck.schedule(slot)
+    debouncedEmailCheck.schedule(slot);
 }
 
 function onEmailInput(slot: number, v: string | number) {
-    props.ctx.answerForm.clearErrors('team_member_emails')
-    setTeamEmail(slot, String(v))
-    scheduleCheck(slot)
+    props.ctx.answerForm.clearErrors('team_member_emails');
+    setTeamEmail(slot, String(v));
+    scheduleCheck(slot);
 }
 
 function statusFor(slot: number): CheckStatus {
-    return statusBySlot.value[slot] ?? 'idle'
+    return statusBySlot.value[slot] ?? 'idle';
 }
 
 function shortDate(iso: string): string {
     try {
-        return formatDisplayDate(iso)
+        return formatDisplayDate(iso);
     } catch {
-        return ''
+        return '';
     }
 }
 
 function summaryLine(slot: number): string {
-    const e = emailAt(slot).trim()
+    const e = emailAt(slot).trim();
     if (e) {
-        return e
+        return e;
     }
-    return 'Tap to add email'
+    return 'Tap to add email';
 }
 
 function rowAccentClass(slot: number): string {
-    const s = statusFor(slot)
+    const s = statusFor(slot);
     if (s === 'found' || s === 'valid') {
-        return 'border-emerald-500/30 bg-emerald-500/[0.04] shadow-[0_0_0_1px_rgba(16,185,129,0.06)]'
+        return 'border-emerald-500/30 bg-emerald-500/[0.04] shadow-[0_0_0_1px_rgba(16,185,129,0.06)]';
     }
     if (s === 'not_found' || s === 'invalid' || s === 'error') {
-        return 'border-destructive/25 bg-destructive/[0.03]'
+        return 'border-destructive/25 bg-destructive/[0.03]';
     }
-    return 'border-border/80 bg-card'
+    return 'border-border/80 bg-card';
 }
 
-const badgeClass =
-    'border font-medium text-[10px] uppercase tracking-wide tabular-nums px-2 py-0.5'
+const badgeClass = 'border font-medium text-[10px] uppercase tracking-wide tabular-nums px-2 py-0.5';
 
 onBeforeUnmount(() => {
-    debouncedEmailCheck.cancelAll()
+    debouncedEmailCheck.cancelAll();
     for (const c of abortBySlot.values()) {
-        c.abort()
+        c.abort();
     }
-})
+});
 </script>
 
 <template>
@@ -323,15 +320,15 @@ onBeforeUnmount(() => {
                 v-for="slot in memberSlots"
                 :key="slot"
                 :class="
- cn(
- 'overflow-hidden rounded-xl border shadow-xs transition-[border-color,box-shadow,background-color] duration-200',
- rowAccentClass(slot),
- )
- "
+                    cn(
+                        'overflow-hidden rounded-xl border shadow-xs transition-[border-color,box-shadow,background-color] duration-200',
+                        rowAccentClass(slot)
+                    )
+                "
             >
                 <button
                     type="button"
-                    class="flex w-full items-center gap-3 px-3 py-3 text-left outline-none transition-colors hover:bg-muted/35 focus-visible:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring/40 sm:px-4"
+                    class="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors outline-none hover:bg-muted/35 focus-visible:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring/40 sm:px-4"
                     :aria-expanded="isExpanded(slot)"
                     @click="toggleSlot(slot)"
                 >
@@ -342,20 +339,30 @@ onBeforeUnmount(() => {
                     />
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-sm font-semibold leading-none tracking-tight text-foreground">
+                            <span class="text-sm leading-none font-semibold tracking-tight text-foreground">
                                 {{ registrationMode === 'bundle' ? 'Participant' : 'Teammate' }} {{ slot }}
                             </span>
                             <Badge
                                 v-if="statusFor(slot) === 'valid'"
                                 variant="secondary"
-                                :class="cn(badgeClass, 'border-emerald-500/30 bg-emerald-500/12 text-emerald-800 dark:text-emerald-200')"
+                                :class="
+                                    cn(
+                                        badgeClass,
+                                        'border-emerald-500/30 bg-emerald-500/12 text-emerald-800 dark:text-emerald-200'
+                                    )
+                                "
                             >
                                 Valid
                             </Badge>
                             <Badge
                                 v-else-if="statusFor(slot) === 'found'"
                                 variant="secondary"
-                                :class="cn(badgeClass, 'border-emerald-500/30 bg-emerald-500/12 text-emerald-800 dark:text-emerald-200')"
+                                :class="
+                                    cn(
+                                        badgeClass,
+                                        'border-emerald-500/30 bg-emerald-500/12 text-emerald-800 dark:text-emerald-200'
+                                    )
+                                "
                             >
                                 Verified
                             </Badge>
@@ -416,10 +423,10 @@ onBeforeUnmount(() => {
                 >
                     <div
                         v-show="isExpanded(slot)"
-                        class="border-t border-border/60 bg-muted/[0.45] px-3 pb-4 pt-3 sm:px-4"
+                        class="border-t border-border/60 bg-muted/[0.45] px-3 pt-3 pb-4 sm:px-4"
                     >
                         <label
-                            class="mb-2 block text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground"
+                            class="mb-2 block text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase"
                             :for="`team_member_emails_${slot}`"
                         >
                             Email <span class="text-destructive">*</span>
@@ -427,7 +434,7 @@ onBeforeUnmount(() => {
 
                         <div class="relative">
                             <div
-                                class="pointer-events-none absolute left-3 top-1/2 z-[1] flex size-5 -translate-y-1/2 items-center justify-center"
+                                class="pointer-events-none absolute top-1/2 left-3 z-[1] flex size-5 -translate-y-1/2 items-center justify-center"
                                 aria-hidden="true"
                             >
                                 <Transition
@@ -468,16 +475,16 @@ onBeforeUnmount(() => {
                                 inputmode="email"
                                 placeholder="name@example.com"
                                 :class="
- cn(
- 'h-11 min-h-11 rounded-lg pl-10 text-[15px] shadow-none transition-[border-color,box-shadow] duration-200',
- (statusFor(slot) === 'found' || statusFor(slot) === 'valid') &&
- 'border-emerald-500/50 focus-visible:border-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-500/20',
- (statusFor(slot) === 'not_found' ||
- statusFor(slot) === 'invalid' ||
- statusFor(slot) === 'error') &&
- 'border-destructive/50 focus-visible:border-destructive focus-visible:ring-2 focus-visible:ring-destructive/15',
- )
- "
+                                    cn(
+                                        'h-11 min-h-11 rounded-lg pl-10 text-[15px] shadow-none transition-[border-color,box-shadow] duration-200',
+                                        (statusFor(slot) === 'found' || statusFor(slot) === 'valid') &&
+                                            'border-emerald-500/50 focus-visible:border-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-500/20',
+                                        (statusFor(slot) === 'not_found' ||
+                                            statusFor(slot) === 'invalid' ||
+                                            statusFor(slot) === 'error') &&
+                                            'border-destructive/50 focus-visible:border-destructive focus-visible:ring-2 focus-visible:ring-destructive/15'
+                                    )
+                                "
                                 :model-value="emailAt(slot)"
                                 :aria-busy="statusFor(slot) === 'loading'"
                                 @update:model-value="(v: string | number) => onEmailInput(slot, v)"
@@ -502,23 +509,29 @@ onBeforeUnmount(() => {
                                     </div>
                                     <dl class="min-w-0 flex-1 space-y-2 text-sm">
                                         <div>
-                                            <dt class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                            <dt
+                                                class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                            >
                                                 Name
                                             </dt>
-                                            <dd class="mt-0.5 truncate font-semibold leading-snug text-foreground">
+                                            <dd class="mt-0.5 truncate leading-snug font-semibold text-foreground">
                                                 {{ foundUserBySlot[slot]!.name }}
                                             </dd>
                                         </div>
                                         <div>
-                                            <dt class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                            <dt
+                                                class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                            >
                                                 Email
                                             </dt>
-                                            <dd class="mt-0.5 break-all text-xs leading-relaxed text-muted-foreground">
+                                            <dd class="mt-0.5 text-xs leading-relaxed break-all text-muted-foreground">
                                                 {{ foundUserBySlot[slot]!.email }}
                                             </dd>
                                         </div>
                                         <div>
-                                            <dt class="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                            <dt
+                                                class="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+                                            >
                                                 Member since
                                             </dt>
                                             <dd class="mt-0.5 text-xs text-foreground">
@@ -538,7 +551,9 @@ onBeforeUnmount(() => {
                                 statusFor(slot) !== 'idle'
                             "
                             class="mt-2.5 text-xs leading-relaxed"
-                            :class="statusFor(slot) === 'error' ? 'font-medium text-destructive' : 'text-muted-foreground'"
+                            :class="
+                                statusFor(slot) === 'error' ? 'font-medium text-destructive' : 'text-muted-foreground'
+                            "
                         >
                             {{ helperBySlot[slot] }}
                         </p>

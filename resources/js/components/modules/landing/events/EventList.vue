@@ -1,47 +1,48 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { MapPin, Calendar, Users, Search, ArrowRight } from 'lucide-vue-next'
-import { routes } from '@/lib/routes'
-import { eventListThumbnailContainerClass } from '@/lib/eventBannerAspect'
-import { eventStatusUi } from '@/lib/eventShowUi'
-import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'
+import { ref, onMounted, computed } from 'vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { MapPin, Calendar, Users, Search, ArrowRight } from 'lucide-vue-next';
+import { routes } from '@/lib/routes';
+import { eventListThumbnailContainerClass } from '@/lib/eventBannerAspect';
+import { eventStatusUi } from '@/lib/eventShowUi';
+import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
 
 const props = defineProps<{
-    events: IEvent[]
-}>()
+    events: IEvent[];
+}>();
 
-const visible = ref(false)
-const query = ref('')
+const visible = ref(false);
+const query = ref('');
 
 onMounted(() => {
     const obs = new IntersectionObserver(
-        ([e]) => { if (e?.isIntersecting) { visible.value = true; obs.disconnect() } },
-        { threshold: 0.05 },
-    )
-    const el = document.getElementById('event-list')
-    if (el) obs.observe(el)
-})
+        ([e]) => {
+            if (e?.isIntersecting) {
+                visible.value = true;
+                obs.disconnect();
+            }
+        },
+        { threshold: 0.05 }
+    );
+    const el = document.getElementById('event-list');
+    if (el) obs.observe(el);
+});
 
 const filtered = computed(() => {
-    const q = query.value.toLowerCase().trim()
-    if (!q) return props.events
-    return props.events.filter(
-        (ev) =>
-            ev.title.toLowerCase().includes(q) ||
-            ev.location?.toLowerCase().includes(q),
-    )
-})
+    const q = query.value.toLowerCase().trim();
+    if (!q) return props.events;
+    return props.events.filter((ev) => ev.title.toLowerCase().includes(q) || ev.location?.toLowerCase().includes(q));
+});
 
 const formatDate = (d: string) => {
     try {
-        return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+        return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
     } catch {
-        return d
+        return d;
     }
-}
+};
 </script>
 
 <template>
@@ -49,24 +50,22 @@ const formatDate = (d: string) => {
         <div class="mx-auto max-w-7xl px-6 lg:px-10">
             <div
                 :class="[
- 'mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between transition-all duration-500',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
- ]"
+                    'mb-10 flex flex-col gap-6 transition-all duration-500 sm:flex-row sm:items-end sm:justify-between',
+                    visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                ]"
             >
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Semua Acara</p>
+                    <p class="text-xs font-semibold tracking-[0.2em] text-primary uppercase">Semua Acara</p>
                     <h2 class="mt-3 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                         Daftar lengkap acara
                     </h2>
                 </div>
 
                 <div class="relative w-full max-w-xs">
-                    <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                        v-model="query"
-                        placeholder="Cari acara..."
-                        class="h-10 pl-9 text-sm"
+                    <Search
+                        class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
                     />
+                    <Input v-model="query" placeholder="Cari acara..." class="h-10 pl-9 text-sm" />
                 </div>
             </div>
 
@@ -76,9 +75,9 @@ const formatDate = (d: string) => {
                     :key="ev.id"
                     :href="routes.landing.events.show(ev.slug)"
                     :class="[
- 'group block rounded-xl border border-border/40 bg-card transition-all duration-400 hover:border-primary/20 hover:shadow-sm',
- visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
- ]"
+                        'group block rounded-xl border border-border/40 bg-card transition-all duration-400 hover:border-primary/20 hover:shadow-sm',
+                        visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                    ]"
                     :style="{ transitionDelay: `${60 + i * 30}ms` }"
                 >
                     <div class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
@@ -90,7 +89,9 @@ const formatDate = (d: string) => {
 
                         <div class="min-w-0 flex-1">
                             <div class="flex items-start gap-3">
-                                <h3 class="flex-1 truncate text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                                <h3
+                                    class="flex-1 truncate text-sm font-semibold text-foreground transition-colors group-hover:text-primary"
+                                >
                                     {{ ev.title }}
                                 </h3>
                                 <Badge
@@ -101,7 +102,9 @@ const formatDate = (d: string) => {
                                 </Badge>
                             </div>
 
-                            <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                            <div
+                                class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground"
+                            >
                                 <span v-if="ev.location" class="flex items-center gap-1">
                                     <MapPin class="size-3" />
                                     {{ ev.location }}
@@ -117,14 +120,17 @@ const formatDate = (d: string) => {
                             </div>
                         </div>
 
-                        <ArrowRight class="hidden size-4 shrink-0 text-muted-foreground group-hover:text-primary sm:block" />
+                        <ArrowRight
+                            class="hidden size-4 shrink-0 text-muted-foreground group-hover:text-primary sm:block"
+                        />
                     </div>
                 </a>
             </div>
 
             <div v-else-if="query" class="rounded-2xl border border-border/40 bg-card p-10 text-center">
                 <p class="text-sm text-muted-foreground">
-                    Tidak ada acara yang cocok dengan "<span class="font-medium text-foreground">{{ query }}</span>".
+                    Tidak ada acara yang cocok dengan "<span class="font-medium text-foreground">{{ query }}</span
+                    >".
                 </p>
                 <Button variant="outline" size="sm" class="mt-4 h-9 text-xs" @click="query = ''">
                     Reset Pencarian

@@ -111,21 +111,21 @@ function isCategoryExpanded(name: string): boolean {
 
 <template>
     <aside
-        class="border-border bg-card hidden w-[260px] shrink-0 flex-col border-r lg:flex lg:max-h-full lg:self-start"
+        class="hidden w-[260px] shrink-0 flex-col border-r border-border bg-card lg:flex lg:max-h-full lg:self-start"
         aria-label="Component palette"
     >
-        <div class="border-border shrink-0 border-b px-4 pt-5 pb-4">
-            <h2 class="font-display text-foreground text-sm font-semibold tracking-tight">Komponen</h2>
-            <p class="text-muted-foreground mt-1 text-xs leading-snug">Tarik ke kanvas di tengah.</p>
+        <div class="shrink-0 border-b border-border px-4 pt-5 pb-4">
+            <h2 class="font-display text-sm font-semibold tracking-tight text-foreground">Komponen</h2>
+            <p class="mt-1 text-xs leading-snug text-muted-foreground">Tarik ke kanvas di tengah.</p>
             <div class="relative mt-4">
                 <Search
-                    class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                    class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
                 />
                 <input
                     v-model="searchQuery"
                     type="text"
                     placeholder="Cari komponen…"
-                    class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 h-11 w-full rounded-lg border py-2.5 pr-3 pl-10 text-sm shadow-sm transition-[border-color,box-shadow] focus:ring-2 focus:outline-none"
+                    class="h-11 w-full rounded-lg border border-border bg-background py-2.5 pr-3 pl-10 text-sm text-foreground shadow-sm transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
                 />
             </div>
         </div>
@@ -134,7 +134,7 @@ function isCategoryExpanded(name: string): boolean {
             <div v-for="cat in categories" :key="cat.name" class="mb-2.5 last:mb-0">
                 <button
                     type="button"
-                    class="text-muted-foreground hover:text-foreground mb-1.5 flex w-full items-center gap-2 px-1.5 py-1 text-left text-xs font-semibold tracking-wide uppercase transition-colors"
+                    class="mb-1.5 flex w-full items-center gap-2 px-1.5 py-1 text-left text-xs font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                     :aria-expanded="isCategoryExpanded(cat.name)"
                     @click="$emit('toggleCategory', cat)"
                 >
@@ -143,7 +143,7 @@ function isCategoryExpanded(name: string): boolean {
                         :class="isCategoryExpanded(cat.name) ? 'rotate-90' : ''"
                     />
                     <span class="min-w-0 flex-1 truncate">{{ cat.name }}</span>
-                    <span class="text-muted-foreground shrink-0 text-[11px] font-medium tabular-nums">
+                    <span class="shrink-0 text-[11px] font-medium text-muted-foreground tabular-nums">
                         {{ cat.fields.length }}
                     </span>
                 </button>
@@ -159,14 +159,14 @@ function isCategoryExpanded(name: string): boolean {
                 </div>
             </div>
             <div v-if="categories.length === 0" class="flex flex-col items-center py-10 text-center">
-                <p class="text-muted-foreground text-sm">Tidak ada komponen yang cocok</p>
+                <p class="text-sm text-muted-foreground">Tidak ada komponen yang cocok</p>
             </div>
 
             <!-- Pengaturan form: pindahan dari tab Pengaturan kanan -->
-            <div class="border-border/70 mt-3 border-t pt-3">
+            <div class="mt-3 border-t border-border/70 pt-3">
                 <button
                     type="button"
-                    class="text-muted-foreground hover:text-foreground flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-semibold tracking-wide uppercase transition-colors"
+                    class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-semibold tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
                     :aria-expanded="formSettingsOpen"
                     @click="$emit('toggleFormSettings')"
                 >
@@ -215,23 +215,23 @@ function isCategoryExpanded(name: string): boolean {
                                         {{ opt.label }}
                                     </button>
                                 </div>
-                                <p v-if="props.fieldErrors.visible_for" class="text-destructive text-xs">
+                                <p v-if="props.fieldErrors.visible_for" class="text-xs text-destructive">
                                     {{ props.fieldErrors.visible_for }}
                                 </p>
                             </div>
 
-                            <div class="border-border/70 mt-0.5 flex flex-col gap-2.5 border-t pt-2.5">
+                            <div class="mt-0.5 flex flex-col gap-2.5 border-t border-border/70 pt-2.5">
                                 <div class="flex flex-col gap-1">
                                     <Label for="l-purpose" class="text-xs font-medium">Tujuan form</Label>
                                     <SearchableSelect
                                         :model-value="formMetadata.purpose"
                                         :options="purposeOptions"
                                         id="l-purpose"
-                                        class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
+                                        class="h-10 w-full border-border/80 bg-background/80 text-xs sm:text-sm"
                                         aria-label="Tujuan form"
                                         @update:model-value="onPurposeChange"
                                     />
-                                    <p class="text-muted-foreground text-[11px] leading-snug">
+                                    <p class="text-[11px] leading-snug text-muted-foreground">
                                         Form pendaftaran memakai kuota & jendela daftar acara. Form lainnya tidak.
                                     </p>
                                 </div>
@@ -242,24 +242,22 @@ function isCategoryExpanded(name: string): boolean {
                                         :model-value="formMetadata.requires_form_id ?? noSelectionSentinel"
                                         :options="requiresFormOptions"
                                         id="l-requires-form"
-                                        class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
+                                        class="h-10 w-full border-border/80 bg-background/80 text-xs sm:text-sm"
                                         aria-label="Memerlukan form"
                                         @update:model-value="onRequiresFormChange"
                                     />
-                                    <p class="text-muted-foreground text-[11px] leading-snug">
+                                    <p class="text-[11px] leading-snug text-muted-foreground">
                                         Peserta harus sudah diterima pada form yang dipilih sebelum mengisi form ini.
                                     </p>
                                 </div>
 
                                 <div v-if="isRegistrationPurpose" class="flex flex-col gap-1.5">
-                                    <Label for="l-registration-mode" class="text-xs font-medium"
-                                        >Mode registrasi</Label
-                                    >
+                                    <Label for="l-registration-mode" class="text-xs font-medium">Mode registrasi</Label>
                                     <SearchableSelect
                                         :model-value="formMetadata.registration_mode ?? noSelectionSentinel"
                                         :options="registrationModeOptions"
                                         id="l-registration-mode"
-                                        class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
+                                        class="h-10 w-full border-border/80 bg-background/80 text-xs sm:text-sm"
                                         aria-label="Mode registrasi"
                                         @update:model-value="onRegistrationModeChange"
                                     />
@@ -267,7 +265,7 @@ function isCategoryExpanded(name: string): boolean {
 
                                 <div
                                     v-if="isTeamStyleRegistration"
-                                    class="border-border/70 grid grid-cols-2 gap-2.5 border-t pt-2.5"
+                                    class="grid grid-cols-2 gap-2.5 border-t border-border/70 pt-2.5"
                                 >
                                     <div class="flex flex-col gap-1">
                                         <Label for="l-max-team-size" class="text-xs font-medium">Max team size</Label>
@@ -280,7 +278,7 @@ function isCategoryExpanded(name: string): boolean {
                                             :model-value="displaySize('max_team_size')"
                                             @update:model-value="(v) => setTeamSizes('max_team_size', v)"
                                         />
-                                        <p class="text-muted-foreground text-[11px] leading-snug">
+                                        <p class="text-[11px] leading-snug text-muted-foreground">
                                             Maks. anggota per tim (≥2). Dipakai jika Team size kosong.
                                         </p>
                                     </div>
@@ -295,7 +293,7 @@ function isCategoryExpanded(name: string): boolean {
                                             :model-value="displaySize('team_size')"
                                             @update:model-value="(v) => setTeamSizes('team_size', v)"
                                         />
-                                        <p class="text-muted-foreground text-[11px] leading-snug">
+                                        <p class="text-[11px] leading-snug text-muted-foreground">
                                             Ukuran tim (≥2). Menggantikan Max team size bila diisi.
                                         </p>
                                     </div>

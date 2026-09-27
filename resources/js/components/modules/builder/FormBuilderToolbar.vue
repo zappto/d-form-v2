@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
-import { Button } from '@/components/ui/button'
-import { CometSpinner } from '@/components/ui/comet'
-import { Link } from '@inertiajs/vue3'
-import { ArrowLeft, Eye } from 'lucide-vue-next'
+import { nextTick, onMounted, ref } from 'vue';
+import { Button } from '@/components/ui/button';
+import { CometSpinner } from '@/components/ui/comet';
+import { Link } from '@inertiajs/vue3';
+import { ArrowLeft, Eye } from 'lucide-vue-next';
 
 const props = withDefaults(
     defineProps<{
-        backHref: string
-        toolbarSubtitle: string
-        headingTitle: string
-        isReadyToSave: boolean
-        validationIssueCount: number
-        isEmpty: boolean
-        processing: boolean
-        saveLabel: string
-        hideTitles?: boolean
-        hideToolbar?: boolean
+        backHref: string;
+        toolbarSubtitle: string;
+        headingTitle: string;
+        isReadyToSave: boolean;
+        validationIssueCount: number;
+        isEmpty: boolean;
+        processing: boolean;
+        saveLabel: string;
+        hideTitles?: boolean;
+        hideToolbar?: boolean;
     }>(),
     { hideTitles: false, hideToolbar: false }
-)
+);
 
 defineEmits<{
-    preview: []
-    save: []
-}>()
+    preview: [];
+    save: [];
+}>();
 
-const canTeleport = ref(false)
+const canTeleport = ref(false);
 
 onMounted(() => {
     void nextTick(() => {
-        const left = document.getElementById('dashboard-fb-nav-left')
-        const right = document.getElementById('dashboard-fb-nav-right')
-        if (left && right) canTeleport.value = true
-    })
-})
+        const left = document.getElementById('dashboard-fb-nav-left');
+        const right = document.getElementById('dashboard-fb-nav-right');
+        if (left && right) canTeleport.value = true;
+    });
+});
 </script>
 
 <template>
@@ -50,30 +50,24 @@ onMounted(() => {
                     </Link>
                 </Button>
                 <div v-if="!props.hideTitles" class="min-w-0 flex-1">
-                    <p class="text-muted-foreground text-[11px] font-medium tracking-wide uppercase sm:text-xs">
+                    <p class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase sm:text-xs">
                         <span class="line-clamp-2 break-words lg:truncate">
                             {{ toolbarSubtitle }}
                         </span>
                     </p>
-                    <h1 class="text-foreground mt-0.5 line-clamp-2 break-words text-base font-semibold tracking-tight sm:text-lg lg:truncate">
+                    <h1
+                        class="mt-0.5 line-clamp-2 text-base font-semibold tracking-tight break-words text-foreground sm:text-lg lg:truncate"
+                    >
                         {{ headingTitle || 'Form tanpa judul' }}
                     </h1>
                 </div>
             </div>
-            <div
-                class="
- flex w-full flex-wrap items-center justify-start gap-2
- sm:w-auto sm:justify-end sm:gap-2.5
-  "
-            >
+            <div class="flex w-full flex-wrap items-center justify-start gap-2 sm:w-auto sm:justify-end sm:gap-2.5">
                 <slot name="toolbar-extra" />
                 <Button
                     variant="outline"
                     size="sm"
-                    class="
- hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
- sm:inline-flex
-  "
+                    class="hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm sm:inline-flex"
                     :disabled="isEmpty"
                     aria-label="Pratinjau formulir"
                     @click="$emit('preview')"
@@ -83,9 +77,7 @@ onMounted(() => {
                 </Button>
                 <Button
                     size="sm"
-                    class="
- hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
-  "
+                    class="hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4"
                     :disabled="processing"
                     :aria-busy="processing"
                     @click="$emit('save')"
@@ -109,12 +101,14 @@ onMounted(() => {
                 </Link>
             </Button>
             <div v-if="!props.hideTitles" class="min-w-0 flex-1">
-                <p class="text-muted-foreground text-[11px] font-medium tracking-wide uppercase sm:text-xs">
+                <p class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase sm:text-xs">
                     <span class="max-sm:line-clamp-2 max-sm:break-words sm:truncate">
                         {{ toolbarSubtitle }}
                     </span>
                 </p>
-                <h1 class="text-foreground mt-0.5 max-sm:line-clamp-2 max-sm:break-words text-[15px] font-semibold tracking-tight sm:mt-0 sm:truncate sm:text-base">
+                <h1
+                    class="mt-0.5 text-[15px] font-semibold tracking-tight text-foreground max-sm:line-clamp-2 max-sm:break-words sm:mt-0 sm:truncate sm:text-base"
+                >
                     {{ headingTitle || 'Form tanpa judul' }}
                 </h1>
             </div>
@@ -122,20 +116,12 @@ onMounted(() => {
     </Teleport>
 
     <Teleport v-if="canTeleport && !props.hideTitles && !props.hideToolbar" to="#dashboard-fb-nav-right">
-        <div
-            class="
- flex w-full flex-wrap items-center justify-start gap-2
- sm:w-auto sm:justify-end sm:gap-2.5
- "
-        >
+        <div class="flex w-full flex-wrap items-center justify-start gap-2 sm:w-auto sm:justify-end sm:gap-2.5">
             <slot name="toolbar-extra" />
             <Button
                 variant="outline"
                 size="sm"
-                class="
- hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm
- sm:inline-flex
- "
+                class="hidden border-border/80 bg-background/90 px-3 text-sm font-medium shadow-sm sm:inline-flex"
                 :disabled="isEmpty"
                 aria-label="Pratinjau formulir"
                 @click="$emit('preview')"
@@ -145,9 +131,7 @@ onMounted(() => {
             </Button>
             <Button
                 size="sm"
-                class="
- hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4
- "
+                class="hidden px-3 text-sm font-medium shadow-sm sm:inline-flex sm:px-4"
                 :disabled="processing"
                 :aria-busy="processing"
                 @click="$emit('save')"

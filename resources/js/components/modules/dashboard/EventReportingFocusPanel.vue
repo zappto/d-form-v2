@@ -1,69 +1,63 @@
 <script setup lang="ts">
-import KpiCard from '@/components/modules/dashboard/KpiCard.vue'
-import FormSubmissionsPagination from '@/components/modules/dashboard/FormSubmissionsPagination.vue'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
-import { ClipboardList, ScanLine, Users, Download } from 'lucide-vue-next'
-import { formatSubmissionDateTime } from '@/lib/format'
+import KpiCard from '@/components/modules/dashboard/KpiCard.vue';
+import FormSubmissionsPagination from '@/components/modules/dashboard/FormSubmissionsPagination.vue';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
+import { ClipboardList, ScanLine, Users, Download } from 'lucide-vue-next';
+import { formatSubmissionDateTime } from '@/lib/format';
 
 const props = withDefaults(
     defineProps<{
-        eventTitle: string
+        eventTitle: string;
         summary: {
-            submission_count: number
-            attended_count: number
-            attendance_rate_percent: number | null
-            registered_count: number
-            quota: number | null
-        }
-        exportUrls: { registrations: string; attendance: string }
+            submission_count: number;
+            attended_count: number;
+            attendance_rate_percent: number | null;
+            registered_count: number;
+            quota: number | null;
+        };
+        exportUrls: { registrations: string; attendance: string };
         attendanceLog: {
             data: {
-                id: string
-                scanned_at: string
-                form_answer_id: string
-                attendee: { name: string; email: string } | null
-                scanned_by: { name: string; email: string } | null
-            }[]
-            current_page: number
-            last_page: number
-            per_page: number
-            total: number
-            links?: { url: string | null; label: string; active: boolean }[]
-        }
+                id: string;
+                scanned_at: string;
+                form_answer_id: string;
+                attendee: { name: string; email: string } | null;
+                scanned_by: { name: string; email: string } | null;
+            }[];
+            current_page: number;
+            last_page: number;
+            per_page: number;
+            total: number;
+            links?: { url: string | null; label: string; active: boolean }[];
+        };
         /** When false, parent renders CSV actions elsewhere (e.g. next to an event picker). */
-        showExportToolbar?: boolean
+        showExportToolbar?: boolean;
     }>(),
-    { showExportToolbar: true },
-)
+    { showExportToolbar: true }
+);
 </script>
 
 <template>
     <div class="flex flex-col gap-4">
         <div v-if="props.showExportToolbar" class="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" as-child class="">
-                <a :href="exportUrls.registrations">
-                    <Download class="mr-1.5 size-4" />Registrations CSV
-                </a>
+                <a :href="exportUrls.registrations"> <Download class="mr-1.5 size-4" />Registrations CSV </a>
             </Button>
             <Button variant="outline" size="sm" as-child class="">
-                <a :href="exportUrls.attendance">
-                    <Download class="mr-1.5 size-4" />Attendance CSV
-                </a>
+                <a :href="exportUrls.attendance"> <Download class="mr-1.5 size-4" />Attendance CSV </a>
             </Button>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiCard label="Submissions (all forms)" :value="summary.submission_count" :icon="ClipboardList" color="primary" />
+            <KpiCard
+                label="Submissions (all forms)"
+                :value="summary.submission_count"
+                :icon="ClipboardList"
+                color="primary"
+            />
             <KpiCard label="Attended (scanned)" :value="summary.attended_count" :icon="ScanLine" color="success" />
             <KpiCard
                 label="Attendance rate"
@@ -73,7 +67,11 @@ const props = withDefaults(
             />
             <KpiCard
                 label="Registered / quota"
-                :value="summary.quota != null ? `${summary.registered_count} / ${summary.quota}` : String(summary.registered_count)"
+                :value="
+                    summary.quota != null
+                        ? `${summary.registered_count} / ${summary.quota}`
+                        : String(summary.registered_count)
+                "
                 :icon="Users"
                 color="primary"
             />
@@ -83,8 +81,8 @@ const props = withDefaults(
             <CardHeader class="pb-3">
                 <CardTitle class="text-base font-medium">Attendance log</CardTitle>
                 <CardDescription class="text-xs">
-                    Rows from <code class="rounded bg-muted px-1 py-0.5 text-[11px]">event_attendances</code>
-                    for {{ eventTitle }}.
+                    Rows from <code class="rounded bg-muted px-1 py-0.5 text-[11px]">event_attendances</code> for
+                    {{ eventTitle }}.
                 </CardDescription>
             </CardHeader>
             <CardContent class="overflow-x-auto pt-0">
@@ -99,7 +97,9 @@ const props = withDefaults(
                     </TableHeader>
                     <TableBody>
                         <TableRow v-for="row in attendanceLog.data" :key="row.id">
-                            <TableCell class="whitespace-nowrap text-sm">{{ formatSubmissionDateTime(row.scanned_at) }}</TableCell>
+                            <TableCell class="text-sm whitespace-nowrap">{{
+                                formatSubmissionDateTime(row.scanned_at)
+                            }}</TableCell>
                             <TableCell>
                                 <template v-if="row.attendee">
                                     <span class="block text-sm font-medium">{{ row.attendee.name }}</span>

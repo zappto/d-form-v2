@@ -10,13 +10,13 @@ defineProps<{
 
 <template>
     <div
-        class="text-muted-foreground flex min-w-0 items-center gap-1 text-xs truncate sm:text-[13px]"
+        class="flex min-w-0 items-center gap-1 truncate text-xs text-muted-foreground sm:text-[13px]"
         aria-label="Breadcrumb"
     >
         <template v-for="(item, idx) in items" :key="`${item.label}-${idx}`">
             <ChevronRight
                 v-if="idx > 0"
-                class="text-muted-foreground/60 size-3 shrink-0 stroke-[1.75]"
+                class="size-3 shrink-0 stroke-[1.75] text-muted-foreground/60"
                 aria-hidden="true"
             />
             <Link
@@ -26,7 +26,7 @@ defineProps<{
             >
                 {{ item.label }}
             </Link>
-            <span v-else class="text-foreground min-w-0 truncate font-medium">
+            <span v-else class="min-w-0 truncate font-medium text-foreground">
                 {{ item.label }}
             </span>
         </template>

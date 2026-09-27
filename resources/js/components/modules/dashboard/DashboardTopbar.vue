@@ -112,12 +112,13 @@ function handleLogout(): void {
 
 <template>
     <header
-        class="border-sidebar-border/50 bg-background/80 sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b px-4 backdrop-blur-md lg:px-6"
+        class="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-sidebar-border/50 bg-background/80 px-4 backdrop-blur-md lg:px-6"
     >
         <!-- Kiri: toggle sidebar (mobile) + back + judul + subtitle (judul hidden di mobile) -->
         <div class="flex min-w-0 items-center gap-1.5">
             <SidebarTrigger class="shrink-0 md:hidden" aria-label="Buka sidebar" />
-            <Button radius="icon"
+            <Button
+                radius="icon"
                 v-if="showBackButton"
                 variant="ghost"
                 size="icon-sm"
@@ -128,7 +129,7 @@ function handleLogout(): void {
                 <ChevronLeft class="size-4 shrink-0 stroke-[1.75]" />
             </Button>
             <div class="hidden min-w-0 flex-col sm:flex">
-                <h1 class="font-display text-foreground min-w-0 truncate text-lg font-semibold tracking-tight">
+                <h1 class="min-w-0 truncate font-display text-lg font-semibold tracking-tight text-foreground">
                     {{ pageTitle }}
                 </h1>
                 <div class="hidden min-w-0 sm:block">
@@ -138,13 +139,13 @@ function handleLogout(): void {
         </div>
 
         <!-- Tengah: search bar -->
-        <div class="relative w-full min-w-0 max-w-[10rem] shrink sm:max-w-sm">
-            <Search class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+        <div class="relative w-full max-w-[10rem] min-w-0 shrink sm:max-w-sm">
+            <Search class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
                 v-model="search"
                 type="search"
                 placeholder="Cari..."
-                class="bg-muted/40 focus-within:bg-background focus-within:border-border h-9 rounded-lg border-transparent pl-9"
+                class="h-9 rounded-lg border-transparent bg-muted/40 pl-9 focus-within:border-border focus-within:bg-background"
                 aria-label="Cari"
             />
         </div>
@@ -153,12 +154,7 @@ function handleLogout(): void {
         <div class="flex shrink-0 items-center gap-1.5">
             <Popover v-model:open="profileMenuOpen" :modal="false">
                 <PopoverTrigger as-child>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Menu profil"
-                        class="rounded-full sm:hidden"
-                    >
+                    <Button variant="ghost" size="icon" aria-label="Menu profil" class="rounded-full sm:hidden">
                         <UserAvatarFallback
                             :src="user?.avatar ?? null"
                             :seed="userAvatarSeed(user)"
@@ -170,7 +166,7 @@ function handleLogout(): void {
                 <PopoverContent align="end" :side-offset="8" class="w-48 rounded-xl p-1">
                     <Link
                         :href="routes.dashboard.profile"
-                        class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0"
+                        class="relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0"
                         @click="closeProfileMenu"
                     >
                         <User class="size-4" aria-hidden="true" />
@@ -179,7 +175,7 @@ function handleLogout(): void {
                     <Button
                         variant="destructive-ghost"
                         type="button"
-                        class="w-full cursor-pointer select-none justify-start"
+                        class="w-full cursor-pointer justify-start select-none"
                         @click="handleLogout"
                     >
                         <LogOut class="size-4" aria-hidden="true" />
@@ -192,7 +188,7 @@ function handleLogout(): void {
                 <Link
                     :href="routes.dashboard.profile"
                     aria-label="Profile"
-                    class="hover:bg-accent flex items-center gap-2 rounded-xl py-1 pr-3 pl-2 transition-colors duration-150"
+                    class="flex items-center gap-2 rounded-xl py-1 pr-3 pl-2 transition-colors duration-150 hover:bg-accent"
                 >
                     <UserAvatarFallback
                         :src="user?.avatar ?? null"
@@ -201,21 +197,16 @@ function handleLogout(): void {
                         fallback-round-class="rounded-full"
                     />
                     <span class="hidden flex-col sm:flex">
-                        <span class="text-foreground max-w-[140px] truncate text-sm leading-tight font-medium">
+                        <span class="max-w-[140px] truncate text-sm leading-tight font-medium text-foreground">
                             {{ user?.name }}
                         </span>
-                        <span class="text-muted-foreground max-w-[140px] truncate text-xs leading-tight">
+                        <span class="max-w-[140px] truncate text-xs leading-tight text-muted-foreground">
                             {{ user?.roles?.length ? formatRole(user.roles[0]!) : user?.email }}
                         </span>
                     </span>
                 </Link>
 
-                <Button
-                    variant="destructive-ghost"
-                    size="sm"
-                    aria-label="Keluar"
-                    @click="router.post(logout().url)"
-                >
+                <Button variant="destructive-ghost" size="sm" aria-label="Keluar" @click="router.post(logout().url)">
                     <LogOut class="size-4" />
                     <span>Keluar</span>
                 </Button>

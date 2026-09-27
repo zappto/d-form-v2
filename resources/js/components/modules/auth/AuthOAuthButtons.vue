@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import { redirectToGithub, redirectToGoogle } from '@/actions/App/Http/Controllers/Auth/OAuthController'
+import { Button } from '@/components/ui/button';
+import { redirectToGithub, redirectToGoogle } from '@/actions/App/Http/Controllers/Auth/OAuthController';
 
 function goToGoogle() {
-    window.location.href = redirectToGoogle.url()
+    window.location.href = redirectToGoogle.url();
 }
 
 function goToGithub() {
-    window.location.href = redirectToGithub.url()
+    window.location.href = redirectToGithub.url();
 }
 </script>
 
@@ -15,7 +15,9 @@ function goToGithub() {
     <div>
         <div class="my-6 flex items-center gap-3">
             <span class="h-px flex-1 bg-border"></span>
-            <span class="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">or continue with</span>
+            <span class="text-[11px] font-medium tracking-[0.16em] text-muted-foreground uppercase"
+                >or continue with</span
+            >
             <span class="h-px flex-1 bg-border"></span>
         </div>
 

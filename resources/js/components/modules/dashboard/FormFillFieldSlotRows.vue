@@ -1,85 +1,83 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props -- ctx.answerForm is parent Inertia form state */
-import { computed } from 'vue'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
-import type { UnwrapNestedRefs } from 'vue'
-import { Star, ImagePlus, Upload, X } from 'lucide-vue-next'
-import type { FormFillPageContext } from '@/hooks/useFormFillPage'
-import type { FormFillOptionRow } from '@/types/form'
-import { formatParagraphContentToHtml } from '@/lib/formParagraphContent'
+import { computed } from 'vue';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import type { UnwrapNestedRefs } from 'vue';
+import { Star, ImagePlus, Upload, X } from 'lucide-vue-next';
+import type { FormFillPageContext } from '@/hooks/useFormFillPage';
+import type { FormFillOptionRow } from '@/types/form';
+import { formatParagraphContentToHtml } from '@/lib/formParagraphContent';
 
 const props = withDefaults(
     defineProps<{
-        ctx: UnwrapNestedRefs<FormFillPageContext>
-        field: IFormField
-        participationSlot: { slotIndex: number | null; title: string }
-        storageKey: string
+        ctx: UnwrapNestedRefs<FormFillPageContext>;
+        field: IFormField;
+        participationSlot: { slotIndex: number | null; title: string };
+        storageKey: string;
         /** 'linear' = legacy one field / card; 'bundleParticipant' = stacked in per-person card */
-        variant: 'linear' | 'bundleParticipant'
-        stackIndex?: number
-        imageUploadFillReadyFn: (key: string) => boolean
+        variant: 'linear' | 'bundleParticipant';
+        stackIndex?: number;
+        imageUploadFillReadyFn: (key: string) => boolean;
     }>(),
-    { stackIndex: 0 },
-)
+    { stackIndex: 0 }
+);
 
 const emit = defineEmits<{
-    openLightbox: [src: string | undefined, title: string]
-}>()
+    openLightbox: [src: string | undefined, title: string];
+}>();
 
 function textAnswer(name: string): string {
-    const v = props.ctx.answerForm[name]
-    return typeof v === 'string' ? v : ''
+    const v = props.ctx.answerForm[name];
+    return typeof v === 'string' ? v : '';
 }
 
 function setTextAnswer(name: string, value: string | number): void {
-    props.ctx.answerForm[name] = String(value)
+    props.ctx.answerForm[name] = String(value);
 }
 
-const showSubtitle = computed(() => props.variant === 'linear' && Boolean(props.participationSlot.title))
+const showSubtitle = computed(() => props.variant === 'linear' && Boolean(props.participationSlot.title));
 
 const headerBorderClass = computed(() => {
     if (props.variant === 'bundleParticipant') {
-        return props.stackIndex > 0 ? 'border-t border-border' : ''
+        return props.stackIndex > 0 ? 'border-t border-border' : '';
     }
-    return ''
-})
+    return '';
+});
 
 /** Tighter vertical rhythm when multiple fields stack in one participant card */
 const cardHeaderSpacingClass = computed(() => {
     if (props.variant === 'bundleParticipant') {
-        return props.stackIndex > 0 ? 'gap-0.5 pt-2 pb-0.5' : 'gap-0.5 pt-2.5 pb-0.5'
+        return props.stackIndex > 0 ? 'gap-0.5 pt-2 pb-0.5' : 'gap-0.5 pt-2.5 pb-0.5';
     }
-    return 'gap-1 pb-1.5 pt-3'
-})
+    return 'gap-1 pb-1.5 pt-3';
+});
 
 const cardContentSpacingClass = computed(() => {
     if (props.variant === 'bundleParticipant') {
-        return 'pb-2 pt-0'
+        return 'pb-2 pt-0';
     }
-    return 'pb-3 pt-0'
-})
+    return 'pb-3 pt-0';
+});
 
-const fieldErrorSpacingClass = computed(() =>
-    props.variant === 'bundleParticipant' ? 'mt-1' : 'mt-1.5',
-)
+const fieldErrorSpacingClass = computed(() => (props.variant === 'bundleParticipant' ? 'mt-1' : 'mt-1.5'));
 
 const showDescription = computed(() => {
-    if (!props.field.description) return false
-    if (props.variant === 'bundleParticipant') return true
-    return props.participationSlot.slotIndex === null
-})
+    if (!props.field.description) return false;
+    if (props.variant === 'bundleParticipant') return true;
+    return props.participationSlot.slotIndex === null;
+});
 
 const descriptionHtml = computed(() =>
-    props.field.description ? formatParagraphContentToHtml(props.field.description) : '',
-)
+    props.field.description ? formatParagraphContentToHtml(props.field.description) : ''
+);
 
 function fillReady(): boolean {
-    return props.imageUploadFillReadyFn(props.storageKey)
+    return props.imageUploadFillReadyFn(props.storageKey);
 }
 
 /** Option rows as SearchableSelect options; value mirrors the label so stored answers stay labels. */
@@ -89,10 +87,9 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
             value: row.label,
             label: row.label,
             imageSrc: row.type === 'image' ? row.imageSrc : undefined,
-        }),
-    ),
-)
-
+        })
+    )
+);
 </script>
 
 <template>
@@ -102,7 +99,9 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                 {{ field.label }}
                 <span v-if="ctx.isRequired(field)" class="text-destructive">*</span>
             </span>
-            <span v-if="showSubtitle" class="text-xs font-normal text-muted-foreground">{{ participationSlot.title }}</span>
+            <span v-if="showSubtitle" class="text-xs font-normal text-muted-foreground">{{
+                participationSlot.title
+            }}</span>
         </CardTitle>
         <p
             v-if="showDescription"
@@ -128,7 +127,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
             />
             <p
                 v-if="ctx.maxLengthForField(field)"
-                class="mt-1 text-right text-[10px] tabular-nums text-muted-foreground"
+                class="mt-1 text-right text-[10px] text-muted-foreground tabular-nums"
             >
                 {{ textAnswer(storageKey).length }} / {{ ctx.maxLengthForField(field) }}
             </p>
@@ -140,16 +139,16 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                     v-for="rating in Number(ctx.metadata(field).maxStars ?? 5)"
                     :key="rating"
                     type="button"
-                    class=" p-1"
+                    class="p-1"
                     @click="ctx.answerForm[storageKey] = String(rating)"
                 >
                     <Star
                         class="size-7 transition-colors"
                         :class="
- Number(ctx.answerForm[storageKey] || 0) >= rating
- ? 'fill-amber-400 text-amber-400'
- : 'text-muted-foreground/50'
- "
+                            Number(ctx.answerForm[storageKey] || 0) >= rating
+                                ? 'fill-amber-400 text-amber-400'
+                                : 'text-muted-foreground/50'
+                        "
                     />
                 </button>
             </div>
@@ -158,7 +157,9 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
 
         <template
             v-else-if="
-                ctx.builderType(field) === 'long_text' || ctx.builderType(field) === 'address' || field.type === 'textarea'
+                ctx.builderType(field) === 'long_text' ||
+                ctx.builderType(field) === 'address' ||
+                field.type === 'textarea'
             "
         >
             <Textarea
@@ -171,7 +172,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
             />
             <p
                 v-if="ctx.maxLengthForField(field)"
-                class="mt-1 text-right text-[10px] tabular-nums text-muted-foreground"
+                class="mt-1 text-right text-[10px] text-muted-foreground tabular-nums"
             >
                 {{ textAnswer(storageKey).length }} / {{ ctx.maxLengthForField(field) }}
             </p>
@@ -199,7 +200,10 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                             ctx.onCheckboxToggle(storageKey, row.label, value === true)
                     "
                 />
-                <div v-if="row.type === 'image' && row.imageSrc" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
+                <div
+                    v-if="row.type === 'image' && row.imageSrc"
+                    class="size-16 shrink-0 overflow-hidden rounded-md border border-border"
+                >
                     <img :src="row.imageSrc" alt="" class="size-full object-cover" />
                 </div>
                 <span v-else>{{ row.label }}</span>
@@ -220,7 +224,10 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                     class="size-4 accent-primary"
                     @change="() => (ctx.answerForm[storageKey] = row.label)"
                 />
-                <div v-if="row.type === 'image' && row.imageSrc" class="size-16 shrink-0 overflow-hidden rounded-md border border-border">
+                <div
+                    v-if="row.type === 'image' && row.imageSrc"
+                    class="size-16 shrink-0 overflow-hidden rounded-md border border-border"
+                >
                     <img :src="row.imageSrc" alt="" class="size-full object-cover" />
                 </div>
                 <span v-else>{{ row.label }}</span>
@@ -235,25 +242,27 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
             :model-value="textAnswer(storageKey)"
             :options="selectOptions"
             :placeholder="ctx.getPlaceholder(field) || 'Select an option'"
-            class="min-h-11 h-11"
+            class="h-11 min-h-11"
             @update:model-value="setTextAnswer(storageKey, $event)"
         />
 
         <div
             v-else-if="['file_upload', 'image_upload', 'fileUpload'].includes(ctx.builderType(field))"
             class="relative overflow-hidden rounded-xl border border-dashed border-border bg-muted/20 transition-colors hover:border-primary/30"
-            :class="fillReady() ? 'p-0' : variant === 'bundleParticipant' ? 'p-4 text-center hover:bg-muted/30' : 'p-6 text-center hover:bg-muted/30'"
+            :class="
+                fillReady()
+                    ? 'p-0'
+                    : variant === 'bundleParticipant'
+                      ? 'p-4 text-center hover:bg-muted/30'
+                      : 'p-6 text-center hover:bg-muted/30'
+            "
         >
             <div v-if="fillReady()" class="relative aspect-video w-full bg-muted/30 sm:aspect-[4/3]">
                 <button
                     type="button"
                     class="absolute inset-0 z-10 flex w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     @click="
-                        emit(
-                            'openLightbox',
-                            ctx.filePreviewUrls[storageKey],
-                            (ctx.answerForm[storageKey] as File).name,
-                        )
+                        emit('openLightbox', ctx.filePreviewUrls[storageKey], (ctx.answerForm[storageKey] as File).name)
                     "
                 >
                     <img
@@ -265,14 +274,14 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                 </button>
                 <button
                     type="button"
-                    class="absolute right-2 top-2 z-20 grid size-9 place-items-center border border-border/80 bg-background/95 text-destructive shadow-md backdrop-blur-sm"
+                    class="absolute top-2 right-2 z-20 grid size-9 place-items-center border border-border/80 bg-background/95 text-destructive shadow-md backdrop-blur-sm"
                     :aria-label="`Remove ${(ctx.answerForm[storageKey] as File).name}`"
                     @click.stop="ctx.clearFileUpload(storageKey)"
                 >
                     <X class="size-4" />
                 </button>
                 <div
-                    class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-1 bg-gradient-to-t from-black/60 via-black/25 to-transparent px-3 pb-3 pt-14 text-center"
+                    class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-1 bg-gradient-to-t from-black/60 via-black/25 to-transparent px-3 pt-14 pb-3 text-center"
                 >
                     <label
                         class="pointer-events-auto cursor-pointer border border-white/20 bg-background/95 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-background"
@@ -316,11 +325,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                 <span class="max-w-[200px] truncate text-xs font-medium text-foreground">{{
                     (ctx.answerForm[storageKey] as File).name
                 }}</span>
-                <button
-                    type="button"
-                    class="text-destructive"
-                    @click="ctx.clearFileUpload(storageKey)"
-                >
+                <button type="button" class="text-destructive" @click="ctx.clearFileUpload(storageKey)">
                     <X class="size-4" />
                 </button>
             </div>

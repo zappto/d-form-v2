@@ -131,7 +131,7 @@ defineExpose({
                 @toggle-visibility="wb.toggleVisibility"
             />
 
-            <main class="bg-background relative min-h-0 flex-1 overflow-visible lg:overflow-y-auto">
+            <main class="relative min-h-0 flex-1 overflow-visible bg-background lg:overflow-y-auto">
                 <FormBuilderCanvasBuildView
                     v-model:form-title="formTitle"
                     v-model:form-description="formDescription"
@@ -183,7 +183,7 @@ defineExpose({
                 <div class="grid grid-cols-2 gap-2">
                     <Button
                         variant="outline"
-                        class="border-border/80 bg-background h-11 text-sm font-medium shadow-sm"
+                        class="h-11 border-border/80 bg-background text-sm font-medium shadow-sm"
                         :disabled="wb.isEmpty"
                         aria-label="Pratinjau formulir"
                         @click="wb.showPreview = true"

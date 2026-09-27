@@ -1,31 +1,34 @@
 <script setup lang="ts">
-import { Badge } from '@/components/ui/badge'
-import { CalendarDays, MapPin } from 'lucide-vue-next'
-import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData'
-import { formatDisplayDate } from '@/lib/format'
-import { parseEventCategories } from '@/lib/eventShowUi'
-import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue'
-import { EVENT_HERO_BANNER_ASPECT } from '@/lib/eventBannerAspect'
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays, MapPin } from 'lucide-vue-next';
+import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData';
+import { formatDisplayDate } from '@/lib/format';
+import { parseEventCategories } from '@/lib/eventShowUi';
+import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
+import { EVENT_HERO_BANNER_ASPECT } from '@/lib/eventBannerAspect';
 
-type StatusPill = { label: string; classes: string }
+type StatusPill = { label: string; classes: string };
 
 type MetaBlock = {
-    title: string
-    value: string
-    icon: object
-}
+    title: string;
+    value: string;
+    icon: object;
+};
 
 defineProps<{
-    event: IEvent
-    statusPill: StatusPill
-    metaBlocks: MetaBlock[]
-    cardShadow: string
-}>()
+    event: IEvent;
+    statusPill: StatusPill;
+    metaBlocks: MetaBlock[];
+    cardShadow: string;
+}>();
 </script>
 
 <template>
     <section
-        :class="['overflow-hidden rounded-2xl border border-border/60 bg-card ring-1 ring-black/5 sm:rounded-3xl', cardShadow]"
+        :class="[
+            'overflow-hidden rounded-2xl border border-border/60 bg-card ring-1 ring-black/5 sm:rounded-3xl',
+            cardShadow,
+        ]"
     >
         <!-- Banner dan konten terpisah (tanpa margin negatif / scale) agar gambar tidak menumpuk teks -->
         <div class="grid min-w-0 grid-cols-1 lg:grid-cols-12 lg:items-stretch">
@@ -39,15 +42,17 @@ defineProps<{
                 </div>
             </div>
 
-            <div class="flex min-w-0 flex-col gap-5 px-4 py-5 sm:gap-6 sm:px-7 sm:py-7 lg:col-span-7 lg:justify-between lg:px-8 lg:py-8">
+            <div
+                class="flex min-w-0 flex-col gap-5 px-4 py-5 sm:gap-6 sm:px-7 sm:py-7 lg:col-span-7 lg:justify-between lg:px-8 lg:py-8"
+            >
                 <div class="flex min-w-0 flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
                         <span
                             :class="[
- 'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium',
- 'border-border/70 bg-muted/60 text-foreground',
- statusPill.classes,
- ]"
+                                'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium',
+                                'border-border/70 bg-muted/60 text-foreground',
+                                statusPill.classes,
+                            ]"
                         >
                             <span class="size-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" />
                             {{ statusPill.label }}
@@ -63,13 +68,14 @@ defineProps<{
                     </div>
 
                     <div>
-                        
                         <h1
-                            class="text-balance break-words text-[1.45rem] font-semibold leading-[1.12] tracking-tight text-foreground sm:text-3xl lg:text-[1.85rem] lg:leading-snug"
+                            class="text-[1.45rem] leading-[1.12] font-semibold tracking-tight text-balance break-words text-foreground sm:text-3xl lg:text-[1.85rem] lg:leading-snug"
                         >
                             {{ event.title }}
                         </h1>
-                        <p class="mt-3 flex flex-col gap-1.5 text-[0.9375rem] leading-relaxed text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3">
+                        <p
+                            class="mt-3 flex flex-col gap-1.5 text-[0.9375rem] leading-relaxed text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3"
+                        >
                             <span class="inline-flex min-w-0 items-center gap-1.5">
                                 <CalendarDays class="size-3.5 shrink-0 text-primary/80" aria-hidden="true" />
                                 {{ formatDisplayDate(event.start_date) }}
@@ -81,8 +87,6 @@ defineProps<{
                             </span>
                         </p>
                     </div>
-
-                    
                 </div>
 
                 <div class="grid min-w-0 gap-2.5 sm:grid-cols-2 sm:gap-3">
@@ -90,10 +94,10 @@ defineProps<{
                         v-for="m in metaBlocks"
                         :key="m.title"
                         :class="[
- 'flex min-h-[4.25rem] min-w-0 items-center gap-3 rounded-2xl border border-border/60 bg-muted/25 p-3 sm:p-3.5',
- 'transition-colors hover:border-primary/25 hover:bg-muted/40',
- cardShadow,
- ]"
+                            'flex min-h-[4.25rem] min-w-0 items-center gap-3 rounded-2xl border border-border/60 bg-muted/25 p-3 sm:p-3.5',
+                            'transition-colors hover:border-primary/25 hover:bg-muted/40',
+                            cardShadow,
+                        ]"
                     >
                         <div
                             class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15"
@@ -101,11 +105,11 @@ defineProps<{
                             <component :is="m.icon" class="size-[18px]" aria-hidden="true" />
                         </div>
                         <div class="min-w-0 flex-1">
-                            <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                            <p class="text-[10px] font-semibold tracking-[0.1em] text-muted-foreground uppercase">
                                 {{ m.title }}
                             </p>
                             <p
-                                class="mt-0.5 line-clamp-2 break-words text-[13px] font-medium leading-snug text-foreground lg:line-clamp-none lg:truncate"
+                                class="mt-0.5 line-clamp-2 text-[13px] leading-snug font-medium break-words text-foreground lg:line-clamp-none lg:truncate"
                             >
                                 {{ m.value }}
                             </p>

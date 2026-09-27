@@ -142,19 +142,15 @@ function isLinkActive(href: string): boolean {
 <template>
     <header
         :class="[
- 'fixed inset-x-0 top-0 z-50 transition-all duration-300',
- scrolled
- ? 'border-border/50 bg-background/85 border-b shadow-[0_1px_3px_rgb(0_0_0/0.04)] backdrop-blur-xl'
- : 'bg-transparent',
- ]"
+            'fixed inset-x-0 top-0 z-50 transition-all duration-300',
+            scrolled
+                ? 'border-b border-border/50 bg-background/85 shadow-[0_1px_3px_rgb(0_0_0/0.04)] backdrop-blur-xl'
+                : 'bg-transparent',
+        ]"
     >
         <div class="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-6 lg:px-10">
             <a :href="routes.home" class="group flex items-center gap-2.5">
-                <img
-                    src="/public/DForm%201.png"
-                    alt="DOSCOM"
-                    class="h-8 w-auto transition-colors duration-200"
-                />
+                <img src="/public/DForm%201.png" alt="DOSCOM" class="h-8 w-auto transition-colors duration-200" />
             </a>
 
             <nav class="hidden items-center gap-1 md:flex" aria-label="Navigasi utama">
@@ -163,9 +159,9 @@ function isLinkActive(href: string): boolean {
                     :key="link.href"
                     :href="link.href"
                     :class="[
- 'rounded-lg px-3.5 py-2 text-sm font-medium transition-colors duration-150',
- isLinkActive(link.href) ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
- ]"
+                        'rounded-lg px-3.5 py-2 text-sm font-medium transition-colors duration-150',
+                        isLinkActive(link.href) ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+                    ]"
                 >
                     {{ link.label }}
                 </a>
@@ -177,7 +173,7 @@ function isLinkActive(href: string): boolean {
                         <button
                             ref="accountTriggerEl"
                             type="button"
-                            class="border-border/60 bg-background/40 hover:border-border hover:bg-muted/60 focus-visible:ring-ring flex max-w-[240px] items-center gap-2 border px-2.5 py-1.5 text-left transition-[box-shadow,background-color,border-color] duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                            class="flex max-w-[240px] items-center gap-2 border border-border/60 bg-background/40 px-2.5 py-1.5 text-left transition-[box-shadow,background-color,border-color] duration-200 hover:border-border hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                             :aria-label="`Menu akun ${user.name}`"
                             @pointerenter="onAccountTriggerEnter"
                             @pointerleave="onAccountTriggerLeave"
@@ -191,13 +187,13 @@ function isLinkActive(href: string): boolean {
                             <span class="min-w-0 flex-1 truncate text-sm leading-tight font-medium">{{
                                 user.name
                             }}</span>
-                            <ChevronsUpDown class="text-muted-foreground size-4 shrink-0" aria-hidden="true" />
+                            <ChevronsUpDown class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                         align="end"
                         :side-offset="4"
-                        class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 w-56 origin-top-right rounded-xl duration-200 ease-out"
+                        class="w-56 origin-top-right rounded-xl duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
                         @pointerenter="onAccountContentEnter"
                         @pointerleave="onAccountContentLeave"
                     >
@@ -206,25 +202,28 @@ function isLinkActive(href: string): boolean {
                         <DropdownMenuLabel class="font-normal">
                             <div class="flex flex-col gap-0.5">
                                 <p class="text-sm leading-none font-medium">{{ user.name }}</p>
-                                <p class="text-muted-foreground text-xs leading-normal">{{ user.email }}</p>
+                                <p class="text-xs leading-normal text-muted-foreground">{{ user.email }}</p>
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem as-child>
                             <Link :href="routes.dashboard.index" class="flex w-full cursor-pointer items-center gap-2">
-                                <LayoutDashboard class="text-muted-foreground size-4" />
+                                <LayoutDashboard class="size-4 text-muted-foreground" />
                                 Dashboard
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem as-child>
-                            <Link :href="routes.dashboard.profile" class="flex w-full cursor-pointer items-center gap-2">
-                                <UserRound class="text-muted-foreground size-4" />
+                            <Link
+                                :href="routes.dashboard.profile"
+                                class="flex w-full cursor-pointer items-center gap-2"
+                            >
+                                <UserRound class="size-4 text-muted-foreground" />
                                 Profile
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            class="text-destructive focus:text-destructive cursor-pointer"
+                            class="cursor-pointer text-destructive focus:text-destructive"
                             @click="signOut"
                         >
                             <LogOut class="size-4" />
@@ -247,7 +246,7 @@ function isLinkActive(href: string): boolean {
                 <SheetTrigger as-child>
                     <button
                         type="button"
-                        class="border-border/70 text-foreground hover:bg-muted inline-flex size-9 items-center justify-center border transition-colors md:hidden"
+                        class="inline-flex size-9 items-center justify-center border border-border/70 text-foreground transition-colors hover:bg-muted md:hidden"
                         aria-label="Menu navigasi"
                     >
                         <svg width="18" height="18" viewBox="0 0 16 16" fill="none" class="text-foreground">
@@ -268,11 +267,11 @@ function isLinkActive(href: string): boolean {
                             :key="link.href"
                             :href="link.href"
                             :class="[
- 'rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
- isLinkActive(link.href)
- ? 'bg-primary/8 text-primary'
- : 'text-muted-foreground hover:bg-muted hover:text-foreground',
- ]"
+                                'rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                                isLinkActive(link.href)
+                                    ? 'bg-primary/8 text-primary'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                            ]"
                             @click="mobileOpen = false"
                         >
                             {{ link.label }}
@@ -282,7 +281,7 @@ function isLinkActive(href: string): boolean {
 
                         <template v-if="user">
                             <div
-                                class="border-border/70 bg-muted/30 mb-3 flex items-center gap-3 rounded-xl border px-3 py-2.5"
+                                class="mb-3 flex items-center gap-3 rounded-xl border border-border/70 bg-muted/30 px-3 py-2.5"
                             >
                                 <UserAvatarFallback
                                     :src="user.avatar ?? null"
@@ -292,7 +291,7 @@ function isLinkActive(href: string): boolean {
                                 />
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-sm font-medium">{{ user.name }}</p>
-                                    <p class="text-muted-foreground truncate text-xs">{{ user.email }}</p>
+                                    <p class="truncate text-xs text-muted-foreground">{{ user.email }}</p>
                                 </div>
                             </div>
                             <Button as-child variant="outline" class="h-10 w-full text-sm">

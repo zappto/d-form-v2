@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
-import { Camera, ShieldAlert } from 'lucide-vue-next'
+import { computed } from 'vue';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
+import { Camera, ShieldAlert } from 'lucide-vue-next';
 
 const props = defineProps<{
-    scannerContainerId: string
-    eventLabel: string
-    cameras: Array<{ id: string; label: string }>
-    selectedCameraId: string
-    isStartingCamera: boolean
-    isCameraReady: boolean
-    isShutterActive: boolean
-    permissionError: string
-}>()
+    scannerContainerId: string;
+    eventLabel: string;
+    cameras: Array<{ id: string; label: string }>;
+    selectedCameraId: string;
+    isStartingCamera: boolean;
+    isCameraReady: boolean;
+    isShutterActive: boolean;
+    permissionError: string;
+}>();
 
 const cameraOptions = computed<SearchableSelectOption[]>(() =>
-    props.cameras.map((camera) => ({ value: camera.id, label: camera.label })),
-)
+    props.cameras.map((camera) => ({ value: camera.id, label: camera.label }))
+);
 
 defineEmits<{
-    switchCamera: [id: string | undefined]
-    startCamera: []
-    stopCamera: []
-}>()
+    switchCamera: [id: string | undefined];
+    startCamera: [];
+    stopCamera: [];
+}>();
 </script>
 
 <template>
@@ -44,12 +44,16 @@ defineEmits<{
                     :options="cameraOptions"
                     id="scanner-camera-select"
                     placeholder="Pilih kamera"
-                    class="border-border/80 bg-background/80 h-10 w-full text-xs sm:text-sm"
+                    class="h-10 w-full border-border/80 bg-background/80 text-xs sm:text-sm"
                     aria-label="Pilih kamera"
                     @update:model-value="$emit('switchCamera', $event)"
                 />
 
-                <Button class="md:min-w-36" :disabled="isStartingCamera || isCameraReady || !selectedCameraId" @click="$emit('startCamera')">
+                <Button
+                    class="md:min-w-36"
+                    :disabled="isStartingCamera || isCameraReady || !selectedCameraId"
+                    @click="$emit('startCamera')"
+                >
                     <Camera data-icon="inline-start" />
                     {{ isStartingCamera ? 'Menyalakan...' : 'Mulai kamera' }}
                 </Button>
@@ -63,17 +67,22 @@ defineEmits<{
         <CardContent class="space-y-4 p-4 md:p-5">
             <div class="relative overflow-hidden rounded-2xl border border-dashed border-border bg-muted/30 p-3">
                 <div class="scanner-stage relative overflow-hidden rounded-xl">
-                    <div
-                        :id="scannerContainerId"
-                        class="min-h-80 w-full overflow-hidden rounded-xl bg-background"
-                    />
+                    <div :id="scannerContainerId" class="min-h-80 w-full overflow-hidden rounded-xl bg-background" />
 
                     <div class="pointer-events-none absolute inset-0 z-20">
                         <div class="absolute inset-0 rounded-xl border-2 border-primary/25" />
-                        <span class="absolute left-0 top-0 size-7 rounded-tl-xl border-l-4 border-t-4 border-primary/70" />
-                        <span class="absolute right-0 top-0 size-7 rounded-tr-xl border-r-4 border-t-4 border-primary/70" />
-                        <span class="absolute bottom-0 left-0 size-7 rounded-bl-xl border-b-4 border-l-4 border-primary/70" />
-                        <span class="absolute bottom-0 right-0 size-7 rounded-br-xl border-b-4 border-r-4 border-primary/70" />
+                        <span
+                            class="absolute top-0 left-0 size-7 rounded-tl-xl border-t-4 border-l-4 border-primary/70"
+                        />
+                        <span
+                            class="absolute top-0 right-0 size-7 rounded-tr-xl border-t-4 border-r-4 border-primary/70"
+                        />
+                        <span
+                            class="absolute bottom-0 left-0 size-7 rounded-bl-xl border-b-4 border-l-4 border-primary/70"
+                        />
+                        <span
+                            class="absolute right-0 bottom-0 size-7 rounded-br-xl border-r-4 border-b-4 border-primary/70"
+                        />
 
                         <div
                             v-if="isCameraReady && !isShutterActive"
@@ -84,7 +93,9 @@ defineEmits<{
                             v-if="!isCameraReady && !isShutterActive"
                             class="absolute inset-x-0 bottom-3 flex justify-center px-3"
                         >
-                            <span class="bg-background/85 text-muted-foreground rounded-full px-3 py-1 text-xs font-medium shadow-sm">
+                            <span
+                                class="rounded-full bg-background/85 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm"
+                            >
                                 Arahkan QR ke seluruh area pindai
                             </span>
                         </div>
@@ -92,7 +103,7 @@ defineEmits<{
 
                     <div v-if="isShutterActive" class="pointer-events-none absolute inset-0 z-30 rounded-xl">
                         <div class="shutter-flash absolute inset-0 rounded-xl bg-white" />
-                        <div class="ring-success/80 absolute inset-0 rounded-xl ring-4 ring-inset" />
+                        <div class="absolute inset-0 rounded-xl ring-4 ring-success/80 ring-inset" />
                     </div>
                 </div>
             </div>

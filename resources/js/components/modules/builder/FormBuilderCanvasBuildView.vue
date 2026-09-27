@@ -144,7 +144,7 @@ const showDropChrome = computed(
         <div class="w-full max-w-[480px] sm:max-w-[520px]">
             <div
                 v-if="isEmpty"
-                class="border-border bg-muted/30 text-muted-foreground mb-3 hidden items-center gap-1.5 rounded-lg border border-dashed px-3 py-2 text-xs whitespace-nowrap lg:flex"
+                class="mb-3 hidden items-center gap-1.5 rounded-lg border border-dashed border-border bg-muted/30 px-3 py-2 text-xs whitespace-nowrap text-muted-foreground lg:flex"
             >
                 <span>Tarik dari panel kiri</span>
                 <span class="text-muted-foreground/40" aria-hidden="true">→</span>
@@ -155,14 +155,14 @@ const showDropChrome = computed(
 
             <!-- Section utama: banner + judul/deskripsi + field, dipisah divider -->
             <section
-                class="border-border bg-card overflow-hidden rounded-2xl border shadow-sm"
-                :class="showDropChrome && !isEmpty ? 'ring-primary/25 ring-2 ring-inset' : ''"
+                class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
+                :class="showDropChrome && !isEmpty ? 'ring-2 ring-primary/25 ring-inset' : ''"
                 @dragover.prevent="$emit('canvasDragOver', $event)"
                 @dragleave="$emit('canvasDragLeave', $event)"
                 @drop="$emit('canvasDrop', $event)"
             >
                 <!-- Banner -->
-                <div class="border-border/70 border-b">
+                <div class="border-b border-border/70">
                     <FormBuilderBannerBlock
                         v-model:banner="banner"
                         :banner-preview-src="bannerPreviewSrc"
@@ -171,7 +171,7 @@ const showDropChrome = computed(
                 </div>
 
                 <!-- Formulir Pendaftaran: judul + deskripsi (editable di kanvas) -->
-                <section class="border-border/70 border-b">
+                <section class="border-b border-border/70">
                     <div class="space-y-3 px-4 py-4 sm:px-5 sm:py-5">
                         <div class="flex flex-col gap-1.5">
                             <div class="flex items-baseline justify-between gap-2">
@@ -179,48 +179,46 @@ const showDropChrome = computed(
                                     Title <span class="text-destructive">*</span>
                                 </Label>
                                 <span
-                                    class="text-muted-foreground/70 text-[10px] font-medium tabular-nums"
+                                    class="text-[10px] font-medium text-muted-foreground/70 tabular-nums"
                                     :class="titleLength >= TITLE_MAX ? 'text-destructive/80' : ''"
                                     >{{ titleLength }}/{{ TITLE_MAX }}</span
                                 >
                             </div>
-                            <div
-                                class="border-border/90 bg-background rounded-lg border px-3 py-2 shadow-sm sm:px-3.5"
-                            >
+                            <div class="rounded-lg border border-border/90 bg-background px-3 py-2 shadow-sm sm:px-3.5">
                                 <input
                                     id="f-title"
                                     :value="formTitle"
                                     :maxlength="TITLE_MAX"
                                     placeholder="Judul form"
-                                    class="font-display text-foreground placeholder:text-muted-foreground/65 w-full border-0 bg-transparent p-0 text-sm leading-snug font-semibold tracking-tight focus:ring-0 focus:outline-none sm:text-base"
+                                    class="w-full border-0 bg-transparent p-0 font-display text-sm leading-snug font-semibold tracking-tight text-foreground placeholder:text-muted-foreground/65 focus:ring-0 focus:outline-none sm:text-base"
                                     @input="onTitleInput"
                                 />
                             </div>
-                            <p v-if="fieldErrors?.title" class="text-destructive text-xs">{{ fieldErrors.title }}</p>
+                            <p v-if="fieldErrors?.title" class="text-xs text-destructive">{{ fieldErrors.title }}</p>
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <div class="flex items-baseline justify-between gap-2">
                                 <Label for="f-description" class="text-xs font-medium">Subtitle</Label>
                                 <span
-                                    class="text-muted-foreground/70 text-[10px] font-medium tabular-nums"
+                                    class="text-[10px] font-medium text-muted-foreground/70 tabular-nums"
                                     :class="subtitleLength >= SUBTITLE_MAX ? 'text-destructive/80' : ''"
                                     >{{ subtitleLength }}/{{ SUBTITLE_MAX }}</span
                                 >
                             </div>
-                            <div
-                                class="border-border/90 bg-background rounded-lg border px-3 py-2 shadow-sm sm:px-3.5"
-                            >
+                            <div class="rounded-lg border border-border/90 bg-background px-3 py-2 shadow-sm sm:px-3.5">
                                 <textarea
                                     id="f-description"
                                     :value="formDescription"
                                     :maxlength="SUBTITLE_MAX"
                                     rows="2"
                                     placeholder="Deskripsi singkat untuk peserta…"
-                                    class="text-muted-foreground placeholder:text-muted-foreground/65 min-h-[2.75rem] w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed focus:ring-0 focus:outline-none"
+                                    class="min-h-[2.75rem] w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed text-muted-foreground placeholder:text-muted-foreground/65 focus:ring-0 focus:outline-none"
                                     @input="onSubtitleInput"
                                 ></textarea>
                             </div>
-                            <p v-if="fieldErrors?.description" class="text-destructive text-xs">{{ fieldErrors.description }}</p>
+                            <p v-if="fieldErrors?.description" class="text-xs text-destructive">
+                                {{ fieldErrors.description }}
+                            </p>
                         </div>
                     </div>
                 </section>
@@ -233,7 +231,7 @@ const showDropChrome = computed(
                             class="flex flex-col items-center justify-center py-8 text-center"
                         >
                             <div
-                                class="empty-state-float text-muted-foreground/70 mb-4 grid size-14 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 shadow-sm"
+                                class="empty-state-float mb-4 grid size-14 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-muted-foreground/70 shadow-sm"
                                 aria-hidden="true"
                             >
                                 <svg
@@ -272,8 +270,8 @@ const showDropChrome = computed(
                                     />
                                 </svg>
                             </div>
-                            <p class="text-foreground text-sm font-semibold">Kanvas masih kosong</p>
-                            <p class="text-muted-foreground mt-1 max-w-[260px] text-sm leading-relaxed">
+                            <p class="text-sm font-semibold text-foreground">Kanvas masih kosong</p>
+                            <p class="mt-1 max-w-[260px] text-sm leading-relaxed text-muted-foreground">
                                 <span class="hidden lg:inline">Tarik komponen dari kiri untuk menambah field.</span>
                                 <span class="lg:hidden">Gunakan tombol di bawah untuk menambah field pertama.</span>
                             </p>
@@ -284,13 +282,13 @@ const showDropChrome = computed(
 
                         <div
                             v-if="isEmpty && isDraggingOverCanvas"
-                            class="border-primary/50 bg-primary/[0.08] text-primary hidden min-h-[140px] flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed transition-all duration-300 lg:flex"
+                            class="hidden min-h-[140px] flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-primary/50 bg-primary/[0.08] text-primary transition-all duration-300 lg:flex"
                         >
-                            <div class="bg-primary/15 grid size-12 place-items-center rounded-full">
+                            <div class="grid size-12 place-items-center rounded-full bg-primary/15">
                                 <PlusCircle class="size-6" />
                             </div>
                             <p class="text-sm font-semibold">Lepaskan di sini</p>
-                            <p class="text-muted-foreground max-w-xs px-4 text-center text-xs">
+                            <p class="max-w-xs px-4 text-center text-xs text-muted-foreground">
                                 Field baru akan ditambahkan pada posisi ini.
                             </p>
                         </div>
@@ -324,7 +322,7 @@ const showDropChrome = computed(
                                             >
                                                 <div
                                                     v-if="gapActive(sliceStart + localIdx)"
-                                                    class="border-primary bg-primary/15 text-primary flex w-full max-w-full scale-[1.01] items-center justify-center gap-2 rounded-xl border-2 border-dashed px-3 py-2.5 shadow-md transition-transform duration-200"
+                                                    class="flex w-full max-w-full scale-[1.01] items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary bg-primary/15 px-3 py-2.5 text-primary shadow-md transition-transform duration-200"
                                                 >
                                                     <PlusCircle class="size-4 shrink-0" />
                                                     <span class="text-xs font-bold tracking-wide"
@@ -333,7 +331,7 @@ const showDropChrome = computed(
                                                 </div>
                                                 <div
                                                     v-else-if="showDropChrome"
-                                                    class="border-muted-foreground/35 bg-muted/40 h-1 w-full max-w-[90%] rounded-full border border-dashed"
+                                                    class="h-1 w-full max-w-[90%] rounded-full border border-dashed border-muted-foreground/35 bg-muted/40"
                                                 />
                                             </div>
                                         </div>
@@ -349,7 +347,7 @@ const showDropChrome = computed(
                                                 :class="dragSourceId === field.id ? 'scale-[0.98]' : ''"
                                             >
                                                 <div
-                                                    class="border-border bg-card text-muted-foreground hover:border-primary/45 hover:bg-primary/8 hover:text-primary ring-border/60 hover:ring-primary/25 grid size-10 cursor-grab place-items-center rounded-full border-2 border-transparent shadow-sm ring-1 transition-all duration-200 active:cursor-grabbing"
+                                                    class="grid size-10 cursor-grab place-items-center rounded-full border-2 border-border border-transparent bg-card text-muted-foreground shadow-sm ring-1 ring-border/60 transition-all duration-200 hover:border-primary/45 hover:bg-primary/8 hover:text-primary hover:ring-primary/25 active:cursor-grabbing"
                                                     draggable="true"
                                                     title="Seret untuk memindahkan urutan — atau pakai tombol naik/turun"
                                                     @dragstart="
@@ -365,7 +363,7 @@ const showDropChrome = computed(
                                                         type="button"
                                                         variant="outline"
                                                         size="icon"
-                                                        class="border-border/80 hover:border-primary/40 hover:bg-primary/5 size-8 shadow-sm transition-all duration-200"
+                                                        class="size-8 border-border/80 shadow-sm transition-all duration-200 hover:border-primary/40 hover:bg-primary/5"
                                                         :disabled="sliceStart + localIdx === 0"
                                                         title="Pindah ke atas"
                                                         @click="$emit('moveField', field.id, -1)"
@@ -377,7 +375,7 @@ const showDropChrome = computed(
                                                         type="button"
                                                         variant="outline"
                                                         size="icon"
-                                                        class="border-border/80 hover:border-primary/40 hover:bg-primary/5 size-8 shadow-sm transition-all duration-200"
+                                                        class="size-8 border-border/80 shadow-sm transition-all duration-200 hover:border-primary/40 hover:bg-primary/5"
                                                         :disabled="sliceStart + localIdx === formFields.length - 1"
                                                         title="Pindah ke bawah"
                                                         @click="$emit('moveField', field.id, 1)"
@@ -401,7 +399,7 @@ const showDropChrome = computed(
                                         </div>
 
                                         <div
-                                            class="border-border bg-muted/30 mt-2 flex items-center justify-between gap-1 rounded-xl border px-2 py-1.5 lg:hidden"
+                                            class="mt-2 flex items-center justify-between gap-1 rounded-xl border border-border bg-muted/30 px-2 py-1.5 lg:hidden"
                                         >
                                             <div class="flex items-center gap-0.5">
                                                 <Button
@@ -457,14 +455,14 @@ const showDropChrome = computed(
                                     <div class="flex min-h-[1.25rem] w-full items-center justify-center">
                                         <div
                                             v-if="gapActive(trailingGapIndex)"
-                                            class="border-primary bg-primary/15 text-primary flex w-full scale-[1.01] items-center justify-center gap-2 rounded-xl border-2 border-dashed px-3 py-2.5 shadow-md transition-transform duration-200"
+                                            class="flex w-full scale-[1.01] items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary bg-primary/15 px-3 py-2.5 text-primary shadow-md transition-transform duration-200"
                                         >
                                             <PlusCircle class="size-4 shrink-0" />
                                             <span class="text-xs font-bold tracking-wide">Sisipkan di akhir</span>
                                         </div>
                                         <div
                                             v-else-if="showDropChrome"
-                                            class="border-muted-foreground/35 bg-muted/40 h-1 w-full max-w-[90%] rounded-full border border-dashed"
+                                            class="h-1 w-full max-w-[90%] rounded-full border border-dashed border-muted-foreground/35 bg-muted/40"
                                         />
                                     </div>
                                 </div>
@@ -472,10 +470,10 @@ const showDropChrome = computed(
 
                             <nav
                                 v-if="totalPages > 1"
-                                class="border-border/80 mt-5 flex shrink-0 flex-wrap items-center justify-between gap-3 border-t pt-5"
+                                class="mt-5 flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-border/80 pt-5"
                                 aria-label="Halaman field"
                             >
-                                <p class="text-muted-foreground text-xs font-medium">
+                                <p class="text-xs font-medium text-muted-foreground">
                                     Field {{ sliceStart + 1 }}–{{
                                         Math.min(sliceStart + paginatedFields.length, formFields.length)
                                     }}
@@ -493,7 +491,7 @@ const showDropChrome = computed(
                                         <ChevronLeft class="size-4" />
                                         <span class="hidden sm:inline">Sebelumnya</span>
                                     </Button>
-                                    <span class="text-muted-foreground text-xs font-semibold tabular-nums">
+                                    <span class="text-xs font-semibold text-muted-foreground tabular-nums">
                                         {{ currentPage }} / {{ totalPages }}
                                     </span>
                                     <Button
@@ -520,7 +518,7 @@ const showDropChrome = computed(
                 />
             </section>
 
-            <p class="text-muted-foreground/80 mt-5 hidden text-center text-xs leading-relaxed lg:block">
+            <p class="mt-5 hidden text-center text-xs leading-relaxed text-muted-foreground/80 lg:block">
                 Lebar pratinjau mengikuti tampilan form di perangkat seluler. Maks. {{ PAGE_SIZE }} field per halaman.
             </p>
         </div>

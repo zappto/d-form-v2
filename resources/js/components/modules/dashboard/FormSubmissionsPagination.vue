@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3'
-import { Button } from '@/components/ui/button'
-import { submissionPaginationLabel } from '@/lib/formSubmissionsUi'
+import { Link } from '@inertiajs/vue3';
+import { Button } from '@/components/ui/button';
+import { submissionPaginationLabel } from '@/lib/formSubmissionsUi';
 
 interface PaginationLink {
-    url: string | null
-    label: string
-    active: boolean
+    url: string | null;
+    label: string;
+    active: boolean;
 }
 
 withDefaults(
     defineProps<{
-        links: PaginationLink[] | undefined
-        currentPage: number
-        lastPage: number
-        total: number
+        links: PaginationLink[] | undefined;
+        currentPage: number;
+        lastPage: number;
+        total: number;
         /** Kata setelah angka total, mis. "pengiriman" atau "rekaman". */
-        totalLabel?: string
+        totalLabel?: string;
     }>(),
-    { totalLabel: 'pengiriman' },
-)
+    { totalLabel: 'pengiriman' }
+);
 
 function formatInt(n: number): string {
-    return new Intl.NumberFormat('id-ID').format(n)
+    return new Intl.NumberFormat('id-ID').format(n);
 }
 </script>
 
@@ -44,10 +44,10 @@ function formatInt(n: number): string {
                 variant="outline"
                 size="sm"
                 :class="[
- 'h-9 min-w-9',
- link.active ? 'border-primary bg-primary/10 text-primary' : '',
- !link.url ? 'opacity-40' : '',
- ]"
+                    'h-9 min-w-9',
+                    link.active ? 'border-primary bg-primary/10 text-primary' : '',
+                    !link.url ? 'opacity-40' : '',
+                ]"
                 :disabled="!link.url"
                 as-child
             >

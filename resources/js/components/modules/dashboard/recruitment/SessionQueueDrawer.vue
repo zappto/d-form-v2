@@ -1,74 +1,70 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import {
-    useRecruitmentQueue,
-    type QueueEntryRow,
-    type QueueSnapshot,
-} from '@/hooks/useRecruitmentQueue'
-import { Skeleton } from '@/components/ui/skeleton'
-import { padQueueNumber } from '@/lib/format'
-import { FORM_SHEET_FOOTER_CLASS, FORM_SHEET_HEADER_CLASS } from './formSheetClasses'
+import { computed, onMounted, ref } from 'vue';
+import { SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useRecruitmentQueue, type QueueEntryRow, type QueueSnapshot } from '@/hooks/useRecruitmentQueue';
+import { Skeleton } from '@/components/ui/skeleton';
+import { padQueueNumber } from '@/lib/format';
+import { FORM_SHEET_FOOTER_CLASS, FORM_SHEET_HEADER_CLASS } from './formSheetClasses';
 
 const props = defineProps<{
-    pollUrl: string
-    sessionDate: string | null
-    division: string | null
-}>()
+    pollUrl: string;
+    sessionDate: string | null;
+    division: string | null;
+}>();
 
 const EMPTY_SNAPSHOT: QueueSnapshot = {
     entries: [],
     current: null,
     next: null,
     stats: { waiting: 0, called: 0, completed: 0, total: 0 },
-}
+};
 
-const { queue, refresh } = useRecruitmentQueue(props.pollUrl, EMPTY_SNAPSHOT)
-const loading = ref<boolean>(true)
+const { queue, refresh } = useRecruitmentQueue(props.pollUrl, EMPTY_SNAPSHOT);
+const loading = ref<boolean>(true);
 
 onMounted(async (): Promise<void> => {
-    await refresh()
-    loading.value = false
-})
+    await refresh();
+    loading.value = false;
+});
 
 function formatSessionDate(value: string): string {
-    const parsed: Date = new Date(`${value}T00:00:00`)
-    if (Number.isNaN(parsed.getTime())) return value
+    const parsed: Date = new Date(`${value}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return value;
     return parsed.toLocaleDateString('id-ID', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         year: 'numeric',
-    })
+    });
 }
 
 const sessionSubtitle = computed<string>((): string => {
-    const parts: string[] = []
+    const parts: string[] = [];
     if (props.sessionDate !== null && props.sessionDate !== '') {
-        parts.push(formatSessionDate(props.sessionDate))
+        parts.push(formatSessionDate(props.sessionDate));
     }
     if (props.division !== null && props.division !== '') {
-        parts.push(props.division)
+        parts.push(props.division);
     }
-    return parts.length > 0 ? parts.join(' · ') : 'Ringkasan antrean sesi interview'
-})
+    return parts.length > 0 ? parts.join(' · ') : 'Ringkasan antrean sesi interview';
+});
 
 /** Nomor antrean drawer sesi; komposisi tipis atas helper kanonis. */
 function queueNumber(value: number): string {
-    return `#${padQueueNumber(value)}`
+    return `#${padQueueNumber(value)}`;
 }
 
 const waitingEntries = computed<QueueEntryRow[]>((): QueueEntryRow[] =>
     queue.value.entries
         .filter((entry: QueueEntryRow): boolean => entry.status === 'waiting')
         .slice()
-        .sort((a: QueueEntryRow, b: QueueEntryRow): number => a.queue_number - b.queue_number),
-)
+        .sort((a: QueueEntryRow, b: QueueEntryRow): number => a.queue_number - b.queue_number)
+);
 
 interface StatItem {
-    key: string
-    label: string
-    value: number
+    key: string;
+    label: string;
+    value: number;
 }
 
 const statItems = computed<StatItem[]>((): StatItem[] => [
@@ -76,7 +72,7 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
     { key: 'called', label: 'Berlangsung', value: queue.value.stats.called },
     { key: 'completed', label: 'Selesai', value: queue.value.stats.completed },
     { key: 'total', label: 'Total', value: queue.value.stats.total },
-])
+]);
 </script>
 
 <template>
@@ -89,11 +85,7 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
         </SheetHeader>
 
         <div class="min-h-0 flex-1 space-y-5 overflow-y-auto p-4" :aria-busy="loading">
-            <div
-                v-if="loading"
-                aria-label="Memuat antrean"
-                class="space-y-5"
-            >
+            <div v-if="loading" aria-label="Memuat antrean" class="space-y-5">
                 <div class="grid grid-cols-2 gap-2">
                     <div
                         v-for="n in 4"
@@ -107,7 +99,9 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
 
                 <div class="space-y-2">
                     <Skeleton class="h-4 w-32" />
-                    <div class="drawer-current-skeleton flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-3.5 py-3">
+                    <div
+                        class="drawer-current-skeleton flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-3.5 py-3"
+                    >
                         <Skeleton class="h-6 w-12 shrink-0 font-mono" />
                         <div class="min-w-0 flex-1 space-y-1.5">
                             <Skeleton class="h-4 w-2/3" />
@@ -139,12 +133,8 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
 
             <template v-else>
                 <dl class="grid grid-cols-2 gap-2">
-                    <div
-                        v-for="stat in statItems"
-                        :key="stat.key"
-                        class="rounded-xl border border-border/70 px-3 py-2"
-                    >
-                        <dt class="text-xs uppercase text-muted-foreground">{{ stat.label }}</dt>
+                    <div v-for="stat in statItems" :key="stat.key" class="rounded-xl border border-border/70 px-3 py-2">
+                        <dt class="text-xs text-muted-foreground uppercase">{{ stat.label }}</dt>
                         <dd class="mt-0.5 text-lg font-semibold tabular-nums">{{ stat.value }}</dd>
                     </div>
                 </dl>
@@ -155,7 +145,7 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
                         v-if="queue.current"
                         class="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-3.5 py-3"
                     >
-                        <span class="font-mono text-lg font-semibold tabular-nums text-primary">
+                        <span class="font-mono text-lg font-semibold text-primary tabular-nums">
                             {{ queueNumber(queue.current.queue_number) }}
                         </span>
                         <div class="min-w-0">
@@ -178,9 +168,7 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
                 <section class="space-y-2" aria-label="Menunggu">
                     <div class="flex items-baseline justify-between gap-2">
                         <h3 class="text-sm font-semibold">Menunggu</h3>
-                        <p class="text-xs text-muted-foreground tabular-nums">
-                            {{ queue.stats.waiting }} menunggu
-                        </p>
+                        <p class="text-xs text-muted-foreground tabular-nums">{{ queue.stats.waiting }} menunggu</p>
                     </div>
                     <ul
                         v-if="waitingEntries.length > 0"
