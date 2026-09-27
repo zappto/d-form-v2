@@ -76,7 +76,9 @@ describe('useFormFillPage — penulisan jawaban', () => {
         const host = mountFillHook(3);
         try {
             expect(host.ctx.answerForm.team_member_emails).toEqual(['', '', '']);
+            const previousEmails = host.ctx.answerForm.team_member_emails;
             host.ctx.setTeamMemberEmail(1, 'a@example.com');
+            expect(host.ctx.answerForm.team_member_emails).not.toBe(previousEmails);
             host.ctx.setTeamMemberEmail(3, 'c@example.com');
             expect(host.ctx.answerForm.team_member_emails).toEqual(['a@example.com', '', 'c@example.com']);
         } finally {
