@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { ariaInvalidBorderClass, ariaInvalidRingClass } from '@/lib/ariaInvalidClass'
 import { Check, ChevronDown, Plus, Search } from 'lucide-vue-next'
 
 defineOptions({ inheritAttrs: false })
@@ -55,7 +56,7 @@ const triggerClass = computed<string>(() =>
         'hover:border-primary/30',
         'focus:outline-none focus:border-ring focus:ring-[3px] focus:ring-ring/30',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+        `${ariaInvalidBorderClass} ${ariaInvalidRingClass}`,
         props.class,
     ),
 )
