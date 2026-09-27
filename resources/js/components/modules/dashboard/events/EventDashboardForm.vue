@@ -27,6 +27,7 @@ import {
     update as updateEvent,
 } from '@/actions/App/Http/Controllers/Dashboard/Events/EventController';
 import { getFieldError } from '@/lib/error-message';
+import { useBannerFilePicker } from '@/hooks/useBannerFilePicker';
 import { cn } from '@/lib/utils';
 import {
     formatIntegerId,
@@ -248,11 +249,13 @@ const pageSubtitle = computed(() =>
         : 'Perbarui detail event kamu — simpan perubahan atau terbitkan kembali.'
 );
 
-const bannerPreview = ref<string | null>(
-    props.variant === 'edit' && props.event?.banner_url ? props.event.banner_url : null
-);
+const bannerPicker = useBannerFilePicker({
+    initialUrl: props.variant === 'edit' && props.event?.banner_url ? props.event.banner_url : null,
+});
 
-const isDragging = ref(false);
+const bannerPreview = bannerPicker.bannerPreview;
+
+const isDragging = bannerPicker.isDragging;
 
 const quotaDisplay = ref(form.quota > 0 ? formatIntegerId(form.quota) : '');
 
@@ -321,25 +324,18 @@ function commitQuotaPriceFromFields(): void {
 }
 
 function handleBannerChange(e: Event): void {
-    const input = e.target as HTMLInputElement;
-    if (input.files?.[0]) {
-        form.banner = input.files[0];
-        bannerPreview.value = URL.createObjectURL(input.files[0]);
-    }
+    bannerPicker.handleInputChange(e);
+    form.banner = bannerPicker.bannerFile.value;
 }
 
 function handleDrop(e: DragEvent): void {
-    isDragging.value = false;
-    const file = e.dataTransfer?.files[0];
-    if (file && file.type.startsWith('image/')) {
-        form.banner = file;
-        bannerPreview.value = URL.createObjectURL(file);
-    }
+    bannerPicker.handleDrop(e);
+    form.banner = bannerPicker.bannerFile.value;
 }
 
 function removeBanner(): void {
+    bannerPicker.clearSelection();
     form.banner = null;
-    bannerPreview.value = null;
 }
 
 function submitForm(publish: boolean): void {

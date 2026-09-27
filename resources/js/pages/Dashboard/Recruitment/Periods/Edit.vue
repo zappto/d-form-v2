@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import { routes } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { useBannerFilePicker } from '@/hooks/useBannerFilePicker'
 import { ImageUp, X } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardLayout })
@@ -58,9 +59,9 @@ const form = useForm({
 })
 
 const bannerInput = ref<HTMLInputElement | null>(null)
-const bannerPreview = ref<string | null>(existingBannerUrl.value)
-const isDragging = ref(false)
-let bannerObjectUrl: string | null = null
+const bannerPicker = useBannerFilePicker({ initialUrl: existingBannerUrl.value })
+const bannerPreview = bannerPicker.bannerPreview
+const isDragging = bannerPicker.isDragging
 
 const dateErrorClass =
     'border-destructive/70 bg-red-50 focus-visible:border-destructive focus-visible:ring-destructive/20 dark:bg-red-500/10'
@@ -69,44 +70,24 @@ onMounted(() => {
     setTopbar({ title: 'Edit periode', subtitle: props.period?.name ?? '' })
 })
 
-onUnmounted(releaseBannerObjectUrl)
-
 function openBannerPicker(): void {
-    bannerInput.value?.click()
-}
-
-function releaseBannerObjectUrl(): void {
-    if (bannerObjectUrl) {
-        URL.revokeObjectURL(bannerObjectUrl)
-        bannerObjectUrl = null
-    }
-}
-
-function applyBannerFile(file: File): void {
-    releaseBannerObjectUrl()
-    bannerObjectUrl = URL.createObjectURL(file)
-    bannerPreview.value = bannerObjectUrl
-    form.banner = file
+    bannerPicker.openPicker(bannerInput.value)
 }
 
 function handleBannerChange(event: Event): void {
-    const input = event.target as HTMLInputElement
-    const file = input.files?.[0]
-    if (file) applyBannerFile(file)
-    input.value = ''
+    bannerPicker.handleInputChange(event)
+    form.banner = bannerPicker.bannerFile.value
 }
 
 function handleBannerDrop(event: DragEvent): void {
-    isDragging.value = false
-    const file = event.dataTransfer?.files?.[0]
-    if (file && file.type.startsWith('image/')) applyBannerFile(file)
+    bannerPicker.handleDrop(event)
+    form.banner = bannerPicker.bannerFile.value
 }
 
 /** Membatalkan pilihan berkas baru; banner lama tetap dipakai (tidak dikirim ulang). */
 function removeBanner(): void {
-    releaseBannerObjectUrl()
+    bannerPicker.clearSelection()
     form.banner = null
-    bannerPreview.value = existingBannerUrl.value
 }
 
 function submit(): void {
