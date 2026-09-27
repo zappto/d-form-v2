@@ -4,7 +4,9 @@ import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils
 import TeamInvitation from '../TeamInvitation.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import { Dialog } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import { toast } from 'vue-sonner';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
@@ -36,9 +38,23 @@ interface IPostedCall {
     options: IMutationOptions | undefined;
 }
 
+/** Nilai state form mock: bag jawaban + flag/kontrol useForm yang ikut di-spread. */
+type TMockFormStateValue =
+    | TFormFillAnswerValue
+    | boolean
+    | Record<string, string>
+    | (() => void)
+    | ((url: string, options?: IMutationOptions) => void);
+
+/** State form mock dengan index signature agar test dapat membaca/menulis bag jawaban. */
+interface IMockFormState {
+    processing: boolean;
+    [key: string]: TMockFormStateValue;
+}
+
 const { postedCalls, formStates, createdCounter } = vi.hoisted(() => ({
     postedCalls: [] as IPostedCall[],
-    formStates: [] as Array<{ tag: 'confirm' | 'decline'; state: { processing: boolean } }>,
+    formStates: [] as Array<{ tag: 'confirm' | 'decline'; state: IMockFormState }>,
     createdCounter: { count: 0 },
 }));
 
@@ -87,13 +103,17 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 
-function mountInvitation(): VueWrapper<InstanceType<typeof TeamInvitation>> {
+function mountInvitationWithFields(
+    fields: IFormField[],
+    answers: TFormFillAnswerMap
+): VueWrapper<InstanceType<typeof TeamInvitation>> {
+    window.localStorage.removeItem('dform:invite:fo-1');
     return mount(TeamInvitation, {
         props: {
             event: { id: 'ev-1', slug: 'acara', title: 'Acara' },
             form: { id: 'fo-1', title: 'Formulir' },
-            fields: [],
-            answers: {},
+            fields,
+            answers,
             leader: { name: 'Ketua', email: 'ketua@example.com' },
             alreadyConfirmed: false,
             confirmUrl: '/invitation/token-abc',
@@ -117,6 +137,31 @@ function mountInvitation(): VueWrapper<InstanceType<typeof TeamInvitation>> {
             },
         },
     });
+}
+
+function mountInvitation(): VueWrapper<InstanceType<typeof TeamInvitation>> {
+    return mountInvitationWithFields([], {});
+}
+
+/** Field undangan editable (`is_append`) dengan default minimal; override sesuai skenario test. */
+function invitationField(overrides: Partial<IFormField>): IFormField {
+    return {
+        id: 'field-1',
+        type: 'input',
+        label: 'Field',
+        name: 'field',
+        order: 1,
+        metadata: {},
+        is_append: true,
+        ...overrides,
+    };
+}
+
+/** Bag jawaban confirmForm dari mock useForm (form pertama yang dibuat komponen undangan). */
+function confirmFormState(): IMockFormState {
+    const entry = formStates.find((s) => s.tag === 'confirm');
+    if (!entry) throw new Error('confirmForm belum dibuat');
+    return entry.state;
 }
 
 function triggerButton(wrapper: VueWrapper, idle: string, busy: string): DOMWrapper<HTMLButtonElement> {
@@ -331,6 +376,121 @@ describe('TeamInvitation decline (Task 7)', () => {
             await nextTick();
 
             expect(declineCalls()).toHaveLength(1);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+});
+
+/**
+ * DFORM-46: test penjaga binding jawaban dinamis (text/textarea/radio/file)
+ * pasca commit f3c4b81 yang menghapus cast `as`. `fields` diisi agar cabang
+ * template memanggil textAnswer/setTextAnswer/onFileAnswerChange (sebelumnya
+ * `fields: []` membuat cabang ini tak pernah dieksekusi).
+ */
+describe('TeamInvitation dynamic field answers (DFORM-46)', () => {
+    it('text: nilai string dari bag jawaban tampil di input', async () => {
+        const wrapper = mountInvitationWithFields(
+            [invitationField({ name: 'catatan', label: 'Catatan', type: 'input' })],
+            { catatan: 'Draft awal' }
+        );
+        try {
+            expect(wrapper.find<HTMLInputElement>('input').element.value).toBe('Draft awal');
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('text: update menulis string ke bag (angka non-string dikonversi)', async () => {
+        const wrapper = mountInvitationWithFields(
+            [invitationField({ name: 'catatan', label: 'Catatan', type: 'input' })],
+            {}
+        );
+        try {
+            wrapper.findComponent(Input).vm.$emit('update:modelValue', 42);
+            await nextTick();
+
+            expect(confirmFormState()['catatan']).toBe('42');
+            expect(wrapper.find<HTMLInputElement>('input').element.value).toBe('42');
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('textarea: nilai dari bag tampil + update menulis string ke bag', async () => {
+        const wrapper = mountInvitationWithFields(
+            [invitationField({ name: 'catatan', label: 'Catatan', type: 'textarea' })],
+            { catatan: 'Draft awal' }
+        );
+        try {
+            const textarea = wrapper.find<HTMLTextAreaElement>('textarea:not(#decline_reason)');
+            expect(textarea.element.value).toBe('Draft awal');
+
+            await textarea.setValue('Draft baru');
+
+            expect(confirmFormState()['catatan']).toBe('Draft baru');
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('radio: baris dengan label cocok checked, lainnya tidak', async () => {
+        const wrapper = mountInvitationWithFields(
+            [
+                invitationField({
+                    name: 'pilihan',
+                    label: 'Pilihan',
+                    type: 'radio',
+                    metadata: { optionChoices: ['Ya', 'Tidak'] },
+                }),
+            ],
+            { pilihan: 'Ya' }
+        );
+        try {
+            const radios = wrapper.findAll<HTMLInputElement>('input[type="radio"]');
+            expect(radios).toHaveLength(2);
+            expect(radios[0].element.checked).toBe(true);
+            expect(radios[1].element.checked).toBe(false);
+
+            await radios[1].setValue();
+
+            expect(confirmFormState()['pilihan']).toBe('Tidak');
+            expect(radios[0].element.checked).toBe(false);
+            expect(radios[1].element.checked).toBe(true);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('file: onFileAnswerChange menaruh objek File pada bag jawaban', async () => {
+        const wrapper = mountInvitationWithFields(
+            [invitationField({ name: 'dokumen', label: 'Dokumen', type: 'fileUpload' })],
+            {}
+        );
+        try {
+            const file = new File(['isi berkas'], 'berkas.txt', { type: 'text/plain' });
+            const fileInput = wrapper.find<HTMLInputElement>('input[type="file"]');
+            Object.defineProperty(fileInput.element, 'files', { value: [file], configurable: true });
+
+            await fileInput.trigger('change');
+
+            expect(confirmFormState()['dokumen']).toBeInstanceOf(File);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('hardening: nilai non-string di bag dirender string kosong', async () => {
+        const wrapper = mountInvitationWithFields(
+            [invitationField({ name: 'catatan', label: 'Catatan', type: 'input' })],
+            { catatan: 'Awal' }
+        );
+        try {
+            // hardening pasca-refactor: textAnswer memetakan non-string ke '' (dulu nilai mentah lolos).
+            confirmFormState()['catatan'] = ['sisa draft'];
+            await nextTick();
+
+            expect(wrapper.find<HTMLInputElement>('input').element.value).toBe('');
         } finally {
             wrapper.unmount();
         }
