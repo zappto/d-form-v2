@@ -6,7 +6,7 @@ import { usePage, Link } from '@inertiajs/vue3';
 import { MapPin, CalendarDays, ArrowRight, Check, Shield } from 'lucide-vue-next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { categoryLabelMap, categoryColorMap, sessionLabelMap } from '@/lib/dummyData';
-import { formatDisplayDate } from '@/lib/format';
+import { formatCountNumber, formatDisplayDate } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
 import { stripHtmlToText } from '@/utils/stripHtml';
 import type { SharedSeoProps } from '@/types/seo';
@@ -301,7 +301,7 @@ const highlights: string[] = [
                                     <div>
                                         <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Kapasitas</p>
                                         <p class="mt-1 text-sm font-semibold text-foreground">
-                                            {{ event.registered_count.toLocaleString() }} / {{ event.quota.toLocaleString() }} terdaftar
+                                            {{ formatCountNumber(event.registered_count) }} / {{ formatCountNumber(event.quota) }} terdaftar
                                         </p>
                                     </div>
                                     <span class="font-display text-2xl font-bold tabular-nums text-primary">{{ capacityPercent }}%</span>
@@ -378,8 +378,8 @@ const highlights: string[] = [
                                         >{{ capacityPercent }}%</span
                                     >
                                     <span class="text-muted-foreground text-xs">
-                                        {{ event.registered_count.toLocaleString() }} /
-                                        {{ event.quota.toLocaleString() }}
+                                        {{ formatCountNumber(event.registered_count) }} /
+                                        {{ formatCountNumber(event.quota) }}
                                     </span>
                                 </div>
                                 <div class="bg-muted h-2.5 w-full overflow-hidden rounded-full">

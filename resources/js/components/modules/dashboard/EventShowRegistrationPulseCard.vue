@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card';
+import { formatCountNumber } from '@/lib/format';
 
 defineProps<{
     event: IEvent;
@@ -48,11 +49,11 @@ defineProps<{
 
             <div class="min-w-0 text-center sm:text-left">
                 <p class="text-foreground/85 text-[0.9375rem] leading-relaxed">
-                    <span class="font-semibold tabular-nums">{{ event.registered_count.toLocaleString() }}</span>
+                    <span class="font-semibold tabular-nums">{{ formatCountNumber(event.registered_count) }}</span>
                     of
-                    <span class="font-semibold tabular-nums">{{ event.quota.toLocaleString() }}</span>
+                    <span class="font-semibold tabular-nums">{{ formatCountNumber(event.quota) }}</span>
                     seats are taken —
-                    <span class="text-muted-foreground">{{ remainingSeats.toLocaleString() }} still open.</span>
+                    <span class="text-muted-foreground">{{ formatCountNumber(remainingSeats) }} still open.</span>
                 </p>
 
                 <div class="mt-3 grid gap-3 sm:grid-cols-2">

@@ -8,6 +8,8 @@
  * Replace with real API data when backend is wired.
  */
 
+import { formatDisplayDate, formatDisplayDateTime } from '@/lib/format';
+
 export const dummyEvents: IEvent[] = [
     {
         id: '1a2b3c4d-0001',
@@ -354,10 +356,12 @@ export const categoryLabelMap: Record<string, string> = {
     etc: 'Etc',
 }
 
+/** Format tanggal pendek id-ID; delegasi ke helper kanonis. */
 export function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    return formatDisplayDate(dateStr);
 }
 
+/** Format tanggal + jam id-ID; delegasi ke helper kanonis. */
 export function formatDateTime(dateStr: string): string {
-    return new Date(dateStr).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    return formatDisplayDateTime(dateStr);
 }
