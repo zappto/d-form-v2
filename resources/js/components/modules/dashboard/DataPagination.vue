@@ -17,10 +17,12 @@ import {
 interface IDataPaginationProps {
     /** Current 1-based page, forwarded to reka as `page`. */
     page: number;
-    /** Total row count, forwarded to reka as `total`. */
-    total: number;
-    /** Rows per page, forwarded to reka as `items-per-page`. */
-    perPage: number;
+    /** Row count; the numbered window derives from it with `perPage` (reka), so numbered call-sites need both. */
+    total?: number;
+    /** Rows per page; the numbered window derives from it with `total` (reka), so numbered call-sites need both. */
+    perPage?: number;
+    /** Authoritative page count (server `last_page`); falls back to ceil(total / perPage). */
+    pageCount?: number;
     /** Page numbers kept on each side of the active page. */
     siblingCount?: number;
     /** Keeps the first/last page always visible, with ellipsis between them. */
@@ -36,6 +38,8 @@ interface IDataPaginationProps {
 }
 
 const props = withDefaults(defineProps<IDataPaginationProps>(), {
+    total: 0,
+    perPage: 1,
     siblingCount: 1,
     edges: false,
     numbers: true,
@@ -46,14 +50,14 @@ const props = withDefaults(defineProps<IDataPaginationProps>(), {
 
 const emits = defineEmits<{ 'update:page': [page: number] }>();
 
-/** Total page count for a row count, never below one page. */
+/** Total page count for a row count, never below one page; fallback for `pageCount`. */
 function toPageCount(total: number, perPage: number): number {
     return Math.max(1, Math.ceil(total / (perPage || 1)));
 }
 
-const pageCount = computed(() => toPageCount(props.total, props.perPage));
+const resolvedPageCount = computed<number>(() => props.pageCount ?? toPageCount(props.total, props.perPage));
 const isFirstPage = computed(() => props.page <= 1);
-const isLastPage = computed(() => props.page >= pageCount.value);
+const isLastPage = computed(() => props.page >= resolvedPageCount.value);
 /** Widens the labelled buttons to match the `size-9` icon-only edge buttons. */
 const labelButtonClass = computed(() => (props.firstLast ? 'h-9 px-4' : undefined));
 
@@ -66,6 +70,8 @@ function emitPage(page: number): void {
 <template>
     <Pagination
         v-if="numbers"
+        class="mx-0 w-auto"
+        aria-label="Navigasi halaman"
         :page="page"
         :total="total"
         :items-per-page="perPage"
@@ -137,7 +143,7 @@ function emitPage(page: number): void {
             class="size-9"
             :disabled="isLastPage"
             aria-label="Halaman terakhir"
-            @click="emitPage(pageCount)"
+            @click="emitPage(resolvedPageCount)"
         >
             <ChevronsRight class="size-4" />
         </Button>

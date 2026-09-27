@@ -168,6 +168,35 @@ describe('DataPagination — mode bernomor', () => {
 
         wrapper.unmount();
     });
+
+    it('nav berlebar konten: menimpa w-full/mx-auto bawaan primitif', () => {
+        const wrapper = mountPagination({ page: 5, total: 200, perPage: 10 });
+        const nav = wrapper.find('[data-slot="pagination"]');
+
+        expect(nav.classes()).toContain('w-auto');
+        expect(nav.classes()).not.toContain('w-full');
+        expect(nav.classes()).toContain('mx-0');
+        expect(nav.classes()).not.toContain('mx-auto');
+        expect(nav.classes()).toContain('justify-center');
+
+        wrapper.unmount();
+    });
+
+    it('nav bernomor memakai nama landmark Indonesia', () => {
+        const wrapper = mountPagination({ page: 5, total: 200, perPage: 10 });
+
+        expect(wrapper.find('[data-slot="pagination"]').attributes('aria-label')).toBe('Navigasi halaman');
+
+        wrapper.unmount();
+    });
+
+    it('mengabaikan pageCount: jendela bernomor tetap dari total/perPage', () => {
+        const wrapper = mountPagination({ page: 5, total: 200, perPage: 10, pageCount: 2 });
+
+        expect(pageItems(wrapper).map((item) => item.text())).toEqual(['4', '5', '6']);
+
+        wrapper.unmount();
+    });
 });
 
 describe('DataPagination — mode kompak (numbers=false)', () => {
@@ -267,6 +296,76 @@ describe('DataPagination — mode kompak (numbers=false)', () => {
         expect(pageItems(wrapper)).toHaveLength(0);
         expect(wrapper.findAll('[data-slot="pagination-ellipsis"]')).toHaveLength(0);
         expect(buttons.map((button) => button.text())).toEqual(['Sebelumnya', 'Berikutnya']);
+
+        wrapper.unmount();
+    });
+
+    it('cukup page + pageCount tanpa total/perPage', () => {
+        const first = mountPagination({
+            page: 1,
+            pageCount: 5,
+            numbers: false,
+            firstLast: true,
+            total: undefined,
+            perPage: undefined,
+        });
+        const firstButtons = first.findAll('button');
+        expect(firstButtons[0]?.attributes('disabled')).toBeDefined();
+        expect(firstButtons[1]?.attributes('disabled')).toBeDefined();
+        expect(firstButtons[2]?.attributes('disabled')).toBeUndefined();
+        expect(firstButtons[3]?.attributes('disabled')).toBeUndefined();
+        first.unmount();
+
+        const last = mountPagination({
+            page: 5,
+            pageCount: 5,
+            numbers: false,
+            firstLast: true,
+            total: undefined,
+            perPage: undefined,
+        });
+        const lastButtons = last.findAll('button');
+        expect(lastButtons[0]?.attributes('disabled')).toBeUndefined();
+        expect(lastButtons[1]?.attributes('disabled')).toBeUndefined();
+        expect(lastButtons[2]?.attributes('disabled')).toBeDefined();
+        expect(lastButtons[3]?.attributes('disabled')).toBeDefined();
+        last.unmount();
+    });
+
+    it('klik Last memakai pageCount sebagai target', async () => {
+        const wrapper = mountPagination({
+            page: 3,
+            pageCount: 7,
+            numbers: false,
+            firstLast: true,
+            total: undefined,
+            perPage: undefined,
+        });
+        const buttons = wrapper.findAll('button');
+
+        await buttons[3]?.trigger('click');
+
+        expect(wrapper.emitted('update:page')).toEqual([[7]]);
+
+        wrapper.unmount();
+    });
+
+    it('pageCount menang atas total/perPage yang tidak konsisten', async () => {
+        const wrapper = mountPagination({
+            page: 1,
+            total: 1,
+            perPage: 1,
+            pageCount: 2,
+            numbers: false,
+            firstLast: true,
+        });
+        const buttons = wrapper.findAll('button');
+
+        expect(buttons[2]?.attributes('disabled')).toBeUndefined();
+
+        await buttons[3]?.trigger('click');
+
+        expect(wrapper.emitted('update:page')).toEqual([[2]]);
 
         wrapper.unmount();
     });
