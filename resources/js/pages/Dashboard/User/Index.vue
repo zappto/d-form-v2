@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import KpiCard from '@/components/modules/dashboard/KpiCard.vue'
+import KpiCardSkeleton from '@/components/modules/dashboard/KpiCardSkeleton.vue'
 import EventCalendar from '@/components/modules/dashboard/EventCalendar.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -65,10 +66,7 @@ onMounted(() => {
             aria-busy="true"
             aria-label="Memuat ringkasan dasbor"
         >
-            <div v-for="n in 3" :key="`kpi-${n}`" class="kpi-skeleton rounded-2xl border border-border/70 p-4 shadow-xs">
-                <Skeleton class="h-3 w-1/2" />
-                <Skeleton class="mt-2 h-7 w-1/3" />
-            </div>
+            <KpiCardSkeleton v-for="n in 3" :key="`kpi-${n}`" />
         </div>
         <div v-else class="fade-up grid gap-4 sm:grid-cols-3">
             <KpiCard label="Events Joined" :value="props.stats?.eventsJoined ?? 0" :trend="20" :icon="CalendarDays" color="primary" />

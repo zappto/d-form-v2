@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import DashboardFocusLayout from '@/layouts/DashboardFocusLayout.vue'
 import KpiCard from '@/components/modules/dashboard/KpiCard.vue'
+import KpiCardSkeleton from '@/components/modules/dashboard/KpiCardSkeleton.vue'
 import EventReportingFocusPanel from '@/components/modules/dashboard/EventReportingFocusPanel.vue'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -72,10 +73,7 @@ onMounted(() => {
             aria-busy="true"
             aria-label="Memuat ringkasan laporan"
         >
-            <div v-for="n in 3" :key="`kpi-${n}`" class="kpi-skeleton rounded-2xl border border-border/70 p-4 shadow-xs">
-                <Skeleton class="h-3 w-1/2" />
-                <Skeleton class="mt-2 h-7 w-1/3" />
-            </div>
+            <KpiCardSkeleton v-for="n in 3" :key="`kpi-${n}`" />
         </div>
         <div v-else class="fade-up grid gap-4 sm:grid-cols-3">
             <KpiCard label="Events" :value="globalSummary?.total_events ?? 0" :icon="BarChart3" color="primary" />
