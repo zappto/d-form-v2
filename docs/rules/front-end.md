@@ -75,6 +75,6 @@ Seluruh komponen Vue disimpan di dalam `resources/js/components` dan dibagi menj
 
 ## 7. TypeScript Standard
 
-1.  **No Any:** Penggunaan `any` sangat dilarang. Gunakan `unknown` atau buatkan `interface` khusus jika tipe data belum pasti.
+1.  **No Any / No Unknown:** Penggunaan `any` **dan** `unknown` sebagai tipe longgar sangat dilarang. Modelkan tipe konkret, atau modelkan nilai hilang secara eksplisit (union dengan `null`, properti opsi `?`, `Partial<T>`). Pemakaian di batas eksternal (JSON/localStorage/response) wajib langsung dipersempit dan alasannya ditulis satu baris di changelog. Acuan mengikat: `AGENTS.md` (14 aturan user).
 2.  **Naming:** Nama Interface/Type harus menggunakan PascalCase. Contoh: `interface UserData { ... }`.
 3.  **Prop Safety:** Manfaatkan `PropType` jika mendefinisikan props secara manual di luar TypeScript generic.
