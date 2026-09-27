@@ -401,6 +401,10 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         scanHistory.value.unshift(entry);
     }
 
+    /**
+     * Terapkan payload feed eksternal. Parameter `unknown` di sini posisi penyempitan:
+     * payload divalidasi predikat `isGlobalScanFeedPayload` sebelum diparse.
+     */
     function applyFeed(payload: unknown): void {
         if (!isGlobalScanFeedPayload(payload)) {
             return;
@@ -425,6 +429,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         pollAbort = controller;
 
         try {
+            // Respons feed mentah sengaja `unknown`: langsung divalidasi predikat isGlobalScanFeedPayload di applyFeed.
             const { data } = await axios.get<unknown>(args.feedUrl, {
                 params: feedCursor.length > 0 ? { since: feedCursor } : {},
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },

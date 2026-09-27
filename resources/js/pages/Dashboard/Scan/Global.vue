@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { FileSpreadsheet, FileText } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
-import { useGlobalQrScanPage } from '@/hooks/useGlobalQrScanPage';
+import { useGlobalQrScanPage, type IGlobalScanTargets } from '@/hooks/useGlobalQrScanPage';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardFocusLayout });
@@ -23,10 +23,7 @@ defineOptions({ layout: DashboardFocusLayout });
 const EXPORT_DOWNLOAD_STAGGER_MS = 400;
 
 const props = defineProps<{
-    targets: {
-        sessions: Array<{ id: string } & Record<string, unknown>>;
-        events: Array<{ id: string | number } & Record<string, unknown>>;
-    };
+    targets: IGlobalScanTargets;
     globalScanStoreUrl: string;
     globalScanFeedUrl?: string;
 }>();

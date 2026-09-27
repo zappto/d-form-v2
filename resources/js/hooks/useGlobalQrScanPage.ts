@@ -4,9 +4,20 @@ import { useQrCamera } from '@/hooks/useQrCamera';
 import { useQrFeed, type TQrScanSource } from '@/hooks/useQrFeed';
 import type { TIScanEntry, TIScanResult } from '@/lib/qrScanUi';
 
+export interface IGlobalScanSessionTarget {
+    id: string;
+    session_date?: string;
+    division?: { name: string } | null;
+}
+
+export interface IGlobalScanEventTarget {
+    id: string | number;
+    title: string;
+}
+
 export interface IGlobalScanTargets {
-    sessions: Array<{ id: string } & Record<string, unknown>>;
-    events: Array<{ id: string | number } & Record<string, unknown>>;
+    sessions: IGlobalScanSessionTarget[];
+    events: IGlobalScanEventTarget[];
 }
 
 export interface IGlobalScanTargetOption {
@@ -43,16 +54,10 @@ function formatSessionDate(raw: string): string {
     return parsed.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function readRecordString(record: Record<string, unknown>, key: string): string {
-    const value: unknown = record[key];
-
-    return typeof value === 'string' ? value : '';
-}
-
-function sessionDivisionName(session: { id: string } & Record<string, unknown>): string {
-    const division: unknown = session.division;
+function sessionDivisionName(session: IGlobalScanSessionTarget): string {
+    const division = session.division;
     if (typeof division === 'object' && division !== null) {
-        const name: unknown = (division as Record<string, unknown>).name;
+        const name = division.name;
         if (typeof name === 'string' && name.trim().length > 0) {
             return name.trim();
         }
@@ -61,9 +66,10 @@ function sessionDivisionName(session: { id: string } & Record<string, unknown>):
     return 'Interview';
 }
 
-function sessionOptionLabel(session: { id: string } & Record<string, unknown>): string {
+function sessionOptionLabel(session: IGlobalScanSessionTarget): string {
     const divisionName = sessionDivisionName(session);
-    const date = formatSessionDate(readRecordString(session, 'session_date'));
+    const rawDate = typeof session.session_date === 'string' ? session.session_date : '';
+    const date = formatSessionDate(rawDate);
 
     return date.length > 0 ? `${divisionName} · ${date}` : divisionName;
 }
@@ -73,15 +79,15 @@ function sessionOptionLabel(session: { id: string } & Record<string, unknown>): 
  * `Oprec · {division.name} · {session_date}`. Kunci ini meniru bagian setelah
  * prefix "Oprec · " agar cocok dengan entri riwayat hasil scan.
  */
-function sessionMatchKey(session: { id: string } & Record<string, unknown>): string {
+function sessionMatchKey(session: IGlobalScanSessionTarget): string {
     const divisionName = sessionDivisionName(session);
-    const rawDate = readRecordString(session, 'session_date');
+    const rawDate = typeof session.session_date === 'string' ? session.session_date : '';
 
     return `${divisionName} · ${rawDate}`;
 }
 
-function eventOptionLabel(event: { id: string | number } & Record<string, unknown>): string {
-    const title = readRecordString(event, 'title');
+function eventOptionLabel(event: IGlobalScanEventTarget): string {
+    const title = typeof event.title === 'string' ? event.title : '';
 
     return title.length > 0 ? title : `Event ${String(event.id)}`;
 }

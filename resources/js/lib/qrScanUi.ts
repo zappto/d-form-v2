@@ -40,7 +40,11 @@ export function extractQrCandidate(decodedText: string): string {
     }
 
     try {
-        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        const parsed: unknown = JSON.parse(raw);
+        if (!isQrDecodedPayload(parsed)) {
+            return raw;
+        }
+
         const candidate =
             parsed.application_id ??
             parsed.submission_id ??
@@ -84,39 +88,62 @@ export interface TIGlobalScanFeedRow {
     queueNumber: number | null;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+/** Bentuk payload JSON yang mungkin dibawa QR; seluruh kolom opsional karena berasal dari luar. */
+interface IQrDecodedPayload {
+    application_id?: string | number | null;
+    submission_id?: string | number | null;
+    token?: string | number | null;
+    code?: string | number | null;
+    qr?: string | number | null;
+    email?: string | number | null;
+    id?: string | number | null;
+}
+
+/** Baris mentah feed scan global; seluruh kolom opsional karena berasal dari respons eksternal. */
+interface IGlobalScanRawRow {
+    id?: string | number | null;
+    ts?: string | number | null;
+    type?: string | null;
+    eventTitle?: string | null;
+    name?: string | null;
+    identifier?: string | null;
+    queueNumber?: string | number | null;
+}
+
+/** Payload mentah feed scan global; seluruh kolom opsional karena berasal dari respons eksternal. */
+interface IGlobalScanRawPayload {
+    rows?: IGlobalScanRawRow[] | null;
+    cursor?: string | number | null;
+}
+
+/** Guard objek polos payload QR; parameter `unknown` di sini posisi penyempitan. */
+function isQrDecodedPayload(value: unknown): value is IQrDecodedPayload {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function toUnknownArray(value: unknown): unknown[] {
-    if (!Array.isArray(value)) {
-        return [];
-    }
-
-    const items: unknown[] = [];
-    for (let index = 0; index < value.length; index += 1) {
-        const item: unknown = value[index];
-        items.push(item);
-    }
-
-    return items;
+/** Guard objek polos satu baris feed; parameter `unknown` di sini posisi penyempitan. */
+function isGlobalScanRawRow(value: unknown): value is IGlobalScanRawRow {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function readString(record: Record<string, unknown>, key: string): string {
-    const value = record[key];
+/** Guard objek polos payload feed; parameter `unknown` di sini posisi penyempitan. */
+function isGlobalScanRawPayload(value: unknown): value is IGlobalScanRawPayload {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
+/** Baca kolom teks dari baris/payload eksternal; '' bila kolom bukan string. */
+function readStringValue(value: string | number | null | undefined): string {
     return typeof value === 'string' ? value : '';
 }
 
-function readQueueNumber(record: Record<string, unknown>, key: string): number | null {
-    const value = record[key];
-
+/** Baca kolom angka dari baris eksternal; null bila kolom bukan angka valid. */
+function readQueueNumberValue(value: string | number | null | undefined): number | null {
     return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
 /** Cek bentuk payload feed scan global; dipakai sebagai guard sebelum mem-parse feed. */
 export function isGlobalScanFeedPayload(payload: unknown): boolean {
-    if (!isRecord(payload)) {
+    if (!isGlobalScanRawPayload(payload)) {
         return false;
     }
 
@@ -125,29 +152,30 @@ export function isGlobalScanFeedPayload(payload: unknown): boolean {
 
 /** Parse baris feed scan global menjadi daftar terketik sambil melewati baris rusak; dipakai saat memuat feed scan. */
 export function parseGlobalScanFeedRows(payload: unknown): TIGlobalScanFeedRow[] {
-    if (!isRecord(payload)) {
+    if (!isGlobalScanRawPayload(payload)) {
         return [];
     }
 
+    const rawRows: IGlobalScanRawRow[] = Array.isArray(payload.rows) ? payload.rows : [];
     const rows: TIGlobalScanFeedRow[] = [];
-    for (const item of toUnknownArray(payload.rows)) {
-        if (!isRecord(item)) {
+    for (const item of rawRows) {
+        if (!isGlobalScanRawRow(item)) {
             continue;
         }
 
-        const id = readString(item, 'id');
+        const id = readStringValue(item.id);
         if (id.length === 0) {
             continue;
         }
 
         rows.push({
             id,
-            ts: readString(item, 'ts'),
-            type: readString(item, 'type') === 'recruitment' ? 'recruitment' : 'event',
-            eventTitle: readString(item, 'eventTitle'),
-            name: readString(item, 'name'),
-            identifier: readString(item, 'identifier'),
-            queueNumber: readQueueNumber(item, 'queueNumber'),
+            ts: readStringValue(item.ts),
+            type: readStringValue(item.type) === 'recruitment' ? 'recruitment' : 'event',
+            eventTitle: readStringValue(item.eventTitle),
+            name: readStringValue(item.name),
+            identifier: readStringValue(item.identifier),
+            queueNumber: readQueueNumberValue(item.queueNumber),
         });
     }
 
@@ -156,11 +184,11 @@ export function parseGlobalScanFeedRows(payload: unknown): TIGlobalScanFeedRow[]
 
 /** Ambil cursor pagination dari payload feed scan global; dipakai untuk memuat halaman feed berikutnya. */
 export function parseGlobalScanCursor(payload: unknown): string {
-    if (!isRecord(payload)) {
+    if (!isGlobalScanRawPayload(payload)) {
         return '';
     }
 
-    return readString(payload, 'cursor');
+    return readStringValue(payload.cursor);
 }
 
 /** Bunyikan beep (dan getar) sesuai status scan; dipakai sebagai umpan balik setelah scan QR. */
