@@ -22,6 +22,7 @@ import type {
     FormFieldRules,
 } from '@/types/form'
 
+/** Nilai jawaban, banner, blok akses, validasi, dan draft lokal halaman isi form responden. */
 export function useFormFillPage(props: {
     event: FormFillPageEvent
     form: FormFillPageForm

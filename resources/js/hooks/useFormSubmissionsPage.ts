@@ -47,6 +47,7 @@ function bundleGroupRows(paginator: BundleGroupPaginator | undefined): IBundleSu
     return paginator?.data ?? []
 }
 
+/** Daftar submission (atau grup bundle), detail terpilih, dan aksi review halaman submission dashboard. */
 export function useFormSubmissionsPage(props: {
     event: { id: string; title: string }
     form: { id: string; title: string; registration_mode?: 'single' | 'bundle' | 'team' }

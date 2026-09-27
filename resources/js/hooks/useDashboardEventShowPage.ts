@@ -11,6 +11,7 @@ import { formatDisplayDate, formatDisplayDateTime, formatRupiahPrice } from '@/l
 import { parseEventCategories } from '@/lib/eventShowUi'
 import { Banknote, CalendarDays, Clock, MapPin } from 'lucide-vue-next'
 
+/** Data turunan (kuota, status, progres) dan aksi arsip/pulihkan/publish halaman detail event dashboard. */
 export function useDashboardEventShowPage(
     event: IEvent,
     forms: { id: string; title: string }[],

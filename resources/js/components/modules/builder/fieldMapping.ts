@@ -7,10 +7,12 @@ import type { BackendField, BuilderField, FieldOptionEntry } from '@/types/form-
 
 export type { BackendField, BuilderField, FieldOptionEntry }
 
+/** Label opsi yang sudah di-trim; dipakai saat menampilkan dan menyerialkan pilihan field. */
 export function optionLabel(entry: FieldOptionEntry): string {
     return String(entry.label ?? '').trim()
 }
 
+/** URL gambar opsi yang sudah di-trim, atau undefined bila kosong; dipakai render opsi bergambar. */
 export function optionImageUrl(entry: FieldOptionEntry): string | undefined {
     return entry.imageUrl?.trim() || undefined
 }
@@ -81,6 +83,7 @@ function mergeTextRules(req: Record<string, unknown>, f: BuilderField): Record<s
     return merged
 }
 
+/** Konversi field builder ke payload backend (5 tipe API) lengkap dengan metadata/rules; dipakai saat simpan form. */
 export function toBackendField(f: BuilderField, order: number): BackendField {
     const base = {
         id: f.id,
@@ -218,6 +221,7 @@ function guessType(apiType: string, m: Record<string, unknown>): string {
     return 'short_text'
 }
 
+/** Konversi field backend ke bentuk builder (menebak tipe builder bila metadata minim); dipakai saat memuat form ke editor. */
 export function fromBackendField(bf: BackendField): BuilderField {
     const mFull: Record<string, unknown> =
         bf.metadata && typeof bf.metadata === 'object' ? (bf.metadata as Record<string, unknown>) : {}

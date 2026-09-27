@@ -30,6 +30,7 @@ export interface QueueSnapshot {
 
 const POLL_INTERVAL_MS = 10_000
 
+/** Snapshot antrean rekrutmen yang di-poll berkala beserta status loading dan kontrol polling. */
 export function useRecruitmentQueue(pollUrl: string, initial: QueueSnapshot) {
     const queue = ref<QueueSnapshot>(initial)
     const polling = ref(true)

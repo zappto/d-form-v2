@@ -24,6 +24,7 @@ function builderApiType(field: IFormField): string {
     return typeof bt === 'string' ? bt : field.type
 }
 
+/** State banner form kosong tanpa file/url; titik awal sebelum baris banner dimuat dari field. */
 export function defaultFormBannerState(): FormBannerState {
     return {
         id: null,
@@ -81,6 +82,7 @@ export function revokeBannerPreview(state: FormBannerState): void {
     state.bannerPreviewUrl = ''
 }
 
+/** Pisahkan baris banner dari daftar field builder ke state banner dan sisakan field kanvas; dipakai saat memuat form. */
 export function extractFormBannerFromBuilderFields(rows: BuilderField[]): {
     banner: FormBannerState
     canvasFields: BuilderField[]
@@ -114,6 +116,7 @@ export function extractFormBannerFromBuilderFields(rows: BuilderField[]): {
 
 const FORM_BANNER_NAME = 'form_banner'
 
+/** Bangun field builder banner dari state, atau null bila tak ada isi; dipakai menyusun payload simpan. */
 export function buildFormBannerBuilderField(state: FormBannerState): BuilderField | null {
     const trimmedUrl = state.bannerUrl.trim()
     const trimmedCaption = state.caption.trim()
@@ -158,6 +161,7 @@ export function buildFormBannerBuilderField(state: FormBannerState): BuilderFiel
     }
 }
 
+/** Sisipkan field banner hasil sintesis di depan daftar field payload; banner kosong membiarkan daftar apa adanya. */
 export function prependFormBannerToBackendPayload(
     canvasFields: BuilderField[],
     banner: FormBannerState,
@@ -238,6 +242,7 @@ export function readBannerPathFromResponse(payload: unknown): string | null {
     return null
 }
 
+/** Pilih baris banner form (yang ditandai formBanner dulu, lalu legacy) paling awal berdasar order; dipakai halaman isi form. */
 export function pickFormBannerField(fields: readonly IFormField[]): IFormField | null {
     const flagged = [...fields].filter((f) => builderApiType(f) === 'banner' && recordMetadata(f).formBanner === true)
     if (flagged.length > 0) {
@@ -247,6 +252,7 @@ export function pickFormBannerField(fields: readonly IFormField[]): IFormField |
     return legacy.sort((a, b) => a.order - b.order)[0] ?? null
 }
 
+/** Buang baris banner dari daftar field agar tersisa field isian saja; dipakai sebelum render/validasi. */
 export function filterBodyFields(fields: readonly IFormField[]): IFormField[] {
     return fields.filter((f) => builderApiType(f) !== 'banner')
 }

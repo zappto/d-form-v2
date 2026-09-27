@@ -90,6 +90,7 @@ function normalizeMatchText(value: string): string {
     return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 }
 
+/** Kamera QR, umpan hasil scan, opsi target filter, dan ringkasan halaman scan QR global. */
 export function useGlobalQrScanPage(
     scannerContainerId: string,
     storeUrl: string,
