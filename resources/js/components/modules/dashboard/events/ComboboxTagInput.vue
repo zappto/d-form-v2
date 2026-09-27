@@ -207,10 +207,11 @@ function handleInputFocus() {
 }
 
 function handleClickOutside(e: PointerEvent) {
-    if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
-        open.value = false;
-        highlightIndex.value = -1;
-    }
+    if (!containerRef.value) return;
+    const target = e.target;
+    if (target instanceof Node && containerRef.value.contains(target)) return;
+    open.value = false;
+    highlightIndex.value = -1;
 }
 
 watch(query, () => {

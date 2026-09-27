@@ -39,6 +39,12 @@ function setTextAnswer(name: string, value: string | number): void {
     props.ctx.setFieldAnswer(name, String(value));
 }
 
+/** Narrow a slot answer to its uploaded File; answers of other kinds yield null. */
+function fileAnswer(name: string): File | null {
+    const value = props.ctx.answerForm[name];
+    return value instanceof File ? value : null;
+}
+
 const showSubtitle = computed(() => props.variant === 'linear' && Boolean(props.participationSlot.title));
 
 const headerBorderClass = computed(() => {
@@ -219,7 +225,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                     type="radio"
                     :name="`${field.name}-${participationSlot.slotIndex ?? 'lead'}`"
                     :value="row.label"
-                    :checked="(ctx.answerForm[storageKey] as string) === row.label"
+                    :checked="ctx.answerForm[storageKey] === row.label"
                     class="size-4 accent-primary"
                     @change="() => ctx.setFieldAnswer(storageKey, row.label)"
                 />
@@ -260,13 +266,11 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                 <button
                     type="button"
                     class="absolute inset-0 z-10 flex w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                    @click="
-                        emit('openLightbox', ctx.filePreviewUrls[storageKey], (ctx.answerForm[storageKey] as File).name)
-                    "
+                    @click="emit('openLightbox', ctx.filePreviewUrls[storageKey], fileAnswer(storageKey)?.name ?? '')"
                 >
                     <img
                         :src="ctx.filePreviewUrls[storageKey]"
-                        :alt="(ctx.answerForm[storageKey] as File).name"
+                        :alt="fileAnswer(storageKey)?.name"
                         class="h-full w-full object-cover"
                     />
                     <span class="sr-only">View full size</span>
@@ -274,7 +278,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                 <button
                     type="button"
                     class="absolute top-2 right-2 z-20 grid size-9 place-items-center border border-border/80 bg-background/95 text-destructive shadow-md backdrop-blur-sm"
-                    :aria-label="`Remove ${(ctx.answerForm[storageKey] as File).name}`"
+                    :aria-label="`Remove ${fileAnswer(storageKey)?.name}`"
                     @click.stop="ctx.clearFileUpload(storageKey)"
                 >
                     <X class="size-4" />
@@ -322,7 +326,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                 class="relative z-10 mt-4 flex items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 shadow-xs"
             >
                 <span class="max-w-[200px] truncate text-xs font-medium text-foreground">{{
-                    (ctx.answerForm[storageKey] as File).name
+                    fileAnswer(storageKey)?.name
                 }}</span>
                 <button type="button" class="text-destructive" @click="ctx.clearFileUpload(storageKey)">
                     <X class="size-4" />

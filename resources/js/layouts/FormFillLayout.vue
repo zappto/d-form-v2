@@ -8,11 +8,18 @@ import { ArrowLeft } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
 import { usePageFlashToast } from '@/hooks/usePageFlashToast';
 
-const page = usePage();
+/** Prop halaman form-fill: `event` ada bila dibuka dari halaman acara. */
+interface IFormFillLayoutEvent {
+    id: string;
+    slug?: string;
+    title: string;
+}
+
+const page = usePage<{ event?: IFormFillLayoutEvent }>();
 usePageFlashToast();
 
 const fallbackBackHref = computed((): string => {
-    const event = page.props.event as { id: string; slug?: string; title: string } | undefined;
+    const event = page.props.event;
     if (event) return routes.member.event.show(event.slug ?? event.id);
     return routes.member.joined;
 });

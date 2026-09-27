@@ -66,7 +66,7 @@ const props = defineProps<{
 }>();
 
 const page = usePage();
-const currentUserEmail = computed(() => (page.props as ITProps).auth?.user?.email?.trim().toLowerCase() ?? '');
+const currentUserEmail = computed(() => page.props.auth?.user?.email?.trim().toLowerCase() ?? '');
 
 const expandedBySlot = ref<Record<number, boolean>>({});
 const statusBySlot = ref<Record<number, TCheckStatus>>({});
@@ -118,8 +118,14 @@ function toggleSlot(slot: number) {
     expandedBySlot.value = { ...expandedBySlot.value, [slot]: !isExpanded(slot) };
 }
 
+/** Stored teammate emails; non-array answers are treated as an empty list. */
+function teamMemberEmails(): string[] {
+    const value = props.ctx.answerForm.team_member_emails;
+    return Array.isArray(value) ? value : [];
+}
+
 function emailAt(slot: number): string {
-    return String((props.ctx.answerForm.team_member_emails as string[] | undefined)?.[slot - 1] ?? '');
+    return String(teamMemberEmails()[slot - 1] ?? '');
 }
 
 function validEmailFormat(s: string): boolean {
@@ -169,6 +175,7 @@ async function runEmailCheck(slot: number) {
                 'X-Requested-With': 'XMLHttpRequest',
             },
         });
+        // Batas eksternal: body HTTP tanpa tipe dari server; bentuknya dijaga konsumen di bawah.
         const body = (await res.json()) as {
             exists?: boolean;
             message?: string;
@@ -184,7 +191,7 @@ async function runEmailCheck(slot: number) {
                 slot,
                 'error',
                 undefined,
-                humanizeErrorMessage((body.message as string | undefined) || 'Could not verify this email.')
+                humanizeErrorMessage(body.message || 'Could not verify this email.')
             );
             return;
         }
@@ -200,7 +207,7 @@ async function runEmailCheck(slot: number) {
             );
         }
     } catch (e) {
-        if ((e as Error).name === 'AbortError') {
+        if (e instanceof Error && e.name === 'AbortError') {
             return;
         }
         setCheckState(slot, 'error', undefined, humanizeErrorMessage('Could not verify this email. Try again.'));

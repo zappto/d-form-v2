@@ -31,6 +31,7 @@ async function submit(): Promise<void> {
         toast.success(humanizeErrorMessage(data.message));
     } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 422) {
+            // Batas eksternal: envelope error Axios tanpa tipe; dipersempit di sini lalu dijaga `if (errors)`.
             const errors = error.response.data?.errors as Record<string, string[]> | undefined;
             if (errors) {
                 handleInertiaFormErrors(errors, { title: 'Gagal mengirim tautan reset' });

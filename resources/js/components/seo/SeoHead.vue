@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import type { ISharedSeoProps } from '@/types/seo';
 
 /** Nilai JSON-LD rekursif: skalar, array, atau objek bertingkat. */
 export type TJsonLdValue = string | number | boolean | null | TJsonLdValue[] | { [key: string]: TJsonLdValue };
@@ -32,7 +31,7 @@ const props = withDefaults(
 
 const page = usePage();
 
-const seo = computed(() => (page.props as { seo?: ISharedSeoProps }).seo);
+const seo = computed(() => page.props.seo);
 
 const siteName = computed(() => seo.value?.siteName ?? 'App');
 

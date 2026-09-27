@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, type ComponentPublicInstance } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import { useEventListener } from '@vueuse/core';
 import { Button } from '@/components/ui/button';
@@ -51,6 +51,16 @@ const openMenuId = ref<string | null>(null);
 const menuRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLElement | null>(null);
 
+/** Simpan elemen pemicu menu; ref komponen non-elemen diabaikan agar berhenti bertipe elemen. */
+function setTriggerRef(el: Element | ComponentPublicInstance | null): void {
+    triggerRef.value = el instanceof HTMLElement ? el : null;
+}
+
+/** Simpan elemen panel menu; ref komponen non-elemen diabaikan agar berhenti bertipe elemen. */
+function setMenuRef(el: Element | ComponentPublicInstance | null): void {
+    menuRef.value = el instanceof HTMLElement ? el : null;
+}
+
 function toggleMenu(): void {
     openMenuId.value = openMenuId.value === props.event.id ? null : props.event.id;
 }
@@ -82,9 +92,8 @@ function requestDelete(): void {
 
 function closeIfOutside(target: EventTarget | null): void {
     if (openMenuId.value === null) return;
-    const node = target as Node | null;
-    if (!node) return;
-    if (triggerRef.value?.contains(node) || menuRef.value?.contains(node)) return;
+    if (!(target instanceof Node)) return;
+    if (triggerRef.value?.contains(target) || menuRef.value?.contains(target)) return;
     closeMenu();
 }
 
@@ -139,11 +148,7 @@ useEventListener('keydown', (e) => {
                 size="icon-sm"
                 aria-label="Menu acara"
                 class="relative size-8 shrink-0 cursor-pointer border border-border/60 bg-white/90 shadow-sm backdrop-blur-sm transition-colors duration-150 hover:bg-white"
-                :ref="
-                    (el) => {
-                        triggerRef = el as HTMLElement | null;
-                    }
-                "
+                :ref="setTriggerRef"
                 @click.stop="toggleMenu"
             >
                 <MoreVertical class="size-4 shrink-0 stroke-[1.75]" />
@@ -159,11 +164,7 @@ useEventListener('keydown', (e) => {
             >
                 <div
                     v-if="canManage && openMenuId === event.id"
-                    :ref="
-                        (el) => {
-                            menuRef = el as HTMLElement | null;
-                        }
-                    "
+                    :ref="setMenuRef"
                     class="absolute top-10 right-0 z-[20] min-w-48 overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-sm"
                 >
                     <button

@@ -198,11 +198,19 @@ const confirmAction = ref<'verify' | 'pass' | 'reject' | 'resend_tracking' | nul
 const finalModalOpen = ref(false);
 const finalAction = ref<TFinalAction>(null);
 
-const screeningForm = useForm({
+/** Field form screening; `sections` daftar bagian aplikan yang diminta revisi. */
+interface IScreeningFormData {
+    reason: string;
+    notes: string;
+    public_message: string;
+    sections: string[];
+}
+
+const screeningForm = useForm<IScreeningFormData>({
     reason: '',
     notes: '',
     public_message: '',
-    sections: [] as string[],
+    sections: [],
 });
 
 const revisionSectionOptions: { value: string; label: string }[] = [

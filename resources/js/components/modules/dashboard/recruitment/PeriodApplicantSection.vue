@@ -112,7 +112,10 @@ watch(
         if (target) {
             target.focus();
         } else {
-            (document.querySelector('[data-applicant-list]') as HTMLElement | null)?.focus();
+            const listEl = document.querySelector('[data-applicant-list]');
+            if (listEl instanceof HTMLElement) {
+                listEl.focus();
+            }
         }
         lastSelectedId = null;
     }
