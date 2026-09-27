@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { MessageSquareCheck } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
+import { hasMeaningfulHtmlText } from '@/lib/htmlText';
 
 /**
  * Zona konfirmasi "Pesan setelah submit" ala Google Forms — segmen terakhir dari
@@ -21,16 +22,7 @@ defineEmits<{
     remove: [];
 }>();
 
-function hasMeaningfulContent(html: string): boolean {
-    if (!html) return false;
-    const text = html
-        .replace(/<[^>]*>/g, '')
-        .replace(/&nbsp;/gi, ' ')
-        .trim();
-    return text !== '';
-}
-
-const visible = computed(() => props.show || hasMeaningfulContent(successContent.value));
+const visible = computed(() => props.show || hasMeaningfulHtmlText(successContent.value));
 </script>
 
 <template>
