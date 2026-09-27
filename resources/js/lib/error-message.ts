@@ -424,11 +424,6 @@ export function showFlashToast(flash: { type?: string; message?: string } | null
     toast.error(message);
 }
 
-/** @deprecated Gunakan {@link showValidationErrorToast} */
-export function showEventValidationToast(errors: TValidationErrors): void {
-    showValidationErrorToast(errors, { title: 'Validasi gagal' });
-}
-
 /** Bangun peta nama field ke label untuk humanisasi error; dipakai halaman yang butuh label field cepat. */
 export function buildFieldLabelMap(fields: IFormField[]): Record<string, string> {
     const map: Record<string, string> = {};
