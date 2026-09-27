@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ChevronLeft, ChevronRight, MapPin, CalendarDays, ArrowRight } from 'lucide-vue-next';
+import { CATEGORY_COLOR_FALLBACK } from '@/lib/categoryColor';
 import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData';
 import { formatDisplayDate } from '@/lib/format';
 import { toCategoryList, primaryCategory } from '@/lib/eventCategories';
@@ -316,7 +317,7 @@ const legendEntries = computed(() =>
                                         :style="{
                                             backgroundColor:
                                                 categoryColorMap[primaryCategory(ev.category)] ??
-                                                'var(--muted-foreground)',
+                                                CATEGORY_COLOR_FALLBACK,
                                         }"
                                         @click="onEventClick(ev)"
                                     />
@@ -331,7 +332,7 @@ const legendEntries = computed(() =>
                                         :style="{
                                             backgroundColor:
                                                 categoryColorMap[primaryCategory(ev.category)] ??
-                                                'var(--muted-foreground)',
+                                                CATEGORY_COLOR_FALLBACK,
                                         }"
                                         @click="onEventClick(ev)"
                                     >
@@ -378,7 +379,7 @@ const legendEntries = computed(() =>
                                     class="w-full truncate border border-white/10 px-2 py-1 text-left text-[10px] font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
                                     :style="{
                                         backgroundColor:
-                                            categoryColorMap[primaryCategory(ev.category)] ?? 'var(--muted-foreground)',
+                                            categoryColorMap[primaryCategory(ev.category)] ?? CATEGORY_COLOR_FALLBACK,
                                     }"
                                     @click="onEventClick(ev)"
                                 >
@@ -416,7 +417,7 @@ const legendEntries = computed(() =>
                                 class="w-full truncate border border-white/10 px-2.5 py-1.5 text-left text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
                                 :style="{
                                     backgroundColor:
-                                        categoryColorMap[primaryCategory(ev.category)] ?? 'var(--muted-foreground)',
+                                        categoryColorMap[primaryCategory(ev.category)] ?? CATEGORY_COLOR_FALLBACK,
                                 }"
                                 @click="onEventClick(ev)"
                             >
@@ -458,7 +459,7 @@ const legendEntries = computed(() =>
                         v-for="cat in toCategoryList(selectedEvent?.category)"
                         :key="cat"
                         class="text-[10px] text-white"
-                        :style="{ backgroundColor: categoryColorMap[cat] ?? '#6B7280' }"
+                        :style="{ backgroundColor: categoryColorMap[cat] ?? CATEGORY_COLOR_FALLBACK }"
                     >
                         {{ categoryLabelMap[cat] ?? cat }}
                     </Badge>

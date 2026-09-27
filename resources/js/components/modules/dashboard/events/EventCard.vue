@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CalendarDays, MapPin, Users, MoreVertical, SquarePen, Download, FileStack, Trash2 } from 'lucide-vue-next';
 import EventBannerImage from '@/components/modules/dashboard/EventBannerImage.vue';
+import { CATEGORY_COLOR_FALLBACK } from '@/lib/categoryColor';
 import { categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
 import { eventStatusUi } from '@/lib/eventShowUi';
 import { formatDisplayDate, formatRupiahPrice } from '@/lib/format';
@@ -135,9 +136,9 @@ useEventListener('keydown', (e) => {
                         :key="`${event.id}-cat-${cat}`"
                         class="border px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm"
                         :style="{
-                            backgroundColor: `color-mix(in oklab, ${categoryColorMap[cat] ?? '#6B7280'} 12%, white)`,
-                            borderColor: `color-mix(in oklab, ${categoryColorMap[cat] ?? '#6B7280'} 30%, transparent)`,
-                            color: categoryColorMap[cat] ?? '#6B7280',
+                            backgroundColor: `color-mix(in oklab, ${categoryColorMap[cat] ?? CATEGORY_COLOR_FALLBACK} 12%, white)`,
+                            borderColor: `color-mix(in oklab, ${categoryColorMap[cat] ?? CATEGORY_COLOR_FALLBACK} 30%, transparent)`,
+                            color: categoryColorMap[cat] ?? CATEGORY_COLOR_FALLBACK,
                         }"
                     >
                         {{ categoryLabelMap[cat] ?? cat }}

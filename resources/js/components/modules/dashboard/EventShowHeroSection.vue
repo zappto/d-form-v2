@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin } from 'lucide-vue-next';
+import { CATEGORY_COLOR_FALLBACK } from '@/lib/categoryColor';
 import { categoryColorMap, categoryLabelMap } from '@/lib/dummyData';
 import { formatDisplayDate } from '@/lib/format';
 import { toCategoryList } from '@/lib/eventCategories';
@@ -61,7 +62,7 @@ defineProps<{
                             v-for="cat in toCategoryList(event.category)"
                             :key="cat"
                             class="border-0 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm"
-                            :style="{ backgroundColor: categoryColorMap[cat] ?? '#6B7280' }"
+                            :style="{ backgroundColor: categoryColorMap[cat] ?? CATEGORY_COLOR_FALLBACK }"
                         >
                             {{ categoryLabelMap[cat] ?? cat }}
                         </Badge>

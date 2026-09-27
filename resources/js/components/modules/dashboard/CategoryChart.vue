@@ -5,6 +5,7 @@ import { chartTickCallback, formatChartCount } from '@/lib/format';
 import { baseChartTooltipOptions, chartThemeTokens, CHART_FONT_FAMILY } from '@/lib/chartTheme';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, type ChartOptions } from 'chart.js';
+import { CATEGORY_COLOR_FALLBACK } from '@/lib/categoryColor';
 import { categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
 import { LayoutGrid } from 'lucide-vue-next';
 
@@ -126,7 +127,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
                     >
                         <span
                             class="size-2.5 shrink-0 rounded-full shadow-sm"
-                            :style="{ backgroundColor: categoryColorMap[row.token] ?? 'var(--muted-foreground)' }"
+                            :style="{ backgroundColor: categoryColorMap[row.token] ?? CATEGORY_COLOR_FALLBACK }"
                         />
                         <span>{{ categoryLabelMap[row.token] ?? row.token }}</span>
                         <span class="text-muted-foreground tabular-nums">{{ row.count.toLocaleString('id-ID') }}</span>
