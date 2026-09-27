@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import { Button } from '@/components/ui/button';
 import { getFormFieldOptionRows, formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions';
 import { isFileUploadTypeName } from '@/lib/formFieldKind';

@@ -4,7 +4,7 @@ import { config, mount, type VueWrapper } from '@vue/test-utils';
 import PeriodsShow from '../Periods/Show.vue';
 import { Tabs } from '@/components/ui/tabs';
 import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/ApplicantDetailPanel.vue';
-import type { IApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
+import type { IApplicationDetail } from '@/types/recruitment';
 
 /** Tipe baris aplikan diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
 type TApplicationRow = NonNullable<InstanceType<typeof PeriodsShow>['$props']['applications']>[number];

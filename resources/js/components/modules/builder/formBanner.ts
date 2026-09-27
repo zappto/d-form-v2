@@ -1,6 +1,7 @@
 import type { BuilderField } from '@/components/modules/builder/fieldMapping';
 import type { BackendField } from '@/types/form-builder';
 import type { TFormFieldMetadataBag } from '@/types/form';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 
 export interface ITFormBannerState {
     id: string | null;
@@ -36,17 +37,6 @@ export function defaultFormBannerState(): ITFormBannerState {
         bannerPreviewUrl: '',
         order: null,
     };
-}
-
-/** Public URL / data URL / relative storage path → safe display URL for <img>. */
-export function normalizeBannerSrc(raw: string): string {
-    const u = raw.trim();
-    if (!u) return '';
-    if (u.startsWith('data:')) return u;
-    if (/^https?:\/\//i.test(u)) return u;
-    if (u.startsWith('blob:')) return u;
-    if (u.startsWith('/')) return u;
-    return `/storage/${u.replace(/^\/+/, '')}`;
 }
 
 /** True bila ada File banner baru yang menunggu upload via POST /fields. */

@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { X, Star, Upload, ImagePlus, Send } from 'lucide-vue-next';
 import { optionLabel, type IFieldOptionEntry } from '@/components/modules/builder/fieldMapping';
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import { resolveOptionImagePreviewSrc } from '@/components/modules/builder/optionImage';
 import PageHeader from '@/components/modules/dashboard/PageHeader.vue';
 import { Button } from '@/components/ui/button';

@@ -10,7 +10,7 @@ export function humanizeSubmissionKey(fieldLabelMap: Record<string, string>, val
     return fieldLabelMap[value] || value.replace(/^field_/, '').replace(/_/g, ' ');
 }
 
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import type { TFormFillAnswerValue } from '@/types/form';
 
 /** Buat pratinjau singkat nilai jawaban untuk daftar; dipakai di ringkasan jawaban submission. */

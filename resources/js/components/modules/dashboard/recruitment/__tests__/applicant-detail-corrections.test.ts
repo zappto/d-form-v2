@@ -1,7 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
-import ApplicantDetailContent, { type IApplicationDetail } from '../ApplicantDetailContent.vue';
+import ApplicantDetailContent from '../ApplicantDetailContent.vue';
+import type { IApplicationDetail } from '@/types/recruitment';
 import { showErrorToast, showFlashToast } from '@/lib/error-message';
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */

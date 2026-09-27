@@ -1,4 +1,4 @@
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
 import type { TFormFieldMetadataBag, TFormFieldMetadataValue, TFormFillOptionRow } from '@/types/form';
 

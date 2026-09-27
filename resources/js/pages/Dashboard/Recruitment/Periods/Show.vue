@@ -10,7 +10,7 @@ import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import PeriodInterviewSection from '@/components/modules/dashboard/recruitment/PeriodInterviewSection.vue';
 import PeriodReportSection from '@/components/modules/dashboard/recruitment/PeriodReportSection.vue';
 import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/ApplicantDetailPanel.vue';
-import { type IApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
+import { type IApplicationDetail } from '@/types/recruitment';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue';
 import { CometSpinner } from '@/components/ui/comet';

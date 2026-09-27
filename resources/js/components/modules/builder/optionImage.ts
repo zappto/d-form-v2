@@ -1,7 +1,7 @@
 import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 import type { TFormFieldMetadataBag, TFormFieldMetadataValue } from '@/types/form';
 import { isMetadataBag } from '@/lib/formFieldMetadata';
-import { normalizeBannerSrc } from '@/components/modules/builder/formBanner';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 
 export interface ITPendingOptionImageFile {
     fieldId: string;

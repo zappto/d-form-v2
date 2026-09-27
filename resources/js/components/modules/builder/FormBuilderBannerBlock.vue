@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { BannerPickerField } from '@/components/core/field';
 import type { ITFormBannerState } from './formBanner';
-import { normalizeBannerSrc } from './formBanner';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 
 const banner = defineModel<ITFormBannerState>('banner', { required: true });
 

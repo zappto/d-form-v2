@@ -1,4 +1,4 @@
-import type { IApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
+import type { IApplicationDetail } from '@/types/recruitment';
 
 type TRecruitmentAuthUser = {
     roles?: string[];
