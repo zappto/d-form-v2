@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useChartTheme } from '@/hooks/useChartTheme';
 import { chartTickCallback, formatChartCount } from '@/lib/format';
+import { baseChartTooltipOptions, chartThemeTokens } from '@/lib/chartTheme';
 import { Line } from 'vue-chartjs';
 import {
     Chart as ChartJS,
@@ -53,10 +54,7 @@ const chartData = computed(() => ({
 }));
 
 const chartOptions = computed<ChartOptions<'line'>>(() => {
-    const tick = isDark.value ? 'oklch(0.72 0.018 255)' : 'oklch(0.46 0.025 255)';
-    const grid = isDark.value ? 'oklch(0.32 0.02 255)' : 'oklch(0.92 0.008 255)';
-    const tooltipBg = isDark.value ? 'oklch(0.22 0.012 255)' : 'oklch(0.18 0.018 255)';
-    const tooltipFg = isDark.value ? 'oklch(0.96 0.005 255)' : 'oklch(0.99 0 0)';
+    const chartTokens = chartThemeTokens(isDark.value);
 
     return {
         responsive: true,
@@ -65,13 +63,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: tooltipBg,
-                titleColor: tooltipFg,
-                bodyColor: tooltipFg,
-                titleFont: { size: 12, weight: '600', family: 'Poppins, sans-serif' },
-                bodyFont: { size: 12, family: 'Poppins, sans-serif' },
-                padding: 12,
-                cornerRadius: 10,
+                ...baseChartTooltipOptions(chartTokens),
                 displayColors: false,
                 callbacks: {
                     title(items) {
@@ -90,18 +82,18 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
                 border: { display: false },
                 ticks: {
                     font: { size: 11, family: 'Poppins, sans-serif' },
-                    color: tick,
+                    color: chartTokens.tick,
                     maxRotation: 45,
                     minRotation: 0,
                 },
             },
             y: {
-                grid: { color: grid, drawTicks: false },
+                grid: { color: chartTokens.grid, drawTicks: false },
                 border: { display: false },
                 beginAtZero: true,
                 ticks: {
                     font: { size: 11, family: 'Poppins, sans-serif' },
-                    color: tick,
+                    color: chartTokens.tick,
                     precision: 0,
                     callback: chartTickCallback,
                 },
