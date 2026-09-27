@@ -3,6 +3,7 @@
  * Keep page components thin — import from here instead of inlining large `type` blocks.
  */
 
+import { isMetadataBag } from '@/lib/formFieldMetadata';
 import type { BackendField } from '@/components/modules/builder/fieldMapping';
 
 /** Access gate for the public form fill route */
@@ -107,7 +108,7 @@ export function emptyFormRegistrationMetadata(): IFormRegistrationMetadata {
 
 /** Parse metadata registrasi dari payload backend menjadi bentuk terketik dengan default aman; dipakai saat memuat form. */
 export function parseFormRegistrationMetadata(raw: unknown): IFormRegistrationMetadata {
-    const m = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as TFormFieldMetadataBag) : {};
+    const m: TFormFieldMetadataBag = isMetadataBag(raw) ? raw : {};
     const purposeRaw = m['purpose'];
     const purpose: TFormPurpose = purposeRaw === 'other' ? 'other' : 'registration';
     const requiresRaw = m['requires_form_id'];

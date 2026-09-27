@@ -55,6 +55,12 @@ function listFromUnknown(value: unknown): string[] {
     return [];
 }
 
+/** True bila field menyimpan `input_type` legacy (kolom DB) non-blank; menyempitkan tanpa cast. */
+function hasLegacyApiType(field: IFormField): field is IFormField & { input_type: string } {
+    if (!('input_type' in field)) return false;
+    return typeof field.input_type === 'string' && field.input_type !== '';
+}
+
 /**
  * API `type` di IFormField, atau `input_type` legacy (kolom DB) bila payload tidak dinormalisasi.
  */
@@ -62,12 +68,11 @@ export function formFieldApiType(field: IFormField | null): string | undefined {
     if (!field) {
         return undefined;
     }
-    const raw = field as IFormField & { input_type?: string };
-    if (typeof raw.type === 'string' && raw.type !== '') {
-        return raw.type;
+    if (typeof field.type === 'string' && field.type !== '') {
+        return field.type;
     }
-    if (typeof raw.input_type === 'string' && raw.input_type !== '') {
-        return raw.input_type === 'selectInput' ? 'select' : raw.input_type;
+    if (hasLegacyApiType(field)) {
+        return field.input_type === 'selectInput' ? 'select' : field.input_type;
     }
     return undefined;
 }
@@ -101,7 +106,7 @@ function fallbackOptionLabels(field: IFormField): string[] {
     if (optionChoices.length > 0) {
         return optionChoices;
     }
-    const ruleOptions = readFieldRules(field).in as string | undefined;
+    const ruleOptions = readFieldRules(field).in;
     return listFromUnknown(ruleOptions);
 }
 
@@ -114,6 +119,11 @@ type TOptionChoiceRaw = {
     imageUrl?: TFormFieldMetadataValue;
     image_url?: TFormFieldMetadataValue;
 };
+
+/** True bila item berbentuk baris option-choice (objek non-null, bukan array); menyempitkan tanpa cast. */
+function isOptionChoiceRaw(value: unknown): value is TOptionChoiceRaw {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
 
 function flattenMetadataValueArray(arr: TFormFieldMetadataValue[]): TFormFieldMetadataValue[] {
     const out: TFormFieldMetadataValue[] = [];
@@ -156,9 +166,9 @@ function parseOptionChoicesRows(value: unknown, builderType: string): TFormFillO
             rows.push({ type: 'text', label });
             continue;
         }
-        if (!isRecord(item)) continue;
+        if (!isOptionChoiceRaw(item)) continue;
 
-        const typedItem = item as TOptionChoiceRaw;
+        const typedItem = item;
         const resolvedLabel =
             asNonEmptyString(typedItem.label) ??
             asNonEmptyString(typedItem.value) ??

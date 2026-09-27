@@ -15,7 +15,11 @@
 export const TITLE_REQUIRED_MESSAGE = 'Judul wajib diisi';
 export const DESCRIPTION_REQUIRED_MESSAGE = 'Deskripsi wajib diisi';
 
-export type TRequiredHeaderKey = 'title' | 'description';
+/** Daftar kunci header wajib; satu sumber kebenaran untuk urutan + tipe key. */
+const REQUIRED_HEADER_KEYS: readonly ['title', 'description'] = ['title', 'description'];
+
+/** Kunci header required; diturunkan dari daftar agar tidak ada daftar key ganda. */
+export type TRequiredHeaderKey = (typeof REQUIRED_HEADER_KEYS)[number];
 
 /** Nilai header required; diturunkan dari union key agar satu sumber kebenaran. */
 export type TRequiredHeaderFields = Record<TRequiredHeaderKey, string>;
@@ -46,8 +50,7 @@ export function stripBlankRequiredKeys<GDiff extends Partial<TRequiredHeaderFiel
     current: TRequiredHeaderFields
 ): GDiff {
     const next: GDiff = { ...diff };
-    // Object.keys selalu string[] di TS; cast sempit ini satu-satunya cara iterasi runtime.
-    for (const key of Object.keys(REQUIRED_HEADER_MESSAGE) as TRequiredHeaderKey[]) {
+    for (const key of REQUIRED_HEADER_KEYS) {
         if (isBlankRequiredValue(current[key])) delete next[key];
     }
     return next;

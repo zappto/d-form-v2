@@ -39,8 +39,7 @@ export function modelValueToCalendarDate(value: string): CalendarDate | undefine
 /** Format nilai DatePicker menjadi string YYYY-MM-DD; dipakai saat menyimpan nilai tanggal. */
 export function calendarDateToYmd(value: DateValue | undefined): string {
     if (!value || !('year' in value) || !('month' in value) || !('day' in value)) return '';
-    const d = value as CalendarDate;
-    return `${d.year}-${pad2(d.month)}-${pad2(d.day)}`;
+    return `${value.year}-${pad2(value.month)}-${pad2(value.day)}`;
 }
 
 /** Parse `YYYY-MM-DDTHH:mm` into calendar date + `HH:mm`. */
