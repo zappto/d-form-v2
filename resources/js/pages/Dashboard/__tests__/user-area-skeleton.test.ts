@@ -84,7 +84,11 @@ vi.mock('@/layouts/DashboardFocusLayout.vue', () => ({ default: { template: '<sl
 
 /** EmptyState menarik LocalLottie → vue3-lottie → lottie-web yang crash di jsdom. */
 vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
-    default: { template: '<div data-testid="empty-state"><slot /></div>' },
+    default: {
+        props: ['title', 'description'],
+        template:
+            '<div data-testid="empty-state"><p>{{ title }}</p><p v-if="description">{{ description }}</p><slot /></div>',
+    },
 }))
 vi.mock('vue3-lottie', () => ({
     Vue3Lottie: { template: '<div />' },

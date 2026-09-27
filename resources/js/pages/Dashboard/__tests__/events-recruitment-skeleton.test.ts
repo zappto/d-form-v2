@@ -50,7 +50,11 @@ vi.mock('@inertiajs/vue3', () => ({
 vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }))
 
 vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
-    default: { template: '<div data-testid="empty-state"><slot /></div>' },
+    default: {
+        props: ['title', 'description'],
+        template:
+            '<div data-testid="empty-state"><p>{{ title }}</p><p v-if="description">{{ description }}</p><slot /></div>',
+    },
 }))
 
 interface RouterGetOptions {
