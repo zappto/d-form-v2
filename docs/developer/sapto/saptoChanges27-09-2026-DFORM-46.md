@@ -2,19 +2,19 @@
 
 Tiket Jira: **DFORM-46** — kepatuhan `resources/` terhadap **14 aturan user** + aturan typing/arsitektur (status: **selesai — menunggu review**, Jira: **In Review**).
 Rencana (`docs/big-changes/plans/2026-09-27-DFORM-46-rule-compliance-plan.md`, 14 tugas/5 fase) dan ledger eksekusi (`.superpowers/sdd/2026-09-27-DFORM-46-rule-compliance-plan/ledger.md`) bersifat **lokal & gitignored** — tidak ikut ter-commit. Dokumen ini karena itu **mandiri**: rujukan utamanya riwayat Git + kode, bukan plan.
-Basis verifikasi dokumen ini: reflog/`git log` + kode pada HEAD akhir **`eba04ce`** (50 commit ber-subjek `DFORM-46`, rentang `7680d67..eba04ce`); seluruh lane sudah ter-commit. Nomor baris yang disebut adalah posisi saat dokumen disusun dan dapat bergeser oleh perubahan berikutnya.
+Basis verifikasi dokumen ini: reflog/`git log` + kode pada HEAD akhir **`afe40f9`** (53 commit ber-subjek `DFORM-46`, rentang `7680d67..afe40f9`); seluruh lane sudah ter-commit. Nomor baris yang disebut adalah posisi saat dokumen disusun dan dapat bergeser oleh perubahan berikutnya.
 
 Pola: **satu tiket, satu berkas changelog, tabel per-commit dengan kolom Issue**, eksekusi **subagent-driven TDD vertical slice**, commit **atomik** per langkah (`git add <path spesifik>`, tidak pernah `git add -A`), tanpa push. Tabel di bawah hanya memuat commit ber-`DFORM-46`; commit tiket lain (DFORM-47/48/49) yang berselang-seling di `main` sengaja tidak dihitung.
 
 ## Ringkasan (TL;DR)
 
-- **50 commit atomik** ber-subjek `DFORM-46` sampai HEAD `eba04ce` (rentang `7680d67..eba04ce`; 45 saat commit changelog `0965e39`). Jumlah per-commit seluruh tiket: **719 berkas, +6117 / −3214**; agregat seluruh rentang **tidak valid** karena memuat commit sibling DFORM-49, jadi tidak dipakai.
-- Aturan 1 (prefix `I`/`G`/`T`): seragam di seluruh `resources/js` (5 commit per-slice + residual).
+- **53 commit atomik** ber-subjek `DFORM-46` sampai HEAD `afe40f9` (rentang `7680d67..afe40f9`; 50 saat finalisasi `b0260f9`, 45 saat commit `0965e39`). Jumlah per-commit 50 commit pertama (sampai `eba04ce`): **719 berkas, +6117 / −3214**; tiga commit sesudahnya (`b0260f9` docs, `3af3d0c` 13 mis-prefix, `afe40f9` dedup) tidak ikut statistik itu. Agregat seluruh rentang **tidak valid** karena memuat commit sibling DFORM-49, jadi tidak dipakai.
+- Aturan 1 (prefix `I`/`G`/`T`): dikerjakan per-slice, lalu audit menemukan **13 mis-prefix (3 regresi)** yang diperbaiki di `3af3d0c`. Pengecualian yang tetap sah hanya `BuilderField`/`BackendField` (`types/formBuilder.ts`, dipakai sebagai nilai) dan alias `User` (`types/global.d.ts`).
 - Aturan 2/14 (utility TS, tanpa redundansi): `IPaginator<GItem>`, `Partial<T>`/`Record<keyof T, …>`, satu `stripHtmlToText`, satu predikat file-upload, satu sumber teks field.
 - Aturan 3 (tipe longgar): **`any` = 0** dan **`as unknown as` = 0** di produksi; `unknown` hanya di **batas eksternal** (respons HTTP/parser) dan selalu dipersempit lewat guard predikat. Termasuk seluruh berkas test (mock bertipe konkret).
 - Aturan 4 (`!` & supresi): **0** `@ts-ignore`/`@ts-expect-error`/`eslint-disable`/`noqa` dan **0** non-null assertion di luar `components/ui/**`; 3 non-null assertion template pra-eksisting yang lolos audit T3 ditutup di `eba04ce` (+ test penjaga).
-- Aturan 5/6/7 (optimal, dedup, ≤2 parameter): satu token/alur review, modul `lib/` bersama, objek argumen untuk fungsi >2 parameter.
-- Aturan 10–12: jalur utama god function dipecah (`useQrFeed.submitScan` **166→32**, `dcda688`; sisa god function `.vue` terdokumentasi), nama ambigu sebagian di-rename (`obs`→`revealObserver`, `wb`→`workspace`, dst. — lihat §Status); konstanta bernama menggantikan magic value (`CHART_FONT_FAMILY`, `AUTOSAVE_DEBOUNCE_MS`, `CATEGORY_COLOR_FALLBACK`, dst.).
+- Aturan 5/6/14 (optimal, dedup, tanpa redundansi): satu token/alur review, modul `lib/` bersama. **Aturan 7 (maksimal 2 parameter) belum dikerjakan — ditunda**: tercatat di papan tech debt lokal `docs/big-changes/tech-debt/TECH-DEBT-BOARD.md` (papan **sudah ada**; `docs/big-changes/` gitignored sehingga tidak ter-commit dan tautannya mati bila dirender) + tiket Jira lanjutan di backlog.
+- Aturan 10–12: satu jalur god function dipecah (`useQrFeed.submitScan` **166→32**, `dcda688`), tetapi **sisa god function jauh lebih banyak dan tidak diselesaikan** (hook `useDashboardEventShowPage`, `useEventRegistrantsPage`, `useRecruitmentQueue`; komponen `FormFillParticipantEmailsSection.vue`; script setup besar `Periods/Show.vue`, `MyInterviews/Index.vue`, `Forms/Show.vue` — daftar lengkap di §Status); nama ambigu sebagian di-rename (`obs`→`revealObserver`, `wb`→`workspace`, dst. — lihat §Status); konstanta bernama menggantikan magic value (`CHART_FONT_FAMILY`, `AUTOSAVE_DEBOUNCE_MS`, `CATEGORY_COLOR_FALLBACK`, dst.).
 - Aturan 13: doc 1–2 baris pada **77 fungsi exported** (T1) + seluruh ekspor baru.
 - Arsitektur: `lib/` **bebas DOM** dan **bebas `vue-sonner`**; efek UI (suara/getar, toast, Inertia request) pindah ke `hooks/`; arah impor `lib → components` = **0**; komponen kustom keluar dari `components/ui/**` (`71ccb0b`).
 - Gerbang terintegrasi final (pohon tenang): `typecheck` 0 · `lint` 0 · **75 berkas / 503 test** · `prettier --check` bersih (kode). Trajektori: baseline **50 berkas / 330 test** → 71/473 → 74/501 (`dcda688`) → 74/501 (`71ccb0b`) → **75/503** (`eba04ce`); tidak ada test yang dihapus/di-`skip`.
@@ -25,13 +25,13 @@ Pola: **satu tiket, satu berkas changelog, tabel per-commit dengan kolom Issue**
 | Tugas    | Isi                                                             | Status                                                                                                                                                                             |
 | -------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | T1       | Doc 1–2 baris tiap fungsi exported (aturan 13)                  | **selesai** (`4fd2909`, `ded16c8`)                                                                                                                                                 |
-| T2       | Prefix `I`/`G`/`T` (aturan 1)                                   | **selesai** (6 commit)                                                                                                                                                             |
+| T2       | Prefix `I`/`G`/`T` (aturan 1)                                   | **selesai** (7 commit)                                                                                                                                                             |
 | T3       | Hapus `!` + supresi (aturan 4)                                  | **selesai** (4 commit + sisa template `eba04ce`)                                                                                                                                   |
 | T4       | Hapus `any`/`unknown` longgar di produksi **+ test** (aturan 3) | **selesai** (12 commit)                                                                                                                                                            |
 | T5       | Guard predikat ganti `as` (aturan 3)                            | **selesai** (5 commit, 37/42 situs cast dihapus)                                                                                                                                   |
 | T6/T7/T8 | Dedup lintas berkas + tipe reusable (aturan 6/14)               | **selesai** (`fbed7ca`, `434d297`, `88d5528`)                                                                                                                                      |
 | T9       | Magic value/teks duplikat → konstanta bernama (aturan 11)       | **selesai dengan sisa terdokumentasi** — `20d1959`; sisa: adopsi label/batas builder opsional pasca-review `ora-8`, `lib/dummyData.ts` `#6B7280` peran lain, `FieldEditor.vue:318` |
-| T10      | God function dipisah per tanggung jawab (aturan 10)             | **selesai dengan sisa terdokumentasi** — `useQrFeed.submitScan` dipecah (`dcda688`); sisa: god function `.vue` `Profile.vue`/`Forms/Show.vue`                                      |
+| T10      | God function dipisah per tanggung jawab (aturan 10)             | **selesai dengan sisa terdokumentasi** — `useQrFeed.submitScan` dipecah (`dcda688`); sisa: god function hook & komponen + script setup besar                                       |
 | T11      | `lib/` murni: pindahkan efek UI ke `hooks/`                     | **selesai** (`f153c42`, `800799e`, `3006428`, `b58f2e0`; T11e `SCAN_STATUS_THEME` di `71ccb0b`)                                                                                    |
 | T12      | Struktur folder & rename berkas                                 | **selesai** (`9e49c2a`, `281d758`; T12b rename kebab→camel di `71ccb0b`)                                                                                                           |
 | T13      | Komponen kustom keluar dari `components/ui/**`                  | **selesai dengan sisa terdokumentasi** (`71ccb0b`); sisa utang historis: `ui/**` 4× `ariaInvalidClass`, varian DFORM-39 di `button/index.ts`, wrapper `DatePicker.vue`             |
@@ -107,8 +107,11 @@ Pola: **satu tiket, satu berkas changelog, tabel per-commit dengan kolom Issue**
 | 23:06 | `dcda688` | zappto | DFORM-46 | T10/T14    | refactor(naming): pecah god function `useQrFeed.submitScan` + rename nama samar T10/T14 (23 berkas)       |
 | 23:12 | `71ccb0b` | zappto | DFORM-46 | struktur   | refactor(structure): rename kebab→camel, komponen kustom keluar `ui/`, `SCAN_STATUS_THEME` ke view        |
 | 23:18 | `eba04ce` | zappto | DFORM-46 | T3-sisa    | fix(types): hapus 3 non-null assertion template + `shortDate` nullable (aturan 4)                         |
+| 23:23 | `b0260f9` | zappto | DFORM-46 | docs       | docs(DFORM-46): finalisasi changelog tiket + baris README (50 commit)                                     |
+| 23:55 | `3af3d0c` | zappto | DFORM-46 | T2         | refactor(types): perbaiki 13 mis-prefix I/T + pulihkan regresi `IScan*`                                   |
+| 23:55 | `afe40f9` | zappto | DFORM-46 | T6/T7/T8   | refactor(dedup): EventCard pakai `toCategoryList` + tipe paginator diturunkan                             |
 
-Sumber waktu/SHA: `git log --format='%h %ad %s'` + `git show --shortstat` per commit; lima baris terakhir diverifikasi dari reflog `+0700` (epoch).
+Sumber waktu/SHA: `git log --format='%h %ad %s'` + `git show --shortstat` per commit; tiga baris terakhir (`b0260f9`, `3af3d0c`, `afe40f9`) diverifikasi dari reflog `+0700` (epoch).
 
 ### T10 + T14 awal — **TER-COMMIT** sebagai `dcda688`
 
@@ -121,7 +124,7 @@ Refactor murni penamaan + pemecahan god function. **Sudah ter-commit** (`dcda688
 
 #### Sisa T10/T14 — **terdokumentasi** (di luar cakupan tiket)
 
-- **Sisa T10:** god function di `<script setup>` `.vue` — `pages/Dashboard/Profile.vue` `saveAllChanges` (ada di baris 199; ~98 baris), `pages/Dashboard/Events/Forms/Show.vue` `syncFieldsFromProps`/`requestSaveAll`/`submitSubmissionReview` (baris 189/124/388). Butuh test penjaga tingkat mount dulu; ditunda agar berhenti di titik hijau.
+- **Sisa T10:** god function belum dipecah — hook `hooks/useDashboardEventShowPage.ts` (baris 15, 155 baris), `hooks/useEventRegistrantsPage.ts` (baris 15, 135 baris), `hooks/useRecruitmentQueue.ts` (baris 36, 64 baris); komponen `components/modules/dashboard/FormFillParticipantEmailsSection.vue` `runEmailCheck` (baris 146, 68 baris); script setup besar `pages/Dashboard/Recruitment/Periods/Show.vue` (1–609), `pages/Dashboard/Recruitment/MyInterviews/Index.vue` (14–506), `pages/Dashboard/Events/Forms/Show.vue` (1–475); serta `.vue` `pages/Dashboard/Profile.vue` `saveAllChanges` (baris 199) / `Forms/Show.vue` `syncFieldsFromProps`/`requestSaveAll`/`submitSubmissionReview` (baris 189/124/388). Butuh test penjaga tingkat mount dulu; ditunda agar berhenti di titik hijau.
 - **Sisa T14:** agregat `hooks/useFormFillPage.ts` (rename lokal sebagian sudah, god composable belum pecah).
 
 ### Struktur (T12b/T13/T11e/T9 residual) — **TER-COMMIT** sebagai `71ccb0b`
@@ -136,7 +139,7 @@ Lane struktur (`fix-48`) **selesai dan sudah di-commit** sebagai `71ccb0b`: rena
 
 ### T2 — Prefix `I`/`G`/`T` (aturan 1)
 
-`interface` → `I…`, `type` alias → `T…`, generic → `G…`, per slice (`types`, `lib`, `hooks`, `components`, `pages`) + residu. Murni rename simbol; import di luar slice ikut diperbarui.
+`interface` → `I…`, `type` alias → `T…`, generic → `G…`, per slice (`types`, `lib`, `hooks`, `components`, `pages`) + residu. Murni rename simbol; import di luar slice ikut diperbarui. Audit independen pasca-commit menemukan **13 mis-prefix** (3 di antaranya regresi `IScan*`) yang lalu diperbaiki di `3af3d0c` ("perbaiki 13 mis-prefix I/T + pulihkan regresi IScan\*"). Pengecualian yang tetap sah hanya `BuilderField`/`BackendField` (`types/formBuilder.ts`, dipakai sebagai nilai) dan alias `User` (`types/global.d.ts`).
 
 ### T3 — `!` dan supresi (aturan 4)
 
@@ -152,7 +155,7 @@ Produksi **dan** test: `any` = 0, `as unknown as` = 0. `unknown` yang tersisa ha
 
 ### T6/T7/T8 — Dedup & tipe reusable (aturan 6/14)
 
-Satu token/alur review, satu `stripHtmlToText` (+ `hasMeaningfulHtmlText`), satu predikat file-upload, `IPaginator<GItem>` untuk paginator lintas modul, `lib/htmlText.ts` + `lib/formFieldKind.ts` sebagai satu sumber kebenaran.
+Satu token/alur review, satu `stripHtmlToText` (+ `hasMeaningfulHtmlText`), satu predikat file-upload, `IPaginator<GItem>` untuk paginator lintas modul, `lib/htmlText.ts` + `lib/formFieldKind.ts` sebagai satu sumber kebenaran. Sisa duplikasi ditutup di `afe40f9`: `EventCard.vue` memakai `toCategoryList`; `ActivityLogs/Index.vue` menurunkan tipe paginator dari `IPaginator`/`IPaginationLink`.
 
 ### T9 — Konstanta bernama (aturan 11), slice 1–5 + #3
 
@@ -221,7 +224,7 @@ Aturan repo: `unknown` **dilarang** sebagai tipe longgar; pemakaian di batas eks
 | `hooks/useInertiaRequest.ts:53`                                          | `body: unknown`               | Kategori D: body respons HTTP (`res.json()`), disempitkan predikat objek                                                                                        |
 | `hooks/useErrorToast.ts:50` (`showHttpErrorToast(body?)`)                | `unknown`                     | Kategori D: body respons HTTP, dipersempit `parseApiErrorMessage`; **alasan 2 baris** di doc fungsi                                                             |
 
-Nomor baris di atas adalah posisi saat dokumen disusun (HEAD akhir `eba04ce`) dan dapat bergeser oleh perubahan berikutnya. Kebijakan T5: kategori **A** (`as unknown as`) dan **G** (`any`) wajib **0** → terbukti 0; kategori **B** (menyangkal tipe) diperbaiki; kategori **C** (`as const` — literal sempit, bukan cast runtime) wajar dipertahankan; kategori **D** (batas eksternal nyata) boleh bertahan + alasan satu baris.
+Nomor baris di atas diukur pada `eba04ce` dan dapat bergeser oleh perubahan berikutnya. Kebijakan T5: kategori **A** (`as unknown as`) dan **G** (`any`) wajib **0** → terbukti 0; kategori **B** (menyangkal tipe) diperbaiki; kategori **C** (`as const` — literal sempit, bukan cast runtime) wajar dipertahankan; kategori **D** (batas eksternal nyata) boleh bertahan + alasan satu baris.
 
 ## Verifikasi
 
@@ -257,16 +260,16 @@ Reviewer independen: T5 builder di-review `@oracle` dengan **differential fuzz 1
 - **`lib/dummyData.ts`**: masih memuat peringatan deprecasi + `categoryColorMap`/`statusColorMap`, termasuk `#6B7280` untuk peran lain (`closed`/`draft`, baris 397/400) yang sengaja tidak disatukan; menariknya ke modul produksi adalah refactor terpisah.
 - **Temuan `@oracle` (ora-5) yang tidak diperbaiki**: `isPlainObject`/`isRecord` yang tidak sepenuhnya sound, dan `noUncheckedIndexedAccess` masih off — dicatat sebagai utang repo, bukan regresi tiket ini.
 - **Item opsional pasca-review `ora-8` (tidak dikerjakan, dicatat + alasan)**: indireksi tipis `readChoiceField` (`optionImage.ts`), alokasi loop `fieldTypeConfig` + divergensi kunci prototipe (`constructor`/`__proto__`) yang bisa ditutup `Object.prototype.hasOwnProperty.call`, dan celah test karakterisasi (`rules.in`, `''`, level komponen).
-- **Utang/sisa terdokumentasi (final)**: god function di `<script setup>` `.vue` (`pages/Dashboard/Profile.vue` `saveAllChanges`; `pages/Dashboard/Events/Forms/Show.vue` `syncFieldsFromProps`/`requestSaveAll`/`submitSubmissionReview` — butuh test penjaga mount) dan agregat `hooks/useFormFillPage.ts` (god composable belum pecah); `types/designSystem.ts` orphan; `lib/dummyData.ts` `#6B7280` peran lain; `FieldEditor.vue:318` (literal `1200 x 900` belum diadopsi); utang `ui/**` (4× `ariaInvalidClass`, varian DFORM-39 di `button/index.ts`, wrapper `DatePicker.vue`; `ui/spinner/Spinner.vue` = pola Shadcn, cukup catatan).
+- **Utang/sisa terdokumentasi (final)**: god function T10 — hook `useDashboardEventShowPage`/`useEventRegistrantsPage`/`useRecruitmentQueue`, komponen `FormFillParticipantEmailsSection.vue` (`runEmailCheck`), script setup besar `Periods/Show.vue`/`MyInterviews/Index.vue`/`Forms/Show.vue`, dan `.vue` `Profile.vue` `saveAllChanges` / `Events/Forms/Show.vue` `syncFieldsFromProps`/`requestSaveAll`/`submitSubmissionReview` (butuh test penjaga mount); aturan 7 (maksimal 2 parameter) **ditunda** (papan tech debt + tiket lanjutan); agregat `hooks/useFormFillPage.ts` (god composable belum pecah); `types/designSystem.ts` orphan; `lib/dummyData.ts` `#6B7280` peran lain; `FieldEditor.vue:318` (literal `1200 x 900` belum diadopsi); utang `ui/**` (4× `ariaInvalidClass`, varian DFORM-39 di `button/index.ts`, wrapper `DatePicker.vue`; `ui/spinner/Spinner.vue` = pola Shadcn, cukup catatan).
 
 ## Status pengerjaan & sisa
 
-**Status: selesai — menunggu review (Jira: In Review).** Seluruh 14 tugas mendarat; sisa hanya item yang sengaja ditunda / di luar cakupan:
+**Status: selesai — menunggu review (Jira: In Review).** Seluruh 14 tugas mendarat; dua sisa utama sengaja ditunda: **aturan 7 (maksimal 2 parameter)** → papan tech debt + tiket lanjutan, dan **sisa god function T10**. Sisanya item yang sengaja ditunda / di luar cakupan:
 
-- **Selesai & ter-commit:** T1, T2, T3, T4, T5, T6/T7/T8, T9, T10, T11, T12, T13, T14 — termasuk T3-sisa (`eba04ce`) dan seluruh lane struktur (`71ccb0b`).
-- **Sisa terdokumentasi (tidak dikerjakan di tiket ini):** god function `.vue` `Profile.vue`/`Forms/Show.vue` (T10 sisa), agregat `hooks/useFormFillPage.ts` (T14 sisa), item opsional pasca-review `ora-8`, utang `ui/**` (4× `ariaInvalidClass`, varian DFORM-39, wrapper `DatePicker.vue`), `types/designSystem.ts` orphan, `lib/dummyData.ts` `#6B7280` peran lain, `FieldEditor.vue:318`.
+- **Selesai & ter-commit:** T1, T2 (termasuk `3af3d0c`), T3, T4, T5, T6/T7/T8 (termasuk `afe40f9`), T9, T10 (sebagian), T11, T12, T13, T14 — termasuk T3-sisa (`eba04ce`), finalisasi `b0260f9`, dan seluruh lane struktur (`71ccb0b`).
+- **Sisa terdokumentasi (tidak dikerjakan di tiket ini):** god function T10 (hook `useDashboardEventShowPage`/`useEventRegistrantsPage`/`useRecruitmentQueue`, `FormFillParticipantEmailsSection.vue`, script setup `Periods/Show.vue`/`MyInterviews/Index.vue`/`Forms/Show.vue`, dan `.vue` `Profile.vue`/`Events/Forms/Show.vue`), **aturan 7 ditunda** (papan tech debt + tiket lanjutan), agregat `hooks/useFormFillPage.ts` (T14 sisa), item opsional pasca-review `ora-8`, utang `ui/**` (4× `ariaInvalidClass`, varian DFORM-39, wrapper `DatePicker.vue`), `types/designSystem.ts` orphan, `lib/dummyData.ts` `#6B7280` peran lain, `FieldEditor.vue:318`.
 - **Gerbang terintegrasi final (pohon tenang):** `typecheck` 0 · `lint` 0 · **75 berkas / 503 test** · `prettier --check` bersih (kode).
-- Dokumen ini selesai pada finalisasi (tabel 50 commit + gerbang akhir + status); penutupan **Done** oleh manusia.
+- Dokumen ini selesai pada finalisasi (tabel 53 commit + gerbang akhir + status); penutupan **Done** oleh manusia.
 
 ## Catatan untuk tim
 
