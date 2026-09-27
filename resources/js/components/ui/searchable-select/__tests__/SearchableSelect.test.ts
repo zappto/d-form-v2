@@ -190,6 +190,8 @@ describe('SearchableSelect', () => {
     expect(image?.getAttribute('src')).toBe('/storage/ayu.png')
     expect(image?.getAttribute('loading')).toBe('lazy')
     expect(image?.getAttribute('alt')).toBe('')
+    expect(image?.classList.contains('rounded-md')).toBe(true)
+    expect(image?.classList.contains('border-border')).toBe(true)
   })
 
   it('merender img thumbnail pada trigger untuk opsi terpilih', async () => {
@@ -201,6 +203,8 @@ describe('SearchableSelect', () => {
 
     expect(image.exists()).toBe(true)
     expect(image.attributes('src')).toBe('/storage/ayu.png')
+    expect(image.classes()).toContain('rounded-md')
+    expect(image.classes()).toContain('border-border')
   })
 
   it('thumbnail menang atas initials saat keduanya tersedia', async () => {

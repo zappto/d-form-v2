@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
-import { StyledSelect } from '@/components/ui/styled-select'
+import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import type { UnwrapNestedRefs } from 'vue'
 import { Star, ImagePlus, Upload, X } from 'lucide-vue-next'
 import type { FormFillPageContext } from '@/hooks/useFormFillPage'
+import type { FormFillOptionRow } from '@/types/form'
 import { formatParagraphContentToHtml } from '@/lib/formParagraphContent'
 
 const props = withDefaults(
@@ -80,6 +81,17 @@ const descriptionHtml = computed(() =>
 function fillReady(): boolean {
     return props.imageUploadFillReadyFn(props.storageKey)
 }
+
+/** Option rows as SearchableSelect options; value mirrors the label so stored answers stay labels. */
+const selectOptions = computed<SearchableSelectOption[]>(() =>
+    props.ctx.getOptionRows(props.field).map(
+        (row: FormFillOptionRow): SearchableSelectOption => ({
+            value: row.label,
+            label: row.label,
+            imageSrc: row.type === 'image' ? row.imageSrc : undefined,
+        }),
+    ),
+)
 
 </script>
 
@@ -215,13 +227,13 @@ function fillReady(): boolean {
             </label>
         </div>
 
-        <StyledSelect
+        <SearchableSelect
             v-else-if="
                 (ctx.builderType(field) === 'dropdown' || field.type === 'select') && !ctx.isMultipleSelect(field)
             "
             :id="storageKey"
             :model-value="textAnswer(storageKey)"
-            :options="ctx.getOptionRows(field)"
+            :options="selectOptions"
             :placeholder="ctx.getPlaceholder(field) || 'Select an option'"
             class="min-h-11 h-11"
             @update:model-value="setTextAnswer(storageKey, $event)"

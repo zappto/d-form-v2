@@ -216,7 +216,7 @@ const listboxId = computed<string>(() => `${props.id ?? 'searchable-select'}-lis
                         :src="selectedImageSrc"
                         alt=""
                         loading="lazy"
-                        class="size-6 shrink-0 rounded-full object-cover"
+                        class="size-6 shrink-0 rounded-md border border-border object-cover"
                     />
                     <span
                         v-else-if="selectedInitials"
@@ -277,7 +277,7 @@ const listboxId = computed<string>(() => `${props.id ?? 'searchable-select'}-lis
                             :src="opt.imageSrc"
                             alt=""
                             loading="lazy"
-                            class="size-7 shrink-0 rounded-full object-cover"
+                            class="size-7 shrink-0 rounded-md border border-border object-cover"
                         />
                         <span
                             v-else-if="optionInitials(opt)"
