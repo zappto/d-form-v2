@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/pagination'
 import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { routes } from '@/lib/routes'
+import { padQueueNumber } from '@/lib/format'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
 import useAuth from '@/hooks/useAuth'
 import {
@@ -506,9 +507,10 @@ function actionLabel(row: InterviewRow): string {
     return 'Detail'
 }
 
+/** Label antrean daftar interviewer; null tetap kosong, angka via helper. */
 function queueNumberLabel(value: number | null): string {
     if (value === null) return ''
-    return `Antrean #${String(value).padStart(2, '0')}`
+    return `Antrean #${padQueueNumber(value)}`
 }
 
 const emptyTitle = computed<string>((): string =>

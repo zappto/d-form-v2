@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { handleInertiaFormErrors } from '@/lib/error-message'
-import { formatBytes } from '@/lib/format'
+import { formatBytes, padQueueNumber } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
 import useAuth from '@/hooks/useAuth'
@@ -502,7 +502,7 @@ function submit(): void {
                                 <p class="text-muted-foreground text-xs uppercase">Antrean</p>
                                 <p v-if="detail.queue" class="mt-0.5 font-medium">
                                     <span class="font-mono tabular-nums">
-                                        #{{ String(detail.queue.queue_number).padStart(2, '0') }}
+                                        #{{ padQueueNumber(detail.queue.queue_number) }}
                                     </span>
                                     <span class="text-muted-foreground"> · {{ detail.queue.status_label }}</span>
                                 </p>

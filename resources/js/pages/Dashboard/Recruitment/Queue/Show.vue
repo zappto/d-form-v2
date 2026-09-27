@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { CometSpinner } from '@/components/ui/comet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { routes } from '@/lib/routes'
+import { padQueueNumber } from '@/lib/format'
 import { setTopbar } from '@/hooks/useDashboardTopbar'
 import { useRecruitmentQueue, type QueueSnapshot } from '@/hooks/useRecruitmentQueue'
 import { toast } from 'vue-sonner'
@@ -220,7 +221,7 @@ const statusVariant = (status: string) => {
             <CardHeader><CardTitle class="text-base">Sedang dilayani</CardTitle></CardHeader>
             <CardContent>
                 <template v-if="queue.current">
-                    <p class="text-3xl font-bold">#{{ String(queue.current.queue_number).padStart(2, '0') }}</p>
+                    <p class="text-3xl font-bold">#{{ padQueueNumber(queue.current.queue_number) }}</p>
                     <p class="font-medium">{{ queue.current.application?.full_name }}</p>
                     <p class="text-muted-foreground text-sm">{{ queue.current.application?.registration_number }}</p>
                     <Button
@@ -244,7 +245,7 @@ const statusVariant = (status: string) => {
             <CardHeader><CardTitle class="text-base">Berikutnya</CardTitle></CardHeader>
             <CardContent>
                 <template v-if="queue.next">
-                    <p class="text-3xl font-bold">#{{ String(queue.next.queue_number).padStart(2, '0') }}</p>
+                    <p class="text-3xl font-bold">#{{ padQueueNumber(queue.next.queue_number) }}</p>
                     <p class="font-medium">{{ queue.next.application?.full_name }}</p>
                     <p class="text-muted-foreground text-sm">{{ queue.next.application?.registration_number }}</p>
                 </template>
@@ -269,7 +270,7 @@ const statusVariant = (status: string) => {
                     <tbody class="fade-up">
                         <tr v-for="entry in queue.entries" :key="entry.id" class="border-b border-border/50">
                             <td class="py-3 pr-4 font-mono font-semibold">
-                                #{{ String(entry.queue_number).padStart(2, '0') }}
+                                #{{ padQueueNumber(entry.queue_number) }}
                             </td>
                             <td class="py-3 pr-4">
                                 <p class="font-medium">{{ entry.application?.full_name ?? '—' }}</p>

@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SimpleSelect, type SimpleSelectOption } from '@/components/ui/simple-select'
 import { Megaphone, WifiOff } from 'lucide-vue-next'
+import { padQueueNumber } from '@/lib/format'
 
 defineOptions({ layout: LandingLayout })
 
@@ -64,8 +65,9 @@ const statusFilter = ref<string>('')
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let isRefreshing = false
 
+/** Label nomor antrean papan display; kosong menjadi #- mengikuti helper. */
 function queueNumberLabel(value: number | null | undefined): string {
-    return `#${String(value ?? 0).padStart(2, '0')}`
+    return `#${padQueueNumber(value)}`
 }
 
 function entryStatusLabel(entry: QueueDisplayEntry): string {

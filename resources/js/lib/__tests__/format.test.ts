@@ -116,6 +116,15 @@ describe('padQueueNumber', () => {
     });
 });
 
+describe('cap antrean', () => {
+    it('helper menang: null menjadi #- bukan #00; angka di-pad dua digit', () => {
+        expect(`#${padQueueNumber(null)}`).toBe('#-');
+        expect(`#${padQueueNumber(undefined)}`).toBe('#-');
+        expect(`#${padQueueNumber(3)}`).toBe('#03');
+        expect(`#${padQueueNumber(12)}`).toBe('#12');
+    });
+});
+
 describe('formatSavedTimeLabel', () => {
     it('null menjadi label kosong; ter-set menjadi jam id-ID dua digit', () => {
         expect(formatSavedTimeLabel(null)).toBe('');

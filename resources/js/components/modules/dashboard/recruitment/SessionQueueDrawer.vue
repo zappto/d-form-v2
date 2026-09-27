@@ -7,6 +7,7 @@ import {
     type QueueSnapshot,
 } from '@/hooks/useRecruitmentQueue'
 import { Skeleton } from '@/components/ui/skeleton'
+import { padQueueNumber } from '@/lib/format'
 
 const props = defineProps<{
     pollUrl: string
@@ -51,8 +52,9 @@ const sessionSubtitle = computed<string>((): string => {
     return parts.length > 0 ? parts.join(' · ') : 'Ringkasan antrean sesi interview'
 })
 
+/** Nomor antrean drawer sesi; komposisi tipis atas helper kanonis. */
 function queueNumber(value: number): string {
-    return `#${String(value).padStart(2, '0')}`
+    return `#${padQueueNumber(value)}`
 }
 
 const waitingEntries = computed<QueueEntryRow[]>((): QueueEntryRow[] =>
