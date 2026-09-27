@@ -30,7 +30,7 @@ import { routes } from '@/lib/routes';
 
 defineOptions({ layout: DashboardFocusLayout });
 
-interface WizardDraftForm {
+interface IWizardDraftForm {
     id: string;
     title: string;
     description: string;
@@ -43,8 +43,8 @@ interface WizardDraftForm {
     fields: BackendField[];
 }
 
-interface WizardDraftEvent extends IEvent {
-    forms: WizardDraftForm[];
+interface IWizardDraftEvent extends IEvent {
+    forms: IWizardDraftForm[];
 }
 
 const props = defineProps<{
@@ -52,7 +52,7 @@ const props = defineProps<{
         categories: { value: string; label: string }[];
         sessions: { value: string; label: string }[];
     };
-    draftEvent?: WizardDraftEvent;
+    draftEvent?: IWizardDraftEvent;
 }>();
 
 const page = usePage();
@@ -64,8 +64,8 @@ const step = ref<'event' | 'forms'>(
     queryStep.value === 'forms' && queryDraftId.value && props.draftEvent ? 'forms' : 'event'
 );
 
-const draftEvent = computed<WizardDraftEvent | null>(() => props.draftEvent ?? null);
-const draftForm = computed<WizardDraftForm | null>(() => draftEvent.value?.forms?.[0] ?? null);
+const draftEvent = computed<IWizardDraftEvent | null>(() => props.draftEvent ?? null);
+const draftForm = computed<IWizardDraftForm | null>(() => draftEvent.value?.forms?.[0] ?? null);
 const eventFormRef = ref<InstanceType<typeof EventDashboardForm> | null>(null);
 
 onMounted(() => {

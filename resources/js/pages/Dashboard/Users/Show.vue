@@ -26,7 +26,7 @@ import {
 
 defineOptions({ layout: DashboardLayout });
 
-interface DetailUser {
+interface IDetailUser {
     id: string;
     name: string;
     email: string;
@@ -40,7 +40,7 @@ interface DetailUser {
     oauth: { google: boolean; github: boolean };
 }
 
-interface Stats {
+interface IStats {
     events_joined: number;
     registrations_pending: number;
     registrations_accepted: number;
@@ -51,7 +51,7 @@ interface Stats {
     interviews_assigned: number;
 }
 
-interface RegistrationRow {
+interface IRegistrationRow {
     form_answer_id: string;
     registration_code: string | null;
     review_status: string | null;
@@ -69,7 +69,7 @@ interface RegistrationRow {
     form: { id: string; title: string | null } | null;
 }
 
-interface EventCreatedRow {
+interface IEventCreatedRow {
     id: string;
     title: string;
     slug: string;
@@ -78,7 +78,7 @@ interface EventCreatedRow {
     created_at: string | null;
 }
 
-interface RecruitmentAppRow {
+interface IRecruitmentAppRow {
     id: string;
     registration_number: string;
     full_name: string;
@@ -90,19 +90,19 @@ interface RecruitmentAppRow {
     primary_division: string | null;
 }
 
-interface StaffInfo {
+interface IStaffInfo {
     interviewer_divisions: Array<{ id: string; name: string | null; code: string | null }>;
     interviews_assigned_count: number;
     scans_recorded_count: number;
 }
 
 const props = defineProps<{
-    user: DetailUser;
-    stats: Stats;
-    registrations: RegistrationRow[];
-    events_created: EventCreatedRow[];
-    recruitment_applications: RecruitmentAppRow[];
-    staff: StaffInfo;
+    user: IDetailUser;
+    stats: IStats;
+    registrations: IRegistrationRow[];
+    events_created: IEventCreatedRow[];
+    recruitment_applications: IRecruitmentAppRow[];
+    staff: IStaffInfo;
     permissions: { can_edit: boolean; can_delete: boolean };
 }>();
 

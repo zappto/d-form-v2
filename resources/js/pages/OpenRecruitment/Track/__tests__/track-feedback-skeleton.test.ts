@@ -5,10 +5,10 @@ import TrackShow from '../Show.vue';
 import TrackFeedback from '../Feedback.vue';
 
 /** Tipe payload tracking diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
-type TrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>;
+type ITrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>;
 
 /** Tipe aplikasi ringkas Feedback diturunkan dari props komponen. */
-type FeedbackApplication = NonNullable<InstanceType<typeof TrackFeedback>['$props']['application']>;
+type TFeedbackApplication = NonNullable<InstanceType<typeof TrackFeedback>['$props']['application']>;
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -43,7 +43,7 @@ vi.mock('@inertiajs/vue3', async () => {
 
 vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-function demoTracking(): TrackingPayload {
+function demoTracking(): ITrackingPayload {
     return {
         application: {
             registration_number: 'OPREC-2026-00001',
@@ -82,7 +82,7 @@ function demoTracking(): TrackingPayload {
     };
 }
 
-function mountTrackShow(tracking: TrackingPayload | undefined): VueWrapper<InstanceType<typeof TrackShow>> {
+function mountTrackShow(tracking: ITrackingPayload | undefined): VueWrapper<InstanceType<typeof TrackShow>> {
     const props: InstanceType<typeof TrackShow>['$props'] = {
         tracking,
         logoutUrl: '/recruitment/track/logout',
@@ -114,7 +114,7 @@ function mountTrackShow(tracking: TrackingPayload | undefined): VueWrapper<Insta
     });
 }
 
-function mountFeedback(application: FeedbackApplication | undefined): VueWrapper<InstanceType<typeof TrackFeedback>> {
+function mountFeedback(application: TFeedbackApplication | undefined): VueWrapper<InstanceType<typeof TrackFeedback>> {
     const props: InstanceType<typeof TrackFeedback>['$props'] = {
         application,
         storeUrl: '/recruitment/track/feedback',

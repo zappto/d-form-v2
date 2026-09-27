@@ -11,7 +11,7 @@ import { ArrowUpRight, Building2, CalendarX2, Clock3, DoorOpen } from 'lucide-vu
 
 defineOptions({ layout: LandingLayout });
 
-interface QueueIndexSession {
+interface IQueueIndexSession {
     id: string;
     name: string;
     division: string;
@@ -21,12 +21,12 @@ interface QueueIndexSession {
 }
 
 const props = defineProps<{
-    sessions?: QueueIndexSession[] | null;
+    sessions?: IQueueIndexSession[] | null;
 }>();
 
-const sessions = computed<QueueIndexSession[]>(() => (Array.isArray(props.sessions) ? props.sessions : []));
+const sessions = computed<IQueueIndexSession[]>(() => (Array.isArray(props.sessions) ? props.sessions : []));
 
-function boardHref(session: QueueIndexSession): string {
+function boardHref(session: IQueueIndexSession): string {
     const url = (session.board_url ?? '').trim();
     return url !== '' ? url : routes.recruitment.queue.show(session.id);
 }

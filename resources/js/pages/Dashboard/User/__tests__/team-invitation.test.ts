@@ -22,7 +22,7 @@ config.global.renderStubDefaultSlot = true;
  * (payload onError Inertia = error-bag datar, preseden Task 4 Deviasi 2).
  */
 
-interface MutationOptions {
+interface IMutationOptions {
     forceFormData?: boolean;
     preserveScroll?: boolean;
     onSuccess?: () => void;
@@ -30,14 +30,14 @@ interface MutationOptions {
     onFinish?: () => void;
 }
 
-interface PostedCall {
+interface IPostedCall {
     tag: 'confirm' | 'decline';
     url: unknown;
-    options: MutationOptions | undefined;
+    options: IMutationOptions | undefined;
 }
 
 const { postedCalls, formStates, createdCounter } = vi.hoisted(() => ({
-    postedCalls: [] as PostedCall[],
+    postedCalls: [] as IPostedCall[],
     formStates: [] as Array<{ tag: 'confirm' | 'decline'; state: Record<string, unknown> }>,
     createdCounter: { count: 0 },
 }));
@@ -60,7 +60,7 @@ vi.mock('@inertiajs/vue3', async () => {
                     postedCalls.push({
                         tag: tag as 'confirm' | 'decline',
                         url: args[0],
-                        options: args[1] as MutationOptions | undefined,
+                        options: args[1] as IMutationOptions | undefined,
                     });
                     return undefined;
                 },
@@ -145,11 +145,11 @@ function declineDialog(wrapper: VueWrapper): VueWrapper<InstanceType<typeof Dial
     return wrapper.findComponent(Dialog);
 }
 
-function confirmCalls(): PostedCall[] {
+function confirmCalls(): IPostedCall[] {
     return postedCalls.filter((c) => c.tag === 'confirm');
 }
 
-function declineCalls(): PostedCall[] {
+function declineCalls(): IPostedCall[] {
     return postedCalls.filter((c) => c.tag === 'decline');
 }
 

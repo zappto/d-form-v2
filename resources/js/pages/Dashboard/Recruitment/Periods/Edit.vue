@@ -18,7 +18,7 @@ import { BannerPickerField } from '@/components/core/field';
 
 defineOptions({ layout: DashboardLayout });
 
-interface Period {
+interface IPeriod {
     id: string;
     name: string;
     description: string | null;
@@ -30,7 +30,7 @@ interface Period {
     banner_url: string | null;
 }
 
-const props = defineProps<{ period: Period | undefined }>();
+const props = defineProps<{ period: IPeriod | undefined }>();
 
 function toDatetimeLocal(value: string | null): string {
     if (!value) return '';

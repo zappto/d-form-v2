@@ -4,7 +4,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import PeriodApplicantSection, {
-    type ApplicationRow,
+    type TApplicationRow,
 } from '@/components/modules/dashboard/recruitment/PeriodApplicantSection.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import PeriodInterviewSection from '@/components/modules/dashboard/recruitment/PeriodInterviewSection.vue';
@@ -43,7 +43,7 @@ import useAuth from '@/hooks/useAuth';
 
 defineOptions({ layout: DashboardLayout });
 
-interface Period {
+interface IPeriod {
     id: string;
     name: string;
     slug: string;
@@ -115,8 +115,8 @@ interface InterviewerCandidate {
 
 const props = withDefaults(
     defineProps<{
-        period: Period;
-        applications?: ApplicationRow[] | null;
+        period: IPeriod;
+        applications?: TApplicationRow[] | null;
         queue_counts: Record<string, number>;
         divisionOptions: { id: string; name: string; code: string }[];
         stageOptions: { value: string; label: string }[];
@@ -257,7 +257,7 @@ const canSubmitAssign = computed<boolean>(() => {
     );
 });
 
-interface AssignmentGroup {
+interface IAssignmentGroup {
     key: string;
     divisionName: string;
     divisionCode: string;
@@ -265,7 +265,7 @@ interface AssignmentGroup {
     rows: InterviewerAssignment[];
 }
 
-const groupedAssignments = computed<AssignmentGroup[]>(() => {
+const groupedAssignments = computed<IAssignmentGroup[]>(() => {
     const byDivision = new Map<string, InterviewerAssignment[]>();
     for (const row of props.assignments) {
         const list: InterviewerAssignment[] = byDivision.get(row.division_id) ?? [];
@@ -273,7 +273,7 @@ const groupedAssignments = computed<AssignmentGroup[]>(() => {
         byDivision.set(row.division_id, list);
     }
     const order = new Map<string, number>(props.divisions.map((d, i) => [d.id, i]));
-    const groups: AssignmentGroup[] = Array.from(byDivision.entries()).map(([divisionId, rows]) => {
+    const groups: IAssignmentGroup[] = Array.from(byDivision.entries()).map(([divisionId, rows]) => {
         const sortedRows: InterviewerAssignment[] = [...rows].sort((a, b) =>
             a.user_name.localeCompare(b.user_name, 'id')
         );
@@ -485,7 +485,7 @@ const canClose = computed<boolean>(() => props.period.status === 'open');
 const descriptionExpanded = ref<boolean>(false);
 const showDescriptionToggle = computed<boolean>(() => (props.period.description?.length ?? 0) > 140);
 
-interface ScheduleItem {
+interface IScheduleItem {
     key: string;
     label: string;
     display: string;
@@ -498,7 +498,7 @@ function scheduleDisplay(value: string | null, withTime: boolean): string {
     return withTime ? formatIdDateTimeLabel(value) : formatIdDateLabel(value);
 }
 
-const scheduleNodes = computed<ScheduleItem[]>(() => {
+const scheduleNodes = computed<IScheduleItem[]>(() => {
     const now = new Date();
     const raw: { key: string; label: string; value: string | null; withTime: boolean }[] = [
         {

@@ -7,7 +7,7 @@ import { Dialog } from '@/components/ui/dialog';
 import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/error-message';
 
 /** Tipe baris aplikan diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
-type ApplicationRow = NonNullable<InstanceType<typeof PeriodApplicantSection>['$props']['applications']>[number];
+type TApplicationRow = NonNullable<InstanceType<typeof PeriodApplicantSection>['$props']['applications']>[number];
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -90,7 +90,7 @@ function lastFormPostOptions(): IRouterMutationOptions {
     return lastFormOptions as IRouterMutationOptions;
 }
 
-function demoRow(id: string, fullName: string): ApplicationRow {
+function demoRow(id: string, fullName: string): TApplicationRow {
     return {
         id,
         registration_number: `REG-${id}`,

@@ -59,13 +59,13 @@ const activeSection = ref('introduction');
 const mobileNavOpen = ref(false);
 const showScrollTop = ref(false);
 
-interface NavItem {
+interface INavItem {
     id: string;
     label: string;
     children?: { id: string; label: string }[];
 }
 
-const navSections: { group: string; items: NavItem[] }[] = [
+const navSections: { group: string; items: INavItem[] }[] = [
     {
         group: 'Mulai',
         items: [

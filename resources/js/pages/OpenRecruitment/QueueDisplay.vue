@@ -12,7 +12,7 @@ import { padQueueNumber } from '@/lib/format';
 
 defineOptions({ layout: LandingLayout });
 
-interface QueueDisplayEntry {
+interface IQueueDisplayEntry {
     queue_number: number;
     display_name: string;
     division?: string | null;
@@ -22,36 +22,36 @@ interface QueueDisplayEntry {
     called_at?: string | null;
 }
 
-interface QueueDisplaySession {
+interface IQueueDisplaySession {
     name?: string | null;
     division?: string | null;
     room?: string | null;
     time?: string | null;
 }
 
-interface QueueDisplayStats {
+interface IQueueDisplayStats {
     waiting?: number | null;
     called?: number | null;
     completed?: number | null;
     total?: number | null;
 }
 
-interface QueueDisplaySnapshot {
-    session?: QueueDisplaySession | null;
-    entries?: QueueDisplayEntry[] | null;
-    current?: QueueDisplayEntry | null;
-    next?: QueueDisplayEntry | null;
-    stats?: QueueDisplayStats | null;
+interface IQueueDisplaySnapshot {
+    session?: IQueueDisplaySession | null;
+    entries?: IQueueDisplayEntry[] | null;
+    current?: IQueueDisplayEntry | null;
+    next?: IQueueDisplayEntry | null;
+    stats?: IQueueDisplayStats | null;
 }
 
 const POLL_INTERVAL_MS = 15_000;
 
 const props = defineProps<{
-    snapshot: QueueDisplaySnapshot;
+    snapshot: IQueueDisplaySnapshot;
     pollUrl?: string | null;
 }>();
 
-const live = ref<QueueDisplaySnapshot>(props.snapshot);
+const live = ref<IQueueDisplaySnapshot>(props.snapshot);
 const loadError = ref<boolean>(false);
 const isOffline = ref<boolean>(false);
 const lastUpdatedAt = ref<Date | null>(null);
@@ -70,11 +70,11 @@ function queueNumberLabel(value: number | null | undefined): string {
     return `#${padQueueNumber(value)}`;
 }
 
-function entryStatusLabel(entry: QueueDisplayEntry): string {
+function entryStatusLabel(entry: IQueueDisplayEntry): string {
     return entry.status_label?.trim() || entry.status || '—';
 }
 
-const entries = computed<QueueDisplayEntry[]>(() => live.value.entries ?? []);
+const entries = computed<IQueueDisplayEntry[]>(() => live.value.entries ?? []);
 
 function uniqueOptions(values: (string | null | undefined)[], allLabel: string): SearchableSelectOption[] {
     const seen = new Map<string, string>();
@@ -108,7 +108,7 @@ const statusOptions = computed<SearchableSelectOption[]>(() => {
     return [{ value: '', label: 'Semua status' }, ...[...seen.entries()].map(([value, label]) => ({ value, label }))];
 });
 
-const filteredEntries = computed<QueueDisplayEntry[]>(() =>
+const filteredEntries = computed<IQueueDisplayEntry[]>(() =>
     entries.value.filter((entry) => {
         if (divisionFilter.value !== '' && (entry.division ?? '').trim() !== divisionFilter.value) return false;
         if (roomFilter.value !== '' && (entry.room ?? '').trim() !== roomFilter.value) return false;
@@ -130,7 +130,7 @@ async function refreshDisplay(): Promise<void> {
     if (isRefreshing || !props.pollUrl) return;
     isRefreshing = true;
     try {
-        const response = await axios.get<QueueDisplaySnapshot>(props.pollUrl, {
+        const response = await axios.get<IQueueDisplaySnapshot>(props.pollUrl, {
             headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         });
         live.value = response.data;

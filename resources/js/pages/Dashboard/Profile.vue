@@ -198,9 +198,9 @@ function saveAllChanges(): void {
         return;
     }
 
-    type SaveTask = (next: () => void, fail: () => void) => void;
+    type TSaveTask = (next: () => void, fail: () => void) => void;
 
-    const tasks: SaveTask[] = [];
+    const tasks: TSaveTask[] = [];
     const fileToUpload = pendingFile.value;
     const shouldRemoveAvatar = pendingAvatarRemoval.value && !fileToUpload;
 

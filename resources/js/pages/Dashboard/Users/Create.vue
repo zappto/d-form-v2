@@ -12,13 +12,13 @@ import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardLayout });
 
-interface RoleOption {
+interface IRoleOption {
     value: string;
     label: string;
 }
 
 const props = defineProps<{
-    roleOptions: RoleOption[];
+    roleOptions: IRoleOption[];
 }>();
 
 const form = useForm({

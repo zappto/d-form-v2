@@ -91,18 +91,18 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 
-interface RouterGetOptions {
+interface IRouterGetOptions {
     preserveState?: boolean;
     preserveScroll?: boolean;
     onStart?: () => void;
     onFinish?: () => void;
 }
 
-function lastGetOptions(): RouterGetOptions {
+function lastGetOptions(): IRouterGetOptions {
     expect(routerGetMock).toHaveBeenCalled();
-    const options = routerGetMock.mock.calls[0]?.[2] as RouterGetOptions | undefined;
+    const options = routerGetMock.mock.calls[0]?.[2] as IRouterGetOptions | undefined;
     expect(options).toBeDefined();
-    return options as RouterGetOptions;
+    return options as IRouterGetOptions;
 }
 
 function switchTab(wrapper: VueWrapper, value: string): Promise<void> {
@@ -252,7 +252,7 @@ beforeEach(() => {
     vi.clearAllMocks();
     routerGetMock.mockReset();
     routerGetMock.mockImplementation((...args: unknown[]) => {
-        const options = args[2] as RouterGetOptions | undefined;
+        const options = args[2] as IRouterGetOptions | undefined;
         options?.onStart?.();
         return undefined;
     });

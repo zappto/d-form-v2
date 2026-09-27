@@ -30,7 +30,7 @@ onMounted(() => {
     setTopbar({ title: 'Acara', subtitle: 'Kelola acara & pendaftaran' });
 });
 
-interface Paginator {
+interface IPaginator {
     data: IEvent[];
     current_page: number;
     last_page: number;
@@ -41,7 +41,7 @@ interface Paginator {
 }
 
 const props = defineProps<{
-    events: Paginator;
+    events: IPaginator;
     filterOptions: {
         categories: { value: string; label: string }[];
         sessions: { value: string; label: string }[];

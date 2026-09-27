@@ -39,21 +39,21 @@ import {
 
 defineOptions({ layout: FormFillLayout });
 
-interface TimelineItem {
+interface ITimelineItem {
     key: string;
     label: string;
     status: 'completed' | 'current' | 'upcoming';
     note?: string | null;
 }
 
-interface NextAction {
+interface INextAction {
     tone: 'info' | 'warning' | 'success' | 'neutral';
     title: string;
     description: string;
     action: string | null;
 }
 
-interface TrackingPayload {
+interface ITrackingPayload {
     application: {
         registration_number: string;
         full_name: string;
@@ -69,8 +69,8 @@ interface TrackingPayload {
         submitted_at: string | null;
     };
     period: { name: string | null };
-    next_action: NextAction;
-    timeline: TimelineItem[];
+    next_action: INextAction;
+    timeline: ITimelineItem[];
     interview: {
         scheduled_at: string;
         location: string;
@@ -114,7 +114,7 @@ interface TrackingPayload {
 }
 
 const props = defineProps<{
-    tracking: TrackingPayload | undefined;
+    tracking: ITrackingPayload | undefined;
     logoutUrl: string;
     editUrl: string;
     correctionUrl: string;
@@ -184,7 +184,7 @@ const showInterviewSection = computed(() => {
     );
 });
 
-function timelineIcon(status: TimelineItem['status']) {
+function timelineIcon(status: ITimelineItem['status']) {
     if (status === 'completed') return CheckCircle2;
     if (status === 'current') return CircleDot;
     return Circle;

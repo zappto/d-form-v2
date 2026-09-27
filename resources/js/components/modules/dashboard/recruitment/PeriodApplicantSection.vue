@@ -24,7 +24,7 @@ import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/e
 import { routes } from '@/lib/routes';
 
 /** Satu-satunya definisi baris aplikan periode; diimpor oleh Periods/Show.vue. */
-export interface ApplicationRow {
+export interface TApplicationRow {
     id: string;
     registration_number: string;
     full_name: string;
@@ -53,7 +53,7 @@ const QUEUE_OPTIONS = [
 const props = withDefaults(
     defineProps<{
         periodId: string;
-        applications: ApplicationRow[] | null;
+        applications: TApplicationRow[] | null;
         queueCounts: Record<string, number>;
         divisionOptions: { id: string; name: string; code: string }[];
         stageOptions: { value: string; label: string }[];
@@ -170,7 +170,7 @@ const queueModel = computed<string>({
     },
 });
 
-function matchesQueue(row: ApplicationRow, activeQueue: string): boolean {
+function matchesQueue(row: TApplicationRow, activeQueue: string): boolean {
     switch (activeQueue) {
         case 'screening':
             return (
@@ -191,7 +191,7 @@ function matchesQueue(row: ApplicationRow, activeQueue: string): boolean {
     }
 }
 
-const filteredRows = computed<ApplicationRow[]>(() => {
+const filteredRows = computed<TApplicationRow[]>(() => {
     const needle: string = search.value.trim().toLowerCase();
     return (props.applications ?? []).filter((row) => {
         if (needle !== '') {
@@ -217,7 +217,7 @@ const filteredRows = computed<ApplicationRow[]>(() => {
 const totalCount = computed<number>(() => filteredRows.value.length);
 const lastPage = computed<number>(() => Math.max(1, Math.ceil(totalCount.value / perPage.value)));
 
-const pagedRows = computed<ApplicationRow[]>(() => {
+const pagedRows = computed<TApplicationRow[]>(() => {
     const page: number = Math.max(1, Math.min(currentPage.value, lastPage.value));
     const start: number = (page - 1) * perPage.value;
     return filteredRows.value.slice(start, start + perPage.value);
@@ -268,7 +268,7 @@ const REJECT_REASONS: IRejectReasonOption[] = [
     { value: 'other', label: 'Lainnya' },
 ];
 
-function canDecide(row: ApplicationRow): boolean {
+function canDecide(row: TApplicationRow): boolean {
     if (!props.canScreen) return false;
     if (row.revision_required) return false;
     if (row.result !== 'pending') return false;
@@ -276,10 +276,10 @@ function canDecide(row: ApplicationRow): boolean {
 }
 
 const processingId = ref<string | null>(null);
-const passTarget = ref<ApplicationRow | null>(null);
+const passTarget = ref<TApplicationRow | null>(null);
 const passDialogOpen = ref(false);
 
-const rejectTarget = ref<ApplicationRow | null>(null);
+const rejectTarget = ref<TApplicationRow | null>(null);
 const rejectDialogOpen = ref(false);
 const rejectLocalError = ref<string | null>(null);
 const rejectForm = useForm({
@@ -301,7 +301,7 @@ const rejectApplicationError = computed<string | null>(() => {
     return message !== undefined && message.length > 0 ? message : null;
 });
 
-function openPass(row: ApplicationRow): void {
+function openPass(row: TApplicationRow): void {
     if (!canDecide(row) || processingId.value !== null) return;
     passTarget.value = row;
     passDialogOpen.value = true;
@@ -336,7 +336,7 @@ function confirmPass(): void {
     );
 }
 
-function openReject(row: ApplicationRow): void {
+function openReject(row: TApplicationRow): void {
     if (!canDecide(row) || processingId.value !== null) return;
     rejectTarget.value = row;
     rejectForm.reset();

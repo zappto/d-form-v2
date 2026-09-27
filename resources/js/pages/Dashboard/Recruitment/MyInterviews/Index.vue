@@ -31,7 +31,7 @@ import { ClipboardCheck, ListOrdered, RotateCcw, Search } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardLayout });
 
-interface InterviewRow {
+interface TInterviewRow {
     interview_id: string;
     scheduled_at: string | null;
     status_label: string;
@@ -55,7 +55,7 @@ interface InterviewRow {
     } | null;
 }
 
-interface TodaySession {
+interface ITodaySession {
     id: string;
     session_date: string;
     starts_at: string;
@@ -66,7 +66,7 @@ interface TodaySession {
     division: { name: string } | null;
 }
 
-interface NextAction {
+interface INextAction {
     title: string;
     description: string;
     application_id: string;
@@ -75,7 +75,7 @@ interface NextAction {
     session_id: string | null;
 }
 
-interface MyInterviewsQuery {
+interface IMyInterviewsQuery {
     queue?: string;
     q?: string;
     division_id?: string;
@@ -84,12 +84,12 @@ interface MyInterviewsQuery {
     sort?: string;
 }
 
-interface FilterOption {
+interface IFilterOption {
     value: string;
     label: string;
 }
 
-type InterviewFilterParams = {
+type TInterviewFilterParams = {
     q?: string;
     division_id?: string;
     session_id?: string;
@@ -99,21 +99,21 @@ type InterviewFilterParams = {
     page?: number;
 };
 
-type InterviewGroupKey = 'urgent' | 'today' | 'upcoming' | 'done';
+type TInterviewGroupKey = 'urgent' | 'today' | 'upcoming' | 'done';
 
 interface InterviewGroup {
-    key: InterviewGroupKey;
+    key: TInterviewGroupKey;
     title: string;
     hint: string;
-    rows: InterviewRow[];
+    rows: TInterviewRow[];
 }
 
-interface StatusBadge {
+interface IStatusBadge {
     label: string;
     variant: 'default' | 'secondary' | 'outline';
 }
 
-interface QueuePermission {
+interface IQueuePermission {
     can_view_recruitment_queue?: boolean;
 }
 
@@ -124,14 +124,14 @@ const QUEUE_TABS: { key: string; label: string }[] = [
     { key: 'done', label: 'Selesai' },
 ];
 
-const EVAL_OPTIONS: FilterOption[] = [
+const EVAL_OPTIONS: IFilterOption[] = [
     { value: '', label: 'Semua status' },
     { value: 'pending', label: 'Perlu dinilai' },
     { value: 'done', label: 'Sudah dinilai' },
     { value: 'locked', label: 'Terkunci' },
 ];
 
-const SORT_OPTIONS: FilterOption[] = [
+const SORT_OPTIONS: IFilterOption[] = [
     { value: '', label: 'Jadwal terdekat' },
     { value: 'pending_first', label: 'Belum dinilai dulu' },
     { value: 'queue', label: 'No. antrean' },
@@ -144,7 +144,7 @@ const FALLBACK_PER_PAGE = 20;
 const props = withDefaults(
     defineProps<{
         interviews: {
-            data: InterviewRow[];
+            data: TInterviewRow[];
             current_page: number;
             last_page: number;
             total: number;
@@ -152,16 +152,16 @@ const props = withDefaults(
             from?: number | null;
             to?: number | null;
         };
-        query: MyInterviewsQuery;
+        query: IMyInterviewsQuery;
         queue_counts: Record<string, number>;
-        today_sessions: TodaySession[];
-        next_action: NextAction | null;
-        division_options?: FilterOption[];
-        session_options?: FilterOption[];
+        today_sessions: ITodaySession[];
+        next_action: INextAction | null;
+        division_options?: IFilterOption[];
+        session_options?: IFilterOption[];
     }>(),
     {
-        division_options: (): FilterOption[] => [],
-        session_options: (): FilterOption[] => [],
+        division_options: (): IFilterOption[] => [],
+        session_options: (): IFilterOption[] => [],
     }
 );
 
@@ -169,7 +169,7 @@ const page = usePage();
 const authUser = useAuth(page.props);
 
 const canViewQueue = computed<boolean>((): boolean => {
-    const candidate: QueuePermission | null = authUser.value;
+    const candidate: IQueuePermission | null = authUser.value;
     return candidate?.can_view_recruitment_queue === true;
 });
 
@@ -196,7 +196,7 @@ function resetSkipFilterRun(): void {
 }
 
 function refsMatchQuery(): boolean {
-    const current: MyInterviewsQuery = props.query;
+    const current: IMyInterviewsQuery = props.query;
     return (
         searchInput.value === (current.q ?? '') &&
         divisionId.value === (current.division_id ?? '') &&
@@ -207,7 +207,7 @@ function refsMatchQuery(): boolean {
     );
 }
 
-function baseParams(pageNumber: number): InterviewFilterParams {
+function baseParams(pageNumber: number): TInterviewFilterParams {
     return {
         q: searchInput.value.trim() || undefined,
         division_id: divisionId.value || undefined,
@@ -237,9 +237,9 @@ function applyFilters(pageNumber: number = 1): void {
     });
 }
 
-type FilterTuple = [string, string, string, string, string, string];
+type TFilterTuple = [string, string, string, string, string, string];
 
-function handleFilterChange(next: FilterTuple, prev: FilterTuple): void {
+function handleFilterChange(next: TFilterTuple, prev: TFilterTuple): void {
     if (skipFilterRun && refsMatchQuery()) {
         skipFilterRun = false;
         return;
@@ -258,7 +258,7 @@ function handleFilterChange(next: FilterTuple, prev: FilterTuple): void {
 
 watch([searchInput, divisionId, sessionId, evalFilter, sortKey, queueTab], handleFilterChange);
 
-function syncRefsFromQuery(next: MyInterviewsQuery): void {
+function syncRefsFromQuery(next: IMyInterviewsQuery): void {
     clearSearchTimer();
     searchInput.value = next.q ?? '';
     divisionId.value = next.division_id ?? '';
@@ -270,7 +270,7 @@ function syncRefsFromQuery(next: MyInterviewsQuery): void {
     void nextTick(resetSkipFilterRun);
 }
 
-watch((): MyInterviewsQuery => props.query, syncRefsFromQuery);
+watch((): IMyInterviewsQuery => props.query, syncRefsFromQuery);
 
 onBeforeUnmount((): void => {
     clearSearchTimer();
@@ -340,12 +340,12 @@ function formatSessionDay(value: string): string {
     });
 }
 
-function sessionFallbackLabel(session: TodaySession): string {
+function sessionFallbackLabel(session: ITodaySession): string {
     const division: string = session.division?.name ?? 'Interview';
     return `${division} · ${formatSessionDay(session.session_date)} · ${session.starts_at}–${session.ends_at}`;
 }
 
-const divisionOptions = computed<FilterOption[]>((): FilterOption[] => {
+const divisionOptions = computed<IFilterOption[]>((): IFilterOption[] => {
     if (props.division_options.length > 0) {
         return [{ value: '', label: 'Semua divisi' }, ...props.division_options];
     }
@@ -360,7 +360,7 @@ const divisionOptions = computed<FilterOption[]>((): FilterOption[] => {
         const sessionDivision: string | undefined = row.session?.division ?? undefined;
         if (sessionDivision && !names.includes(sessionDivision)) names.push(sessionDivision);
     }
-    const fallback: FilterOption[] = names.map((name: string): FilterOption => ({ value: name, label: name }));
+    const fallback: IFilterOption[] = names.map((name: string): IFilterOption => ({ value: name, label: name }));
     return [{ value: '', label: 'Semua divisi' }, ...fallback];
 });
 
@@ -369,7 +369,7 @@ const sessionOptions = computed<SearchableSelectOption[]>((): SearchableSelectOp
         return [{ value: '', label: 'Semua sesi' }, ...props.session_options];
     }
     const fallback: SearchableSelectOption[] = props.today_sessions.map(
-        (session: TodaySession): SearchableSelectOption => ({
+        (session: ITodaySession): SearchableSelectOption => ({
             value: session.id,
             label: sessionFallbackLabel(session),
         })
@@ -422,7 +422,7 @@ function startOfCalendarDay(value: Date): Date {
     return day;
 }
 
-function groupKeyForRow(row: InterviewRow, now: Date): InterviewGroupKey {
+function groupKeyForRow(row: TInterviewRow, now: Date): TInterviewGroupKey {
     if (row.evaluation_locked || row.has_evaluation) return 'done';
     const scheduled: Date | null = parseSchedule(row.scheduled_at);
     if (scheduled === null) return row.needs_evaluation ? 'urgent' : 'upcoming';
@@ -433,7 +433,7 @@ function groupKeyForRow(row: InterviewRow, now: Date): InterviewGroupKey {
 
 const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
     const now: Date = new Date();
-    const buckets: Record<InterviewGroupKey, InterviewRow[]> = {
+    const buckets: Record<TInterviewGroupKey, TInterviewRow[]> = {
         urgent: [],
         today: [],
         upcoming: [],
@@ -478,14 +478,14 @@ const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
     return groups;
 });
 
-function statusBadge(row: InterviewRow): StatusBadge {
+function statusBadge(row: TInterviewRow): IStatusBadge {
     if (row.needs_evaluation) return { label: 'Perlu dinilai', variant: 'default' };
     if (row.evaluation_locked) return { label: 'Terkunci', variant: 'secondary' };
     if (row.has_evaluation) return { label: 'Sudah dinilai', variant: 'outline' };
     return { label: row.status_label, variant: 'outline' };
 }
 
-function actionLabel(row: InterviewRow): string {
+function actionLabel(row: TInterviewRow): string {
     if (row.needs_evaluation) return 'Nilai';
     if (row.has_evaluation && !row.evaluation_locked) return 'Ubah';
     return 'Detail';

@@ -5,9 +5,9 @@ import { Head } from '@inertiajs/vue3';
 const RICKROLL_EMBED_SRC =
     'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1&mute=0&loop=1&playlist=dQw4w9WgXcQ&controls=1&playsinline=1&rel=0&modestbranding=1';
 
-type Phase = 'intro' | 'rickroll';
+type TPhase = 'intro' | 'rickroll';
 
-const phase = ref<Phase>('intro');
+const phase = ref<TPhase>('intro');
 let autoTimer: ReturnType<typeof setTimeout> | null = null;
 const prefersReducedMotion =
     typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;

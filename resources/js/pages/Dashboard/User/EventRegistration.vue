@@ -16,7 +16,7 @@ import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardLayout });
 
-interface BundleParticipant {
+interface IBundleParticipant {
     invited_email: string;
     display_name: string;
     review_status: 'pending' | 'accepted' | 'rejected';
@@ -24,7 +24,7 @@ interface BundleParticipant {
     qr_base64: string | null;
 }
 
-interface RegistrationSummary {
+interface IRegistrationSummary {
     review_status: 'pending' | 'accepted' | 'rejected';
     submitted_at: string;
     reviewed_at: string | null;
@@ -42,8 +42,8 @@ const props = defineProps<{
         registration_mode: 'single' | 'bundle' | 'team' | null;
         success_content?: string | null;
     } | null;
-    registration: RegistrationSummary | undefined;
-    bundle_participants?: BundleParticipant[];
+    registration: IRegistrationSummary | undefined;
+    bundle_participants?: IBundleParticipant[];
 }>();
 
 const bundleParticipants = computed(() => props.bundle_participants ?? []);
@@ -60,13 +60,13 @@ const isBundleLeader = computed(() => {
     return props.form?.registration_mode === 'bundle' && registration.registration_role === 'leader';
 });
 
-const participantStatusLabels: Record<BundleParticipant['review_status'], string> = {
+const participantStatusLabels: Record<IBundleParticipant['review_status'], string> = {
     pending: 'Awaiting review',
     accepted: 'Accepted',
     rejected: 'Not accepted',
 };
 
-const statusLabels: Record<RegistrationSummary['review_status'], string> = {
+const statusLabels: Record<IRegistrationSummary['review_status'], string> = {
     pending: 'Awaiting review',
     accepted: 'Accepted',
     rejected: 'Not accepted',

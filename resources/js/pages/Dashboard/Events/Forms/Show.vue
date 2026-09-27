@@ -47,7 +47,7 @@ import { userAvatarSeed } from '@/lib/userAvatarFallback';
 
 defineOptions({ layout: DashboardLayout });
 
-type ShowTab = 'editor' | 'jawaban';
+type TShowTab = 'editor' | 'jawaban';
 const props = defineProps<{
     event: { id: string; title: string };
     form: IForm;
@@ -63,11 +63,11 @@ const props = defineProps<{
 const page = usePage();
 
 /** Baca tab dari query string agar deep-link ?tab=jawaban bekerja saat refresh/back. */
-function tabFromQuery(): ShowTab {
+function tabFromQuery(): TShowTab {
     const raw = new URLSearchParams(page.url.split('?')[1] ?? '').get('tab');
     return raw === 'jawaban' ? 'jawaban' : 'editor';
 }
-const activeTab = ref<ShowTab>(tabFromQuery());
+const activeTab = ref<TShowTab>(tabFromQuery());
 
 /** Sinkronkan tab ke query string (?tab=jawaban) agar deep-link tetap bertahan saat refresh. */
 watch(activeTab, (tab) => {

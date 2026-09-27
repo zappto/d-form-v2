@@ -57,7 +57,7 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     },
 }));
 
-interface RouterGetOptions {
+interface IRouterGetOptions {
     preserveState?: boolean;
     preserveScroll?: boolean;
     replace?: boolean;
@@ -66,11 +66,11 @@ interface RouterGetOptions {
     onFinish?: () => void;
 }
 
-function lastGetOptions(): RouterGetOptions {
+function lastGetOptions(): IRouterGetOptions {
     expect(routerGetMock).toHaveBeenCalled();
-    const options = routerGetMock.mock.calls[0]?.[2] as RouterGetOptions | undefined;
+    const options = routerGetMock.mock.calls[0]?.[2] as IRouterGetOptions | undefined;
     expect(options).toBeDefined();
-    return options as RouterGetOptions;
+    return options as IRouterGetOptions;
 }
 
 function demoIEvent(id: string, title: string): IEvent {
@@ -224,7 +224,7 @@ beforeEach(() => {
     // Cerminkan Inertia: onStart jalan saat request berangkat; onFinish hanya
     // bila test memicunya eksplisit (navigasi "menggantung" seperti throttle nyata).
     routerGetMock.mockImplementation((...args: unknown[]) => {
-        const options = args[2] as RouterGetOptions | undefined;
+        const options = args[2] as IRouterGetOptions | undefined;
         options?.onStart?.();
         return undefined;
     });

@@ -20,7 +20,7 @@ import { ListOrdered, Plus } from 'lucide-vue-next';
 
 defineOptions({ layout: DashboardLayout });
 
-interface InterviewRow {
+interface TInterviewRow {
     id: string;
     scheduled_at: string | null;
     location: string;
@@ -47,10 +47,10 @@ interface SessionDetail {
     interviews_count: number;
     period: { id: string; name: string } | null;
     division: { id: string; name: string; code: string } | null;
-    interviews: InterviewRow[];
+    interviews: TInterviewRow[];
 }
 
-interface ApplicantOption {
+interface IApplicantOption {
     id: string;
     full_name: string;
     registration_number: string;
@@ -59,7 +59,7 @@ interface ApplicantOption {
 
 const props = defineProps<{
     session: SessionDetail | undefined;
-    eligibleApplicants: ApplicantOption[];
+    eligibleApplicants: IApplicantOption[];
     interviewerOptions: { id: string; name: string }[];
     otherSessions: { id: string; session_date: string; starts_at: string; division: { name: string } | null }[];
 }>();

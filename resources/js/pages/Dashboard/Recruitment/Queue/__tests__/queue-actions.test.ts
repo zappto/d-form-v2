@@ -39,30 +39,30 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 
-interface QueueApplication {
+interface IQueueApplication {
     id: string;
     full_name: string;
     registration_number: string;
 }
 
-interface QueueEntry {
+interface IQueueEntry {
     id: string;
     queue_number: number;
     status: string;
     status_label: string;
     called_at: string | null;
     completed_at: string | null;
-    application: QueueApplication | null;
+    application: IQueueApplication | null;
 }
 
 interface IQueueSnapshot {
-    entries: QueueEntry[];
-    current: QueueEntry | null;
-    next: QueueEntry | null;
+    entries: IQueueEntry[];
+    current: IQueueEntry | null;
+    next: IQueueEntry | null;
     stats: { waiting: number; called: number; completed: number; total: number };
 }
 
-function makeEntry(partial: Partial<QueueEntry> & { id: string }): QueueEntry {
+function makeEntry(partial: Partial<IQueueEntry> & { id: string }): IQueueEntry {
     return {
         queue_number: 1,
         status: 'waiting',

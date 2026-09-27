@@ -47,7 +47,7 @@ vi.mock('vue-sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 
-interface QueueApi {
+interface IQueueApi {
     // Refs setup kembali ter-unwrap di vm proxy.
     queue: IQueueSnapshot;
     isInitialLoading: boolean;
@@ -71,8 +71,8 @@ function mountHarness(initial: IQueueSnapshot): VueWrapper<InstanceType<typeof Q
     });
 }
 
-function harnessApi(wrapper: VueWrapper): QueueApi {
-    return wrapper.vm as unknown as QueueApi;
+function harnessApi(wrapper: VueWrapper): IQueueApi {
+    return wrapper.vm as unknown as IQueueApi;
 }
 
 function demoEntry(id: string, queueNumber: number, status: string, name: string): IQueueEntryRow {

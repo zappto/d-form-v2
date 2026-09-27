@@ -12,21 +12,21 @@ import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardLayout });
 
-interface ManagedUser {
+interface IManagedUser {
     id: string;
     name: string;
     email: string;
     roles: string[];
 }
 
-interface RoleOption {
+interface IRoleOption {
     value: string;
     label: string;
 }
 
 const props = defineProps<{
-    managedUser: ManagedUser;
-    roleOptions: RoleOption[];
+    managedUser: IManagedUser;
+    roleOptions: IRoleOption[];
 }>();
 
 const initialRole =

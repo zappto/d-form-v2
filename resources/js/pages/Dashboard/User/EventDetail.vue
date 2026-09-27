@@ -32,7 +32,7 @@ import type { TFormAccessStatus } from '@/types/form';
 
 defineOptions({ layout: DashboardLayout });
 
-type ParticipantFormRow = {
+type TParticipantFormRow = {
     id: string;
     title: string;
     description: string | null;
@@ -51,7 +51,7 @@ const props = defineProps<{
     registrationStatus: 'pending' | 'accepted' | 'rejected' | null;
     qr_base64: string | null;
     registration_code: string | null;
-    participantForms?: ParticipantFormRow[];
+    participantForms?: TParticipantFormRow[];
 }>();
 
 /** Tanpa GET (props saja): skeleton hanya untuk props awal yang belum ada. */

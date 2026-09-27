@@ -11,7 +11,7 @@ import { setTopbar } from '@/hooks/useDashboardTopbar';
 
 defineOptions({ layout: DashboardLayout });
 
-interface LogRow {
+interface ILogRow {
     id: string;
     action: string;
     actor_type: string;
@@ -26,7 +26,7 @@ interface LogRow {
 }
 
 defineProps<{
-    logs: { data: LogRow[]; links: { url: string | null; label: string; active: boolean }[] };
+    logs: { data: ILogRow[]; links: { url: string | null; label: string; active: boolean }[] };
     periodOptions: { id: string; name: string }[];
     query: { period_id: string | null; action: string | null };
 }>();

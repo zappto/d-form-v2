@@ -4,7 +4,7 @@ import { config, mount, type VueWrapper } from '@vue/test-utils';
 import MyInterviewsIndex from '../Index.vue';
 
 /** Tipe baris interview diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
-type InterviewRow = InstanceType<typeof MyInterviewsIndex>['$props']['interviews']['data'][number];
+type TInterviewRow = InstanceType<typeof MyInterviewsIndex>['$props']['interviews']['data'][number];
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -45,7 +45,7 @@ vi.mock('@/components/modules/dashboard/EmptyState.vue', () => ({
     },
 }));
 
-interface RouterGetOptions {
+interface IRouterGetOptions {
     preserveState?: boolean;
     preserveScroll?: boolean;
     replace?: boolean;
@@ -53,14 +53,14 @@ interface RouterGetOptions {
     onFinish?: () => void;
 }
 
-function lastGetOptions(): RouterGetOptions {
+function lastGetOptions(): IRouterGetOptions {
     expect(routerGetMock).toHaveBeenCalled();
-    const options = routerGetMock.mock.calls[0]?.[2] as RouterGetOptions | undefined;
+    const options = routerGetMock.mock.calls[0]?.[2] as IRouterGetOptions | undefined;
     expect(options).toBeDefined();
-    return options as RouterGetOptions;
+    return options as IRouterGetOptions;
 }
 
-function demoRow(): InterviewRow {
+function demoRow(): TInterviewRow {
     return {
         interview_id: 'iv-1',
         scheduled_at: null,
@@ -82,7 +82,7 @@ function demoRow(): InterviewRow {
     };
 }
 
-function baseProps(data: InterviewRow[]): InstanceType<typeof MyInterviewsIndex>['$props'] {
+function baseProps(data: TInterviewRow[]): InstanceType<typeof MyInterviewsIndex>['$props'] {
     return {
         interviews: {
             data,
@@ -100,7 +100,7 @@ function baseProps(data: InterviewRow[]): InstanceType<typeof MyInterviewsIndex>
     };
 }
 
-function mountIndex(data: InterviewRow[] = [demoRow()]): VueWrapper<InstanceType<typeof MyInterviewsIndex>> {
+function mountIndex(data: TInterviewRow[] = [demoRow()]): VueWrapper<InstanceType<typeof MyInterviewsIndex>> {
     return mount(MyInterviewsIndex, {
         props: baseProps(data),
         global: {
@@ -142,7 +142,7 @@ beforeEach(() => {
     // Cerminkan Inertia: onStart jalan saat request berangkat; onFinish hanya
     // bila test memicunya eksplisit (navigasi "menggantung" seperti throttle nyata).
     routerGetMock.mockImplementation((...args: unknown[]) => {
-        const options = args[2] as RouterGetOptions | undefined;
+        const options = args[2] as IRouterGetOptions | undefined;
         options?.onStart?.();
         return undefined;
     });

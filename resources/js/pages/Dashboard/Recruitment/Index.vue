@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import DivisionListSheet, {
-    type IDashboardDivision,
+    type TIDashboardDivision,
 } from '@/components/modules/dashboard/recruitment/DivisionListSheet.vue';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
@@ -24,21 +24,21 @@ import { CalendarRange, ImageOff, Layers, User, Users, ClipboardList, ListOrdere
 
 defineOptions({ layout: DashboardLayout });
 
-interface PeriodSummary {
+interface IPeriodSummary {
     id: string;
     name: string;
     status: string;
     status_label: string;
 }
 
-interface ActionQueue {
+interface IActionQueue {
     key: string;
     label: string;
     description: string;
     count: number;
 }
 
-interface TodaySession {
+interface ITodaySession {
     id: string;
     session_date: string;
     starts_at: string;
@@ -49,12 +49,12 @@ interface TodaySession {
     division: { name: string } | null;
 }
 
-interface PeriodCreator {
+interface IPeriodCreator {
     name: string;
     avatar_url: string | null;
 }
 
-interface PeriodRow {
+interface IPeriodRow {
     id: string;
     name: string;
     slug: string;
@@ -64,13 +64,13 @@ interface PeriodRow {
     registration_opens_at: string | null;
     registration_closes_at: string | null;
     applications_count: number;
-    creator?: PeriodCreator | null;
+    creator?: IPeriodCreator | null;
     can_edit?: boolean;
     can_delete?: boolean;
 }
 
-interface PeriodPaginator {
-    data: PeriodRow[];
+interface IPeriodPaginator {
+    data: IPeriodRow[];
     current_page: number;
     last_page: number;
     total: number;
@@ -80,18 +80,18 @@ interface PeriodPaginator {
 const props = withDefaults(
     defineProps<{
         summary: {
-            active_period: PeriodSummary | null;
+            active_period: IPeriodSummary | null;
             stats: Record<string, number>;
             funnel?: { stage: string; label: string; count: number }[];
             accepted_count?: number;
             is_interviewer_view?: boolean;
-            action_queues?: ActionQueue[];
-            today_sessions?: TodaySession[];
+            action_queues?: IActionQueue[];
+            today_sessions?: ITodaySession[];
         };
-        periods?: PeriodPaginator | null;
+        periods?: IPeriodPaginator | null;
         query?: { search?: string; status?: string };
         statusOptions?: { value: string; label: string }[];
-        divisions?: IDashboardDivision[];
+        divisions?: TIDashboardDivision[];
     }>(),
     { periods: null, query: () => ({}), statusOptions: () => [], divisions: () => [] }
 );
@@ -105,12 +105,12 @@ const canViewQueue = computed(() => user.value?.can_view_recruitment_queue === t
 const actionQueues = computed(() => props.summary.action_queues ?? []);
 const todaySessions = computed(() => props.summary.today_sessions ?? []);
 
-const periodRows = computed<PeriodRow[]>(() => props.periods?.data ?? []);
+const periodRows = computed<IPeriodRow[]>(() => props.periods?.data ?? []);
 const periodCurrentPage = computed<number>(() => props.periods?.current_page ?? 1);
 const periodLastPage = computed<number>(() => props.periods?.last_page ?? 1);
 const periodTotal = computed<number>(() => props.periods?.total ?? 0);
 
-const divisionRows = computed<IDashboardDivision[]>(() => props.divisions ?? []);
+const divisionRows = computed<TIDashboardDivision[]>(() => props.divisions ?? []);
 const divisionDrawerOpen = ref<boolean>(false);
 
 function openDivisionDrawer(): void {
@@ -188,7 +188,7 @@ function applicationsQueueUrl(queue: string): string {
 }
 
 /** Konfirmasi hapus periode — soft delete, data pendaftar tetap tersimpan. */
-const deleteTarget = ref<PeriodRow | null>(null);
+const deleteTarget = ref<IPeriodRow | null>(null);
 const deleteDialogOpen = ref(false);
 const isDeleting = ref(false);
 
@@ -198,7 +198,7 @@ const deleteDescription = computed<string>(() => {
     return name ? `Periode “${name}” akan dihapus dari daftar. ${base}` : base;
 });
 
-function startDelete(period: PeriodRow): void {
+function startDelete(period: IPeriodRow): void {
     deleteTarget.value = period;
     deleteDialogOpen.value = true;
 }
@@ -210,7 +210,7 @@ function cancelDelete(): void {
 }
 
 function confirmDelete(): void {
-    const target: PeriodRow | null = deleteTarget.value;
+    const target: IPeriodRow | null = deleteTarget.value;
     if (!target || isDeleting.value) return;
     isDeleting.value = true;
     router.delete(routes.admin.recruitment.periods.destroy(target.id), {

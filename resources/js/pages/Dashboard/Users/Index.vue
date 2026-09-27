@@ -19,7 +19,7 @@ import { Eye, Pencil, Plus, RotateCcw, Search, Trash2 } from 'lucide-vue-next';
 
 defineOptions({ layout: DashboardLayout });
 
-interface ManagedUser {
+interface IManagedUser {
     id: string;
     name: string;
     email: string;
@@ -28,19 +28,19 @@ interface ManagedUser {
     deleted_at: string | null;
 }
 
-interface RoleOption {
+interface IRoleOption {
     value: string;
     label: string;
 }
 
-interface UsersQuery {
+interface IUsersQuery {
     search?: string;
     role?: string | null;
     per_page?: number;
 }
 
-interface UsersPaginator {
-    data: ManagedUser[];
+interface IUsersPaginator {
+    data: IManagedUser[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -48,9 +48,9 @@ interface UsersPaginator {
 }
 
 const props = defineProps<{
-    users: UsersPaginator;
-    roleOptions: RoleOption[];
-    query: UsersQuery;
+    users: IUsersPaginator;
+    roleOptions: IRoleOption[];
+    query: IUsersQuery;
 }>();
 
 const page = usePage();
@@ -107,23 +107,23 @@ function formatRoles(roles: string[]): string {
     return roles.map((name) => roleLabelMap.value[name] ?? name).join(', ');
 }
 
-function isSuperAdminTarget(user: ManagedUser): boolean {
+function isSuperAdminTarget(user: IManagedUser): boolean {
     return user.roles.includes('super-admin');
 }
 
-function isSelf(user: ManagedUser): boolean {
+function isSelf(user: IManagedUser): boolean {
     return authUser.value?.id === user.id;
 }
 
-function canEdit(user: ManagedUser): boolean {
+function canEdit(user: IManagedUser): boolean {
     return !isSuperAdminTarget(user);
 }
 
-function canDelete(user: ManagedUser): boolean {
+function canDelete(user: IManagedUser): boolean {
     return !isSuperAdminTarget(user) && !isSelf(user);
 }
 
-const deleteTarget = ref<ManagedUser | null>(null);
+const deleteTarget = ref<IManagedUser | null>(null);
 const isDeleting = ref(false);
 const showDeleteModal = computed(() => deleteTarget.value !== null);
 
@@ -134,7 +134,7 @@ const deleteDescription = computed(() => {
         : 'Akun akan dihapus (soft delete).';
 });
 
-function startDelete(user: ManagedUser): void {
+function startDelete(user: IManagedUser): void {
     if (!canDelete(user)) return;
     deleteTarget.value = user;
 }

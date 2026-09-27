@@ -10,7 +10,7 @@ import ProfilePage from '../Profile.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 
 /** Tipe baris form picker diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
-type PickFormRow = NonNullable<InstanceType<typeof UserEventRegistrationPickForm>['$props']['forms']>[number];
+type TPickFormRow = NonNullable<InstanceType<typeof UserEventRegistrationPickForm>['$props']['forms']>[number];
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -261,7 +261,7 @@ describe('User/EventRegistration skeleton (M2 Task 10)', () => {
 describe('User/EventRegistrationPickForm skeleton (M2 Task 10)', () => {
     function mountPickForm(
         event: IEvent | undefined,
-        forms: PickFormRow[] | undefined
+        forms: TPickFormRow[] | undefined
     ): VueWrapper<InstanceType<typeof UserEventRegistrationPickForm>> {
         return mount(UserEventRegistrationPickForm, {
             props: { event, forms },
@@ -269,7 +269,7 @@ describe('User/EventRegistrationPickForm skeleton (M2 Task 10)', () => {
         });
     }
 
-    function demoFormRow(): PickFormRow {
+    function demoFormRow(): TPickFormRow {
         return {
             id: 'fo-1',
             title: 'Formulir A',

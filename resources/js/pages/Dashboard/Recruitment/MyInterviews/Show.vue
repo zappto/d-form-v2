@@ -81,7 +81,7 @@ interface DetailPayload {
     };
 }
 
-interface QueuePermission {
+interface IQueuePermission {
     can_view_recruitment_queue?: boolean;
 }
 
@@ -96,7 +96,7 @@ const page = usePage();
 const authUser = useAuth(page.props);
 
 const canViewQueue = computed<boolean>((): boolean => {
-    const candidate: QueuePermission | null = authUser.value;
+    const candidate: IQueuePermission | null = authUser.value;
     return candidate?.can_view_recruitment_queue === true;
 });
 
@@ -135,13 +135,13 @@ const recommendationChoices = computed(() =>
           ]
 );
 
-interface RecommendationStyle {
+interface IRecommendationStyle {
     card: string;
     tile: string;
     indicator: string;
 }
 
-const RECOMMENDATION_STYLES: Partial<Record<string, RecommendationStyle>> = {
+const RECOMMENDATION_STYLES: Partial<Record<string, IRecommendationStyle>> = {
     recommended: {
         card: 'border-success/40 bg-success/5',
         tile: 'border-success/30 bg-success/10 text-success',
@@ -154,7 +154,7 @@ const RECOMMENDATION_STYLES: Partial<Record<string, RecommendationStyle>> = {
     },
 };
 
-const RECOMMENDATION_FALLBACK_STYLE: RecommendationStyle = {
+const RECOMMENDATION_FALLBACK_STYLE: IRecommendationStyle = {
     card: 'border-primary/40 bg-primary/5',
     tile: 'border-primary/30 bg-primary/10 text-primary',
     indicator: 'text-primary',
@@ -164,7 +164,7 @@ const RECOMMENDATION_CARD_IDLE: string = 'border-border bg-card hover:bg-muted/4
 const RECOMMENDATION_TILE_IDLE: string =
     'border-border/70 bg-muted/40 text-muted-foreground group-hover:text-foreground';
 
-function recommendationStyle(value: string): RecommendationStyle {
+function recommendationStyle(value: string): IRecommendationStyle {
     return RECOMMENDATION_STYLES[value] ?? RECOMMENDATION_FALLBACK_STYLE;
 }
 
@@ -172,7 +172,7 @@ function isRecommendationSelected(value: string): boolean {
     return form.recommendation === value;
 }
 
-type ScoreField = 'speaking_score' | 'technical_score' | 'attitude_score';
+type TScoreField = 'speaking_score' | 'technical_score' | 'attitude_score';
 
 const SCORE_MIN: number = 1;
 const SCORE_MAX: number = 10;
@@ -190,29 +190,29 @@ const form = useForm({
     notes: props.detail?.evaluation.notes ?? '',
 });
 
-function scoreValue(field: ScoreField): number {
+function scoreValue(field: TScoreField): number {
     const raw: unknown = form[field];
     const parsed: number = typeof raw === 'number' ? raw : Number.parseInt(String(raw ?? ''), 10);
     return Number.isFinite(parsed) ? clampScore(parsed) : SCORE_DEFAULT;
 }
 
-function canDecrease(field: ScoreField): boolean {
+function canDecrease(field: TScoreField): boolean {
     return !form.processing && !isLocked.value && scoreValue(field) > SCORE_MIN;
 }
 
-function canIncrease(field: ScoreField): boolean {
+function canIncrease(field: TScoreField): boolean {
     return !form.processing && !isLocked.value && scoreValue(field) < SCORE_MAX;
 }
 
-function adjustScore(field: ScoreField, delta: number): void {
+function adjustScore(field: TScoreField, delta: number): void {
     form[field] = clampScore(scoreValue(field) + delta);
 }
 
-function commitScore(field: ScoreField): void {
+function commitScore(field: TScoreField): void {
     form[field] = scoreValue(field);
 }
 
-function onScoreInput(field: ScoreField, event: Event): void {
+function onScoreInput(field: TScoreField, event: Event): void {
     const target: EventTarget | null = event.target;
     if (!(target instanceof HTMLInputElement)) return;
 
@@ -223,7 +223,7 @@ function onScoreInput(field: ScoreField, event: Event): void {
     if (next !== '') form[field] = Number.parseInt(next, 10);
 }
 
-function onScoreKeydown(field: ScoreField, event: KeyboardEvent): void {
+function onScoreKeydown(field: TScoreField, event: KeyboardEvent): void {
     if (event.key === 'Enter') {
         commitScore(field);
         return;

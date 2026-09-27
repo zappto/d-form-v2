@@ -19,7 +19,7 @@ import { emptyFormRegistrationMetadata, toFormMetadataPayload } from '@/types/fo
 import { routes } from '@/lib/routes';
 
 /** Inertia `FormDataType` cannot recurse `BackendField.metadata` (Record<string, unknown>); store fields loosely for typing only. */
-type CreateFormClientPayload = Omit<ICreateDashboardFormPayload, 'fields'> & {
+type TCreateFormClientPayload = Omit<ICreateDashboardFormPayload, 'fields'> & {
     fields: object[];
 };
 
@@ -40,7 +40,7 @@ const formFields = ref<BuilderField[]>([]);
 const formMetadata = ref(emptyFormRegistrationMetadata());
 const isSaving = ref<boolean>(false);
 
-const createForm = useForm<CreateFormClientPayload>({
+const createForm = useForm<TCreateFormClientPayload>({
     title: '',
     description: '',
     success_content: '',

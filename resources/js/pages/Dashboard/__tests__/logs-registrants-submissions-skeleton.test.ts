@@ -90,7 +90,7 @@ vi.mock('axios', () => ({
     default: { post: vi.fn(), patch: vi.fn(), isAxiosError: () => false },
 }));
 
-interface AsyncOptions {
+interface IAsyncOptions {
     preserveState?: boolean;
     preserveScroll?: boolean;
     replace?: boolean;
@@ -100,16 +100,16 @@ interface AsyncOptions {
     onFinish?: () => void;
 }
 
-function lastOptions(mock: { mock: { calls: unknown[][] } }): AsyncOptions {
+function lastOptions(mock: { mock: { calls: unknown[][] } }): IAsyncOptions {
     expect(mock).toHaveBeenCalled();
     const args = mock.mock.calls[0] as unknown[];
     // get(url, data, options) → [2]; visit(url, options) → [1]; reload(options) → [0].
-    const options = (args[2] ?? args[1] ?? args[0]) as AsyncOptions | undefined;
+    const options = (args[2] ?? args[1] ?? args[0]) as IAsyncOptions | undefined;
     expect(options).toBeDefined();
-    return options as AsyncOptions;
+    return options as IAsyncOptions;
 }
 
-function demoLog(id: string, action: string): LogRowFixture {
+function demoLog(id: string, action: string): ILogRowFixture {
     return {
         id,
         action,
@@ -125,7 +125,7 @@ function demoLog(id: string, action: string): LogRowFixture {
     };
 }
 
-interface LogRowFixture {
+interface ILogRowFixture {
     id: string;
     action: string;
     actor_type: string;
@@ -139,7 +139,7 @@ interface LogRowFixture {
     created_at: string | null;
 }
 
-function mountLogs(data: LogRowFixture[]): VueWrapper<InstanceType<typeof ActivityLogsIndex>> {
+function mountLogs(data: ILogRowFixture[]): VueWrapper<InstanceType<typeof ActivityLogsIndex>> {
     return mount(ActivityLogsIndex, {
         props: {
             logs: { data, links: [] },
@@ -329,13 +329,13 @@ beforeEach(() => {
     routerVisitMock.mockReset();
     putMock.mockReset();
     const hangGet = (...args: unknown[]): undefined => {
-        const options = args[2] as AsyncOptions | undefined;
+        const options = args[2] as IAsyncOptions | undefined;
         options?.onStart?.();
         return undefined;
     };
     const hangVisitReload = (...args: unknown[]): undefined => {
         // visit(url, options) → [1]; reload(options) → [0].
-        const options = (args[1] ?? args[0]) as AsyncOptions | undefined;
+        const options = (args[1] ?? args[0]) as IAsyncOptions | undefined;
         options?.onStart?.();
         return undefined;
     };

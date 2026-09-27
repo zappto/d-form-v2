@@ -16,7 +16,7 @@ import { CircleAlert } from 'lucide-vue-next';
 
 defineOptions({ layout: FormFillLayout });
 
-interface ApplyPageProps {
+interface IApplyPageProps {
     period: Record<string, unknown> | null;
     registration: { is_open: boolean; message: string | null };
     divisions: Array<Record<string, unknown>>;
@@ -26,7 +26,7 @@ interface ApplyPageProps {
     submitUrl: string;
 }
 
-const props = defineProps<ApplyPageProps>();
+const props = defineProps<IApplyPageProps>();
 
 const ctx = reactive(
     useFormFillPage({

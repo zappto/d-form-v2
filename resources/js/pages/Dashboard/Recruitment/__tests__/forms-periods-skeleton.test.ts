@@ -7,7 +7,7 @@ import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/App
 import type { IApplicationDetail } from '@/components/modules/dashboard/recruitment/ApplicantDetailContent.vue';
 
 /** Tipe baris aplikan diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
-type ApplicationRow = NonNullable<InstanceType<typeof PeriodsShow>['$props']['applications']>[number];
+type TApplicationRow = NonNullable<InstanceType<typeof PeriodsShow>['$props']['applications']>[number];
 
 /** Stub component (`: true`) ikut me-render slot bawaannya. */
 config.global.renderStubDefaultSlot = true;
@@ -75,21 +75,21 @@ vi.mock('@/lib/error-message', () => ({
     showFlashToast: vi.fn(),
 }));
 
-interface RouterGetOptions {
+interface IRouterGetOptions {
     preserveState?: boolean;
     preserveScroll?: boolean;
     onStart?: () => void;
     onFinish?: () => void;
 }
 
-function lastGetOptions(): RouterGetOptions {
+function lastGetOptions(): IRouterGetOptions {
     expect(routerGetMock).toHaveBeenCalled();
-    const options = routerGetMock.mock.calls[0]?.[2] as RouterGetOptions | undefined;
+    const options = routerGetMock.mock.calls[0]?.[2] as IRouterGetOptions | undefined;
     expect(options).toBeDefined();
-    return options as RouterGetOptions;
+    return options as IRouterGetOptions;
 }
 
-function demoRow(): ApplicationRow {
+function demoRow(): TApplicationRow {
     return {
         id: 'ap-1',
         registration_number: 'OPREC-2026-00001',
@@ -228,7 +228,7 @@ beforeEach(() => {
     // Cerminkan Inertia: onStart jalan saat visit berangkat; onFinish hanya
     // bila test memicunya eksplisit (navigasi "menggantung").
     routerGetMock.mockImplementation((...args: unknown[]) => {
-        const options = args[2] as RouterGetOptions | undefined;
+        const options = args[2] as IRouterGetOptions | undefined;
         options?.onStart?.();
         return undefined;
     });

@@ -17,12 +17,12 @@ import { readFormError } from '@/lib/formErrors';
 
 defineOptions({ layout: FormFillLayout });
 
-interface DivisionOption {
+interface IDivisionOption {
     id: string;
     name: string;
 }
 
-interface ApplicationFormData {
+interface IApplicationFormData {
     full_name: string;
     nim: string;
     semester: number;
@@ -41,8 +41,8 @@ interface ApplicationFormData {
 }
 
 const props = defineProps<{
-    application: ApplicationFormData | undefined;
-    divisions: DivisionOption[] | undefined;
+    application: IApplicationFormData | undefined;
+    divisions: IDivisionOption[] | undefined;
     updateUrl: string;
     dashboardUrl: string;
 }>();
@@ -92,7 +92,7 @@ const semesterOptions: SearchableSelectOption[] = [
 
 const divisionOptions = computed<SearchableSelectOption[]>(() =>
     (props.divisions ?? []).map(
-        (division: DivisionOption): SearchableSelectOption => ({
+        (division: IDivisionOption): SearchableSelectOption => ({
             value: division.id,
             label: division.name,
         })
@@ -166,9 +166,9 @@ const portfolioUrlRadio = ref<HTMLButtonElement | null>(null);
 const portfolioFileRadio = ref<HTMLButtonElement | null>(null);
 const portfolioNoneRadio = ref<HTMLButtonElement | null>(null);
 
-type PortfolioType = 'none' | 'url' | 'file';
+type TPortfolioType = 'none' | 'url' | 'file';
 
-function focusPortfolioRadio(value: PortfolioType): void {
+function focusPortfolioRadio(value: TPortfolioType): void {
     const target =
         value === 'url'
             ? portfolioUrlRadio.value
@@ -179,8 +179,8 @@ function focusPortfolioRadio(value: PortfolioType): void {
 }
 
 function onPortfolioTypeKeydown(event: KeyboardEvent): void {
-    const order: PortfolioType[] = ['none', 'url', 'file'];
-    const current = order.indexOf(form.portfolio_type as PortfolioType);
+    const order: TPortfolioType[] = ['none', 'url', 'file'];
+    const current = order.indexOf(form.portfolio_type as TPortfolioType);
     let next: number | null = null;
     switch (event.key) {
         case 'ArrowRight':
