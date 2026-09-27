@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
 import FormFillLayout from '@/layouts/FormFillLayout.vue'
 import { Button } from '@/components/ui/button'
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { routes } from '@/lib/routes'
+import { readFormError } from '@/lib/formErrors'
 import { Eye, EyeOff, Mail } from 'lucide-vue-next'
 
 defineOptions({ layout: FormFillLayout })
@@ -28,6 +29,9 @@ const form = useForm({
     registration_number: prefilledReg,
     tracking_token: prefilledToken,
 })
+
+const credentialsError = computed(() => readFormError(form.errors, 'credentials'))
+const trackingError = computed(() => readFormError(form.errors, 'tracking'))
 
 function submit() {
     form.post(props.authenticateUrl, {
@@ -51,11 +55,11 @@ function submit() {
         <Card class="rounded-2xl border-border/70">
             <CardContent class="p-5">
                 <form class="space-y-4" @submit.prevent="submit">
-                    <p v-if="form.errors.credentials" class="text-destructive text-sm">
-                        {{ form.errors.credentials }}
+                    <p v-if="credentialsError" class="text-destructive text-sm">
+                        {{ credentialsError }}
                     </p>
-                    <p v-if="form.errors.tracking" class="text-destructive text-sm">
-                        {{ form.errors.tracking }}
+                    <p v-if="trackingError" class="text-destructive text-sm">
+                        {{ trackingError }}
                     </p>
 
                     <div class="space-y-2">

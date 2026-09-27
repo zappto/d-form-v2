@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select'
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata'
+import type { FormFillAnswerValue } from '@/types/form'
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue'
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers'
 import { getFormFieldOptionRows, formFieldBuilderType } from '@/lib/formFieldOptions'
@@ -42,8 +43,9 @@ const props = defineProps<{
     confirmUrl: string
 }>()
 
-function metadata(field: IFormField): Record<string, unknown> {
-    return field.metadata && typeof field.metadata === 'object' ? field.metadata : {}
+function metadataText(field: IFormField, key: string): string {
+    const value = readFieldMetadata(field)[key]
+    return typeof value === 'string' ? value : ''
 }
 
 function builderType(field: IFormField): string {
@@ -65,8 +67,8 @@ function invitationFieldError(errors: ValidationErrors, key: string): string | u
     return getFieldError(errors, key, errorContext.value)
 }
 
-function initialFormState(): Record<string, unknown> {
-    const o: Record<string, unknown> = {}
+function initialFormState(): Record<string, FormFillAnswerValue> {
+    const o: Record<string, FormFillAnswerValue> = {}
     for (const f of appendableFields.value) {
         const raw = props.answers[f.name]
         const meta = readFieldMetadata(f)
@@ -254,7 +256,7 @@ function submitDeclineFromDialog() {
                         class="rounded-2xl border border-border bg-primary/8 px-5 py-4 shadow-xs"
                     >
                         <h2 class="font-display text-xl font-bold text-foreground">
-                            {{ (metadata(field).content as string) || field.label }}
+                            {{ metadataText(field, 'content') || field.label }}
                         </h2>
                     </div>
 
@@ -263,7 +265,7 @@ function submitDeclineFromDialog() {
                         class="rounded-2xl border border-border bg-card px-5 py-4 shadow-xs"
                     >
                         <FormParagraphContent
-                            :content="String(metadata(field).content ?? '')"
+                            :content="metadataText(field, 'content')"
                             :fallback="field.description || field.label"
                         />
                     </div>
@@ -275,17 +277,17 @@ function submitDeclineFromDialog() {
                         class="overflow-hidden rounded-2xl border border-border bg-card shadow-xs"
                     >
                         <img
-                            v-if="typeof metadata(field).bannerUrl === 'string' && metadata(field).bannerUrl.trim()"
-                            :src="normalizeBannerSrc(metadata(field).bannerUrl as string)"
+                            v-if="metadataText(field, 'bannerUrl').trim()"
+                            :src="normalizeBannerSrc(metadataText(field, 'bannerUrl'))"
                             alt=""
                             class="aspect-video w-full object-cover sm:aspect-[3/1]"
                             loading="lazy"
                         />
                         <p
-                            v-if="typeof metadata(field).content === 'string' && metadata(field).content.trim()"
+                            v-if="metadataText(field, 'content').trim()"
                             class="border-t border-border px-4 py-3 text-sm text-muted-foreground"
                         >
-                            {{ metadata(field).content }}
+                            {{ metadataText(field, 'content') }}
                         </p>
                     </div>
 

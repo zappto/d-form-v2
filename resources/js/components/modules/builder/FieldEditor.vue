@@ -141,7 +141,7 @@ const hasOptions = computed(() =>
 const isContent = computed(() =>
     ['heading', 'paragraph', 'divider'].includes(props.field.type),
 )
-function onMaxLengthInput(v: string) {
+function onMaxLengthInput(v: string | number) {
     const t = String(v ?? '').trim()
     if (t === '') {
         const meta = { ...(props.field.metadata || {}) }

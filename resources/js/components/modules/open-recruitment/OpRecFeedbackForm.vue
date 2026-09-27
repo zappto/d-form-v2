@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { CometSpinner } from '@/components/ui/comet'
 import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message'
+import { readFormError } from '@/lib/formErrors'
 
 const props = defineProps<{
     storeUrl: string
@@ -32,6 +34,8 @@ const form = useForm({
     rating_staff_service: '',
     feedback_text: '',
 })
+
+const feedbackError = computed(() => readFormError(form.errors, 'feedback'))
 
 function applyFeedbackDraftValues(draft: unknown): void {
     if (typeof draft !== 'object' || draft === null) return
@@ -102,7 +106,7 @@ function submit(): void {
             />
         </div>
 
-        <p v-if="form.errors.feedback" class="text-destructive text-sm">{{ form.errors.feedback }}</p>
+        <p v-if="feedbackError" class="text-destructive text-sm">{{ feedbackError }}</p>
 
         <div class="flex flex-wrap gap-2 pt-1">
             <Button

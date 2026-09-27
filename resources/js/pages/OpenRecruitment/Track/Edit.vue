@@ -13,6 +13,7 @@ import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/s
 import { Separator } from '@/components/ui/separator';
 import { routes } from '@/lib/routes';
 import { handleInertiaFormErrors, showFlashToast } from '@/lib/error-message';
+import { readFormError } from '@/lib/formErrors';
 
 defineOptions({ layout: FormFillLayout });
 
@@ -63,6 +64,8 @@ const form = useForm({
     instagram_follow_proof: null as File | null,
     twibbon_url: props.application?.twibbon_url ?? '',
 });
+
+const applicationError = computed(() => readFormError(form.errors, 'application'));
 
 function applyTrackEditDraftValues(draft: unknown): void {
     if (typeof draft !== 'object' || draft === null) return;
@@ -310,8 +313,8 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
         </div>
 
         <form class="fade-up space-y-4" @submit.prevent="submit">
-            <p v-if="form.errors.application" class="text-destructive text-sm">
-                {{ form.errors.application }}
+            <p v-if="applicationError" class="text-destructive text-sm">
+                {{ applicationError }}
             </p>
 
             <!-- Data diri -->
