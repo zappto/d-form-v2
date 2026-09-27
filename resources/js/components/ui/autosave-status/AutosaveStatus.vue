@@ -29,7 +29,7 @@ const displayText = computed((): string => {
     <p
         v-if="props.variant === 'block' && props.status !== 'idle'"
         aria-live="polite"
-        class="text-muted-foreground flex items-center justify-center gap-1.5 text-xs"
+        class="flex items-center justify-center gap-1.5 text-xs text-muted-foreground"
     >
         <Loader2 v-if="props.status === 'saving'" class="size-3 animate-spin" aria-hidden="true" />
         <span v-else class="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
@@ -38,7 +38,7 @@ const displayText = computed((): string => {
     <span
         v-else-if="props.variant === 'inline' && props.status !== 'idle'"
         aria-live="polite"
-        class="text-muted-foreground flex shrink-0 items-center gap-1.5 text-xs"
+        class="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground"
     >
         <Loader2 v-if="props.status === 'saving'" class="size-3 animate-spin" aria-hidden="true" />
         <span v-else class="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />

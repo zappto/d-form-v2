@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DropdownMenuGroup } from 'reka-ui'
+import { DropdownMenuGroup } from 'reka-ui';
 </script>
 
 <template>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import DatePicker from '@/components/ui/date-picker/DatePicker.vue'
-import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue'
-import { Label } from '@/components/ui/label'
-import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
+import { computed, ref, watch } from 'vue';
+import DatePicker from '@/components/ui/date-picker/DatePicker.vue';
+import TimeAmPmInput from '@/components/ui/date-picker/TimeAmPmInput.vue';
+import { Label } from '@/components/ui/label';
+import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 
 /**
  * Satu field tanggal + jam yang nilai keluar/masuknya tetap
@@ -13,70 +13,70 @@ import { fieldInvalidClass } from '@/lib/fieldInvalidClass'
 const props = withDefaults(
     defineProps<{
         /** Nilai utuh `YYYY-MM-DDTHH:mm`. */
-        modelValue: string
-        label: string
-        idPrefix: string
+        modelValue: string;
+        label: string;
+        idPrefix: string;
         /** True saat field punya error validasi. */
-        invalid?: boolean
-        error?: string
+        invalid?: boolean;
+        error?: string;
         /** True untuk menampilkan asterisk wajib di samping label. */
-        required?: boolean
+        required?: boolean;
         /** True saat field bergoyang (shake) karena error validasi. */
-        shaking?: boolean
+        shaking?: boolean;
         /** Class tambahan untuk tombol pilih tanggal (mis. warna permukaan sesuai konteks). */
-        pickerClass?: string
+        pickerClass?: string;
         /**
          * `col` → tanggal di atas, jam di bawah (hemat lebar, cocok panel sempit).
          * `row` → tanggal kiri melebar, jam kanan (compact di form lebar).
          */
-        layout?: 'col' | 'row'
+        layout?: 'col' | 'row';
     }>(),
-    { invalid: false, error: '', required: false, shaking: false, pickerClass: '', layout: 'row' },
-)
+    { invalid: false, error: '', required: false, shaking: false, pickerClass: '', layout: 'row' }
+);
 
 const emit = defineEmits<{
-    'update:modelValue': [value: string]
-}>()
+    'update:modelValue': [value: string];
+}>();
 
 function splitDateTimeParts(value: string): { date: string; time: string } {
-    if (!value) return { date: '', time: '' }
-    const [d, t = ''] = value.split('T')
-    return { date: d.length >= 10 ? d.slice(0, 10) : '', time: t.length >= 5 ? t.slice(0, 5) : '' }
+    if (!value) return { date: '', time: '' };
+    const [d, t = ''] = value.split('T');
+    return { date: d.length >= 10 ? d.slice(0, 10) : '', time: t.length >= 5 ? t.slice(0, 5) : '' };
 }
 
 function combineDateTime(date: string, time: string): string {
-    if (!date) return ''
-    const t = time && time.length >= 5 ? time.slice(0, 5) : '00:00'
-    return `${date}T${t}`
+    if (!date) return '';
+    const t = time && time.length >= 5 ? time.slice(0, 5) : '00:00';
+    return `${date}T${t}`;
 }
 
-const parts = ref(splitDateTimeParts(props.modelValue))
+const parts = ref(splitDateTimeParts(props.modelValue));
 
 watch(
     parts,
     () => {
-        emit('update:modelValue', combineDateTime(parts.value.date, parts.value.time))
+        emit('update:modelValue', combineDateTime(parts.value.date, parts.value.time));
     },
-    { deep: true },
-)
+    { deep: true }
+);
 
 watch(
     () => props.modelValue,
     (v) => {
-        const next = splitDateTimeParts(v)
+        const next = splitDateTimeParts(v);
         if (next.date !== parts.value.date || next.time !== parts.value.time) {
-            parts.value = next
+            parts.value = next;
         }
-    },
-)
+    }
+);
 
-const dateId = computed(() => `${props.idPrefix}-date`)
-const timeId = computed(() => `${props.idPrefix}-time`)
+const dateId = computed(() => `${props.idPrefix}-date`);
+const timeId = computed(() => `${props.idPrefix}-time`);
 </script>
 
 <template>
     <div class="flex flex-col gap-2">
-        <Label :for="dateId" class="text-foreground text-sm font-medium">
+        <Label :for="dateId" class="text-sm font-medium text-foreground">
             {{ label }}
             <span v-if="required" class="text-destructive">*</span>
         </Label>
@@ -91,11 +91,7 @@ const timeId = computed(() => `${props.idPrefix}-time`)
                 :model-value="parts.date"
                 placeholder="Pilih tanggal"
                 :aria-invalid="invalid"
-                :class="[
-                    'text-sm',
-                    fieldInvalidClass(invalid),
-                    pickerClass,
-                ]"
+                :class="['text-sm', fieldInvalidClass(invalid), pickerClass]"
                 @update:model-value="parts.date = $event"
             />
             <TimeAmPmInput
@@ -106,6 +102,6 @@ const timeId = computed(() => `${props.idPrefix}-time`)
                 @update:model-value="parts.time = String($event)"
             />
         </div>
-        <p v-if="error" class="text-destructive text-xs">{{ error }}</p>
+        <p v-if="error" class="text-xs text-destructive">{{ error }}</p>
     </div>
 </template>

@@ -1,50 +1,50 @@
 <script setup lang="ts">
-import type { DateValue } from 'reka-ui'
-import type { ClassValue } from 'clsx'
-import { ref, shallowRef, watch } from 'vue'
-import { Calendar as CalendarIcon } from 'lucide-vue-next'
-import { Calendar } from '@/components/ui/calendar'
-import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
-import { calendarDateToYmd, formatIdDateLabel, modelValueToCalendarDate } from '@/lib/shadcnDateFormat'
+import type { DateValue } from 'reka-ui';
+import type { ClassValue } from 'clsx';
+import { ref, shallowRef, watch } from 'vue';
+import { Calendar as CalendarIcon } from 'lucide-vue-next';
+import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { calendarDateToYmd, formatIdDateLabel, modelValueToCalendarDate } from '@/lib/shadcnDateFormat';
 
 const props = withDefaults(
     defineProps<{
-        id?: string
-        modelValue: string
-        placeholder?: string
-        disabled?: boolean
+        id?: string;
+        modelValue: string;
+        placeholder?: string;
+        disabled?: boolean;
         /** True saat field punya error validasi: border/ring destructive (lewat trigger outline). */
-        ariaInvalid?: boolean
+        ariaInvalid?: boolean;
         /** Trigger + calendar width. Array/object values diizinkan seperti class binding Vue biasa. */
-        class?: ClassValue
+        class?: ClassValue;
     }>(),
-    { placeholder: 'Pilih tanggal', disabled: false, ariaInvalid: false },
-)
+    { placeholder: 'Pilih tanggal', disabled: false, ariaInvalid: false }
+);
 
 const emit = defineEmits<{
-    'update:modelValue': [value: string]
-}>()
+    'update:modelValue': [value: string];
+}>();
 
-const open = ref(false)
-const selected = shallowRef<DateValue | undefined>(undefined)
+const open = ref(false);
+const selected = shallowRef<DateValue | undefined>(undefined);
 
 watch(
     () => props.modelValue,
     (v) => {
-        selected.value = modelValueToCalendarDate(v)
+        selected.value = modelValueToCalendarDate(v);
     },
-    { immediate: true },
-)
+    { immediate: true }
+);
 
 function onCalendarUpdate(v: DateValue | undefined): void {
-    selected.value = v
-    emit('update:modelValue', calendarDateToYmd(v))
-    open.value = false
+    selected.value = v;
+    emit('update:modelValue', calendarDateToYmd(v));
+    open.value = false;
 }
 
-const label = (): string => formatIdDateLabel(props.modelValue)
+const label = (): string => formatIdDateLabel(props.modelValue);
 </script>
 
 <template>
@@ -57,12 +57,12 @@ const label = (): string => formatIdDateLabel(props.modelValue)
                 :disabled="disabled"
                 :aria-invalid="ariaInvalid === true ? true : undefined"
                 :class="
- cn(
- 'h-9 w-full justify-start gap-2 px-3 text-left text-xs font-normal shadow-none',
- !modelValue && 'text-muted-foreground',
- props.class,
- )
- "
+                    cn(
+                        'h-9 w-full justify-start gap-2 px-3 text-left text-xs font-normal shadow-none',
+                        !modelValue && 'text-muted-foreground',
+                        props.class
+                    )
+                "
             >
                 <CalendarIcon class="size-4 shrink-0 opacity-60" aria-hidden="true" />
                 <span class="truncate">{{ label() || placeholder }}</span>

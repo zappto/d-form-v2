@@ -1,35 +1,41 @@
 <script setup lang="ts">
-import type { CheckboxRootEmits, CheckboxRootProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import { reactiveOmit } from "@vueuse/core"
-import { Check } from "lucide-vue-next"
-import { CheckboxIndicator, CheckboxRoot, useForwardPropsEmits } from "reka-ui"
-import { cn } from "@/lib/utils"
+import type { CheckboxRootEmits, CheckboxRootProps } from 'reka-ui';
+import type { HTMLAttributes } from 'vue';
+import { reactiveOmit } from '@vueuse/core';
+import { Check } from 'lucide-vue-next';
+import { CheckboxIndicator, CheckboxRoot, useForwardPropsEmits } from 'reka-ui';
+import { cn } from '@/lib/utils';
 import { ariaInvalidBorderClass, ariaInvalidRingClass } from '@/lib/ariaInvalidClass';
 
-const props = defineProps<CheckboxRootProps & { class?: HTMLAttributes["class"] }>()
-const emits = defineEmits<CheckboxRootEmits>()
+const props = defineProps<CheckboxRootProps & { class?: HTMLAttributes['class'] }>();
+const emits = defineEmits<CheckboxRootEmits>();
 
-const delegatedProps = reactiveOmit(props, "class")
+const delegatedProps = reactiveOmit(props, 'class');
 
-const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
-  <CheckboxRoot
-    v-slot="slotProps"
-    data-slot="checkbox"
-    v-bind="forwarded"
-    :class="
-      cn('peer size-4 shrink-0 rounded-[5px] border border-input bg-card shadow-xs transition-[background-color,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50', ariaInvalidBorderClass, ariaInvalidRingClass, props.class)"
-  >
-    <CheckboxIndicator
-      data-slot="checkbox-indicator"
-      class="grid place-content-center text-current transition-none"
+    <CheckboxRoot
+        v-slot="slotProps"
+        data-slot="checkbox"
+        v-bind="forwarded"
+        :class="
+            cn(
+                'peer size-4 shrink-0 rounded-[5px] border border-input bg-card shadow-xs transition-[background-color,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
+                ariaInvalidBorderClass,
+                ariaInvalidRingClass,
+                props.class
+            )
+        "
     >
-      <slot v-bind="slotProps">
-        <Check class="size-3" :stroke-width="3" />
-      </slot>
-    </CheckboxIndicator>
-  </CheckboxRoot>
+        <CheckboxIndicator
+            data-slot="checkbox-indicator"
+            class="grid place-content-center text-current transition-none"
+        >
+            <slot v-bind="slotProps">
+                <Check class="size-3" :stroke-width="3" />
+            </slot>
+        </CheckboxIndicator>
+    </CheckboxRoot>
 </template>

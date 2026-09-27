@@ -1,29 +1,36 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue"
-import { useVModel } from "@vueuse/core"
-import { cn } from "@/lib/utils"
+import type { HTMLAttributes } from 'vue';
+import { useVModel } from '@vueuse/core';
+import { cn } from '@/lib/utils';
 import { ariaInvalidBorderClass, ariaInvalidRingClass } from '@/lib/ariaInvalidClass';
 
 const props = defineProps<{
-  class?: HTMLAttributes["class"]
-  defaultValue?: string | number
-  modelValue?: string | number
-}>()
+    class?: HTMLAttributes['class'];
+    defaultValue?: string | number;
+    modelValue?: string | number;
+}>();
 
 const emits = defineEmits<{
-  (e: "update:modelValue", payload: string | number): void
-}>()
+    (e: 'update:modelValue', payload: string | number): void;
+}>();
 
-const modelValue = useVModel(props, "modelValue", emits, {
-  passive: true,
-  defaultValue: props.defaultValue,
-})
+const modelValue = useVModel(props, 'modelValue', emits, {
+    passive: true,
+    defaultValue: props.defaultValue,
+});
 </script>
 
 <template>
-  <textarea
-    v-model="modelValue"
-    data-slot="textarea"
-    :class="cn('border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/30 flex field-sizing-content min-h-24 w-full rounded-lg border bg-card px-3 py-2 text-sm font-medium text-foreground shadow-xs transition-[border-color,box-shadow,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none hover:border-primary/30 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm', ariaInvalidBorderClass, ariaInvalidRingClass, props.class)"
-  />
+    <textarea
+        v-model="modelValue"
+        data-slot="textarea"
+        :class="
+            cn(
+                'flex field-sizing-content min-h-24 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm font-medium text-foreground shadow-xs transition-[border-color,box-shadow,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] outline-none placeholder:text-muted-foreground hover:border-primary/30 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                ariaInvalidBorderClass,
+                ariaInvalidRingClass,
+                props.class
+            )
+        "
+    />
 </template>

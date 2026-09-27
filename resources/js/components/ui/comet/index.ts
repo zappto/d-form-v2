@@ -1,1 +1,1 @@
-export { default as CometSpinner } from "./CometSpinner.vue"
+export { default as CometSpinner } from './CometSpinner.vue';

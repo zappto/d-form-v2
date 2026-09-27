@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { DropdownMenuRoot, type DropdownMenuRootProps } from 'reka-ui'
+import { DropdownMenuRoot, type DropdownMenuRootProps } from 'reka-ui';
 
-const props = defineProps<DropdownMenuRootProps>()
+const props = defineProps<DropdownMenuRootProps>();
 </script>
 
 <template>
