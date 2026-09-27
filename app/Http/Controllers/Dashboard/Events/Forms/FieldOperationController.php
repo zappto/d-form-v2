@@ -51,7 +51,7 @@ class FieldOperationController extends Controller
                 $rows = $this->applyStoredBannerPath($rows, $storedBannerPath, $bannerFile->getClientOriginalName());
             }
             // Upload gambar opsi (checkbox/radio): file opsional
-            // `option_images[fieldId][optionId]` (image, max 10MB — samakan
+            // `option_images[fieldId][optionId]` (image, max 5MB — samakan
             // banner). Disimpan ke disk public `forms/options`; DB hanya
             // menyimpan path, bukan base64. Tanpa file berperilaku seperti
             // sekarang. Baris DB lama ber-base64 dibiarkan (tanpa backfill).
