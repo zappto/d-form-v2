@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-disable vue/no-mutating-props -- ctx.answerForm is parent Inertia form state */
 import { computed } from 'vue';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -37,7 +36,7 @@ function textAnswer(name: string): string {
 }
 
 function setTextAnswer(name: string, value: string | number): void {
-    props.ctx.answerForm[name] = String(value);
+    props.ctx.setFieldAnswer(name, String(value));
 }
 
 const showSubtitle = computed(() => props.variant === 'linear' && Boolean(props.participationSlot.title));
@@ -140,7 +139,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                     :key="rating"
                     type="button"
                     class="p-1"
-                    @click="ctx.answerForm[storageKey] = String(rating)"
+                    @click="ctx.setFieldAnswer(storageKey, String(rating))"
                 >
                     <Star
                         class="size-7 transition-colors"
@@ -222,7 +221,7 @@ const selectOptions = computed<SearchableSelectOption[]>(() =>
                     :value="row.label"
                     :checked="(ctx.answerForm[storageKey] as string) === row.label"
                     class="size-4 accent-primary"
-                    @change="() => (ctx.answerForm[storageKey] = row.label)"
+                    @change="() => ctx.setFieldAnswer(storageKey, row.label)"
                 />
                 <div
                     v-if="row.type === 'image' && row.imageSrc"

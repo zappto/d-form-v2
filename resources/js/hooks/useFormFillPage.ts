@@ -15,6 +15,7 @@ import { readFieldMetadata, readFieldRules, readMetaBoolean } from '@/lib/formFi
 import type {
     TFormAccessStatus,
     TFormFillAnswerMap,
+    TFormFillAnswerValue,
     TFormFillOptionRow,
     IFormFillPageEvent,
     IFormFillPageForm,
@@ -383,6 +384,22 @@ export function useFormFillPage(props: {
 
     const memberSlots = computed(() => props.memberSlots);
 
+    /** Tulis satu nilai jawaban (teks/rating/radio) ke state form induk; dipakai slot field responden. */
+    function setFieldAnswer(name: string, value: TFormFillAnswerValue): void {
+        answerForm[name] = value;
+    }
+
+    /** Tulis email peserta pada indeks slot dan jaga panjang array = `memberSlots` (pindahan setTeamEmail komponen). */
+    function setTeamMemberEmail(slot: number, value: string): void {
+        const n = memberSlots.value;
+        const arr = [...((answerForm.team_member_emails as string[]) ?? [])];
+        while (arr.length < n) {
+            arr.push('');
+        }
+        arr[slot - 1] = value;
+        answerForm.team_member_emails = arr;
+    }
+
     return {
         answerForm,
         metadata,
@@ -412,6 +429,8 @@ export function useFormFillPage(props: {
         isCheckboxSelected,
         onFileChange,
         clearFileUpload,
+        setFieldAnswer,
+        setTeamMemberEmail,
         filePreviewUrls,
         submit,
         fieldError,

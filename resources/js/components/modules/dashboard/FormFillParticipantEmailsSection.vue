@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* eslint-disable vue/no-mutating-props -- ctx.answerForm is Inertia useForm */
 import { computed, onBeforeUnmount, ref, watch, type UnwrapNestedRefs } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { Input } from '@/components/ui/input';
@@ -121,16 +120,6 @@ function toggleSlot(slot: number) {
 
 function emailAt(slot: number): string {
     return String((props.ctx.answerForm.team_member_emails as string[] | undefined)?.[slot - 1] ?? '');
-}
-
-function setTeamEmail(slot: number, value: string) {
-    const n = memberSlots.value;
-    const arr = [...((props.ctx.answerForm.team_member_emails as string[]) ?? [])];
-    while (arr.length < n) {
-        arr.push('');
-    }
-    arr[slot - 1] = value;
-    props.ctx.answerForm.team_member_emails = arr;
 }
 
 function validEmailFormat(s: string): boolean {
@@ -257,7 +246,7 @@ function scheduleCheck(slot: number) {
 
 function onEmailInput(slot: number, v: string | number) {
     props.ctx.answerForm.clearErrors('team_member_emails');
-    setTeamEmail(slot, String(v));
+    props.ctx.setTeamMemberEmail(slot, String(v));
     scheduleCheck(slot);
 }
 
