@@ -42,7 +42,7 @@ onBeforeUnmount(() => {
     <!-- Intro: celebratory SVG + confetti (no external assets) -->
     <div
         v-show="phase === 'intro'"
-        class="secret-intro fixed inset-0 z-[2147483646] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-violet-200 via-fuchsia-100 to-amber-100 text-foreground dark:from-violet-950 dark:via-fuchsia-950 dark:to-slate-950"
+        class="secret-intro fixed inset-0 z-[2147483646] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-violet-200 via-fuchsia-100 to-amber-100 text-foreground"
         role="presentation"
     >
         <p class="sr-only">Animasi pembuka pesta rahasia.</p>
@@ -130,15 +130,7 @@ onBeforeUnmount(() => {
                             fill="currentColor"
                             class="text-amber-800/80"
                         />
-                        <rect
-                            x="8"
-                            y="24"
-                            width="68"
-                            height="20"
-                            rx="3"
-                            fill="currentColor"
-                            class="text-amber-100 dark:text-amber-200/90"
-                        />
+                        <rect x="8" y="24" width="68" height="20" rx="3" fill="currentColor" class="text-amber-100" />
                         <rect x="36" y="12" width="12" height="16" rx="2" fill="currentColor" class="text-rose-400" />
                         <ellipse cx="42" cy="10" rx="4" ry="6" fill="#fbbf24" class="flame" />
                     </g>
@@ -152,9 +144,7 @@ onBeforeUnmount(() => {
                 </g>
             </svg>
 
-            <h1
-                class="mt-2 font-display text-2xl font-bold tracking-tight text-balance text-violet-950 sm:text-3xl dark:text-violet-100"
-            >
+            <h1 class="mt-2 font-display text-2xl font-bold tracking-tight text-balance text-violet-950 sm:text-3xl">
                 Pesta rahasia 🎈
             </h1>
             <p class="mt-2 max-w-sm text-sm text-pretty text-muted-foreground sm:text-base">
@@ -163,7 +153,7 @@ onBeforeUnmount(() => {
 
             <button
                 type="button"
-                class="mt-8 bg-background/90 px-7 py-3 text-sm font-semibold text-foreground shadow-lg ring-1 ring-border/60 transition-[box-shadow] hover:bg-background dark:ring-white/10"
+                class="mt-8 bg-background/90 px-7 py-3 text-sm font-semibold text-foreground shadow-lg ring-1 ring-border/60 transition-[box-shadow] hover:bg-background"
                 @click="goRickroll"
             >
                 Buka kejutan 🎁

@@ -9,7 +9,7 @@ describe('fieldInvalidClass', () => {
         expect(invalidClass).toContain('border-destructive/70');
         expect(invalidClass).toContain('bg-red-50');
         expect(invalidClass).toContain('focus-visible:border-destructive');
-        expect(invalidClass).toContain('dark:focus-visible:border-destructive/70');
+        expect(invalidClass).not.toContain('dark:');
     });
 
     it('mengembalikan string kosong saat field valid', () => {

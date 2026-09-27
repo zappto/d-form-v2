@@ -138,7 +138,7 @@ const quotaPercent = computed(() => {
         aria-label="Memuat detail acara"
     >
         <section
-            class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+            class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04]"
         >
             <div class="flex flex-col lg:grid lg:min-h-[min(26rem,70vh)] lg:grid-cols-2 lg:items-stretch">
                 <div
@@ -181,9 +181,7 @@ const quotaPercent = computed(() => {
 
         <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
             <div class="flex min-w-0 flex-col gap-8">
-                <div
-                    class="rounded-2xl border border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
-                >
+                <div class="rounded-2xl border border-border/70 shadow-sm ring-1 ring-black/[0.03]">
                     <div class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <Skeleton class="h-5 w-36" />
                     </div>
@@ -194,9 +192,7 @@ const quotaPercent = computed(() => {
                     </div>
                 </div>
 
-                <div
-                    class="rounded-2xl border border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
-                >
+                <div class="rounded-2xl border border-border/70 shadow-sm ring-1 ring-black/[0.03]">
                     <div class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <Skeleton class="h-5 w-44" />
                     </div>
@@ -249,7 +245,7 @@ const quotaPercent = computed(() => {
     </div>
     <div v-else class="fade-up mx-auto flex w-full flex-col gap-6 pb-6 sm:gap-8">
         <section
-            class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+            class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_0_0_rgba(0,0,0,0.04)] ring-1 ring-black/[0.04]"
         >
             <div class="flex flex-col lg:grid lg:min-h-[min(26rem,70vh)] lg:grid-cols-2 lg:items-stretch">
                 <!-- Kolom konten: permukaan solid, hierarki jelas -->
@@ -268,7 +264,7 @@ const quotaPercent = computed(() => {
                         <Badge
                             v-if="pendingTeamInvitationUrl"
                             variant="secondary"
-                            class="border border-amber-500/50 bg-amber-500/20 text-[10px] font-semibold text-amber-950 dark:text-amber-50"
+                            class="border border-amber-500/50 bg-amber-500/20 text-[10px] font-semibold text-amber-950"
                         >
                             Diundang · menunggu Anda
                         </Badge>
@@ -330,7 +326,7 @@ const quotaPercent = computed(() => {
         <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
             <div class="flex min-w-0 flex-col gap-8">
                 <!-- Deskripsi -->
-                <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]">
+                <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03]">
                     <CardHeader class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <CardTitle class="font-display text-base font-bold tracking-tight sm:text-lg"
                             >Tentang acara</CardTitle
@@ -343,7 +339,7 @@ const quotaPercent = computed(() => {
 
                 <Card
                     v-if="isRegistered && participantForms.length > 0"
-                    class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.05]"
+                    class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03]"
                 >
                     <CardHeader class="border-b border-border/50 bg-muted/10 px-5 py-4 sm:px-6">
                         <CardTitle class="font-display text-base font-bold tracking-tight sm:text-lg"

@@ -147,7 +147,7 @@ export function groupReviewStatusBadge(status: 'pending' | 'partial' | 'accepted
     if (status === 'partial') {
         return {
             label: 'Sebagian direview',
-            class: 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400',
+            class: 'border-blue-500/30 bg-blue-500/10 text-blue-700',
         };
     }
     return {

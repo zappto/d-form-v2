@@ -62,7 +62,7 @@ function statusLabel(s: TFormAccessStatus): string {
 
     <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 sm:gap-8 xl:max-w-7xl">
         <div
-            class="flex w-full gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground/90 sm:p-5 dark:bg-primary/10"
+            class="flex w-full gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground/90 sm:p-5"
             role="status"
         >
             <AlertCircle class="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
