@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { chartTickCallback, formatChartCount } from '@/lib/format';
-import { baseChartTooltipOptions, chartThemeTokens } from '@/lib/chartTheme';
+import { baseChartTooltipOptions, chartThemeTokens, CHART_FONT_FAMILY } from '@/lib/chartTheme';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, type ChartOptions } from 'chart.js';
 import { categoryLabelMap, categoryColorMap } from '@/lib/dummyData';
@@ -66,7 +66,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
                 border: { display: false },
                 beginAtZero: true,
                 ticks: {
-                    font: { size: 11, family: 'Poppins, sans-serif' },
+                    font: { size: 11, family: CHART_FONT_FAMILY },
                     color: chartTokens.tick,
                     precision: 0,
                     callback: chartTickCallback,
@@ -76,7 +76,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => {
                 grid: { display: false },
                 border: { display: false },
                 ticks: {
-                    font: { size: 12, weight: 500, family: 'Poppins, sans-serif' },
+                    font: { size: 12, weight: 500, family: CHART_FONT_FAMILY },
                     color: chartTokens.tick,
                     autoSkip: false,
                 },

@@ -1,11 +1,9 @@
 import { computed, onBeforeUnmount, onMounted, type ComputedRef, type Ref } from 'vue';
+import { RESPONDENT_DRAFT_DEBOUNCE_MS } from '@/lib/debounce';
 import { formatSavedTimeLabel } from '@/lib/format';
 import type { TFormFillAnswerMap } from '@/types/form';
 import { snapshotRespondentValues, useRespondentDraft, type IUseRespondentDraftResult } from './useRespondentDraft';
 import type { AutosaveStatus } from './useAutosaveSync';
-
-/** Debounce tunggal draft responden; sama dengan autosave builder agar indikator seragam. */
-const RESPONDENT_DRAFT_DEBOUNCE_MS = 800;
 
 /** Snapshot draft tersimpan untuk form tanpa field ekstra: peta jawaban responden. */
 export interface IDraftValuesSnapshot {

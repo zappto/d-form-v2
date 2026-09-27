@@ -9,6 +9,7 @@ import { CheckCircle2, ChevronDown, Loader2, UserRound, XCircle } from 'lucide-v
 import { routes } from '@/lib/routes';
 import { humanizeErrorMessage } from '@/lib/error-message';
 import { formatDisplayDate } from '@/lib/format';
+import { jsonRequestHeaders } from '@/lib/jsonRequest';
 
 const CHECK_EMAIL_URL = routes.member.checkEmail;
 const DEBOUNCE_MS = 1000;
@@ -170,10 +171,7 @@ async function runEmailCheck(slot: number) {
         const res = await fetch(url, {
             credentials: 'same-origin',
             signal: controller.signal,
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
+            headers: jsonRequestHeaders(),
         });
         // Batas eksternal: body HTTP tanpa tipe dari server; bentuknya dijaga konsumen di bawah.
         const body = (await res.json()) as {

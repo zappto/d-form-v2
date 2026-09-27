@@ -1,4 +1,5 @@
 import { ref, watch, type Ref } from 'vue';
+import { AUTOSAVE_DEBOUNCE_MS } from '@/lib/debounce';
 
 export type AutosaveStatus = 'idle' | 'saving' | 'saved';
 
@@ -37,7 +38,7 @@ export function useAutosaveSync(
     save: (snapshot: string) => Promise<boolean>,
     opts: IUseAutosaveSyncOptions = {}
 ): IUseAutosaveSyncResult {
-    const debounceMs = opts.debounceMs ?? 800;
+    const debounceMs = opts.debounceMs ?? AUTOSAVE_DEBOUNCE_MS;
     const status = ref<AutosaveStatus>('idle');
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     let saveSeq = 0;

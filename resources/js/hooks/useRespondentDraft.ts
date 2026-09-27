@@ -1,5 +1,6 @@
 import { computed, ref, type Ref } from 'vue';
 import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
+import { RESPONDENT_DRAFT_DEBOUNCE_MS } from '@/lib/debounce';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
 
 export interface IUseRespondentDraftOptions {
@@ -125,7 +126,7 @@ export function useRespondentDraft<T>(
     const lastSavedAt = ref<Date | null>(null);
 
     const autosave = useAutosaveSync(source, async () => false, {
-        debounceMs: opts.debounceMs ?? 800,
+        debounceMs: opts.debounceMs ?? RESPONDENT_DRAFT_DEBOUNCE_MS,
         storageKey,
         storage: {
             read: (key: string): string | null => readLocal(key),

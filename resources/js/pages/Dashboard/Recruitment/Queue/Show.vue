@@ -11,6 +11,7 @@ import { CometSpinner } from '@/components/ui/comet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { routes } from '@/lib/routes';
 import { padQueueNumber } from '@/lib/format';
+import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import { useRecruitmentQueue, type IQueueSnapshot } from '@/hooks/useRecruitmentQueue';
 import { toast } from 'vue-sonner';
@@ -68,7 +69,7 @@ async function callNext() {
             props.callNextUrl,
             {},
             {
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                headers: jsonRequestHeaders(),
             }
         );
         queue.value = data.queue;
@@ -97,7 +98,7 @@ async function completeEntry(entryId: string) {
             completeUrlFor(entryId),
             {},
             {
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                headers: jsonRequestHeaders(),
             }
         );
         queue.value = data.queue;

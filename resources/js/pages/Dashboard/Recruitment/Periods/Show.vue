@@ -27,6 +27,7 @@ import { BarChart3, CalendarClock, Plus, Trash2, UserCheck, Users } from 'lucide
 import { showErrorToast, showFlashToast } from '@/lib/error-message';
 import type { IPaginator } from '@/lib/pagination';
 import { routes } from '@/lib/routes';
+import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import type { TPeriodStatusValue } from '@/lib/recruitmentPeriodPhase';
 import {
     daysRemaining,
@@ -412,7 +413,7 @@ async function selectApplicant(id: string): Promise<void> {
     detailLoading.value = true;
     try {
         const { data } = await axios.get<{ application: IApplicationDetail }>(detailUrl(id), {
-            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            headers: jsonRequestHeaders(),
         });
         detailCache.set(id, data.application);
         selectedApplication.value = data.application;

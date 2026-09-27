@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { Megaphone, WifiOff } from 'lucide-vue-next';
 import { padQueueNumber } from '@/lib/format';
+import { jsonRequestHeaders } from '@/lib/jsonRequest';
 
 defineOptions({ layout: LandingLayout });
 
@@ -131,7 +132,7 @@ async function refreshDisplay(): Promise<void> {
     isRefreshing = true;
     try {
         const response = await axios.get<IQueueDisplaySnapshot>(props.pollUrl, {
-            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            headers: jsonRequestHeaders(),
         });
         live.value = response.data;
         loadError.value = false;

@@ -1,6 +1,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import axios from 'axios';
 import { showErrorToast } from '@/lib/error-message';
+import { jsonRequestHeaders } from '@/lib/jsonRequest';
 
 export interface IQueueEntryRow {
     id: string;
@@ -43,7 +44,7 @@ export function useRecruitmentQueue(pollUrl: string, initial: IQueueSnapshot) {
     async function refresh() {
         try {
             const { data } = await axios.get<IQueueSnapshot>(pollUrl, {
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                headers: jsonRequestHeaders(),
             });
             queue.value = data;
             pollErrorShown.value = false;

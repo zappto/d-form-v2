@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'vue-sonner';
 import { humanizeErrorMessage, parseApiErrorMessage, showErrorToast } from '@/lib/error-message';
 import { padQueueNumber } from '@/lib/format';
+import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import {
     createScanHistoryEntry,
     extractQrCandidate,
@@ -219,7 +220,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
             const { data } = await axios.post<IGlobalScanEnvelope>(
                 args.storeUrl,
                 { raw: trimmed, desk: deskId },
-                { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
+                { headers: jsonRequestHeaders() }
             );
 
             const kind = mapEnvelopeKind(data.type);
@@ -439,7 +440,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
             // Respons feed mentah sengaja `unknown`: langsung divalidasi predikat isGlobalScanFeedPayload di applyFeed.
             const { data } = await axios.get<unknown>(args.feedUrl, {
                 params: feedCursor.length > 0 ? { since: feedCursor } : {},
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                headers: jsonRequestHeaders(),
                 signal: controller.signal,
                 timeout: FEED_POLL_TIMEOUT_MS,
             });

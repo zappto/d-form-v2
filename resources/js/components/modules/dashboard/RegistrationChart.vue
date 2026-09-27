@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { chartTickCallback, formatChartCount } from '@/lib/format';
-import { baseChartTooltipOptions, chartThemeTokens } from '@/lib/chartTheme';
+import { baseChartTooltipOptions, chartThemeTokens, CHART_FONT_FAMILY } from '@/lib/chartTheme';
 import { Line } from 'vue-chartjs';
 import {
     Chart as ChartJS,
@@ -78,7 +78,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
                 grid: { display: false },
                 border: { display: false },
                 ticks: {
-                    font: { size: 11, family: 'Poppins, sans-serif' },
+                    font: { size: 11, family: CHART_FONT_FAMILY },
                     color: chartTokens.tick,
                     maxRotation: 45,
                     minRotation: 0,
@@ -89,7 +89,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
                 border: { display: false },
                 beginAtZero: true,
                 ticks: {
-                    font: { size: 11, family: 'Poppins, sans-serif' },
+                    font: { size: 11, family: CHART_FONT_FAMILY },
                     color: chartTokens.tick,
                     precision: 0,
                     callback: chartTickCallback,

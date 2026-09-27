@@ -25,7 +25,9 @@ import {
     type ITPendingOptionImageFile,
 } from '@/components/modules/builder/optionImage';
 import { mergeSentHeader, stripBlankRequiredKeys } from '@/lib/autosaveHeader';
+import { AUTOSAVE_DEBOUNCE_MS } from '@/lib/debounce';
 import { readXsrfToken } from '@/lib/inertiaRequest';
+import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import { toFormMetadataPayload, type IFormRegistrationMetadata } from '@/types/form';
 import type { BackendField, BuilderField } from '@/types/form-builder';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
@@ -264,14 +266,14 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
                 optionFiles,
             });
             const response = await axios.post(request.url, uploadBody, {
-                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                headers: jsonRequestHeaders(),
             });
             applyUploadResults({ state: request.state, bannerFile, optionFiles, response: response.data });
         } else {
             await axios.post(
                 request.url,
                 { fields: dirtyRows, deleted_ids: fieldDiff.deletedIds },
-                { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
+                { headers: jsonRequestHeaders() }
             );
         }
         lastSentFields.value = snapshotBackendFields(backend);
@@ -284,7 +286,7 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
         const headerDiff = stripBlankRequiredKeys(diffHeaderPayload(header, lastSentHeader.value), header);
         if (Object.keys(headerDiff).length === 0) return false;
         await axios.patch(request.url, headerDiff, {
-            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            headers: jsonRequestHeaders(),
         });
         lastSentHeader.value = mergeSentHeader(lastSentHeader.value, header, headerDiff);
         return true;
@@ -349,9 +351,9 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
         }
     }
 
-    // Debounce 800ms stabil milik pipeline autosave (literal sekali pakai).
+    // Debounce stabil pipeline autosave builder.
     const sync = useAutosaveSync(snapshot, save, {
-        debounceMs: 800,
+        debounceMs: AUTOSAVE_DEBOUNCE_MS,
         enabled: computed(() => options.readEnabled()),
         onError: options.notifySaveError,
     });
