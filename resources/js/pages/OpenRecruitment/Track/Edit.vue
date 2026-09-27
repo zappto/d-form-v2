@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftRestore';
+import { buildValuesDraftSnapshot, useDraftRestore, type IDraftValuesSnapshot } from '@/hooks/useDraftRestore';
+import type { TFormFillAnswerMap } from '@/types/form';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import { Button } from '@/components/ui/button';
 import { CometSpinner } from '@/components/ui/comet';
@@ -67,15 +68,24 @@ const form = useForm({
 
 const applicationError = computed(() => readFormError(form.errors, 'application'));
 
-function applyTrackEditDraftValues(draft: unknown): void {
-    if (typeof draft !== 'object' || draft === null) return;
-    const values = (draft as { values?: unknown }).values;
-    if (typeof values !== 'object' || values === null) return;
-    for (const [key, value] of Object.entries(values as Record<string, unknown>)) {
+/** Batas luar snapshot localStorage: verifikasi bentuk `{ values }` sebelum dipakai. */
+function isValuesSnapshot(value: unknown): value is IDraftValuesSnapshot {
+    if (typeof value !== 'object' || value === null || !('values' in value)) return false;
+    const values: unknown = value.values;
+    return typeof values === 'object' && values !== null;
+}
+
+/** Form Inertia dinamis diperlakukan sebagai peta jawaban; verifikasi bentuk object saat menulis. */
+function isFormFillAnswerMap(value: unknown): value is TFormFillAnswerMap {
+    return typeof value === 'object' && value !== null;
+}
+
+/** Restorasi toleran: snapshot rusak/parsial diabaikan; hanya isian teks yang dituang ke form. */
+function applyTrackEditDraftValues(draft: IDraftValuesSnapshot): void {
+    if (!isValuesSnapshot(draft) || !isFormFillAnswerMap(form)) return;
+    for (const [key, value] of Object.entries(draft.values)) {
         if (!(key in form)) continue;
-        if (typeof value === 'string') {
-            (form as unknown as Record<string, unknown>)[key] = value;
-        }
+        if (typeof value === 'string') form[key] = value;
     }
 }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { useDraftRestore } from '@/hooks/useDraftRestore';
+import { useDraftRestore, type IDraftValuesSnapshot } from '@/hooks/useDraftRestore';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import OpRecFeedbackForm from '@/components/modules/open-recruitment/OpRecFeedbackForm.vue';
 import { Button } from '@/components/ui/button';
@@ -134,11 +134,17 @@ function correctionDraftSnapshot(): string {
     return JSON.stringify({ values: { request_message: correctionForm.request_message } });
 }
 
-function applyCorrectionDraftValues(draft: unknown): void {
-    if (typeof draft !== 'object' || draft === null) return;
-    const values = (draft as { values?: unknown }).values;
-    if (typeof values !== 'object' || values === null) return;
-    const message = (values as Record<string, unknown>).request_message;
+/** Batas luar snapshot localStorage: verifikasi bentuk `{ values }` sebelum dipakai. */
+function isValuesSnapshot(value: unknown): value is IDraftValuesSnapshot {
+    if (typeof value !== 'object' || value === null || !('values' in value)) return false;
+    const values: unknown = value.values;
+    return typeof values === 'object' && values !== null;
+}
+
+/** Restorasi toleran: snapshot rusak/parsial diabaikan; hanya pesan teks yang dituang ke form. */
+function applyCorrectionDraftValues(draft: IDraftValuesSnapshot): void {
+    if (!isValuesSnapshot(draft)) return;
+    const message = draft.values.request_message;
     if (typeof message === 'string' && message !== '') {
         correctionForm.request_message = message;
     }
