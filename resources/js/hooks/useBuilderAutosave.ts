@@ -29,9 +29,6 @@ import { toFormMetadataPayload, type FormRegistrationMetadata } from '@/types/fo
 import type { BackendField, BuilderField } from '@/types/form-builder';
 import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
 
-/** Status autosave builder (idle/saving/saved) untuk badge di toolbar halaman. */
-export type TAutosaveStatus = AutosaveStatus;
-
 /** State builder langsung yang dibaca hook tiap save; sumber tetap milik halaman. */
 export interface IBuilderAutosaveState {
     title: string;
@@ -56,8 +53,9 @@ export interface IBuilderAutosaveOptions {
 /** Hasil hook: snapshot/save autosave + guard hydrate + beacon unload. */
 export interface IBuilderAutosaveResult {
     snapshot: () => string;
+    /** Dipanggil watch dengan snapshot terbaru sebagai pemicu; state dibaca live saat save. */
     save: (snapshot: string) => Promise<boolean>;
-    status: Ref<TAutosaveStatus>;
+    status: Ref<AutosaveStatus>;
     flush: () => Promise<void>;
     evaluateHydrate: (formId: string, pending: boolean) => boolean;
     registerHydrated: (formId: string) => void;
@@ -73,7 +71,7 @@ interface IHeaderPayload {
     visible_for: string[];
     banner_url: string | null;
     banner_caption: string | null;
-    metadata: Record<string, unknown>;
+    metadata: ReturnType<typeof toFormMetadataPayload>;
 }
 
 /** Header PATCH ternormalisasi dari state builder saat ini. */
@@ -199,6 +197,12 @@ interface IUploadResultRequest {
     response: unknown;
 }
 
+/** Argumen pipeline save (fields POST + header PATCH): state live + URL endpoint. */
+interface ISaveRequest {
+    state: IBuilderAutosaveState;
+    url: string;
+}
+
 /** Terapkan path hasil upload ke state; buang pending bila respons tanpa path. */
 function applyUploadResults(request: IUploadResultRequest): void {
     const storedBannerPath = readBannerPathFromResponse(request.response);
@@ -236,16 +240,12 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
         return buildSnapshotText(options.getState());
     }
 
-    /** Argumen pipeline fields: state live + URL POST. */
-    interface IFieldSaveRequest {
-        state: IBuilderAutosaveState;
-        postUrl: string;
-    }
-
     /** Jalankan pipeline fields (diff → POST → refresh snapshot); true bila terkirim. */
-    async function postFieldChanges(request: IFieldSaveRequest): Promise<boolean> {
-        const merged = prependFormBannerToBackendPayload(request.state.fields, request.state.banner);
-        const backend = toBackendFields(merged, lastSentFields.value);
+    async function postFieldChanges(request: ISaveRequest): Promise<boolean> {
+        const backend = toBackendFields(
+            prependFormBannerToBackendPayload(request.state.fields, request.state.banner),
+            lastSentFields.value,
+        );
         const fieldDiff = diffBackendFields(backend, lastSentFields.value);
         const bannerFile = pendingBannerUpload(request.state);
         const optionFiles = collectPendingOptionImageFiles(request.state.fields);
@@ -264,38 +264,27 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
                 bannerFile,
                 optionFiles,
             });
-            const response = await axios.post(request.postUrl, uploadBody, {
+            const response = await axios.post(request.url, uploadBody, {
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
             });
             applyUploadResults({ state: request.state, bannerFile, optionFiles, response: response.data });
         } else {
             await axios.post(
-                request.postUrl,
+                request.url,
                 { fields: dirtyRows, deleted_ids: fieldDiff.deletedIds },
                 { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } },
             );
         }
-        lastSentFields.value = snapshotBackendFields(
-            toBackendFields(
-                prependFormBannerToBackendPayload(request.state.fields, request.state.banner),
-                lastSentFields.value,
-            ),
-        );
+        lastSentFields.value = snapshotBackendFields(backend);
         return true;
     }
 
-    /** Argumen pipeline header: state live + URL PATCH. */
-    interface IHeaderSaveRequest {
-        state: IBuilderAutosaveState;
-        patchUrl: string;
-    }
-
     /** PATCH parsial per-key (blank required dikecualikan); true bila ada key terkirim. */
-    async function patchHeaderChanges(request: IHeaderSaveRequest): Promise<boolean> {
+    async function patchHeaderChanges(request: ISaveRequest): Promise<boolean> {
         const header = buildHeaderPayload(request.state);
         const headerDiff = stripBlankRequiredKeys(diffHeaderPayload(header, lastSentHeader.value), header);
         if (Object.keys(headerDiff).length === 0) return false;
-        await axios.patch(request.patchUrl, headerDiff, {
+        await axios.patch(request.url, headerDiff, {
             headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         });
         lastSentHeader.value = mergeSentHeader(lastSentHeader.value, header, headerDiff);
@@ -303,15 +292,13 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
     }
 
     /** Orkestrasi save: pipeline fields lalu header; true hanya bila ada yang terkirim. */
-    async function save(watchedSnapshot: string): Promise<boolean> {
-        // Snapshot hanya pemicu watch; save selalu membaca state live via getState.
-        void watchedSnapshot;
+    async function save(): Promise<boolean> {
         const fieldsUrl = options.resolveFieldsUrl();
         const patchUrl = options.resolveAutosaveUrl();
         if (fieldsUrl === '' || patchUrl === '') return false;
         const state = options.getState();
-        const fieldsSent = await postFieldChanges({ state, postUrl: fieldsUrl });
-        const headerSent = await patchHeaderChanges({ state, patchUrl: patchUrl });
+        const fieldsSent = await postFieldChanges({ state, url: fieldsUrl });
+        const headerSent = await patchHeaderChanges({ state, url: patchUrl });
         if (fieldsSent || headerSent) lastCleanSnapshot.value = buildSnapshotText(state);
         return fieldsSent || headerSent;
     }

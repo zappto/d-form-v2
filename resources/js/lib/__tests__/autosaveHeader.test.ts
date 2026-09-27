@@ -34,12 +34,11 @@ describe('isBlankRequiredValue', () => {
         expect(isBlankRequiredValue('\t\n ')).toBe(true);
     });
 
-    it('valid: teks non-blank dan non-string', () => {
+    it('valid: teks non-blank dan nilai nullish', () => {
         expect(isBlankRequiredValue('Judul')).toBe(false);
         expect(isBlankRequiredValue(' a ')).toBe(false);
         expect(isBlankRequiredValue(null)).toBe(false);
         expect(isBlankRequiredValue(undefined)).toBe(false);
-        expect(isBlankRequiredValue(0)).toBe(false);
     });
 });
 
