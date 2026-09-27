@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { DateValue } from 'reka-ui'
-import { ref, watch } from 'vue'
+import type { ClassValue } from 'clsx'
+import { ref, shallowRef, watch } from 'vue'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
@@ -16,8 +17,8 @@ const props = withDefaults(
         disabled?: boolean
         /** True saat field punya error validasi: border/ring destructive (lewat trigger outline). */
         ariaInvalid?: boolean
-        /** Trigger + calendar width */
-        class?: string
+        /** Trigger + calendar width. Array/object values diizinkan seperti class binding Vue biasa. */
+        class?: ClassValue
     }>(),
     { placeholder: 'Pilih tanggal', disabled: false, ariaInvalid: false },
 )
@@ -27,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const open = ref(false)
-const selected = ref<DateValue | undefined>(undefined)
+const selected = shallowRef<DateValue | undefined>(undefined)
 
 watch(
     () => props.modelValue,

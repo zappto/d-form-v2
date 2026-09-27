@@ -41,10 +41,11 @@ function cancelDelete() {
 }
 
 function confirmDelete() {
-    if (!deleteTarget.value || isDeleting.value) return
+    const event = props.event
+    if (!event || !deleteTarget.value || isDeleting.value) return
     const id = deleteTarget.value.id
     isDeleting.value = true
-    router.delete(routes.admin.events.forms.destroy(props.event.id, id), {
+    router.delete(routes.admin.events.forms.destroy(event.id, id), {
         preserveScroll: true,
         onSuccess: () => {
             // Tanpa toast manual: sukses sudah ditampilkan global oleh usePageFlashToast
@@ -61,8 +62,11 @@ function confirmDelete() {
     })
 }
 
+/** URL halaman pengiriman form; `'#'` hanya saat event belum termuat (tidak pernah dirender). */
 function submissionsHref(formId: string): string {
-    return FormSubmissionsController.url({ event: props.event.id, form: formId })
+    const event = props.event
+    if (!event) return '#'
+    return FormSubmissionsController.url({ event: event.id, form: formId })
 }
 </script>
 

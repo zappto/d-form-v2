@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import FormFillLayout from '@/layouts/FormFillLayout.vue';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,16 +28,18 @@ interface ApplyPageProps {
 
 const props = defineProps<ApplyPageProps>();
 
-const ctx = useFormFillPage({
-    event: props.oprecEvent,
-    form: props.oprecForm,
-    fields: props.fields,
-    submitUrl: props.submitUrl,
-    accessStatus: 'allowed',
-    accessMessage: '',
-    memberSlots: 0,
-    registrationMode: 'single',
-});
+const ctx = reactive(
+    useFormFillPage({
+        event: props.oprecEvent,
+        form: props.oprecForm,
+        fields: props.fields,
+        submitUrl: props.submitUrl,
+        accessStatus: 'allowed',
+        accessMessage: '',
+        memberSlots: 0,
+        registrationMode: 'single',
+    }),
+);
 
 const TOTAL_STEPS = 3;
 const STEP_LIST = [1, 2, 3];

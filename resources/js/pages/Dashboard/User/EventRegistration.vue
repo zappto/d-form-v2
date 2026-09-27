@@ -24,6 +24,16 @@ interface BundleParticipant {
     qr_base64: string | null
 }
 
+interface RegistrationSummary {
+    review_status: 'pending' | 'accepted' | 'rejected'
+    submitted_at: string
+    reviewed_at: string | null
+    registration_code: string | null
+    registration_role: 'leader' | 'member' | null
+    answers_summary: Record<string, string>
+    qr_base64: string | null
+}
+
 const props = defineProps<{
     event: IEvent | undefined
     form: {
@@ -32,15 +42,7 @@ const props = defineProps<{
         registration_mode: 'single' | 'bundle' | 'team' | null
         success_content?: string | null
     } | null
-    registration: {
-        review_status: 'pending' | 'accepted' | 'rejected'
-        submitted_at: string
-        reviewed_at: string | null
-        registration_code: string | null
-        registration_role: 'leader' | 'member' | null
-        answers_summary: Record<string, string>
-        qr_base64: string | null
-    } | undefined
+    registration: RegistrationSummary | undefined
     bundle_participants?: BundleParticipant[]
 }>()
 
@@ -52,9 +54,11 @@ const successContent = computed(() => {
     return html
 })
 
-const isBundleLeader = computed(
-    () => props.form?.registration_mode === 'bundle' && props.registration.registration_role === 'leader',
-)
+const isBundleLeader = computed(() => {
+    const registration = props.registration
+    if (!registration) return false
+    return props.form?.registration_mode === 'bundle' && registration.registration_role === 'leader'
+})
 
 const participantStatusLabels: Record<BundleParticipant['review_status'], string> = {
     pending: 'Awaiting review',
@@ -62,15 +66,17 @@ const participantStatusLabels: Record<BundleParticipant['review_status'], string
     rejected: 'Not accepted',
 }
 
-const statusLabels: Record<(typeof props.registration)['review_status'], string> = {
+const statusLabels: Record<RegistrationSummary['review_status'], string> = {
     pending: 'Awaiting review',
     accepted: 'Accepted',
     rejected: 'Not accepted',
 }
 
 const participationLabel = computed(() => {
+    const registration = props.registration
+    if (!registration) return null
     const mode = props.form?.registration_mode
-    const role = props.registration.registration_role
+    const role = registration.registration_role
     if (mode === 'bundle') {
         if (role === 'leader') return 'Ketua / pendaftar utama (bundle)'
         if (role === 'member') return 'Peserta bundle'

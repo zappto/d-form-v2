@@ -136,7 +136,7 @@ function statusLabel(s: FormAccessStatus): string {
                                     as-child
                                     class="w-full sm:w-auto"
                                 >
-                                    <Link :href="routes.member.event.registration(event.slug)" class="justify-center">
+                                    <Link :href="routes.member.event.registration(props.event.slug)" class="justify-center">
                                         Lihat pendaftaran
                                     </Link>
                                 </Button>

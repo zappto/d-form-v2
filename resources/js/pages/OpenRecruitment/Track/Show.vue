@@ -151,7 +151,9 @@ const { clear: clearCorrectionDraft } = useDraftRestore({
 });
 
 const heroToneClass = computed(() => {
-    const tone = props.tracking.next_action.tone;
+    const tracking = props.tracking;
+    if (!tracking) return '';
+    const tone = tracking.next_action.tone;
     if (tone === 'warning') return 'border-amber-200 bg-amber-50 text-amber-950';
     if (tone === 'success') return 'border-emerald-200 bg-emerald-50 text-emerald-950';
     if (tone === 'neutral') return 'border-border/70 bg-muted/40';
@@ -159,8 +161,9 @@ const heroToneClass = computed(() => {
 });
 
 const interviewSchedule = computed(() => {
-    if (!props.tracking.interview?.scheduled_at) return null;
-    return new Date(props.tracking.interview.scheduled_at).toLocaleString('id-ID', {
+    const scheduledAt = props.tracking?.interview?.scheduled_at;
+    if (!scheduledAt) return null;
+    return new Date(scheduledAt).toLocaleString('id-ID', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -170,13 +173,16 @@ const interviewSchedule = computed(() => {
     });
 });
 
-const showInterviewSection = computed(
-    () =>
-        props.tracking.interview !== null ||
-        props.tracking.attendance_qr_base64 !== null ||
-        props.tracking.attendance !== null ||
-        props.tracking.queue !== null
-);
+const showInterviewSection = computed(() => {
+    const tracking = props.tracking;
+    if (!tracking) return false;
+    return (
+        tracking.interview !== null ||
+        tracking.attendance_qr_base64 !== null ||
+        tracking.attendance !== null ||
+        tracking.queue !== null
+    );
+});
 
 function timelineIcon(status: TimelineItem['status']) {
     if (status === 'completed') return CheckCircle2;
@@ -189,7 +195,9 @@ function scrollToInterview() {
 }
 
 function handleHeroAction() {
-    const action = props.tracking.next_action.action;
+    const tracking = props.tracking;
+    if (!tracking) return;
+    const action = tracking.next_action.action;
     if (action === 'edit') {
         router.visit(props.editUrl);
         return;

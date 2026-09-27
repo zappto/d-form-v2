@@ -67,7 +67,7 @@ const TYPE_CONFIG = {
     heading: { icon: HeadingIcon, label: 'Judul', tone: 'neutral' },
     paragraph: { icon: TextCursorInput, label: 'Paragraf', tone: 'neutral' },
     divider: { icon: Minus, label: 'Pemisah', tone: 'neutral' },
-}
+} as const
 
 /** Aksen kecil per kategori field — berbasis tone token proyek, bukan warna acak. */
 const FIELD_TONE_CLASSES: Record<'neutral' | 'info' | 'primary' | 'success' | 'warning', string> = {
