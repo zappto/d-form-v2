@@ -176,14 +176,15 @@ function handleLogout(): void {
                         <User class="size-4" aria-hidden="true" />
                         <span>Profil</span>
                     </Link>
-                    <button
+                    <Button
+                        variant="destructive-ghost"
                         type="button"
-                        class="relative flex w-full cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-destructive outline-none transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:bg-destructive/10 focus-visible:text-destructive [&>svg]:size-4 [&>svg]:shrink-0"
+                        class="w-full cursor-pointer select-none justify-start"
                         @click="handleLogout"
                     >
                         <LogOut class="size-4" aria-hidden="true" />
                         <span>Keluar</span>
-                    </button>
+                    </Button>
                 </PopoverContent>
             </Popover>
 

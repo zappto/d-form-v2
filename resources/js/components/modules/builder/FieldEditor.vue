@@ -383,14 +383,17 @@ const hasAdvancedFlags = computed(
                                     @change="onOptionImageFile(i, $event)"
                                 />
                             </label>
-                            <button
+                            <Button
+                                variant="destructive-ghost"
+                                radius="icon"
+                                size="icon-sm"
+                                class="size-8"
                                 type="button"
-                                class="flex size-8 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                                 title="Hapus opsi"
                                 @click="removeOption(i)"
                             >
                                 <X class="size-3.5" />
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>

@@ -179,13 +179,14 @@ useEventListener('keydown', (e) => {
                         <FileStack class="mr-2 size-4 shrink-0 stroke-[1.75]" />Kelola formulir
                     </button>
                     <div class="bg-border my-1 h-px" />
-                    <button
+                    <Button
+                        variant="destructive-ghost"
                         type="button"
-                        class="text-destructive hover:bg-destructive/10 focus:text-destructive focus:bg-destructive/15 relative flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-sm font-medium transition-colors outline-none"
+                        class="w-full cursor-pointer justify-start"
                         @click="menuAction(requestDelete)"
                     >
                         <Trash2 class="mr-2 size-4 shrink-0 stroke-[1.75]" />Hapus acara
-                    </button>
+                    </Button>
                 </div>
             </Transition>
         </div>
