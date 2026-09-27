@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import { Card, CardContent } from '@/components/ui/card'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { routes } from '@/lib/routes'
@@ -117,9 +118,9 @@ const isLoadingLogs = ref(false)
                             </template>
                         </p>
                     </div>
-                    <p v-if="logs.data.length === 0" class="text-muted-foreground p-6 text-center text-sm">
-                        Tidak ada activity log.
-                    </p>
+                    <div v-if="logs.data.length === 0" class="p-6">
+                        <EmptyState variant="inline" title="Tidak ada activity log." />
+                    </div>
                 </template>
             </CardContent>
         </Card>

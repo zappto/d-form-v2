@@ -11,6 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { ClipboardList, ScanLine, Users, Download } from 'lucide-vue-next'
 import { formatSubmissionDateTime } from '@/lib/format'
 
@@ -116,8 +117,8 @@ const props = withDefaults(
                             </TableCell>
                         </TableRow>
                         <TableRow v-if="attendanceLog.data.length === 0">
-                            <TableCell colspan="4" class="py-10 text-center text-sm text-muted-foreground">
-                                No attendance records yet.
+                            <TableCell colspan="4" class="py-10">
+                                <EmptyState variant="inline" title="No attendance records yet." />
                             </TableCell>
                         </TableRow>
                     </TableBody>

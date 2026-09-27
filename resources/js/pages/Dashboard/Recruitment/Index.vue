@@ -6,6 +6,7 @@ import DivisionListSheet, {
     type DashboardDivision,
 } from '@/components/modules/dashboard/recruitment/DivisionListSheet.vue'
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 import { showErrorToast } from '@/lib/error-message'
 import { Card, CardContent } from '@/components/ui/card'
@@ -427,11 +428,11 @@ onMounted(() => {
                     </CardContent>
                 </Card>
             </div>
-            <Card v-else class="rounded-2xl border-dashed border-border/70">
-                <CardContent class="px-4 py-10 text-center">
-                    <p class="text-muted-foreground text-sm">Belum ada periode recruitment.</p>
-                </CardContent>
-            </Card>
+            <EmptyState
+                v-else
+                title="Belum ada periode recruitment."
+                animation-name="emptyData"
+            />
 
             <div v-if="periodLastPage > 1 && !isLoadingPeriods" class="mt-4 flex justify-center gap-2">
                 <DataPagination

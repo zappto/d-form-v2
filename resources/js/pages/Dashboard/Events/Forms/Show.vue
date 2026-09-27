@@ -11,6 +11,7 @@ import {
 } from '@/lib/autosaveHeader';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import FormBuilderWorkspace from '@/components/modules/builder/FormBuilderWorkspace.vue';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -664,21 +665,12 @@ function rejectLabel(submission: IFormSubmission): string {
                     </div>
                 </div>
 
-                <div
+                <EmptyState
                     v-else-if="submissionRows.length === 0"
-                    class="border-border/70 bg-muted/10 flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-6 py-20 text-center"
-                >
-                    <div class="border-border bg-card grid size-14 place-items-center rounded-full border shadow-xs">
-                        <Inbox class="text-muted-foreground size-6" aria-hidden="true" />
-                    </div>
-                    <h2 class="font-display text-foreground mt-2 text-lg font-bold tracking-[-0.02em]">
-                        Belum ada jawaban
-                    </h2>
-                    <p class="text-muted-foreground max-w-md text-sm leading-relaxed">
-                        Saat ada yang mengisi dan mengirim formulir ini, daftar jawaban akan muncul di sini beserta
-                        status review-nya.
-                    </p>
-                </div>
+                    title="Belum ada jawaban"
+                    description="Saat ada yang mengisi dan mengirim formulir ini, daftar jawaban akan muncul di sini beserta status review-nya."
+                    animation-name="emptyData"
+                />
 
                 <div v-else class="fade-up app-surface overflow-hidden rounded-2xl p-0">
                     <div class="border-border/60 flex items-center gap-2.5 border-b px-5 py-4">

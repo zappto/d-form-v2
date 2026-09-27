@@ -13,6 +13,7 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import FormFieldAnswerDisplay from '@/components/modules/dashboard/FormFieldAnswerDisplay.vue';
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
 import { formSubmissionReviewIsPending, submissionReviewBadge } from '@/lib/formSubmissionsUi';
 import { formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions';
@@ -166,12 +167,9 @@ const answerSections = computed(() => {
                             </div>
                         </div>
                     </div>
-                    <p
-                        v-if="answerSections.length === 0"
-                        class="py-6 text-center text-sm text-muted-foreground"
-                    >
-                        Belum ada jawaban tercatat.
-                    </p>
+                    <div v-if="answerSections.length === 0" class="py-6">
+                        <EmptyState variant="inline" title="Belum ada jawaban tercatat." />
+                    </div>
                     <p
                         v-if="fileAnswerKeys.length > 0"
                         class="flex items-start gap-1.5 text-[11px] leading-relaxed text-muted-foreground"

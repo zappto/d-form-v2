@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { Button } from '@/components/ui/button'
 import { dummyEvents, categoryLabelMap } from '@/lib/dummyData'
 import { formatDisplayDate } from '@/lib/format'
@@ -84,9 +85,9 @@ const baseHref = computed(() => props.eventBaseHref ?? routes.admin.events.index
                     {{ event.registered_count }}/{{ event.quota }}
                 </span>
             </Link>
-            <p v-if="recentEvents.length === 0" class="text-muted-foreground py-6 text-center text-sm">
-                Belum ada acara. Buat acara pertama untuk mulai.
-            </p>
+            <div v-if="recentEvents.length === 0" class="py-6">
+                <EmptyState variant="inline" title="Belum ada acara. Buat acara pertama untuk mulai." />
+            </div>
         </CardContent>
     </Card>
 </template>
