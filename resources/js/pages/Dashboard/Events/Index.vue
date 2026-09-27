@@ -6,11 +6,11 @@ import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import EventCard from '@/components/modules/dashboard/events/EventCard.vue';
+import EventCardSkeleton from '@/components/modules/dashboard/events/EventCardSkeleton.vue';
 import EventFilterBar from '@/components/modules/dashboard/events/EventFilterBar.vue';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Plus } from 'lucide-vue-next';
 import {
     index as eventsIndex,
@@ -202,27 +202,7 @@ function handleDeleteConfirm(): void {
             aria-busy="true"
             aria-label="Memuat event"
         >
-            <div
-                v-for="n in 8"
-                :key="`event-skeleton-${n}`"
-                class="event-card-skeleton flex min-w-0 flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:p-5"
-            >
-                <div class="flex items-center justify-between gap-3">
-                    <Skeleton class="h-6 w-20" />
-                    <Skeleton class="size-8 shrink-0" />
-                </div>
-                <Skeleton class="aspect-[16/7] w-full" />
-                <div class="flex items-center gap-3">
-                    <Skeleton class="h-4 min-w-0 flex-1" />
-                    <Skeleton class="h-6 w-16 shrink-0" />
-                </div>
-                <Skeleton class="h-3 w-3/4" />
-                <Skeleton class="h-3 w-1/2" />
-                <div class="mt-auto flex items-center justify-between gap-3 border-t border-border/60 pt-3">
-                    <Skeleton class="h-3 w-1/3" />
-                    <Skeleton class="h-4 w-16 shrink-0" />
-                </div>
-            </div>
+            <EventCardSkeleton v-for="n in 8" :key="`event-skeleton-${n}`" />
         </div>
 
         <div

@@ -4,9 +4,9 @@ import { Head, Link } from '@inertiajs/vue3';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import EventCard from '@/components/modules/dashboard/events/EventCard.vue';
+import EventCardSkeleton from '@/components/modules/dashboard/events/EventCardSkeleton.vue';
 import EventFilterBar from '@/components/modules/dashboard/events/EventFilterBar.vue';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { FilterX } from 'lucide-vue-next';
 import { categoryLabelMap, sessionLabelMap } from '@/lib/dummyData';
 import { toCategoryList } from '@/lib/eventCategories';
@@ -125,23 +125,7 @@ onMounted(() => {
         </div>
 
         <div v-if="!events" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true" aria-label="Memuat event">
-            <div v-for="n in 6" :key="`event-${n}`" class="event-card-skeleton flex min-w-0 flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
-                <div class="flex items-center justify-between gap-3">
-                    <Skeleton class="h-6 w-20 rounded-full" />
-                    <Skeleton class="size-8 shrink-0" />
-                </div>
-                <Skeleton class="aspect-[16/7] w-full rounded-xl" />
-                <div class="flex items-center gap-3">
-                    <Skeleton class="h-4 min-w-0 flex-1" />
-                    <Skeleton class="h-6 w-16 shrink-0 rounded-full" />
-                </div>
-                <Skeleton class="h-3 w-3/4" />
-                <Skeleton class="h-3 w-1/2" />
-                <div class="mt-auto flex items-center justify-between gap-3 border-t border-border/60 pt-3">
-                    <Skeleton class="h-3 w-1/3" />
-                    <Skeleton class="h-4 w-16 shrink-0" />
-                </div>
-            </div>
+            <EventCardSkeleton v-for="n in 6" :key="`event-${n}`" />
         </div>
 
         <div v-else-if="filteredEvents.length > 0" class="fade-up grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
