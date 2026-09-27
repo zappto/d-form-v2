@@ -7,10 +7,11 @@ import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import EventCard from '@/components/modules/dashboard/events/EventCard.vue';
 import EventFilterBar from '@/components/modules/dashboard/events/EventFilterBar.vue';
+import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, ChevronsLeft, ChevronsRight } from 'lucide-vue-next';
+import { Plus } from 'lucide-vue-next';
 import {
     index as eventsIndex,
     destroy as destroyEvent,
@@ -272,44 +273,13 @@ function handleDeleteConfirm(): void {
                 acara
             </p>
             <div class="flex flex-wrap items-center justify-center gap-2">
-                <Button
-                    radius="icon"
-                    variant="outline"
-                    size="icon"
-                    class="size-9"
-                    :disabled="currentPage <= 1"
-                    @click="goToPage(1)"
-                >
-                    <ChevronsLeft class="size-4" />
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    class="h-9 px-4"
-                    :disabled="currentPage <= 1"
-                    @click="goToPage(currentPage - 1)"
-                >
-                    Sebelumnya
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    class="h-9 px-4"
-                    :disabled="currentPage >= lastPage"
-                    @click="goToPage(currentPage + 1)"
-                >
-                    Berikutnya
-                </Button>
-                <Button
-                    radius="icon"
-                    variant="outline"
-                    size="icon"
-                    class="size-9"
-                    :disabled="currentPage >= lastPage"
-                    @click="goToPage(lastPage)"
-                >
-                    <ChevronsRight class="size-4" />
-                </Button>
+                <DataPagination
+                    :numbers="false"
+                    :first-last="true"
+                    :page="currentPage"
+                    :page-count="lastPage"
+                    @update:page="goToPage"
+                />
             </div>
         </Card>
     </div>

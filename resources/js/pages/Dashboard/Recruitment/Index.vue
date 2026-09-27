@@ -5,6 +5,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import DivisionListSheet, {
     type DashboardDivision,
 } from '@/components/modules/dashboard/recruitment/DivisionListSheet.vue'
+import DataPagination from '@/components/modules/dashboard/DataPagination.vue'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 import { showErrorToast } from '@/lib/error-message'
 import { Card, CardContent } from '@/components/ui/card'
@@ -433,25 +434,15 @@ onMounted(() => {
             </Card>
 
             <div v-if="periodLastPage > 1 && !isLoadingPeriods" class="mt-4 flex justify-center gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    :disabled="periodCurrentPage <= 1"
-                    @click="applyPeriodFilters(periodCurrentPage - 1)"
-                >
-                    Sebelumnya
-                </Button>
+                <DataPagination
+                    :numbers="false"
+                    :page="periodCurrentPage"
+                    :page-count="periodLastPage"
+                    @update:page="applyPeriodFilters"
+                />
                 <span class="text-muted-foreground self-center text-xs tabular-nums">
                     {{ periodCurrentPage }} / {{ periodLastPage }} · {{ periodTotal }} periode
                 </span>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    :disabled="periodCurrentPage >= periodLastPage"
-                    @click="applyPeriodFilters(periodCurrentPage + 1)"
-                >
-                    Berikutnya
-                </Button>
             </div>
         </section>
 
