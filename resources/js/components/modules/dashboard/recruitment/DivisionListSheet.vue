@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { routes } from '@/lib/routes';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors } = useErrorToast();
 
@@ -112,7 +113,7 @@ function saveDivision(division: TIDashboardDivision): void {
                                 :aria-busy="isSaving"
                             >
                                 <CometSpinner v-if="isSaving" :size="16" />
-                                {{ isSaving ? 'Menyimpan...' : 'Simpan' }}
+                                {{ isSaving ? SAVING_LABEL : 'Simpan' }}
                             </Button>
                             <Button size="sm" variant="ghost" type="button" @click="cancelEdit">Batal</Button>
                         </div>

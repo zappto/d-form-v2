@@ -6,6 +6,7 @@
 import type { BackendField, BuilderField, IFieldOptionEntry } from '@/types/form-builder';
 import type { TFormFieldMetadataBag, TFormFieldRules } from '@/types/form';
 import { isFormFieldRules, isMetadataBag } from '@/lib/formFieldMetadata';
+import { BANNER_ACCEPT_MIMES } from '@/lib/displayLimits';
 
 export type { BackendField, BuilderField, IFieldOptionEntry };
 
@@ -271,7 +272,7 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
                 metadata: withMeta(f, {
                     rules: {},
                     builderType: 'banner',
-                    accepts: 'gif, png, jpg, jpeg',
+                    accepts: BANNER_ACCEPT_MIMES,
                     bannerUrl: f.metadata?.bannerUrl || '',
                     bannerFileName: f.metadata?.bannerFileName || '',
                     content: f.metadata?.content || '',

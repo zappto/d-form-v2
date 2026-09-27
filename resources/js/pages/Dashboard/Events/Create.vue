@@ -28,6 +28,7 @@ import type { TFormFieldMetadataBag } from '@/types/form';
 import { DESCRIPTION_REQUIRED_MESSAGE, TITLE_REQUIRED_MESSAGE, isBlankRequiredValue } from '@/lib/autosaveHeader';
 import type { BuilderField } from '@/types/form-builder';
 import { routes } from '@/lib/routes';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors } = useErrorToast();
 
@@ -310,7 +311,7 @@ const currentIndex = computed(() => (step.value === 'forms' ? 1 : 0));
                     <Button variant="destructive-outline" @click="showCancelModal = true"> Batalkan </Button>
                     <Button :disabled="finishing" :aria-busy="finishing" @click="finishWizard">
                         <CometSpinner v-if="finishing" :size="16" />
-                        {{ finishing ? 'Menyimpan...' : 'Selesai' }}
+                        {{ finishing ? SAVING_LABEL : 'Selesai' }}
                     </Button>
                 </div>
             </div>

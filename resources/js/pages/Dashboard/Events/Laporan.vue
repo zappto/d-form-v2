@@ -189,7 +189,7 @@ onMounted(() => {
             "
             :export-urls="exports ?? { registrations: '#', attendance: '#' }"
             :attendance-log="
-                eventReporting?.attendanceLog ?? { data: [], current_page: 1, last_page: 1, per_page: 10, total: 0 }
+                eventReporting?.attendanceLog ?? { data: [], current_page: 1, last_page: 1, per_page: 15, total: 0 }
             "
             :show-export-toolbar="false"
         />

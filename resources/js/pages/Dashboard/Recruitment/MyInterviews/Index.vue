@@ -24,7 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { routes } from '@/lib/routes';
-import type { IPaginator } from '@/lib/pagination';
+import { MY_INTERVIEWS_PAGE_SIZE, type IPaginator } from '@/lib/pagination';
 import { padQueueNumber } from '@/lib/format';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
@@ -140,7 +140,6 @@ const SORT_OPTIONS: IFilterOption[] = [
 ];
 
 const SEARCH_DEBOUNCE_MS = 300;
-const FALLBACK_PER_PAGE = 20;
 
 const props = withDefaults(
     defineProps<{
@@ -384,7 +383,7 @@ function queueBadgeLabel(key: string): number {
     return queueBadgeCount(key) ?? 0;
 }
 
-const perPage = computed<number>((): number => props.interviews.per_page ?? FALLBACK_PER_PAGE);
+const perPage = computed<number>((): number => props.interviews.per_page ?? MY_INTERVIEWS_PAGE_SIZE);
 
 const rangeStart = computed<number>((): number => {
     if (props.interviews.from !== undefined && props.interviews.from !== null) return props.interviews.from;

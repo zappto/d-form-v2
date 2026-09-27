@@ -13,6 +13,7 @@ import { statusColorMap } from '@/lib/dummyData';
 import { formatDisplayDate, formatDisplayDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
+import { isStorageHref } from '@/lib/bannerSrc';
 
 defineOptions({ layout: DashboardLayout });
 
@@ -98,10 +99,6 @@ onMounted(() => {
         subtitle: `Registration — ${props.event?.title ?? ''}`,
     });
 });
-
-function isFileLink(value: string): boolean {
-    return /^https?:\/\//i.test(value) || value.startsWith('/storage/');
-}
 
 function isImageFileUrl(value: string): boolean {
     const path = (value.split('?')[0] ?? '').toLowerCase();
@@ -260,7 +257,7 @@ function isImageFileUrl(value: string): boolean {
                     class="rounded-lg border border-border/60 bg-muted/15 px-3 py-2"
                 >
                     <p class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{{ label }}</p>
-                    <template v-if="isFileLink(value)">
+                    <template v-if="isStorageHref(value)">
                         <div class="mt-2 space-y-2">
                             <a
                                 :href="value"

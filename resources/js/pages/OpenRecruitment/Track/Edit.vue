@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { routes } from '@/lib/routes';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { readFormError } from '@/lib/formErrors';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors, showFlashToast } = useErrorToast();
 
@@ -621,7 +622,7 @@ function onPortfolioTypeKeydown(event: KeyboardEvent): void {
                 <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
                     <Button type="submit" :disabled="form.processing" :aria-busy="form.processing" class="sm:min-w-44">
                         <CometSpinner v-if="form.processing" :size="16" />
-                        {{ form.processing ? 'Menyimpan...' : 'Simpan perubahan' }}
+                        {{ form.processing ? SAVING_LABEL : 'Simpan perubahan' }}
                     </Button>
                     <Button as-child variant="outline">
                         <Link :href="dashboardUrl">Batal</Link>

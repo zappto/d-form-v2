@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
-import { normalizeBannerSrc } from '@/lib/bannerSrc';
+import { isStorageHref, normalizeBannerSrc } from '@/lib/bannerSrc';
 import { Button } from '@/components/ui/button';
 import { getFormFieldOptionRows, formFieldApiType, formFieldBuilderType } from '@/lib/formFieldOptions';
 import { isFileUploadTypeName } from '@/lib/formFieldKind';
@@ -105,8 +105,7 @@ const treatsAsFile = computed((): boolean => {
         if (typeof props.value !== 'string') {
             return false;
         }
-        const s = props.value.trim();
-        return s.startsWith('form-uploads/') || /^https?:\/\//i.test(s) || s.startsWith('/storage/');
+        return isStorageHref(props.value);
     }
     if (formFieldApiType(props.field) === 'fileUpload') {
         return true;

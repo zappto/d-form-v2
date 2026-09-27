@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/dialog';
 import { CheckCircle2, Users } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
+import { SENDING_LABEL } from '@/lib/uiLabels';
 import {
     buildFieldLabelMap,
     getFieldError,
@@ -515,7 +516,7 @@ function submitDeclineFromDialog() {
                             @click="acceptConfirmOpen = true"
                         >
                             <CometSpinner v-if="confirmForm.processing" :size="16" />
-                            {{ confirmForm.processing ? 'Mengirim...' : 'Accept invitation' }}
+                            {{ confirmForm.processing ? SENDING_LABEL : 'Accept invitation' }}
                         </Button>
                     </div>
                 </div>
@@ -578,7 +579,7 @@ function submitDeclineFromDialog() {
                         @click="submitDeclineFromDialog"
                     >
                         <CometSpinner v-if="declineForm.processing" :size="16" />
-                        {{ declineForm.processing ? 'Mengirim...' : 'Decline invitation' }}
+                        {{ declineForm.processing ? SENDING_LABEL : 'Decline invitation' }}
                     </Button>
                 </DialogFooter>
             </DialogContent>

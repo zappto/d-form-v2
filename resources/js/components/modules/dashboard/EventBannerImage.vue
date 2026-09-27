@@ -2,6 +2,7 @@
 import { ref, watch, computed } from 'vue';
 import { ImageOff } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
+import { normalizeBannerSrc } from '@/lib/bannerSrc';
 
 const props = withDefaults(
     defineProps<{
@@ -27,20 +28,7 @@ watch(
 
 const showImg = computed(() => Boolean(props.src) && !failed.value);
 
-const resolvedSrc = computed(() => {
-    if (!props.src) return '';
-    const value = String(props.src);
-    if (
-        value.startsWith('http://') ||
-        value.startsWith('https://') ||
-        value.startsWith('/') ||
-        value.startsWith('data:')
-    ) {
-        return value;
-    }
-
-    return `/storage/${value.replace(/^storage\//, '')}`;
-});
+const resolvedSrc = computed(() => (props.src ? normalizeBannerSrc(props.src) : ''));
 </script>
 
 <template>

@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import { routes } from '@/lib/routes';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors } = useErrorToast();
 
@@ -120,7 +121,7 @@ function submit(): void {
                     :aria-busy="form.processing"
                 >
                     <CometSpinner v-if="form.processing" :size="16" />
-                    {{ form.processing ? 'Menyimpan...' : 'Buat sesi' }}
+                    {{ form.processing ? SAVING_LABEL : 'Buat sesi' }}
                 </Button>
             </div>
         </template>

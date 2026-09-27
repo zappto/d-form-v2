@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { buttonVariants } from '@/components/ui/button';
 import { CometSpinner } from '@/components/ui/comet';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 
 defineProps<{
     open: boolean;
@@ -55,7 +56,7 @@ const emit = defineEmits<{
                         loading
                             ? variant === 'destructive'
                                 ? 'Menghapus...'
-                                : 'Menyimpan...'
+                                : SAVING_LABEL
                             : (confirmText ?? 'Continue')
                     }}
                 </AlertDialogAction>

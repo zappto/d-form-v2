@@ -13,6 +13,7 @@ import { routes } from '@/lib/routes';
 import { padQueueNumber } from '@/lib/format';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
+import { PROCESSING_LABEL } from '@/lib/uiLabels';
 import { useRecruitmentQueue, type IQueueSnapshot } from '@/hooks/useRecruitmentQueue';
 import { toast } from 'vue-sonner';
 
@@ -124,7 +125,7 @@ const statusVariant = (status: string) => {
         <div class="flex flex-wrap items-center justify-end gap-3">
             <Button v-if="canManage" :disabled="actionBusy" :aria-busy="actionBusy" @click="callNext">
                 <CometSpinner v-if="actionBusy" :size="16" />
-                {{ actionBusy ? 'Memproses...' : 'Panggil berikutnya' }}
+                {{ actionBusy ? PROCESSING_LABEL : 'Panggil berikutnya' }}
             </Button>
             <Button variant="outline" as-child>
                 <Link :href="routes.admin.recruitment.interviewSessions.show(session.id)">Detail sesi</Link>
@@ -261,7 +262,7 @@ const statusVariant = (status: string) => {
                                 @click="completeEntry(queue.current.id)"
                             >
                                 <CometSpinner v-if="actionBusy" :size="16" />
-                                {{ actionBusy ? 'Memproses...' : 'Tandai selesai' }}
+                                {{ actionBusy ? PROCESSING_LABEL : 'Tandai selesai' }}
                             </Button>
                         </template>
                         <EmptyState v-else variant="inline" title="Belum ada yang dipanggil." />
@@ -320,7 +321,7 @@ const statusVariant = (status: string) => {
                                             @click="completeEntry(entry.id)"
                                         >
                                             <CometSpinner v-if="actionBusy" :size="16" />
-                                            {{ actionBusy ? 'Memproses...' : 'Selesai' }}
+                                            {{ actionBusy ? PROCESSING_LABEL : 'Selesai' }}
                                         </Button>
                                     </td>
                                 </tr>

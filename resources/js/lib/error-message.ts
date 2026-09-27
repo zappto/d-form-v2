@@ -5,6 +5,12 @@ export type TErrorMessageContext = {
     fieldLabels?: Record<string, string>;
 };
 
+/**
+ * Pesan FE saat konfirmasi kata sandi tidak cocok; satu sumber untuk register & reset password.
+ * `humanizeErrorMessage` memetakan kedua varian (dengan/tanpa titik) ke "Konfirmasi kata sandi tidak cocok.".
+ */
+export const PASSWORD_MISMATCH_MESSAGE = 'Password does not match.';
+
 /** Label statis untuk field umum di luar form builder. */
 export const STATIC_FIELD_LABELS: Record<string, string> = {
     title: 'Judul',

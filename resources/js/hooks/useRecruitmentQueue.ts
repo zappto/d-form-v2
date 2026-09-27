@@ -29,7 +29,8 @@ export interface IQueueSnapshot {
     };
 }
 
-const POLL_INTERVAL_MS = 10_000;
+/** Interval polling antrean admin (ms); endpoint `snapshot()` memuat data penuh, 10 dtk menjaga admin tetap segar. */
+const ADMIN_QUEUE_POLL_INTERVAL_MS = 10_000;
 
 /** Snapshot antrean rekrutmen yang di-poll berkala beserta status loading dan kontrol polling. */
 export function useRecruitmentQueue(pollUrl: string, initial: IQueueSnapshot) {
@@ -69,7 +70,7 @@ export function useRecruitmentQueue(pollUrl: string, initial: IQueueSnapshot) {
             if (polling.value) {
                 void refresh();
             }
-        }, POLL_INTERVAL_MS);
+        }, ADMIN_QUEUE_POLL_INTERVAL_MS);
     }
 
     function stopPolling() {

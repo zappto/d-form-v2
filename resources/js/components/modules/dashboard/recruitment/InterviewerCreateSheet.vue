@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { routes } from '@/lib/routes';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 import { Eye, EyeOff } from 'lucide-vue-next';
 
 const { handleInertiaFormErrors } = useErrorToast();
@@ -130,7 +131,7 @@ function submit(): void {
                     :aria-busy="form.processing"
                 >
                     <CometSpinner v-if="form.processing" :size="16" />
-                    {{ form.processing ? 'Menyimpan...' : 'Simpan interviewer' }}
+                    {{ form.processing ? SAVING_LABEL : 'Simpan interviewer' }}
                 </Button>
             </div>
         </template>

@@ -40,6 +40,7 @@ import {
 import { formatIdDateLabel, formatIdDateTimeLabel } from '@/lib/shadcnDateFormat';
 import { initialsOf } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
 
@@ -650,7 +651,7 @@ function closePeriod(): void {
                             @click="openPeriod"
                         >
                             <CometSpinner v-if="isOpeningPeriod" :size="16" />
-                            {{ isOpeningPeriod ? 'Menyimpan...' : 'Buka pendaftaran' }}
+                            {{ isOpeningPeriod ? SAVING_LABEL : 'Buka pendaftaran' }}
                         </Button>
                         <Button
                             v-if="canClose"
@@ -662,7 +663,7 @@ function closePeriod(): void {
                             @click="closePeriod"
                         >
                             <CometSpinner v-if="isClosingPeriod" :size="16" />
-                            {{ isClosingPeriod ? 'Menyimpan...' : 'Tutup pendaftaran' }}
+                            {{ isClosingPeriod ? SAVING_LABEL : 'Tutup pendaftaran' }}
                         </Button>
                         <Button as-child size="sm" variant="outline">
                             <Link

@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { formatBytes, padQueueNumber } from '@/lib/format';
 import { routes } from '@/lib/routes';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import useAuth from '@/hooks/useAuth';
 import {
@@ -1156,7 +1157,7 @@ function submit(): void {
                             :aria-busy="form.processing"
                         >
                             <CometSpinner v-if="form.processing" :size="16" />
-                            {{ form.processing ? 'Menyimpan...' : 'Simpan penilaian' }}
+                            {{ form.processing ? SAVING_LABEL : 'Simpan penilaian' }}
                         </Button>
                     </form>
 

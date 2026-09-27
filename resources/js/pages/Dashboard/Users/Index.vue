@@ -11,7 +11,7 @@ import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import { SearchableSelect, type SearchableSelectOption } from '@/components/ui/searchable-select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useErrorToast } from '@/hooks/useErrorToast';
-import type { IPaginator } from '@/lib/pagination';
+import { USERS_PAGE_SIZE, type IPaginator } from '@/lib/pagination';
 import { routes } from '@/lib/routes';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
@@ -65,7 +65,7 @@ const roleLabelMap = computed(() =>
 
 const hasActiveFilters = computed(() => Boolean(search.value || role.value));
 
-const perPage = computed(() => props.users.per_page || props.query.per_page || 10);
+const perPage = computed(() => props.users.per_page || props.query.per_page || USERS_PAGE_SIZE);
 
 const rangeLabel = computed(() => {
     if (props.users.total === 0) return 'Tidak ada data';

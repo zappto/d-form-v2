@@ -45,7 +45,8 @@ interface IQueueDisplaySnapshot {
     stats?: IQueueDisplayStats | null;
 }
 
-const POLL_INTERVAL_MS = 15_000;
+/** Interval polling papan antrean publik (ms); endpoint `publicSnapshot()` tersanitasi tanpa auth, 15 dtk lebih hemat beban. */
+const PUBLIC_DISPLAY_POLL_INTERVAL_MS = 15_000;
 
 const props = defineProps<{
     snapshot: IQueueDisplaySnapshot;
@@ -158,7 +159,7 @@ function startPolling(): void {
     if (pollTimer !== null || !props.pollUrl) return;
     pollTimer = setInterval((): void => {
         void refreshDisplay();
-    }, POLL_INTERVAL_MS);
+    }, PUBLIC_DISPLAY_POLL_INTERVAL_MS);
 }
 
 function stopPolling(): void {

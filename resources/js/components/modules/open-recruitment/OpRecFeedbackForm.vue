@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { CometSpinner } from '@/components/ui/comet';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { SENDING_LABEL } from '@/lib/uiLabels';
 import { readFormError } from '@/lib/formErrors';
 
 const { handleInertiaFormErrors, showFlashToast } = useErrorToast();
@@ -123,7 +124,7 @@ function submit(): void {
         <div class="flex flex-wrap gap-2 pt-1">
             <Button type="submit" size="sm" :disabled="form.processing" :aria-busy="form.processing">
                 <CometSpinner v-if="form.processing" :size="16" />
-                {{ form.processing ? 'Mengirim...' : 'Kirim feedback' }}
+                {{ form.processing ? SENDING_LABEL : 'Kirim feedback' }}
             </Button>
             <Button
                 v-if="$attrs.onCancel !== undefined"

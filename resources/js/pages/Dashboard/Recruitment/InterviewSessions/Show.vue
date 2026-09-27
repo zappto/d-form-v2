@@ -14,6 +14,7 @@ import { routes } from '@/lib/routes';
 import { initialsOf } from '@/lib/format';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 import useAuth from '@/hooks/useAuth';
 import { usePage } from '@inertiajs/vue3';
 import { ListOrdered, Plus } from 'lucide-vue-next';
@@ -426,7 +427,7 @@ function rescheduleInterview(interviewId: string): void {
                                     @click="rescheduleInterview(interview.id)"
                                 >
                                     <CometSpinner v-if="reschedulingId === interview.id" :size="16" />
-                                    {{ reschedulingId === interview.id ? 'Menyimpan...' : 'Pindah' }}
+                                    {{ reschedulingId === interview.id ? SAVING_LABEL : 'Pindah' }}
                                 </Button>
                             </div>
                         </div>

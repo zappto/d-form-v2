@@ -15,6 +15,7 @@ import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
 import { BannerPickerField } from '@/components/core/field';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors, showFlashToast } = useErrorToast();
 
@@ -161,7 +162,7 @@ function submit(): void {
                     class="w-full shrink-0 sm:w-auto"
                 >
                     <CometSpinner v-if="form.processing" :size="16" />
-                    {{ form.processing ? 'Menyimpan...' : 'Simpan perubahan' }}
+                    {{ form.processing ? SAVING_LABEL : 'Simpan perubahan' }}
                 </Button>
             </div>
 

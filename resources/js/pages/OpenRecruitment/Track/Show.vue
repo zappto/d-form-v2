@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { routes } from '@/lib/routes';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { SENDING_LABEL } from '@/lib/uiLabels';
 import {
     ArrowRight,
     CalendarClock,
@@ -626,7 +627,7 @@ function submitCorrection(): void {
                     <Button type="button" variant="outline" @click="correctionModalOpen = false">Batal</Button>
                     <Button type="submit" :disabled="correctionForm.processing" :aria-busy="correctionForm.processing">
                         <CometSpinner v-if="correctionForm.processing" :size="16" />
-                        {{ correctionForm.processing ? 'Mengirim...' : 'Kirim' }}
+                        {{ correctionForm.processing ? SENDING_LABEL : 'Kirim' }}
                     </Button>
                 </DialogFooter>
             </form>

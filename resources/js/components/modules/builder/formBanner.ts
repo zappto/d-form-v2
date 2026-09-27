@@ -2,6 +2,7 @@ import type { BuilderField } from '@/components/modules/builder/fieldMapping';
 import type { BackendField } from '@/types/form-builder';
 import type { TFormFieldMetadataBag } from '@/types/form';
 import { normalizeBannerSrc } from '@/lib/bannerSrc';
+import { BANNER_ACCEPT_MIMES } from '@/lib/displayLimits';
 
 export interface ITFormBannerState {
     id: string | null;
@@ -140,7 +141,7 @@ export function buildFormBannerBuilderField(state: ITFormBannerState): BuilderFi
         options: [],
         ...(order !== undefined ? { order } : {}),
         metadata: {
-            accepts: 'gif, png, jpg, jpeg',
+            accepts: BANNER_ACCEPT_MIMES,
             bannerUrl: trimmedUrl,
             bannerFileName: state.bannerFileName.trim(),
             content: trimmedCaption,

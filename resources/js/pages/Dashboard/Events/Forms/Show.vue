@@ -47,6 +47,7 @@ import FormAnswerReviewController from '@/actions/App/Http/Controllers/Dashboard
 import FormAnswerDetailSheet from '@/components/modules/dashboard/FormAnswerDetailSheet.vue';
 import UserAvatarFallback from '@/components/modules/user/UserAvatarFallback.vue';
 import { userAvatarSeed } from '@/lib/userAvatarFallback';
+import { PROCESSING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors, showErrorToast, showHttpErrorToast } = useErrorToast();
 
@@ -461,13 +462,13 @@ function onDetailReview(payload: { action: 'accept' | 'reject'; submission: IFor
 }
 
 function acceptLabel(submission: IFormSubmission): string {
-    if (isSubmissionReviewing(submission.id)) return 'Memproses...';
+    if (isSubmissionReviewing(submission.id)) return PROCESSING_LABEL;
     if (submission.review_status === 'accepted') return 'Sudah diterima';
     return 'Terima';
 }
 
 function rejectLabel(submission: IFormSubmission): string {
-    if (isSubmissionReviewing(submission.id)) return 'Memproses...';
+    if (isSubmissionReviewing(submission.id)) return PROCESSING_LABEL;
     if (submission.review_status === 'rejected') return 'Sudah ditolak';
     return 'Tolak';
 }

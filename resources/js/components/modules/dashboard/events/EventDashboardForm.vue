@@ -29,6 +29,7 @@ import { toCategoryList } from '@/lib/eventCategories';
 import { BannerPickerField } from '@/components/core/field';
 import { cn } from '@/lib/utils';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
+import { TITLE_MAX_LENGTH } from '@/lib/displayLimits';
 import {
     formatIntegerId,
     formatPriceId,
@@ -155,7 +156,6 @@ const classificationDescription = computed(() =>
 );
 
 /** Batas karakter frontend (counter) — backend tetap memvalidasi. */
-const TITLE_MAX = 200;
 const DESCRIPTION_MAX = 5000;
 
 const titleLength = computed(() => form.title.length);
@@ -175,7 +175,7 @@ const descriptionLength = computed(() => {
 });
 
 function onTitleInput(v: string | number): void {
-    const s = String(v).slice(0, TITLE_MAX);
+    const s = String(v).slice(0, TITLE_MAX_LENGTH);
     form.title = s;
 }
 
@@ -433,9 +433,9 @@ defineExpose({ submitForm, validateRequired, form });
                                     </Label>
                                     <span
                                         class="text-xs text-muted-foreground tabular-nums"
-                                        :class="titleLength > TITLE_MAX ? 'font-medium text-destructive' : ''"
+                                        :class="titleLength > TITLE_MAX_LENGTH ? 'font-medium text-destructive' : ''"
                                     >
-                                        {{ titleLength }}/{{ TITLE_MAX }}
+                                        {{ titleLength }}/{{ TITLE_MAX_LENGTH }}
                                     </span>
                                 </div>
                                 <Input

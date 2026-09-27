@@ -23,6 +23,7 @@ import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formChe
 import type { IApplicationDetail } from '@/types/recruitment';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import useAuth from '@/hooks/useAuth';
+import { SAVING_LABEL } from '@/lib/uiLabels';
 import {
     CheckCircle2,
     ClipboardCheck,
@@ -955,7 +956,7 @@ const defaultTab = computed(() => {
                                     @click="approveCorrection(correction.id)"
                                 >
                                     <CometSpinner v-if="reviewingCorrectionId === correction.id" :size="16" />
-                                    {{ reviewingCorrectionId === correction.id ? 'Menyimpan...' : 'Setujui' }}
+                                    {{ reviewingCorrectionId === correction.id ? SAVING_LABEL : 'Setujui' }}
                                 </Button>
                                 <Button
                                     size="sm"

@@ -22,6 +22,7 @@ import { CometSpinner } from '@/components/ui/comet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { routes } from '@/lib/routes';
+import { PERIOD_APPLICANTS_PAGE_SIZE } from '@/lib/pagination';
 
 const { handleInertiaFormErrors, showErrorToast, showFlashToast } = useErrorToast();
 
@@ -128,7 +129,7 @@ const divisionId = ref<string>('');
 const stage = ref<string>('');
 const queue = ref<string>('');
 const semester = ref<string>('');
-const perPage = ref<number>(20);
+const perPage = ref<number>(PERIOD_APPLICANTS_PAGE_SIZE);
 const currentPage = ref<number>(1);
 
 const divisionSelectOptions = computed<SearchableSelectOption[]>(() => [
@@ -235,7 +236,7 @@ const perPageOptions = computed<SearchableSelectOption[]>(() =>
 const perPageModel = computed<string>({
     get: () => String(perPage.value),
     set: (value: string) => {
-        perPage.value = Number(value) || 20;
+        perPage.value = Number(value) || PERIOD_APPLICANTS_PAGE_SIZE;
         currentPage.value = 1;
     },
 });

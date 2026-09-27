@@ -5,15 +5,13 @@ import { ImageUp, RefreshCw, X } from 'lucide-vue-next';
 import { cn } from '@/lib/utils';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import { useBannerFilePicker } from '@/hooks/useBannerFilePicker';
+import { BANNER_ACCEPT_TYPES, BANNER_PICKER_ACCEPT } from '@/lib/displayLimits';
 
-/** Tipe MIME yang diterima picker banner; selaras batas backend `banner_file`. */
-const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/gif'];
 /** Batas ukuran banner; backend memakai `banner_file max:5120` (KB). */
 const MAX_BANNER_BYTES = 5 * 1024 * 1024;
 /** Copy galat yang sama dengan implementasi banner sebelumnya. */
 const TYPE_ERROR = 'Gunakan PNG, JPG, JPEG, atau GIF.';
 const SIZE_ERROR = 'Ukuran banner maksimal 5 MB.';
-const DEFAULT_ACCEPT = 'image/png,image/jpeg,image/gif';
 
 /** Berkas terpilih sumber upload multipart; null saat kosong atau setelah Hapus. */
 const file = defineModel<File | null>('file', { default: null });
@@ -42,7 +40,7 @@ const props = withDefaults(
         invalid: false,
         error: '',
         id: 'banner',
-        accept: DEFAULT_ACCEPT,
+        accept: BANNER_PICKER_ACCEPT,
     }
 );
 
@@ -96,7 +94,7 @@ watch(
 
 /** Kembalikan pesan galat untuk berkas banner, atau null bila lolos validasi. */
 function validationError(candidate: File): string | null {
-    if (!ALLOWED_TYPES.includes(candidate.type)) return TYPE_ERROR;
+    if (!BANNER_ACCEPT_TYPES.includes(candidate.type)) return TYPE_ERROR;
     if (candidate.size > MAX_BANNER_BYTES) return SIZE_ERROR;
     return null;
 }
