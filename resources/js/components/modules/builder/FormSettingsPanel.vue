@@ -32,8 +32,8 @@ const isTeamStyleRegistration = computed(() => {
     if (!isRegistrationPurpose.value) {
         return false;
     }
-    const m = formMetadata.value.registration_mode;
-    return m === 'team' || m === 'bundle';
+    const registrationMode = formMetadata.value.registration_mode;
+    return registrationMode === 'team' || registrationMode === 'bundle';
 });
 
 const registrationModeSelectSentinel = '__none__' as const;
@@ -84,21 +84,21 @@ function onRegistrationModeSelect(value: string): void {
     };
 }
 
-function setMaxTeamSize(v: string | number): void {
-    const s = String(v);
-    const n = s === '' ? null : Number(s);
+function setMaxTeamSize(value: string | number): void {
+    const rawValue = String(value);
+    const parsedValue = rawValue === '' ? null : Number(rawValue);
     formMetadata.value = {
         ...formMetadata.value,
-        max_team_size: n === null || Number.isNaN(n) ? null : n,
+        max_team_size: parsedValue === null || Number.isNaN(parsedValue) ? null : parsedValue,
     };
 }
 
-function setTeamSize(v: string | number): void {
-    const s = String(v);
-    const n = s === '' ? null : Number(s);
+function setTeamSize(value: string | number): void {
+    const rawValue = String(value);
+    const parsedValue = rawValue === '' ? null : Number(rawValue);
     formMetadata.value = {
         ...formMetadata.value,
-        team_size: n === null || Number.isNaN(n) ? null : n,
+        team_size: parsedValue === null || Number.isNaN(parsedValue) ? null : parsedValue,
     };
 }
 </script>

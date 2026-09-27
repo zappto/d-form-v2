@@ -174,9 +174,9 @@ const descriptionLength = computed(() => {
     return plain.length;
 });
 
-function onTitleInput(v: string | number): void {
-    const s = String(v).slice(0, TITLE_MAX_LENGTH);
-    form.title = s;
+function onTitleInput(value: string | number): void {
+    const sanitizedTitle = String(value).slice(0, TITLE_MAX_LENGTH);
+    form.title = sanitizedTitle;
 }
 
 const sessionPickerId = computed(() => (props.variant === 'create' ? 'field-session' : 'edit-field-session'));
@@ -266,27 +266,27 @@ function isFieldShaking(key: string): boolean {
     return shakingFields.value.has(key);
 }
 
-function onQuotaInput(v: string | number): void {
-    const s = sanitizeQuotaTyping(String(v));
-    quotaDisplay.value = s;
-    form.quota = parseQuotaInput(s);
+function onQuotaInput(value: string | number): void {
+    const quotaDigits = sanitizeQuotaTyping(String(value));
+    quotaDisplay.value = quotaDigits;
+    form.quota = parseQuotaInput(quotaDigits);
 }
 
 function onQuotaBlur(): void {
-    const q = parseQuotaInput(quotaDisplay.value);
-    form.quota = q;
-    quotaDisplay.value = q > 0 ? formatIntegerId(q) : '';
+    const parsedQuota = parseQuotaInput(quotaDisplay.value);
+    form.quota = parsedQuota;
+    quotaDisplay.value = parsedQuota > 0 ? formatIntegerId(parsedQuota) : '';
 }
 
-function onPriceInput(v: string | number): void {
-    priceDisplay.value = formatPriceTyping(String(v));
+function onPriceInput(value: string | number): void {
+    priceDisplay.value = formatPriceTyping(String(value));
     form.price = parsePriceInput(priceDisplay.value);
 }
 
 function onPriceBlur(): void {
-    const p = parsePriceInput(priceDisplay.value);
-    form.price = p;
-    priceDisplay.value = p > 0 ? formatPriceId(p) : '';
+    const parsedPrice = parsePriceInput(priceDisplay.value);
+    form.price = parsedPrice;
+    priceDisplay.value = parsedPrice > 0 ? formatPriceId(parsedPrice) : '';
 }
 
 function commitQuotaPriceFromFields(): void {

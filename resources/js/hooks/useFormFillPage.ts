@@ -52,24 +52,24 @@ export function useFormFillPage(props: {
     }
 
     function isDisplayOnly(field: IFormField): boolean {
-        const bt = builderType(field);
-        return ['heading', 'paragraph', 'divider', 'banner'].includes(bt);
+        const builderTypeName = builderType(field);
+        return ['heading', 'paragraph', 'divider', 'banner'].includes(builderTypeName);
     }
 
     const formBannerField = computed(() => pickFormBannerField(props.fields ?? []));
 
     const formBannerImageSrc = computed(() => {
-        const fb = formBannerField.value;
-        const meta = fb ? metadata(fb) : {};
+        const bannerField = formBannerField.value;
+        const meta = bannerField ? metadata(bannerField) : {};
         const url = (meta.bannerUrl as string) || props.form.banner_url;
         if (!url) return '';
         return normalizeBannerSrc(url);
     });
 
     const formBannerCaption = computed(() => {
-        const fb = formBannerField.value;
-        if (fb) {
-            const raw = metadata(fb).content;
+        const bannerField = formBannerField.value;
+        if (bannerField) {
+            const raw = metadata(bannerField).content;
             if (typeof raw === 'string' && raw.trim()) return raw;
         }
         return props.form.banner_caption ?? '';
@@ -201,8 +201,8 @@ export function useFormFillPage(props: {
 
     function getSelectedOptionRow(field: IFormField, storageKey?: string) {
         const key = storageKey ?? field.name;
-        const val = answerForm[key] as string;
-        return getOptionRows(field).find((r) => r.label === val);
+        const rawAnswer = answerForm[key] as string;
+        return getOptionRows(field).find((r) => r.label === rawAnswer);
     }
 
     function isBundleDuplicatableField(field: IFormField): boolean {
@@ -234,8 +234,8 @@ export function useFormFillPage(props: {
             if (type === 'phone') return 'tel';
             return type;
         }
-        const bt = builderType(field);
-        if (bt === 'url') return 'url';
+        const builderTypeName = builderType(field);
+        if (builderTypeName === 'url') return 'url';
         return 'text';
     }
 
@@ -253,32 +253,32 @@ export function useFormFillPage(props: {
     }
 
     function isRadioLike(field: IFormField): boolean {
-        const bt = builderType(field);
-        return field.type === 'radio' || bt === 'radio' || bt === 'yes_no';
+        const builderTypeName = builderType(field);
+        return field.type === 'radio' || builderTypeName === 'radio' || builderTypeName === 'yes_no';
     }
 
     function isCheckboxLike(field: IFormField): boolean {
-        const bt = builderType(field);
-        return field.type === 'checkbox' || bt === 'checkbox' || isMultipleSelect(field);
+        const builderTypeName = builderType(field);
+        return field.type === 'checkbox' || builderTypeName === 'checkbox' || isMultipleSelect(field);
     }
 
     /** Batas karakter untuk teks pendek / panjang (metadata.rules + maxLength). */
     function maxLengthForField(field: IFormField): number | undefined {
-        const bt = builderType(field);
-        if (bt !== 'short_text' && bt !== 'long_text') return undefined;
-        const r = rules(field);
-        const rm = r.max;
-        if (typeof rm === 'number' && rm > 0) return rm;
-        if (typeof rm === 'string' && rm !== '') {
-            const n = parseInt(rm, 10);
-            if (Number.isFinite(n) && n > 0) return n;
+        const builderTypeName = builderType(field);
+        if (builderTypeName !== 'short_text' && builderTypeName !== 'long_text') return undefined;
+        const fieldRules = rules(field);
+        const maxRule = fieldRules.max;
+        if (typeof maxRule === 'number' && maxRule > 0) return maxRule;
+        if (typeof maxRule === 'string' && maxRule !== '') {
+            const parsedMaxLength = parseInt(maxRule, 10);
+            if (Number.isFinite(parsedMaxLength) && parsedMaxLength > 0) return parsedMaxLength;
         }
         const meta = metadata(field);
-        const ml = meta.maxLength;
-        if (typeof ml === 'number' && ml > 0) return ml;
-        if (typeof ml === 'string' && ml.trim() !== '') {
-            const n = parseInt(ml, 10);
-            if (Number.isFinite(n) && n > 0) return n;
+        const maxLengthMeta = meta.maxLength;
+        if (typeof maxLengthMeta === 'number' && maxLengthMeta > 0) return maxLengthMeta;
+        if (typeof maxLengthMeta === 'string' && maxLengthMeta.trim() !== '') {
+            const parsedMaxLength = parseInt(maxLengthMeta, 10);
+            if (Number.isFinite(parsedMaxLength) && parsedMaxLength > 0) return parsedMaxLength;
         }
         return undefined;
     }
@@ -396,13 +396,13 @@ export function useFormFillPage(props: {
 
     /** Tulis email peserta pada indeks slot dan jaga panjang array = `memberSlots` (pindahan setTeamEmail komponen). */
     function setTeamMemberEmail(slot: number, value: string): void {
-        const n = memberSlots.value;
-        const arr = [...((answerForm.team_member_emails as string[]) ?? [])];
-        while (arr.length < n) {
-            arr.push('');
+        const slotCount = memberSlots.value;
+        const teamMemberEmails = [...((answerForm.team_member_emails as string[]) ?? [])];
+        while (teamMemberEmails.length < slotCount) {
+            teamMemberEmails.push('');
         }
-        arr[slot - 1] = value;
-        answerForm.team_member_emails = arr;
+        teamMemberEmails[slot - 1] = value;
+        answerForm.team_member_emails = teamMemberEmails;
     }
 
     return {

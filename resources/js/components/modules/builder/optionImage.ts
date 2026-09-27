@@ -79,9 +79,9 @@ function rowHasPendingFile(row: BackendField): boolean {
  * `option_images[fieldId][optionId]` agar server bisa pasangkan tanpa
  * peta tambahan (fieldId/optionId = UUID tanpa karakter khusus).
  */
-export function appendOptionImageFiles(fd: FormData, files: ITPendingOptionImageFile[]): void {
+export function appendOptionImageFiles(formData: FormData, files: ITPendingOptionImageFile[]): void {
     for (const p of files) {
-        fd.append(`option_images[${p.fieldId}][${p.optionId}]`, p.file, p.file.name);
+        formData.append(`option_images[${p.fieldId}][${p.optionId}]`, p.file, p.file.name);
     }
 }
 
@@ -96,14 +96,14 @@ export function buildOptionImageFieldsFormData(
     optionFiles: ITPendingOptionImageFile[],
     bannerFile?: File | null
 ): FormData {
-    const fd = new FormData();
-    fd.append('fields', JSON.stringify(dirty));
-    fd.append('deleted_ids', JSON.stringify(deletedIds));
+    const formData = new FormData();
+    formData.append('fields', JSON.stringify(dirty));
+    formData.append('deleted_ids', JSON.stringify(deletedIds));
     if (bannerFile instanceof File) {
-        fd.append('banner_file', bannerFile, bannerFile.name);
+        formData.append('banner_file', bannerFile, bannerFile.name);
     }
-    appendOptionImageFiles(fd, optionFiles);
-    return fd;
+    appendOptionImageFiles(formData, optionFiles);
+    return formData;
 }
 
 /** Baca peta stored path opsi dari respons POST /fields (toleran bila tak ada). */

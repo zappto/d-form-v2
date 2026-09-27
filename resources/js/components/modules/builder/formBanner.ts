@@ -22,9 +22,9 @@ function recordMetadata(field: IFormField): TFormFieldMetadataBag {
 }
 
 function builderApiType(field: IFormField): string {
-    const m = recordMetadata(field);
-    const bt = m.builderType;
-    return typeof bt === 'string' ? bt : field.type;
+    const metadata = recordMetadata(field);
+    const builderType = metadata.builderType;
+    return typeof builderType === 'string' ? builderType : field.type;
 }
 
 /** State banner form kosong tanpa file/url; titik awal sebelum baris banner dimuat dari field. */
@@ -47,9 +47,9 @@ export function hasPendingBannerFile(state: ITFormBannerState): boolean {
 
 /** Kunci snapshot autosave untuk file pending (nama + ukuran + mtime). */
 export function pendingBannerSnapshotKey(state: ITFormBannerState): string | null {
-    const f = state.bannerFile;
-    if (!(f instanceof File)) return null;
-    return `${f.name}:${f.size}:${f.lastModified}`;
+    const bannerFile = state.bannerFile;
+    if (!(bannerFile instanceof File)) return null;
+    return `${bannerFile.name}:${bannerFile.size}:${bannerFile.lastModified}`;
 }
 
 /** Preview yang harus tampil: object URL file baru diutamakan, lalu path tersimpan. */
@@ -87,16 +87,19 @@ export function extractFormBannerFromBuilderFields(rows: BuilderField[]): {
         return { banner: defaultFormBannerState(), canvasFields: [...rows] };
     }
 
-    const bf = rows[idx];
-    const meta = bf.metadata ?? {};
+    const backendField = rows[idx];
+    const meta = backendField.metadata ?? {};
     const banner: ITFormBannerState = {
-        id: bf.id,
+        id: backendField.id,
         bannerUrl: typeof meta.bannerUrl === 'string' ? meta.bannerUrl : '',
         bannerFileName: typeof meta.bannerFileName === 'string' ? meta.bannerFileName : '',
         caption: typeof meta.content === 'string' ? meta.content : '',
         bannerFile: null,
         bannerPreviewUrl: '',
-        order: typeof bf.order === 'number' && Number.isFinite(bf.order) ? Math.trunc(bf.order) : null,
+        order:
+            typeof backendField.order === 'number' && Number.isFinite(backendField.order)
+                ? Math.trunc(backendField.order)
+                : null,
     };
     const canvasFields = rows.filter((_, i) => i !== idx);
     return { banner, canvasFields };
@@ -125,13 +128,13 @@ export function buildFormBannerBuilderField(state: ITFormBannerState): BuilderFi
         state.id = crypto.randomUUID();
     }
 
-    const id = state.id;
-    if (id === null) return null;
+    const fieldId = state.id;
+    if (fieldId === null) return null;
 
     const order = typeof state.order === 'number' && Number.isFinite(state.order) ? Math.trunc(state.order) : undefined;
 
     return {
-        id,
+        id: fieldId,
         type: 'banner',
         label: 'Form banner',
         description: '',
@@ -191,11 +194,11 @@ export function ensureBannerRowDirty(backend: BackendField[], dirty: BackendFiel
  * via FormData; decode di server) + `banner_file` sebagai file part.
  */
 export function buildBannerFieldsFormData(dirty: BackendField[], deletedIds: string[], file: File): FormData {
-    const fd = new FormData();
-    fd.append('fields', JSON.stringify(dirty));
-    fd.append('deleted_ids', JSON.stringify(deletedIds));
-    fd.append('banner_file', file, file.name);
-    return fd;
+    const formData = new FormData();
+    formData.append('fields', JSON.stringify(dirty));
+    formData.append('deleted_ids', JSON.stringify(deletedIds));
+    formData.append('banner_file', file, file.name);
+    return formData;
 }
 
 /** Setelah upload sukses: state pegang path string, bukan File/base64. */
@@ -219,8 +222,8 @@ export function readBannerPathFromResponse(payload: unknown): string | null {
     if (!isMetadataBag(payload)) return null;
     const rec = payload;
     for (const key of ['banner_url', 'banner_path', 'bannerUrl']) {
-        const v = rec[key];
-        if (typeof v === 'string' && v.trim() !== '') return v.trim();
+        const rawValue = rec[key];
+        if (typeof rawValue === 'string' && rawValue.trim() !== '') return rawValue.trim();
     }
     return null;
 }

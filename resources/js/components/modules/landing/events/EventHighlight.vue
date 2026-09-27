@@ -15,17 +15,17 @@ const props = defineProps<{
 
 const visible = ref(false);
 onMounted(() => {
-    const obs = new IntersectionObserver(
+    const revealObserver = new IntersectionObserver(
         ([e]) => {
             if (e?.isIntersecting) {
                 visible.value = true;
-                obs.disconnect();
+                revealObserver.disconnect();
             }
         },
         { threshold: 0.1 }
     );
     const el = document.getElementById('event-highlight');
-    if (el) obs.observe(el);
+    if (el) revealObserver.observe(el);
 });
 
 const featured = computed(() => props.events.slice(0, 3));

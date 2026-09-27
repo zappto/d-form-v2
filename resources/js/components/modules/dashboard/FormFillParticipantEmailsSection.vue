@@ -39,15 +39,15 @@ function createPerSlotTrailingDebounce(
             );
         },
         cancel(slot: number) {
-            const t = timers.get(slot);
-            if (t !== undefined) {
-                clearTimeout(t);
+            const debounceTimer = timers.get(slot);
+            if (debounceTimer !== undefined) {
+                clearTimeout(debounceTimer);
                 timers.delete(slot);
             }
         },
         cancelAll() {
-            for (const t of timers.values()) {
-                clearTimeout(t);
+            for (const debounceTimer of timers.values()) {
+                clearTimeout(debounceTimer);
             }
             timers.clear();
         },
@@ -95,11 +95,11 @@ const sectionHint = computed(() =>
 
 watch(
     memberSlots,
-    (n) => {
+    (slotCount) => {
         const next = { ...expandedBySlot.value };
-        for (let s = 1; s <= n; s++) {
-            if (next[s] === undefined) {
-                next[s] = n <= 1 || s === 1;
+        for (let slotNumber = 1; slotNumber <= slotCount; slotNumber++) {
+            if (next[slotNumber] === undefined) {
+                next[slotNumber] = slotCount <= 1 || slotNumber === 1;
             }
         }
         expandedBySlot.value = next;
@@ -108,9 +108,9 @@ watch(
 );
 
 function isExpanded(slot: number): boolean {
-    const v = expandedBySlot.value[slot];
-    if (v !== undefined) {
-        return v;
+    const isExpandedValue = expandedBySlot.value[slot];
+    if (isExpandedValue !== undefined) {
+        return isExpandedValue;
     }
     return memberSlots.value <= 1 || slot === 1;
 }
@@ -129,8 +129,8 @@ function emailAt(slot: number): string {
     return String(teamMemberEmails()[slot - 1] ?? '');
 }
 
-function validEmailFormat(s: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+function validEmailFormat(emailAddress: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress.trim());
 }
 
 function setCheckState(slot: number, status: TCheckStatus, found?: IFoundUser, helper?: string) {
@@ -168,13 +168,13 @@ async function runEmailCheck(slot: number) {
 
     try {
         const url = `${CHECK_EMAIL_URL}?${new URLSearchParams({ email: raw }).toString()}`;
-        const res = await fetch(url, {
+        const response = await fetch(url, {
             credentials: 'same-origin',
             signal: controller.signal,
             headers: jsonRequestHeaders(),
         });
         // Batas eksternal: body HTTP tanpa tipe dari server; bentuknya dijaga konsumen di bawah.
-        const body = (await res.json()) as {
+        const body = (await response.json()) as {
             exists?: boolean;
             message?: string;
             data?: IFoundUser;
@@ -184,7 +184,7 @@ async function runEmailCheck(slot: number) {
             return;
         }
 
-        if (!res.ok) {
+        if (!response.ok) {
             setCheckState(
                 slot,
                 'error',
@@ -204,8 +204,8 @@ async function runEmailCheck(slot: number) {
                 humanizeErrorMessage(body.message ?? 'No account exists for this email.')
             );
         }
-    } catch (e) {
-        if (e instanceof Error && e.name === 'AbortError') {
+    } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
             return;
         }
         setCheckState(slot, 'error', undefined, humanizeErrorMessage('Could not verify this email. Try again.'));
@@ -249,9 +249,9 @@ function scheduleCheck(slot: number) {
     debouncedEmailCheck.schedule(slot);
 }
 
-function onEmailInput(slot: number, v: string | number) {
+function onEmailInput(slot: number, value: string | number) {
     props.ctx.answerForm.clearErrors('team_member_emails');
-    props.ctx.setTeamMemberEmail(slot, String(v));
+    props.ctx.setTeamMemberEmail(slot, String(value));
     scheduleCheck(slot);
 }
 
@@ -268,19 +268,19 @@ function shortDate(iso: string): string {
 }
 
 function summaryLine(slot: number): string {
-    const e = emailAt(slot).trim();
-    if (e) {
-        return e;
+    const email = emailAt(slot).trim();
+    if (email) {
+        return email;
     }
     return 'Tap to add email';
 }
 
 function rowAccentClass(slot: number): string {
-    const s = statusFor(slot);
-    if (s === 'found' || s === 'valid') {
+    const checkStatus = statusFor(slot);
+    if (checkStatus === 'found' || checkStatus === 'valid') {
         return 'border-emerald-500/30 bg-emerald-500/[0.04] shadow-[0_0_0_1px_rgba(16,185,129,0.06)]';
     }
-    if (s === 'not_found' || s === 'invalid' || s === 'error') {
+    if (checkStatus === 'not_found' || checkStatus === 'invalid' || checkStatus === 'error') {
         return 'border-destructive/25 bg-destructive/[0.03]';
     }
     return 'border-border/80 bg-card';

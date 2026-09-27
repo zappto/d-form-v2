@@ -17,17 +17,17 @@ const visible = ref(false);
 const query = ref('');
 
 onMounted(() => {
-    const obs = new IntersectionObserver(
+    const revealObserver = new IntersectionObserver(
         ([e]) => {
             if (e?.isIntersecting) {
                 visible.value = true;
-                obs.disconnect();
+                revealObserver.disconnect();
             }
         },
         { threshold: 0.05 }
     );
     const el = document.getElementById('event-list');
-    if (el) obs.observe(el);
+    if (el) revealObserver.observe(el);
 });
 
 const filtered = computed(() => {

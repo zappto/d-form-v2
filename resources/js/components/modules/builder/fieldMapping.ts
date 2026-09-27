@@ -40,11 +40,11 @@ function parseOptionChoices(raw: unknown): IFieldOptionEntry[] | null {
     const out: IFieldOptionEntry[] = [];
     for (const item of raw) {
         if (isMetadataBag(item)) {
-            const id = String(item.id ?? crypto.randomUUID());
+            const optionId = String(item.id ?? crypto.randomUUID());
             const type = item.type === 'image' ? 'image' : 'text';
             const label = String(item.label ?? '').trim();
             const imageUrl = String(item.imageUrl ?? '').trim();
-            out.push({ id, type, label, imageUrl });
+            out.push({ id: optionId, type, label, imageUrl });
         } else if (Array.isArray(item)) {
             // Paritas perilaku lama: array lolos guard objek dan dibaca sebagai bag kosong.
             out.push({ id: crypto.randomUUID(), type: 'text', label: '', imageUrl: '' });
@@ -72,11 +72,11 @@ function withMeta(f: BuilderField, specific: TFormFieldMetadataBag): TFormFieldM
 function mergeTextRules(req: TFormFieldMetadataBag, f: BuilderField): TFormFieldMetadataBag {
     const merged = { ...req };
     const raw = f.metadata?.maxLength;
-    const n =
+    const ruleValue =
         typeof raw === 'number' ? raw : raw != null && String(raw).trim() !== '' ? parseInt(String(raw), 10) : NaN;
-    if (Number.isFinite(n) && n > 0) {
+    if (Number.isFinite(ruleValue) && ruleValue > 0) {
         merged.min = 0;
-        merged.max = Math.min(Math.floor(n), 100_000);
+        merged.max = Math.min(Math.floor(ruleValue), 100_000);
     }
     return merged;
 }
@@ -285,15 +285,15 @@ export function toBackendField(f: BuilderField, order: number): BackendField {
     }
 }
 
-function guessType(apiType: string, m: TFormFieldMetadataBag): string {
+function guessType(apiType: string, metadata: TFormFieldMetadataBag): string {
     if (apiType === 'input') {
-        if (m.type === 'email') return 'email';
-        if (m.type === 'tel') return 'phone';
-        if (m.type === 'number') return 'number';
+        if (metadata.type === 'email') return 'email';
+        if (metadata.type === 'tel') return 'phone';
+        if (metadata.type === 'number') return 'number';
         return 'short_text';
     }
     if (apiType === 'textarea') return 'long_text';
-    if (apiType === 'select') return m.is_multiple ? 'checkbox' : 'dropdown';
+    if (apiType === 'select') return metadata.is_multiple ? 'checkbox' : 'dropdown';
     if (apiType === 'checkbox') return 'checkbox';
     if (apiType === 'radio') return 'radio';
     if (apiType === 'datePicker') return 'date';
@@ -303,16 +303,16 @@ function guessType(apiType: string, m: TFormFieldMetadataBag): string {
 
 /** Konversi field backend ke bentuk builder (menebak tipe builder bila metadata minim); dipakai saat memuat form ke editor. */
 export function fromBackendField(bf: BackendField): BuilderField {
-    const mFull: TFormFieldMetadataBag = bf.metadata && typeof bf.metadata === 'object' ? bf.metadata : {};
-    const m: TFormFieldMetadataBag = { ...mFull };
-    delete m.options;
-    const rules: TFormFieldRules = isFormFieldRules(m.rules) ? m.rules : {};
-    const bt = (m.builderType as string) || guessType(bf.type, m);
+    const rawMetadata: TFormFieldMetadataBag = bf.metadata && typeof bf.metadata === 'object' ? bf.metadata : {};
+    const metadata: TFormFieldMetadataBag = { ...rawMetadata };
+    delete metadata.options;
+    const rules: TFormFieldRules = isFormFieldRules(metadata.rules) ? metadata.rules : {};
+    const builderType = (metadata.builderType as string) || guessType(bf.type, metadata);
     const inStr = rules.in || '';
-    const parsedChoices = parseOptionChoices(m.optionChoices);
+    const parsedChoices = parseOptionChoices(metadata.optionChoices);
     const optsRaw: IFieldOptionEntry[] =
         parsedChoices ??
-        (['dropdown', 'checkbox', 'radio'].includes(bt)
+        (['dropdown', 'checkbox', 'radio'].includes(builderType)
             ? inStr
                   .split(',')
                   .map((s) => s.trim())
@@ -320,7 +320,7 @@ export function fromBackendField(bf: BackendField): BuilderField {
                   .map((label) => ({ id: crypto.randomUUID(), type: 'text' as const, label }))
             : []);
     const opts: IFieldOptionEntry[] =
-        bt === 'dropdown'
+        builderType === 'dropdown'
             ? optsRaw.map((opt) => ({
                   ...opt,
                   type: 'text',
@@ -331,29 +331,29 @@ export function fromBackendField(bf: BackendField): BuilderField {
 
     const maxFromRules = rules.max;
     let maxLengthForMeta: number | undefined;
-    if (['short_text', 'long_text'].includes(bt) && maxFromRules != null && String(maxFromRules) !== '') {
-        const n = Number(maxFromRules);
-        if (Number.isFinite(n) && n > 0) {
-            maxLengthForMeta = n;
+    if (['short_text', 'long_text'].includes(builderType) && maxFromRules != null && String(maxFromRules) !== '') {
+        const maxFromRulesNumber = Number(maxFromRules);
+        if (Number.isFinite(maxFromRulesNumber) && maxFromRulesNumber > 0) {
+            maxLengthForMeta = maxFromRulesNumber;
         }
     }
 
     return {
         id: bf.id,
-        type: bt,
+        type: builderType,
         label: bf.label || '',
         description: bf.description || '',
         name: bf.name || '',
-        placeholder: (m.placeholder as string) || '',
+        placeholder: (metadata.placeholder as string) || '',
         required: !!rules.required,
         options: opts,
         is_append: bf.is_append === true,
         order: bf.order,
         metadata: {
-            ...m,
-            maxStars: m.maxStars || 5,
+            ...metadata,
+            maxStars: metadata.maxStars || 5,
             accepts: (rules.mimes || '').replace(/,/g, ', '),
-            formBanner: m.formBanner === true,
+            formBanner: metadata.formBanner === true,
             ...(maxLengthForMeta != null ? { maxLength: maxLengthForMeta } : {}),
         },
     };
@@ -436,8 +436,8 @@ export function toBackendFields(
     builderFields: BuilderField[],
     prevOrders?: Map<string, number> | BackendField[] | null
 ): BackendField[] {
-    const n = builderFields.length;
-    if (n === 0) return [];
+    const fieldCount = builderFields.length;
+    if (fieldCount === 0) return [];
     const prevMap = prevMapFrom(prevOrders);
     const known: (number | null)[] = builderFields.map((f) => {
         const carried = asKnownOrder(f.order);
@@ -462,23 +462,23 @@ export function toBackendFields(
         }
     }
 
-    const resultOrders: number[] = new Array<number>(n);
+    const resultOrders: number[] = new Array<number>(fieldCount);
 
     if (increasing) {
         known.forEach((v, i) => {
             if (v !== null) resultOrders[i] = v;
         });
         let i = 0;
-        while (i < n) {
+        while (i < fieldCount) {
             if (known[i] !== null) {
                 i++;
                 continue;
             }
             let j = i;
-            while (j < n && known[j] === null) j++;
+            while (j < fieldCount && known[j] === null) j++;
             const count = j - i;
             const prevVal: number | null = i > 0 ? resultOrders[i - 1] : null;
-            const nextVal: number | null = j < n ? known[j] : null;
+            const nextVal: number | null = j < fieldCount ? known[j] : null;
             const alloc = allocateOrderRun(prevVal, nextVal, count);
             if (alloc === null) {
                 return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP));
@@ -498,25 +498,25 @@ export function toBackendFields(
             lastInvSeq = k;
         }
     }
-    const lo = knownSeq[firstInvSeq].idx;
-    const hi = knownSeq[lastInvSeq].idx;
+    const inversionLowIndex = knownSeq[firstInvSeq].idx;
+    const inversionHighIndex = knownSeq[lastInvSeq].idx;
     const prevAnchor: number | null = firstInvSeq > 0 ? knownSeq[firstInvSeq - 1].order : null;
     const nextAnchor: number | null = lastInvSeq + 1 < knownSeq.length ? knownSeq[lastInvSeq + 1].order : null;
-    const windowSize = hi - lo + 1;
+    const windowSize = inversionHighIndex - inversionLowIndex + 1;
     const windowAlloc = allocateOrderRun(prevAnchor, nextAnchor, windowSize);
     if (windowAlloc === null) {
         return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP));
     }
-    for (let k = 0; k < windowSize; k++) resultOrders[lo + k] = windowAlloc[k];
+    for (let k = 0; k < windowSize; k++) resultOrders[inversionLowIndex + k] = windowAlloc[k];
     // Known di luar window dipertahankan.
     known.forEach((v, i) => {
-        if (v !== null && (i < lo || i > hi)) resultOrders[i] = v;
+        if (v !== null && (i < inversionLowIndex || i > inversionHighIndex)) resultOrders[i] = v;
     });
     // Unknown di luar window dialokasikan seperti kasus increasing.
     let i = 0;
-    while (i < n) {
-        if (i >= lo && i <= hi) {
-            i = hi + 1;
+    while (i < fieldCount) {
+        if (i >= inversionLowIndex && i <= inversionHighIndex) {
+            i = inversionHighIndex + 1;
             continue;
         }
         if (known[i] !== null) {
@@ -524,13 +524,13 @@ export function toBackendFields(
             continue;
         }
         let j = i;
-        while (j < n && !(j >= lo && j <= hi) && known[j] === null) j++;
+        while (j < fieldCount && !(j >= inversionLowIndex && j <= inversionHighIndex) && known[j] === null) j++;
         // j berhenti di window atau known berikutnya; next anchor = resultOrders[j] bila j di window/known.
         const count = j - i;
         const prevVal: number | null = i > 0 ? resultOrders[i - 1] : null;
         let nextVal: number | null = null;
-        if (j < n) {
-            if (j >= lo && j <= hi) {
+        if (j < fieldCount) {
+            if (j >= inversionLowIndex && j <= inversionHighIndex) {
                 nextVal = resultOrders[j];
             } else {
                 const knownNext = known[j];

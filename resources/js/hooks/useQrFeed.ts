@@ -1,6 +1,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import type { Ref } from 'vue';
 import axios from 'axios';
+import type { AxiosError } from 'axios';
 import { toast } from 'vue-sonner';
 import { humanizeErrorMessage, parseApiErrorMessage } from '@/lib/error-message';
 import { useErrorToast } from './useErrorToast';
@@ -79,6 +80,30 @@ interface IGlobalScanErrorBody {
     errors?: Record<string, string[]>;
 }
 
+/** Konteks sumber scan (sumber input + kode mentah yang tampil) untuk merakit hasil. */
+interface IScanResultContext {
+    source: TQrScanSource;
+    rawCode: string;
+}
+
+/** Konteks penyusunan hasil gagal non-duplikat (nama sebab + event terakhir). */
+interface IInvalidScanContext extends IScanResultContext {
+    name: string;
+    eventKind: 'event' | 'oprec';
+    eventTitle: string;
+}
+
+/** Konteks penyusunan hasil duplikat termasuk nomor antrean cadangan dari hasil terakhir. */
+interface IDuplicateScanContext extends IScanResultContext {
+    fallbackQueue: number | null;
+}
+
+/** Hasil duplikat 409: entri riwayat + deskripsi toast peringatan. */
+interface IDuplicateScanOutcome {
+    result: TIScanResult;
+    warningDescription: string;
+}
+
 /** True bila body error scan berupa objek JSON (batas eksternal `error.response.data`). */
 function isGlobalScanErrorBody(value: unknown): value is IGlobalScanErrorBody {
     return typeof value === 'object' && value !== null;
@@ -134,6 +159,114 @@ function scanIdentity(
     return `${kind}|${eventTitle}|${identifier}|${queueNumber === null ? '-' : String(queueNumber)}`;
 }
 
+/** Petakan tipe envelope server ke jenis event internal. */
+function mapEnvelopeKind(type: string | undefined): 'event' | 'oprec' {
+    return type === 'recruitment' ? 'oprec' : 'event';
+}
+
+/** Rakit hasil scan sukses dari envelope check-in (cabang event & oprec). */
+function buildCheckInResult(data: IGlobalScanEnvelope, context: IScanResultContext): TIScanResult {
+    const kind = mapEnvelopeKind(data.type);
+    const eventTitle = formatGlobalEventTitle(kind, data.eventTitle ?? '');
+    const name = data.attendee.name?.trim() || 'Tanpa nama';
+
+    if (kind === 'oprec') {
+        return {
+            name,
+            email: data.attendee.registration_number?.trim() || '-',
+            status: 'success',
+            source: context.source,
+            rawCode: context.rawCode,
+            eventKind: kind,
+            eventTitle,
+            queueNumber: data.attendee.queue_number ?? null,
+        };
+    }
+
+    return {
+        name,
+        email: data.attendee.email?.trim() || '-',
+        status: 'success',
+        source: context.source,
+        rawCode: context.rawCode,
+        eventKind: kind,
+        eventTitle,
+        queueNumber: null,
+    };
+}
+
+/** Tampilkan toast sukses check-in; cabang oprec memuat nomor antrean ter-pad. */
+function showCheckInSuccessToast(data: IGlobalScanEnvelope, result: TIScanResult): void {
+    toast.success(data.attendee.name?.trim() || 'Check-in berhasil.', {
+        description:
+            result.eventKind === 'oprec'
+                ? `#${padQueueNumber(result.queueNumber)} — arahkan ke ruang tunggu`
+                : 'Boleh masuk — tiket dikirim ke email',
+    });
+}
+
+/** Rakit hasil scan duplikat (409) beserta deskripsi toast per cabang event/oprec. */
+function buildDuplicateScan(
+    body: IGlobalScanErrorBody | undefined,
+    context: IDuplicateScanContext
+): IDuplicateScanOutcome {
+    const kind = mapEnvelopeKind(body?.type);
+    const eventTitle = formatGlobalEventTitle(kind, body?.eventTitle ?? '');
+    const name = body?.attendee?.name?.trim() || 'Sudah terdaftar hadir';
+
+    if (kind === 'oprec') {
+        const identifier = body?.attendee?.registration_number?.trim() || '-';
+        return {
+            result: {
+                name,
+                email: identifier,
+                status: 'already',
+                source: context.source,
+                rawCode: context.rawCode,
+                eventKind: kind,
+                eventTitle,
+                queueNumber: body?.attendee?.queue_number ?? context.fallbackQueue,
+            },
+            warningDescription: `${name} · ${identifier}`,
+        };
+    }
+
+    const email = body?.attendee?.email?.trim() || '-';
+    return {
+        result: {
+            name,
+            email,
+            status: 'already',
+            source: context.source,
+            rawCode: context.rawCode,
+            eventKind: kind,
+            eventTitle,
+            queueNumber: null,
+        },
+        warningDescription: email !== '-' ? `${name} · ${email}` : name,
+    };
+}
+
+/** Rakit hasil scan gagal (status `invalid`) dari nama sebab dan konteks event terakhir. */
+function buildInvalidScanResult(context: IInvalidScanContext): TIScanResult {
+    return {
+        name: context.name,
+        email: '-',
+        status: 'invalid',
+        source: context.source,
+        rawCode: context.rawCode,
+        eventKind: context.eventKind,
+        eventTitle: context.eventTitle,
+        queueNumber: null,
+    };
+}
+
+/** Baca body error scan dari kegagalan axios; `undefined` bila bukan objek JSON. */
+function readScanErrorBody(error: AxiosError): IGlobalScanErrorBody | undefined {
+    const rawBody: unknown = error.response?.data;
+    return isGlobalScanErrorBody(rawBody) ? rawBody : undefined;
+}
+
 /** Kelola pengiriman hasil scan, riwayat, dan identitas meja kasir. */
 export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
     const { showErrorToast } = useErrorToast();
@@ -176,10 +309,6 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         };
     }
 
-    function mapEnvelopeKind(type: string | undefined): 'event' | 'oprec' {
-        return type === 'recruitment' ? 'oprec' : 'event';
-    }
-
     function pushResult(result: TIScanResult): void {
         localEntryIdentities.add(scanIdentity(result.eventKind, result.email, result.queueNumber, result.eventTitle));
         scanResult.value = result;
@@ -203,13 +332,101 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         return true;
     }
 
+    /** Catat hasil duplikat 409 lalu tampilkan peringatan (push riwayat dulu, toast kemudian). */
+    function handleDuplicateScan(body: IGlobalScanErrorBody | undefined, context: IScanResultContext): void {
+        const fallbackQueue =
+            scanResult.value?.eventKind === mapEnvelopeKind(body?.type) ? scanResult.value.queueNumber : null;
+        const outcome = buildDuplicateScan(body, {
+            source: context.source,
+            rawCode: context.rawCode,
+            fallbackQueue,
+        });
+
+        pushResult(outcome.result);
+        toast.warning(humanizeErrorMessage(body?.message ?? 'Peserta sudah pernah scan.'), {
+            description: outcome.warningDescription,
+        });
+    }
+
+    /** Catat hasil 422 sebagai invalid lalu tampilkan pesan validasi API. */
+    function handleInvalidScan(body: IGlobalScanErrorBody | undefined, context: IScanResultContext): void {
+        pushResult(
+            buildInvalidScanResult({
+                source: context.source,
+                rawCode: context.rawCode,
+                name: 'Tidak dapat diproses',
+                eventKind: scanResult.value?.eventKind ?? 'event',
+                eventTitle: scanResult.value?.eventTitle ?? '-',
+            })
+        );
+        showErrorToast(parseApiErrorMessage(body, 'Data tidak valid.'));
+    }
+
+    /** Catat hasil 429 sebagai invalid lalu tampilkan pesan tunggu. */
+    function handleRateLimitedScan(context: IScanResultContext): void {
+        pushResult(
+            buildInvalidScanResult({
+                source: context.source,
+                rawCode: context.rawCode,
+                name: 'Terlalu banyak scan',
+                eventKind: scanResult.value?.eventKind ?? 'event',
+                eventTitle: scanResult.value?.eventTitle ?? '-',
+            })
+        );
+        showErrorToast('Terlalu banyak scan', {
+            description: 'Tunggu sebentar sebelum memindai lagi.',
+        });
+    }
+
+    /** Catat hasil jaringan/kesalahan tak terduga sebagai invalid lalu tampilkan pesan gagal. */
+    function handleNetworkScanFailure(error: unknown, context: IScanResultContext): void {
+        pushResult(
+            buildInvalidScanResult({
+                source: context.source,
+                rawCode: context.rawCode,
+                name: 'Kesalahan jaringan',
+                eventKind: scanResult.value?.eventKind ?? 'event',
+                eventTitle: scanResult.value?.eventTitle ?? '-',
+            })
+        );
+        showErrorToast('Permintaan gagal', {
+            description:
+                error instanceof Error ? humanizeErrorMessage(error.message) : 'Coba lagi dalam beberapa saat.',
+        });
+    }
+
+    /** Arahkan kegagalan POST scan ke penangan sesuai status (409/422/429) atau fallback jaringan. */
+    function handleScanFailure(error: unknown, context: IScanResultContext): void {
+        if (axios.isAxiosError(error)) {
+            const status = error.response?.status;
+            const body = readScanErrorBody(error);
+
+            if (status === 409) {
+                handleDuplicateScan(body, context);
+                return;
+            }
+
+            if (status === 422) {
+                handleInvalidScan(body, context);
+                return;
+            }
+
+            if (status === 429) {
+                handleRateLimitedScan(context);
+                return;
+            }
+        }
+
+        handleNetworkScanFailure(error, context);
+    }
+
+    /** Kirim hasil scan ke server lalu catat riwayat/umpan balik; diabaikan saat sedang sibuk. */
     async function submitScan(scanArgs: ISubmitScanArgs): Promise<void> {
-        const { raw, source } = scanArgs;
         if (scanBusy.value) {
             return;
         }
 
-        const trimmed = raw.trim();
+        const trimmed = scanArgs.raw.trim();
         if (trimmed.length === 0) {
             showErrorToast('Isi kode registrasi terlebih dahulu.');
 
@@ -218,6 +435,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
 
         scanBusy.value = true;
         const rawDisplay = extractQrCandidate(trimmed);
+        const context: IScanResultContext = { source: scanArgs.source, rawCode: rawDisplay };
 
         try {
             const { data } = await axios.post<IGlobalScanEnvelope>(
@@ -226,145 +444,11 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
                 { headers: jsonRequestHeaders() }
             );
 
-            const kind = mapEnvelopeKind(data.type);
-            const title = formatGlobalEventTitle(kind, data.eventTitle ?? '');
-
-            let result: TIScanResult;
-
-            if (kind === 'oprec') {
-                const identifier = data.attendee.registration_number?.trim() || '-';
-                const queueNumber = data.attendee.queue_number ?? null;
-                result = {
-                    name: data.attendee.name?.trim() || 'Tanpa nama',
-                    email: identifier,
-                    status: 'success',
-                    source,
-                    rawCode: rawDisplay,
-                    eventKind: kind,
-                    eventTitle: title,
-                    queueNumber,
-                };
-                toast.success(data.attendee.name?.trim() || 'Check-in berhasil.', {
-                    description: `#${padQueueNumber(queueNumber)} — arahkan ke ruang tunggu`,
-                });
-            } else {
-                const email = data.attendee.email?.trim() || '-';
-                result = {
-                    name: data.attendee.name?.trim() || 'Tanpa nama',
-                    email,
-                    status: 'success',
-                    source,
-                    rawCode: rawDisplay,
-                    eventKind: kind,
-                    eventTitle: title,
-                    queueNumber: null,
-                };
-                toast.success(data.attendee.name?.trim() || 'Check-in berhasil.', {
-                    description: 'Boleh masuk — tiket dikirim ke email',
-                });
-            }
-
+            const result = buildCheckInResult(data, context);
+            showCheckInSuccessToast(data, result);
             pushResult(result);
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                const status = error.response?.status;
-                // Body error (batas eksternal `error.response.data`); `unknown` disempitkan predikat objek.
-                const rawBody: unknown = error.response?.data;
-                const body = isGlobalScanErrorBody(rawBody) ? rawBody : undefined;
-
-                if (status === 409) {
-                    const kind = mapEnvelopeKind(body?.type);
-                    const title = formatGlobalEventTitle(kind, body?.eventTitle ?? '');
-                    const fallbackQueue = scanResult.value?.eventKind === kind ? scanResult.value.queueNumber : null;
-                    const msg = humanizeErrorMessage(body?.message ?? 'Peserta sudah pernah scan.');
-
-                    if (kind === 'oprec') {
-                        const identifier = body?.attendee?.registration_number?.trim() || '-';
-                        const name = body?.attendee?.name?.trim() || 'Sudah terdaftar hadir';
-                        pushResult({
-                            name,
-                            email: identifier,
-                            status: 'already',
-                            source,
-                            rawCode: rawDisplay,
-                            eventKind: kind,
-                            eventTitle: title,
-                            queueNumber: body?.attendee?.queue_number ?? fallbackQueue,
-                        });
-                        toast.warning(msg, {
-                            description: `${name} · ${identifier}`,
-                        });
-                    } else {
-                        const email = body?.attendee?.email?.trim() || '-';
-                        const name = body?.attendee?.name?.trim() || 'Sudah terdaftar hadir';
-                        pushResult({
-                            name,
-                            email,
-                            status: 'already',
-                            source,
-                            rawCode: rawDisplay,
-                            eventKind: kind,
-                            eventTitle: title,
-                            queueNumber: null,
-                        });
-                        toast.warning(msg, {
-                            description: email !== '-' ? `${name} · ${email}` : name,
-                        });
-                    }
-
-                    return;
-                }
-
-                if (status === 422) {
-                    const msg = parseApiErrorMessage(body, 'Data tidak valid.');
-                    pushResult({
-                        name: 'Tidak dapat diproses',
-                        email: '-',
-                        status: 'invalid',
-                        source,
-                        rawCode: rawDisplay,
-                        eventKind: scanResult.value?.eventKind ?? 'event',
-                        eventTitle: scanResult.value?.eventTitle ?? '-',
-                        queueNumber: null,
-                    });
-                    showErrorToast(msg);
-
-                    return;
-                }
-
-                if (status === 429) {
-                    pushResult({
-                        name: 'Terlalu banyak scan',
-                        email: '-',
-                        status: 'invalid',
-                        source,
-                        rawCode: rawDisplay,
-                        eventKind: scanResult.value?.eventKind ?? 'event',
-                        eventTitle: scanResult.value?.eventTitle ?? '-',
-                        queueNumber: null,
-                    });
-                    showErrorToast('Terlalu banyak scan', {
-                        description: 'Tunggu sebentar sebelum memindai lagi.',
-                    });
-
-                    return;
-                }
-            }
-
-            pushResult({
-                name: 'Kesalahan jaringan',
-                email: '-',
-                status: 'invalid',
-                source,
-                rawCode: rawDisplay,
-                eventKind: scanResult.value?.eventKind ?? 'event',
-                eventTitle: scanResult.value?.eventTitle ?? '-',
-                queueNumber: null,
-            });
-            showErrorToast('Permintaan gagal', {
-                description:
-                    error instanceof Error ? humanizeErrorMessage(error.message) : 'Coba lagi dalam beberapa saat.',
-            });
+            handleScanFailure(error, context);
         } finally {
             scanBusy.value = false;
         }

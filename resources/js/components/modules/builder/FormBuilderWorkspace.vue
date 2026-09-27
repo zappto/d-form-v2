@@ -54,7 +54,7 @@ const banner = defineModel<ITFormBannerState>('banner', { required: true });
 const formFields = defineModel<BuilderField[]>('formFields', { required: true });
 const formMetadata = defineModel<IFormRegistrationMetadata>('formMetadata', { required: true });
 
-const wb = reactive(
+const workspace = reactive(
     useFormBuilderWorkspace(
         {
             formTitle,
@@ -81,9 +81,9 @@ function toggleFormSettings(): void {
 /** Handle untuk aksi toolbar eksternal (Pratinjau / Save All) dari halaman induk. */
 defineExpose({
     showPreview: () => {
-        wb.showPreview = true;
+        workspace.showPreview = true;
     },
-    requestSave: () => wb.requestSave(),
+    requestSave: () => workspace.requestSave(),
 });
 </script>
 
@@ -93,15 +93,15 @@ defineExpose({
             :back-href="backHref"
             :toolbar-subtitle="toolbarSubtitle"
             :heading-title="formTitle"
-            :is-ready-to-save="wb.isReadyToSave"
-            :validation-issue-count="wb.validationIssues.length"
-            :is-empty="wb.isEmpty"
+            :is-ready-to-save="workspace.isReadyToSave"
+            :validation-issue-count="workspace.validationIssues.length"
+            :is-empty="workspace.isEmpty"
             :processing="processing"
             :save-label="saveLabel"
             :hide-titles="hideToolbarTitles"
             :hide-toolbar="hideToolbar"
-            @preview="wb.showPreview = true"
-            @save="wb.requestSave"
+            @preview="workspace.showPreview = true"
+            @save="workspace.requestSave"
         >
             <template #toolbar-extra>
                 <slot name="toolbar-extra" />
@@ -109,26 +109,26 @@ defineExpose({
         </FormBuilderToolbar>
 
         <FormBuilderMobileTabBar
-            v-model="wb.mobileTab"
+            v-model="workspace.mobileTab"
             :field-count="formFields.length"
-            :is-ready-to-save="wb.isReadyToSave"
+            :is-ready-to-save="workspace.isReadyToSave"
         />
 
         <div class="flex flex-1 flex-col overflow-visible lg:flex-row lg:overflow-hidden">
             <FormBuilderPalettePanel
-                v-model:search-query="wb.searchQuery"
+                v-model:search-query="workspace.searchQuery"
                 v-model:closed-at="closedAt"
                 v-model:visible-for="visibleFor"
                 v-model:form-metadata="formMetadata"
-                :categories="wb.filteredCategories"
-                :open-category-name="wb.openCategoryName"
+                :categories="workspace.filteredCategories"
+                :open-category-name="workspace.openCategoryName"
                 :form-settings-open="formSettingsOpen"
                 :field-errors="fieldErrors"
                 :visibility-options="visibilityOptions"
                 :sibling-forms="siblingForms"
-                @toggle-category="wb.toggleCategory"
+                @toggle-category="workspace.toggleCategory"
                 @toggle-form-settings="toggleFormSettings"
-                @toggle-visibility="wb.toggleVisibility"
+                @toggle-visibility="workspace.toggleVisibility"
             />
 
             <main class="relative min-h-0 flex-1 overflow-visible bg-background lg:overflow-y-auto">
@@ -138,32 +138,32 @@ defineExpose({
                     v-model:success-content="successContent"
                     v-model:banner="banner"
                     :field-errors="fieldErrors"
-                    :show-success-zone="wb.showSuccessZone"
-                    :hide-on-mobile-settings="wb.mobileTab === 'settings'"
-                    :banner-preview-src="wb.bannerPreviewSrc"
-                    :is-empty="wb.isEmpty"
-                    :is-dragging-over-canvas="wb.isDraggingOverCanvas"
+                    :show-success-zone="workspace.showSuccessZone"
+                    :hide-on-mobile-settings="workspace.mobileTab === 'settings'"
+                    :banner-preview-src="workspace.bannerPreviewSrc"
+                    :is-empty="workspace.isEmpty"
+                    :is-dragging-over-canvas="workspace.isDraggingOverCanvas"
                     :form-fields="formFields"
-                    :selected-field-id="wb.selectedFieldId"
-                    :drop-indicator-index="wb.dropIndicatorIndex"
-                    :drag-source-id="wb.dragSourceId"
-                    @remove="wb.hideSuccessZone"
-                    @canvas-drag-over="wb.onCanvasDragOver"
-                    @canvas-drag-leave="wb.onCanvasDragLeave"
-                    @canvas-drop="wb.onCanvasDrop"
-                    @gap-drag-enter="wb.onGapDragEnter"
-                    @canvas-drag-start="wb.onCanvasDragStart"
-                    @drag-end="wb.onDragEnd"
-                    @select-field="wb.selectField"
-                    @update-field="wb.updateField"
-                    @manage-field="wb.openFieldManage"
-                    @delete-field="wb.deleteField"
-                    @duplicate-field="wb.duplicateField"
-                    @move-field="wb.moveField"
-                    @open-add-sheet="wb.showAddSheet = true"
+                    :selected-field-id="workspace.selectedFieldId"
+                    :drop-indicator-index="workspace.dropIndicatorIndex"
+                    :drag-source-id="workspace.dragSourceId"
+                    @remove="workspace.hideSuccessZone"
+                    @canvas-drag-over="workspace.onCanvasDragOver"
+                    @canvas-drag-leave="workspace.onCanvasDragLeave"
+                    @canvas-drop="workspace.onCanvasDrop"
+                    @gap-drag-enter="workspace.onGapDragEnter"
+                    @canvas-drag-start="workspace.onCanvasDragStart"
+                    @drag-end="workspace.onDragEnd"
+                    @select-field="workspace.selectField"
+                    @update-field="workspace.updateField"
+                    @manage-field="workspace.openFieldManage"
+                    @delete-field="workspace.deleteField"
+                    @duplicate-field="workspace.duplicateField"
+                    @move-field="workspace.moveField"
+                    @open-add-sheet="workspace.showAddSheet = true"
                 />
 
-                <div v-show="wb.mobileTab === 'settings'" class="px-4 pt-5 pb-24 lg:hidden">
+                <div v-show="workspace.mobileTab === 'settings'" class="px-4 pt-5 pb-24 lg:hidden">
                     <div class="mx-auto max-w-[480px]">
                         <FormSettingsPanel
                             v-model:closed-at="closedAt"
@@ -173,7 +173,7 @@ defineExpose({
                             :field-errors="fieldErrors"
                             :visibility-options="visibilityOptions"
                             :sibling-forms="siblingForms"
-                            @toggle-visibility="wb.toggleVisibility"
+                            @toggle-visibility="workspace.toggleVisibility"
                         />
                     </div>
                 </div>
@@ -184,9 +184,9 @@ defineExpose({
                     <Button
                         variant="outline"
                         class="h-11 border-border/80 bg-background text-sm font-medium shadow-sm"
-                        :disabled="wb.isEmpty"
+                        :disabled="workspace.isEmpty"
                         aria-label="Pratinjau formulir"
-                        @click="wb.showPreview = true"
+                        @click="workspace.showPreview = true"
                     >
                         Pratinjau
                     </Button>
@@ -194,7 +194,7 @@ defineExpose({
                         class="h-11 text-sm font-medium shadow-sm"
                         :disabled="processing"
                         :aria-busy="processing"
-                        @click="wb.requestSave"
+                        @click="workspace.requestSave"
                     >
                         <CometSpinner v-if="processing" :size="16" />
                         {{ processing ? 'Menyimpan...' : 'Simpan' }}
@@ -202,30 +202,33 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <FormBuilderMobileAddFab v-if="wb.mobileTab === 'build' && !wb.isEmpty" @click="wb.showAddSheet = true" />
+        <FormBuilderMobileAddFab
+            v-if="workspace.mobileTab === 'build' && !workspace.isEmpty"
+            @click="workspace.showAddSheet = true"
+        />
     </div>
 
     <FormBuilderAddFieldSheet
-        v-model:open="wb.showAddSheet"
-        v-model:search-query="wb.searchQuery"
-        :categories="wb.filteredCategories"
-        @pick-field="wb.addField($event, false)"
+        v-model:open="workspace.showAddSheet"
+        v-model:search-query="workspace.searchQuery"
+        :categories="workspace.filteredCategories"
+        @pick-field="workspace.addField($event, false)"
     />
 
     <FormBuilderEditFieldSheet
-        v-model:open="wb.showMobileEditor"
-        :field="wb.selectedField"
-        @update-field="wb.updateField"
-        @done="wb.showMobileEditor = false"
+        v-model:open="workspace.showMobileEditor"
+        :field="workspace.selectedField"
+        @update-field="workspace.updateField"
+        @done="workspace.showMobileEditor = false"
     />
 
     <FormPreviewDialog
-        :open="wb.showPreview"
+        :open="workspace.showPreview"
         :title="formTitle || 'Untitled Form'"
         :description="formDescription"
-        :form-banner-url="wb.bannerPreviewSrc"
+        :form-banner-url="workspace.bannerPreviewSrc"
         :form-banner-caption="banner.caption"
         :fields="formFields"
-        @close="wb.showPreview = false"
+        @close="workspace.showPreview = false"
     />
 </template>

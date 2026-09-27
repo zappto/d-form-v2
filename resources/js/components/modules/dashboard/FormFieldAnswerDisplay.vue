@@ -32,8 +32,8 @@ function openLightbox(url: string): void {
     lightboxUrl.value = url;
 }
 
-watch(lightboxUrl, (v) => {
-    if (v) {
+watch(lightboxUrl, (next) => {
+    if (next) {
         window.addEventListener('keydown', onEscapeClose);
     } else {
         window.removeEventListener('keydown', onEscapeClose);
@@ -45,25 +45,25 @@ onUnmounted(() => {
 });
 
 function plainText(): string {
-    const v = props.value;
-    if (v == null || v === '') {
+    const displayValue = props.value;
+    if (displayValue == null || displayValue === '') {
         return '—';
     }
-    if (Array.isArray(v)) {
-        return v.length ? v.map(String).join(', ') : '—';
+    if (Array.isArray(displayValue)) {
+        return displayValue.length ? displayValue.map(String).join(', ') : '—';
     }
-    return String(v);
+    return String(displayValue);
 }
 
 const publicFileUrl = computed((): string | null => {
     if (typeof props.value !== 'string') {
         return null;
     }
-    const t = props.value.trim();
-    if (!t) {
+    const trimmedValue = props.value.trim();
+    if (!trimmedValue) {
         return null;
     }
-    const norm = normalizeBannerSrc(t);
+    const norm = normalizeBannerSrc(trimmedValue);
     if (!norm) {
         return null;
     }
@@ -110,8 +110,8 @@ const treatsAsFile = computed((): boolean => {
     if (formFieldApiType(props.field) === 'fileUpload') {
         return true;
     }
-    const bt = formFieldBuilderType(props.field);
-    return isFileUploadTypeName(bt);
+    const builderType = formFieldBuilderType(props.field);
+    return isFileUploadTypeName(builderType);
 });
 
 const preferImagePreview = computed((): boolean => {
@@ -121,8 +121,8 @@ const preferImagePreview = computed((): boolean => {
     if (!props.field) {
         return isImageHref(publicFileUrl.value);
     }
-    const bt = formFieldBuilderType(props.field);
-    if (bt === 'image_upload') {
+    const builderType = formFieldBuilderType(props.field);
+    if (builderType === 'image_upload') {
         return true;
     }
     return isImageHref(publicFileUrl.value);
@@ -154,11 +154,11 @@ const isMultipleChoice = computed((): boolean => {
         return false;
     }
     const meta = readFieldMetadata(props.field);
-    const bt = formFieldBuilderType(props.field);
+    const builderType = formFieldBuilderType(props.field);
     return (
         props.field.type === 'checkbox' ||
         (props.field.type === 'select' && Boolean(meta.is_multiple)) ||
-        bt === 'checkbox'
+        builderType === 'checkbox'
     );
 });
 
@@ -166,8 +166,8 @@ const isRadioLike = computed((): boolean => {
     if (!props.field) {
         return false;
     }
-    const bt = formFieldBuilderType(props.field);
-    return props.field.type === 'radio' || bt === 'radio' || bt === 'yes_no';
+    const builderType = formFieldBuilderType(props.field);
+    return props.field.type === 'radio' || builderType === 'radio' || builderType === 'yes_no';
 });
 
 const isSelectSingle = computed((): boolean => {
@@ -182,13 +182,13 @@ const matchedOptionRows = computed(() => {
         return [];
     }
     const rows = getFormFieldOptionRows(props.field);
-    const v = props.value;
-    if (Array.isArray(v)) {
-        const set = new Set(v.map(String));
+    const answerValue = props.value;
+    if (Array.isArray(answerValue)) {
+        const set = new Set(answerValue.map(String));
         return rows.filter((r) => set.has(r.label));
     }
-    if (typeof v === 'string' && v !== '') {
-        return rows.filter((r) => r.label === v);
+    if (typeof answerValue === 'string' && answerValue !== '') {
+        return rows.filter((r) => r.label === answerValue);
     }
     return [];
 });
@@ -198,28 +198,28 @@ const showChoiceMedia = computed(() => isMultipleChoice.value || isRadioLike.val
 async function downloadStoredFile(url: string, suggestedName: string): Promise<void> {
     const name = suggestedName || basenameFromHref(url);
     try {
-        const res = await fetch(url, { credentials: 'same-origin' });
-        if (!res.ok) {
+        const response = await fetch(url, { credentials: 'same-origin' });
+        if (!response.ok) {
             throw new Error('fetch failed');
         }
-        const blob = await res.blob();
+        const blob = await response.blob();
         const href = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = href;
-        a.download = name;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.href = href;
+        downloadAnchor.download = name;
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
         URL.revokeObjectURL(href);
     } catch {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = name;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.href = url;
+        downloadAnchor.download = name;
+        downloadAnchor.target = '_blank';
+        downloadAnchor.rel = 'noopener noreferrer';
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
     }
 }
 

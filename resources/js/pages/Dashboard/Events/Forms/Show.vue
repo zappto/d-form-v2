@@ -389,12 +389,12 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
     if (!formSubmissionReviewIsPending(submission) || isSubmissionReviewing(submission.id)) return;
 
     const review_status = action === 'accept' ? 'accepted' : 'rejected';
-    const id = submission.id;
-    reviewingIds.value = new Set(reviewingIds.value).add(id);
+    const submissionId = submission.id;
+    reviewingIds.value = new Set(reviewingIds.value).add(submissionId);
 
     const clearReviewing = (): void => {
         const next = new Set(reviewingIds.value);
-        next.delete(id);
+        next.delete(submissionId);
         reviewingIds.value = next;
     };
 
@@ -440,8 +440,8 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
                     isLoadingSubmissions.value = true;
                 },
                 onSuccess: () => {
-                    const next = (props.submissions ?? []).find((s) => s.id === id) ?? null;
-                    if (next && selectedSubmission.value?.id === id) {
+                    const next = (props.submissions ?? []).find((s) => s.id === submissionId) ?? null;
+                    if (next && selectedSubmission.value?.id === submissionId) {
                         selectedSubmission.value = next;
                     }
                 },

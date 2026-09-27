@@ -71,17 +71,17 @@ const features: IFeature[] = [
 
 const visible = ref(false);
 onMounted(() => {
-    const obs = new IntersectionObserver(
+    const revealObserver = new IntersectionObserver(
         ([e]) => {
             if (e?.isIntersecting) {
                 visible.value = true;
-                obs.disconnect();
+                revealObserver.disconnect();
             }
         },
         { threshold: 0.08 }
     );
     const el = document.getElementById('section-features');
-    if (el) obs.observe(el);
+    if (el) revealObserver.observe(el);
 });
 </script>
 
