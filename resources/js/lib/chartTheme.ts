@@ -12,8 +12,8 @@ const CHART_TOOLTIP_BG_LIGHT = 'oklch(0.18 0.018 255)';
 /** Teks tooltip; dipakai CategoryChart dan RegistrationChart. */
 const CHART_TOOLTIP_FG_LIGHT = 'oklch(0.99 0 0)';
 
-/** Family font chart dashboard; satu-satunya sumber literal Poppins tooltip. */
-const CHART_FONT_FAMILY = 'Poppins, sans-serif';
+/** Family font chart dashboard; sumber literal Poppins tooltip dan palet chart lain. */
+export const CHART_FONT_FAMILY = 'Poppins, sans-serif';
 
 /** Ukuran font judul tooltip chart dashboard. */
 const CHART_TOOLTIP_TITLE_SIZE = 12;
