@@ -7,7 +7,8 @@
         "dev": "vite",
         "lint": "eslint \"resources/js/**/*.{ts,vue}\"",
         "lint:fix": "eslint \"resources/js/**/*.{ts,vue}\" --fix",
-        "test": "vitest run"
+        "test": "vitest run",
+        "typecheck": "vue-tsc --noEmit"
     },
     "devDependencies": {
         "@laravel/vite-plugin-wayfinder": "^0.1.7",
@@ -31,7 +32,8 @@
         "typescript-eslint": "^8.57.2",
         "vite": "^7.0.7",
         "vite-plugin-eslint2": "^5.1.0",
-        "vitest": "^5.0.1"
+        "vitest": "^5.0.1",
+        "vue-tsc": "3.3.11"
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.3.18",
