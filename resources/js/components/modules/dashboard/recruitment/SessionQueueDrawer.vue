@@ -8,6 +8,7 @@ import {
 } from '@/hooks/useRecruitmentQueue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { padQueueNumber } from '@/lib/format'
+import { FORM_SHEET_FOOTER_CLASS, FORM_SHEET_HEADER_CLASS } from './formSheetClasses'
 
 const props = defineProps<{
     pollUrl: string
@@ -80,7 +81,7 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
 
 <template>
     <div class="flex min-h-0 flex-1 flex-col">
-        <SheetHeader class="shrink-0 space-y-1 border-b border-border/70 py-4 pr-12 pl-4 text-left">
+        <SheetHeader :class="FORM_SHEET_HEADER_CLASS">
             <SheetTitle class="text-base">Antrean sesi</SheetTitle>
             <SheetDescription class="truncate text-xs text-muted-foreground">
                 {{ sessionSubtitle }}
@@ -213,7 +214,7 @@ const statItems = computed<StatItem[]>((): StatItem[] => [
             </template>
         </div>
 
-        <SheetFooter class="shrink-0 border-t border-border/70 py-3">
+        <SheetFooter :class="FORM_SHEET_FOOTER_CLASS">
             <p class="text-xs text-muted-foreground">Memperbarui otomatis setiap 10 detik</p>
         </SheetFooter>
     </div>

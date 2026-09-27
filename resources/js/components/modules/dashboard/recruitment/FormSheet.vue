@@ -29,12 +29,14 @@ withDefaults(
 <template>
     <Sheet v-model:open="open">
         <SheetContent side="right" :class="formSheetContentClass(size)" :overlay-class="FORM_SHEET_OVERLAY_CLASS">
-            <SheetHeader v-if="title || description || $slots.actions" :class="FORM_SHEET_HEADER_CLASS">
-                <SheetTitle v-if="title" class="truncate text-base">{{ title }}</SheetTitle>
-                <SheetDescription v-if="description" class="text-muted-foreground truncate text-xs">
-                    {{ description }}
-                </SheetDescription>
-                <slot name="actions" />
+            <!-- Slot `#header`: isi header penuh, menggantikan `title`/`description` untuk header dinamis. -->
+            <SheetHeader v-if="$slots.header || title || description" :class="FORM_SHEET_HEADER_CLASS">
+                <slot name="header">
+                    <SheetTitle v-if="title" class="truncate text-base">{{ title }}</SheetTitle>
+                    <SheetDescription v-if="description" class="text-muted-foreground truncate text-xs">
+                        {{ description }}
+                    </SheetDescription>
+                </slot>
             </SheetHeader>
 
             <slot />

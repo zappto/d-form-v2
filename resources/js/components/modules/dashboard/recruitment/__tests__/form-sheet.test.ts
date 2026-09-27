@@ -13,7 +13,7 @@ import {
 
 /**
  * DFORM-35 F1: shell `FormSheet`. Kelas shell (prefix + lebar, overlay, header, footer)
- * satu sumber di `formSheetClasses.ts`; slot `#actions`/`#footer` opsional; isi default
+ * satu sumber di `formSheetClasses.ts`; slot `#header`/`#footer` opsional; isi default
  * dirender langsung di dalam `SheetContent` (tanpa wrapper); `v-model:open` transparan.
  */
 
@@ -147,32 +147,35 @@ describe('FormSheet shell (primitif ui/sheet asli)', () => {
         expect(header.textContent).toContain('Daftar divisi open recruitment');
     });
 
-    it('header absen tanpa title, description, dan #actions', async () => {
+    it('header absen tanpa title, description, dan #header', async () => {
         mountSheet({ open: true }, { default: '<div data-testid="body">Isi</div>' });
         await nextTick();
 
         expect(document.body.querySelector('[data-slot="sheet-header"]')).toBeNull();
     });
 
-    it('slot #actions saja memunculkan header dan dirender di dalamnya', async () => {
-        mountSheet({ open: true }, { actions: '<button data-testid="action">Verifikasi</button>' });
-        await nextTick();
-
-        const header = requireElement('[data-slot="sheet-header"]');
-        expect(header.querySelector('[data-testid="action"]')).not.toBeNull();
-        expect(header.textContent).toContain('Verifikasi');
-    });
-
-    it('title + #actions dirender di dalam header yang sama', async () => {
+    it('slot #header menggantikan fallback title/description di dalam SheetHeader kanonik', async () => {
         mountSheet(
-            { open: true, title: 'Detail peserta' },
-            { actions: '<button data-testid="action">Terima</button>' }
+            { open: true, title: 'Judul prop', description: 'Deskripsi prop' },
+            { header: '<div data-testid="header">Header dinamis</div>' }
         );
         await nextTick();
 
         const header = requireElement('[data-slot="sheet-header"]');
-        expect(header.textContent).toContain('Detail peserta');
-        expect(header.querySelector('[data-testid="action"]')).not.toBeNull();
+        expect(hasAllClasses(header, HEADER_TOKENS)).toBe(true);
+        expect(header.querySelector('[data-testid="header"]')).not.toBeNull();
+        expect(header.textContent).toContain('Header dinamis');
+        expect(header.textContent).not.toContain('Judul prop');
+        expect(header.textContent).not.toContain('Deskripsi prop');
+    });
+
+    it('slot #header tanpa props tetap memunculkan SheetHeader kanonik', async () => {
+        mountSheet({ open: true }, { header: '<div data-testid="header">Hanya header</div>' });
+        await nextTick();
+
+        const header = requireElement('[data-slot="sheet-header"]');
+        expect(hasAllClasses(header, HEADER_TOKENS)).toBe(true);
+        expect(header.textContent).toContain('Hanya header');
     });
 
     it('slot #footer dirender di dalam SheetFooter dengan kelas kanonik', async () => {

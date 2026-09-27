@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import SessionQueueDrawer from '@/components/modules/dashboard/recruitment/SessionQueueDrawer.vue'
+import FormSheet from '@/components/modules/dashboard/recruitment/FormSheet.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,7 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { CometSpinner } from '@/components/ui/comet'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { handleInertiaFormErrors } from '@/lib/error-message'
 import { formatBytes, padQueueNumber } from '@/lib/format'
 import { routes } from '@/lib/routes'
@@ -1199,19 +1199,13 @@ function submit(): void {
             </Card>
         </div>
 
-        <Sheet v-model:open="queueDrawerOpen">
-            <SheetContent
-                side="right"
-                overlay-class="bg-black/60 backdrop-blur-sm"
-                class="inset-y-0 right-0 h-full w-full gap-0 p-0 sm:inset-y-3 sm:right-3 sm:h-[calc(100%-1.5rem)] sm:w-[27rem] sm:max-w-[calc(100vw-1.5rem)] sm:rounded-2xl sm:border sm:shadow-xl"
-            >
-                <SessionQueueDrawer
-                    v-if="queuePollUrl !== ''"
-                    :poll-url="queuePollUrl"
-                    :session-date="detail.interview?.session?.session_date ?? null"
-                    :division="detail.interview?.session?.division ?? null"
-                />
-            </SheetContent>
-        </Sheet>
+        <FormSheet v-model:open="queueDrawerOpen">
+            <SessionQueueDrawer
+                v-if="queuePollUrl !== ''"
+                :poll-url="queuePollUrl"
+                :session-date="detail.interview?.session?.session_date ?? null"
+                :division="detail.interview?.session?.division ?? null"
+            />
+        </FormSheet>
     </div>
 </template>
