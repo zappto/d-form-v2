@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import FormSheet from './FormSheet.vue'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { Button } from '@/components/ui/button'
 import { CometSpinner } from '@/components/ui/comet'
 import { Input } from '@/components/ui/input'
@@ -132,9 +133,9 @@ function saveDivision(division: DashboardDivision): void {
                 </template>
             </div>
 
-            <p v-if="divisions.length === 0" class="text-muted-foreground px-4 py-10 text-center text-sm">
-                Belum ada data divisi.
-            </p>
+            <div v-if="divisions.length === 0" class="px-4 py-10">
+                <EmptyState variant="inline" title="Belum ada data divisi." />
+            </div>
         </div>
     </FormSheet>
 </template>

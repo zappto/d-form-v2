@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import axios from 'axios'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -237,7 +238,7 @@ const statusVariant = (status: string) => {
                         {{ actionBusy ? 'Memproses...' : 'Tandai selesai' }}
                     </Button>
                 </template>
-                <p v-else class="text-muted-foreground text-sm">Belum ada yang dipanggil.</p>
+                <EmptyState v-else variant="inline" title="Belum ada yang dipanggil." />
             </CardContent>
         </Card>
 
@@ -249,7 +250,7 @@ const statusVariant = (status: string) => {
                     <p class="font-medium">{{ queue.next.application?.full_name }}</p>
                     <p class="text-muted-foreground text-sm">{{ queue.next.application?.registration_number }}</p>
                 </template>
-                <p v-else class="text-muted-foreground text-sm">Antrean kosong.</p>
+                <EmptyState v-else variant="inline" title="Antrean kosong." />
             </CardContent>
         </Card>
     </div>
@@ -294,7 +295,9 @@ const statusVariant = (status: string) => {
                             </td>
                         </tr>
                         <tr v-if="queue.entries.length === 0">
-                            <td colspan="4" class="text-muted-foreground py-6 text-center">Belum ada check-in.</td>
+                            <td colspan="4" class="py-6">
+                                <EmptyState variant="inline" title="Belum ada check-in." />
+                            </td>
                         </tr>
                     </tbody>
                 </table>

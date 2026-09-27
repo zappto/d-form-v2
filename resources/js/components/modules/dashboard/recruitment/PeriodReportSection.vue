@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { routes } from '@/lib/routes'
 import { Download, Funnel, GraduationCap, Users } from 'lucide-vue-next'
@@ -136,7 +137,7 @@ const maxFunnel = computed(() =>
                             <span class="font-medium tabular-nums">{{ row.count }}</span>
                         </div>
                     </div>
-                    <p v-else class="text-muted-foreground">Belum ada data.</p>
+                    <EmptyState v-else variant="inline" title="Belum ada data." />
                 </CardContent>
             </Card>
 
@@ -158,7 +159,7 @@ const maxFunnel = computed(() =>
                             <span class="font-medium tabular-nums">{{ row.count }}</span>
                         </div>
                     </div>
-                    <p v-else class="text-muted-foreground">Belum ada data.</p>
+                    <EmptyState v-else variant="inline" title="Belum ada data." />
                 </CardContent>
             </Card>
         </div>

@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue'
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -526,8 +527,11 @@ function submitReject(): void {
                                 </td>
                             </tr>
                             <tr v-if="pagedRows.length === 0">
-                                <td colspan="7" class="text-muted-foreground px-4 py-10 text-center">
-                                    Belum ada applicant untuk periode ini yang cocok dengan filter.
+                                <td colspan="7" class="px-4 py-10">
+                                    <EmptyState
+                                        variant="inline"
+                                        title="Belum ada applicant untuk periode ini yang cocok dengan filter."
+                                    />
                                 </td>
                             </tr>
                         </tbody>

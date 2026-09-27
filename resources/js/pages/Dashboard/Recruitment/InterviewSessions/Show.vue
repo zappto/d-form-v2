@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import InterviewerCreateSheet from '@/components/modules/dashboard/recruitment/InterviewerCreateSheet.vue'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import { CometSpinner } from '@/components/ui/comet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
@@ -423,9 +424,11 @@ function rescheduleInterview(interviewId: string): void {
                         </div>
                     </div>
                 </div>
-                <p v-if="session.interviews.length === 0" class="text-muted-foreground text-sm">
-                    Belum ada applicant dijadwalkan pada sesi ini.
-                </p>
+                <EmptyState
+                    v-if="session.interviews.length === 0"
+                    variant="inline"
+                    title="Belum ada applicant dijadwalkan pada sesi ini."
+                />
             </CardContent>
         </Card>
 

@@ -6,6 +6,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import PeriodApplicantSection, {
     type ApplicationRow,
 } from '@/components/modules/dashboard/recruitment/PeriodApplicantSection.vue'
+import EmptyState from '@/components/modules/dashboard/EmptyState.vue'
 import PeriodInterviewSection from '@/components/modules/dashboard/recruitment/PeriodInterviewSection.vue'
 import PeriodReportSection from '@/components/modules/dashboard/recruitment/PeriodReportSection.vue'
 import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/ApplicantDetailPanel.vue'
@@ -940,20 +941,12 @@ function closePeriod(): void {
                             </section>
                             </div>
                         </TooltipProvider>
-                        <div
-                            v-else
-                            class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border/80 px-4 py-8 text-center"
-                        >
-                            <span
-                                aria-hidden="true"
-                                class="flex size-10 items-center justify-center rounded-full bg-muted"
-                            >
-                                <UserCheck class="size-5 text-muted-foreground" />
-                            </span>
-                            <p class="text-sm font-medium">Belum ada interviewer yang ditugaskan.</p>
-                            <p class="max-w-sm text-xs leading-relaxed text-muted-foreground">
-                                Pilih interviewer dan divisi di atas untuk menugaskan.
-                            </p>
+                        <div v-else class="px-4 py-8">
+                            <EmptyState
+                                variant="inline"
+                                title="Belum ada interviewer yang ditugaskan."
+                                description="Pilih interviewer dan divisi di atas untuk menugaskan."
+                            />
                         </div>
                     </CardContent>
                 </Card>
