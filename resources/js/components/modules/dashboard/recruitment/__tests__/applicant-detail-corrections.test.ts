@@ -17,7 +17,7 @@ config.global.renderStubDefaultSlot = true
  * biasa yang tidak dibaca usePageFlashToast, preseden Task 4 open/close);
  * gagal → showErrorToast (pola handler tetangga postScreeningReject di file ini).
  * Swap: setujui → 'Menyimpan...' (default, preseden ConfirmationModal non-destruktif);
- * tolak → 'Menghapus...' (destruktif, preseden ConfirmationModal variant destruktif).
+ * tolak → 'Menolak...' (aksi Tolak; sebelumnya salah 'Menghapus...' milik aksi hapus).
  */
 
 const { formHolder, postMock } = vi.hoisted(() => ({
@@ -177,7 +177,7 @@ function approveButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
 }
 
 function rejectButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
-    return correctionButton(wrapper, 'Tolak', 'Menghapus...')
+    return correctionButton(wrapper, 'Tolak', 'Menolak...')
 }
 
 beforeEach(() => {
@@ -269,7 +269,7 @@ describe('ApplicantDetailContent koreksi (Task 7)', () => {
         }
     })
 
-    it("tolak → sibuk (spinner + 'Menghapus...' + disabled + aria-busy) + POST reject", async () => {
+    it("tolak → sibuk (spinner + 'Menolak...' + disabled + aria-busy) + POST reject", async () => {
         const wrapper = mountContent()
         try {
             await rejectButton(wrapper).trigger('click')
@@ -282,7 +282,7 @@ describe('ApplicantDetailContent koreksi (Task 7)', () => {
             expect(btn.attributes('disabled')).not.toBeUndefined()
             expect(btn.attributes('aria-busy')).toBe('true')
             expect(btn.find('[role="status"]').exists()).toBe(true)
-            expect(btn.text()).toContain('Menghapus...')
+            expect(btn.text()).toContain('Menolak...')
         } finally {
             wrapper.unmount()
         }

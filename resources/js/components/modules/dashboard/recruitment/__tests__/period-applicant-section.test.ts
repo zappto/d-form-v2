@@ -13,8 +13,8 @@ config.global.renderStubDefaultSlot = true
  * Spec §3.2/§3.4, Task 7: lulus/tolak applicant —
  * tombol per-baris: spinner saat processingId === id + disabled + aria-busy
  * (icon-only, tanpa swap teks); modal pass sudah wired Task 3 (:loading);
- * submit tolak: spinner + swap 'Menghapus...' (destruktif, preseden ConfirmationModal
- * variant destruktif) + disabled + aria-busy.
+ * submit tolak: spinner + swap 'Menolak...' (aksi Tolak; sebelumnya salah pakai
+ * 'Menghapus...' milik aksi hapus) + disabled + aria-busy.
  * Sukses → showFlashToast manual dengan copy verbatim server
  * (RecruitmentScreeningController::pass/reject memakai ->with('message') sesi biasa
  * yang tidak dibaca usePageFlashToast, preseden Task 4 open/close) — bukan copy
@@ -148,7 +148,7 @@ function rejectDialog(wrapper: VueWrapper): VueWrapper {
 function rejectSubmitButton(wrapper: VueWrapper): DOMWrapper<HTMLButtonElement> {
     const found = wrapper
         .findAll('button')
-        .find((b) => b.text().includes('Tolak applicant') || b.text().includes('Menghapus...'))
+        .find((b) => b.text().includes('Tolak applicant') || b.text().includes('Menolak...'))
     if (!found) throw new Error('tombol submit tolak tidak ditemukan')
     return found as DOMWrapper<HTMLButtonElement>
 }
@@ -299,7 +299,7 @@ describe('PeriodApplicantSection reject (Task 7)', () => {
         }
     })
 
-    it("submit tolak → sibuk (spinner + 'Menghapus...' + disabled + aria-busy) + POST reject", async () => {
+    it("submit tolak → sibuk (spinner + 'Menolak...' + disabled + aria-busy) + POST reject", async () => {
         const wrapper = mountSection()
         try {
             await openRejectWithReason(wrapper)
@@ -314,7 +314,7 @@ describe('PeriodApplicantSection reject (Task 7)', () => {
             expect(btn.attributes('disabled')).not.toBeUndefined()
             expect(btn.attributes('aria-busy')).toBe('true')
             expect(btn.find('[role="status"]').exists()).toBe(true)
-            expect(btn.text()).toContain('Menghapus...')
+            expect(btn.text()).toContain('Menolak...')
             expect(btn.text()).not.toContain('…')
         } finally {
             wrapper.unmount()

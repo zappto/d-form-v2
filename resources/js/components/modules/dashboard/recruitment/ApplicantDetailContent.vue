@@ -1052,7 +1052,7 @@ const defaultTab = computed(() => {
                                     @click="rejectCorrection(correction.id)"
                                 >
                                     <CometSpinner v-if="reviewingCorrectionId === correction.id" :size="16" />
-                                    {{ reviewingCorrectionId === correction.id ? 'Menghapus...' : 'Tolak' }}
+                                    {{ reviewingCorrectionId === correction.id ? 'Menolak...' : 'Tolak' }}
                                 </Button>
                             </div>
                         </div>

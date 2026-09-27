@@ -722,7 +722,7 @@ function submitReject(): void {
                             :aria-busy="rejectForm.processing"
                         >
                             <CometSpinner v-if="rejectForm.processing" :size="16" />
-                            {{ rejectForm.processing ? 'Menghapus...' : 'Tolak applicant' }}
+                            {{ rejectForm.processing ? 'Menolak...' : 'Tolak applicant' }}
                         </Button>
                     </DialogFooter>
                 </form>
