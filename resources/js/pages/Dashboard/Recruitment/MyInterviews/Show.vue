@@ -191,8 +191,8 @@ const form = useForm({
 });
 
 function scoreValue(field: TScoreField): number {
-    const raw: unknown = form[field];
-    const parsed: number = typeof raw === 'number' ? raw : Number.parseInt(String(raw ?? ''), 10);
+    const raw: number | string = form[field];
+    const parsed: number = typeof raw === 'number' ? raw : Number.parseInt(String(raw), 10);
     return Number.isFinite(parsed) ? clampScore(parsed) : SCORE_DEFAULT;
 }
 

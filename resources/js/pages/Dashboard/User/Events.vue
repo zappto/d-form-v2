@@ -35,7 +35,7 @@ const categoryFilterOptions = computed(() => [{ value: 'all', label: 'Semua kate
 const sessionOptions = computed(() => {
     const tokens = new Set<string>();
     for (const event of props.events ?? []) {
-        for (const session of eventTokenList(event.session)) tokens.add(session);
+        for (const session of toCategoryList(event.session)) tokens.add(session);
     }
     return [...tokens]
         .sort((a, b) => (sessionLabelMap[a] ?? a).localeCompare(sessionLabelMap[b] ?? b))
@@ -43,16 +43,6 @@ const sessionOptions = computed(() => {
 });
 
 const sessionFilterOptions = computed(() => [{ value: 'all', label: 'Semua sesi' }, ...sessionOptions.value]);
-
-function eventTokenList(v: unknown): string[] {
-    if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
-    if (typeof v === 'string')
-        return v
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean);
-    return [];
-}
 
 const hasActiveFilters = computed(() => filterCategory.value !== 'all' || filterSession.value !== 'all');
 
@@ -76,7 +66,7 @@ const filteredEvents = computed(() => {
     if (filterCategory.value !== 'all')
         list = list.filter((e) => toCategoryList(e.category).includes(filterCategory.value));
     if (filterSession.value !== 'all')
-        list = list.filter((e) => eventTokenList(e.session).includes(filterSession.value));
+        list = list.filter((e) => toCategoryList(e.session).includes(filterSession.value));
     return list;
 });
 

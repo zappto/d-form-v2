@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, type ComponentPublicInstance } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
@@ -82,8 +82,8 @@ const emit = defineEmits<{
 const rowRefs = ref<Record<string, HTMLElement | null>>({});
 let lastSelectedId: string | null = null;
 
-function setRowRef(id: string, el: unknown): void {
-    rowRefs.value[id] = (el as HTMLElement | null) ?? null;
+function setRowRef(id: string, el: Element | ComponentPublicInstance | null): void {
+    rowRefs.value[id] = el instanceof HTMLElement ? el : null;
 }
 
 const rowIds = computed<string[]>(() => pagedRows.value.map((row) => row.id));

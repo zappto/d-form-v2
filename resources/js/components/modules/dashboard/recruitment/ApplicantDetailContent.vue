@@ -21,6 +21,7 @@ import { formatBytes, formatSubmissionDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { showErrorToast, showFlashToast } from '@/lib/error-message';
 import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
+import type { TFormFieldMetadataValue } from '@/types/form';
 import useAuth from '@/hooks/useAuth';
 import {
     CheckCircle2,
@@ -34,6 +35,12 @@ import {
     User,
     XCircle,
 } from 'lucide-vue-next';
+
+/** Nilai tunggal payload diff koreksi activity log backend (JSON-like rekursif), diturunkan dari union JSON bersama. */
+type TApplicantCorrectionValue = TFormFieldMetadataValue;
+
+/** Peta payload diff koreksi (`old_values`/`new_values`): kunci field → nilai JSON-like. */
+type TApplicantCorrectionMap = Record<string, TApplicantCorrectionValue>;
 
 type TFinalAction = 'accept' | 'reject' | null;
 
@@ -53,8 +60,8 @@ interface IScreeningRow {
 interface IActivityRow {
     id: string;
     action: string;
-    old_values: Record<string, unknown> | null;
-    new_values: Record<string, unknown> | null;
+    old_values: TApplicantCorrectionMap | null;
+    new_values: TApplicantCorrectionMap | null;
     created_at: string | null;
     actor: { id: string; name: string } | null;
 }
