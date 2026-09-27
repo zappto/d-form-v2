@@ -103,7 +103,7 @@ interface FilterOption {
     label: string
 }
 
-interface InterviewFilterParams {
+type InterviewFilterParams = {
     q?: string
     division_id?: string
     session_id?: string

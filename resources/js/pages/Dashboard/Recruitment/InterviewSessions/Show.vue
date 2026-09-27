@@ -97,8 +97,10 @@ const allSelected = computed({
 })
 
 function scheduleSelected() {
+    const currentSession = props.session
+    if (!currentSession) return
     scheduleForm.application_ids = selectedApplicants.value
-    scheduleForm.post(routes.admin.recruitment.interviewSessions.schedule(props.session.id), {
+    scheduleForm.post(routes.admin.recruitment.interviewSessions.schedule(currentSession.id), {
         preserveScroll: true,
         onSuccess: () => {
             selectedApplicants.value = []

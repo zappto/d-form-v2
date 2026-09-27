@@ -278,9 +278,9 @@ const cvMetaLabel = computed<string>(() => {
 const cvAvailable = computed<boolean>(() => cvPreviewUrl.value !== null || cvDownloadUrl.value !== null)
 
 const portfolioExternalUrl = computed<string | null>(() => {
-    const documents = props.detail?.documents
-    if (documents.portfolio_is_url === false) return null
-    return isFilled(documents.portfolio_url) ? documents.portfolio_url : null
+    if (props.detail?.documents.portfolio_is_url === false) return null
+    const url = props.detail?.documents?.portfolio_url
+    return isFilled(url) ? url : null
 })
 
 const portfolioPreviewUrl = computed<string | null>(() => {

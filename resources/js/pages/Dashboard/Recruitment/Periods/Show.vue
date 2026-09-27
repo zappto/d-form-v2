@@ -3,7 +3,9 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import PeriodApplicantSection from '@/components/modules/dashboard/recruitment/PeriodApplicantSection.vue'
+import PeriodApplicantSection, {
+    type ApplicationRow,
+} from '@/components/modules/dashboard/recruitment/PeriodApplicantSection.vue'
 import PeriodInterviewSection from '@/components/modules/dashboard/recruitment/PeriodInterviewSection.vue'
 import PeriodReportSection from '@/components/modules/dashboard/recruitment/PeriodReportSection.vue'
 import ApplicantDetailPanel from '@/components/modules/dashboard/recruitment/ApplicantDetailPanel.vue'
@@ -53,22 +55,6 @@ interface Period {
     interview_ends_at: string | null
     finalization_deadline_at: string | null
     applications_count: number
-}
-
-interface ApplicationRow {
-    id: string
-    registration_number: string
-    full_name: string
-    nim: string
-    semester: number
-    stage: string
-    stage_label: string
-    result: string
-    result_label: string
-    revision_required: boolean
-    submitted_at: string | null
-    primary_division: { id: string; name: string } | null
-    period: { id: string; name: string } | null
 }
 
 interface SessionRow {

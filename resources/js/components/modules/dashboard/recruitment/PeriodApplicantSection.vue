@@ -21,7 +21,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { handleInertiaFormErrors, showErrorToast, showFlashToast } from '@/lib/error-message'
 import { routes } from '@/lib/routes'
 
-interface ApplicationRow {
+/** Satu-satunya definisi baris aplikan periode; diimpor oleh Periods/Show.vue. */
+export interface ApplicationRow {
     id: string
     registration_number: string
     full_name: string
@@ -306,6 +307,19 @@ const rejectForm = useForm({
     reason: '',
     notes: '',
     public_message: '',
+})
+
+/**
+ * Membaca pesan error non-field (mis. `application` dari ScreeningService) yang
+ * bukan kunci form sehingga tidak tercakup tipe FormDataErrors.
+ */
+function crossCuttingError(errors: Record<string, string>, key: string): string | undefined {
+    return errors[key]
+}
+
+const rejectApplicationError = computed<string | null>(() => {
+    const message = crossCuttingError(rejectForm.errors, 'application')
+    return message !== undefined && message.length > 0 ? message : null
 })
 
 function openPass(row: ApplicationRow): void {
@@ -707,8 +721,8 @@ function submitReject(): void {
                     <p v-if="rejectLocalError" class="text-destructive text-xs">
                         {{ rejectLocalError }}
                     </p>
-                    <p v-if="rejectForm.errors.application" class="text-destructive text-xs">
-                        {{ rejectForm.errors.application }}
+                    <p v-if="rejectApplicationError" class="text-destructive text-xs">
+                        {{ rejectApplicationError }}
                     </p>
 
                     <DialogFooter>
