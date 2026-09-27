@@ -318,9 +318,7 @@ const toolbarGroups: ToolbarTool[][] = [
 </script>
 
 <template>
-    <div
-        class="overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
-    >
+    <div class="overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04]">
         <div
             v-if="editor"
             class="flex flex-wrap items-center gap-2 border-b border-border/60 bg-gradient-to-b from-muted/45 via-muted/25 to-muted/10 px-2 py-2 md:px-3"

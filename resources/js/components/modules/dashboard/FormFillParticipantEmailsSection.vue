@@ -292,9 +292,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <section
-        class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm ring-1 ring-black/[0.04] dark:bg-card/95 dark:ring-white/[0.05]"
-    >
+    <section class="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm ring-1 ring-black/[0.04]">
         <header class="border-b border-border/70 bg-muted/25 px-4 py-3.5 sm:px-5 sm:py-4">
             <h2 class="font-display text-sm font-semibold tracking-tight text-foreground sm:text-base">
                 {{ sectionTitle }}
@@ -334,24 +332,14 @@ onBeforeUnmount(() => {
                             <Badge
                                 v-if="statusFor(slot) === 'valid'"
                                 variant="secondary"
-                                :class="
-                                    cn(
-                                        badgeClass,
-                                        'border-emerald-500/30 bg-emerald-500/12 text-emerald-800 dark:text-emerald-200'
-                                    )
-                                "
+                                :class="cn(badgeClass, 'border-emerald-500/30 bg-emerald-500/12 text-emerald-800')"
                             >
                                 Valid
                             </Badge>
                             <Badge
                                 v-else-if="statusFor(slot) === 'found'"
                                 variant="secondary"
-                                :class="
-                                    cn(
-                                        badgeClass,
-                                        'border-emerald-500/30 bg-emerald-500/12 text-emerald-800 dark:text-emerald-200'
-                                    )
-                                "
+                                :class="cn(badgeClass, 'border-emerald-500/30 bg-emerald-500/12 text-emerald-800')"
                             >
                                 Verified
                             </Badge>
@@ -389,7 +377,7 @@ onBeforeUnmount(() => {
                         />
                         <CheckCircle2
                             v-else-if="statusFor(slot) === 'found' || statusFor(slot) === 'valid'"
-                            class="size-[18px] text-emerald-600 dark:text-emerald-400"
+                            class="size-[18px] text-emerald-600"
                             aria-hidden="true"
                         />
                         <XCircle
@@ -443,7 +431,7 @@ onBeforeUnmount(() => {
                                     <CheckCircle2
                                         v-else-if="statusFor(slot) === 'found' || statusFor(slot) === 'valid'"
                                         key="ok"
-                                        class="size-5 text-emerald-600 dark:text-emerald-400"
+                                        class="size-5 text-emerald-600"
                                     />
                                     <XCircle
                                         v-else-if="
@@ -488,11 +476,11 @@ onBeforeUnmount(() => {
                         >
                             <div
                                 v-if="!isBundleMode && statusFor(slot) === 'found' && foundUserBySlot[slot]"
-                                class="mt-3 overflow-hidden rounded-lg border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.09] to-emerald-500/[0.02] px-3 py-3 dark:from-emerald-950/40 dark:to-transparent"
+                                class="mt-3 overflow-hidden rounded-lg border border-emerald-500/20 bg-gradient-to-br from-emerald-500/[0.09] to-emerald-500/[0.02] px-3 py-3"
                             >
                                 <div class="flex gap-3">
                                     <div
-                                        class="grid size-10 shrink-0 place-items-center rounded-full border border-emerald-500/25 bg-background/90 text-emerald-700 shadow-xs dark:text-emerald-300"
+                                        class="grid size-10 shrink-0 place-items-center rounded-full border border-emerald-500/25 bg-background/90 text-emerald-700 shadow-xs"
                                     >
                                         <UserRound class="size-4" aria-hidden="true" />
                                     </div>

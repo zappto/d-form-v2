@@ -183,7 +183,7 @@ const legendEntries = computed(() =>
 </script>
 
 <template>
-    <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]">
+    <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03]">
         <CardHeader class="space-y-0 border-b border-border/50 bg-muted/10 p-0">
             <div
                 class="flex flex-col gap-2.5 px-4 py-3 sm:gap-3 sm:px-5 sm:py-4 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between"

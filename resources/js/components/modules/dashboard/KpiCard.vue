@@ -33,7 +33,7 @@ const colorClasses = computed(() => {
     <Card
         :class="
             cn(
-                'rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] transition-all duration-500 dark:ring-white/[0.06]',
+                'rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] transition-all duration-500',
                 visible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
             )
         "

@@ -26,7 +26,7 @@ const formFilterOptions = computed<SearchableSelectOption[]>(() => [
 </script>
 
 <template>
-    <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]">
+    <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03]">
         <CardHeader class="pb-3">
             <CardTitle class="text-base font-medium">Filter dan pencarian</CardTitle>
             <CardDescription class="text-sm">

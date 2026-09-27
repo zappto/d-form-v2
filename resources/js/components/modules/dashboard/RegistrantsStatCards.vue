@@ -28,7 +28,7 @@ const emit = defineEmits<{
             :class="
                 cn(
                     'cursor-pointer rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] transition-colors',
-                    'hover:bg-muted/25 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:ring-white/[0.06]',
+                    'hover:bg-muted/25 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
                     activeStatusTab === stat.key && 'border-primary/30 bg-primary/[0.04] ring-2 ring-primary/25'
                 )
             "

@@ -307,7 +307,7 @@ const hasAdvancedFlags = computed(() => !['heading', 'paragraph', 'divider', 'ba
                     1200 x 900
                 </span>
                 <span
-                    class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300"
+                    class="rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
                 >
                     area tengah aman
                 </span>

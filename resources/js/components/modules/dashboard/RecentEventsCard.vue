@@ -32,7 +32,7 @@ const baseHref = computed(() => props.eventBaseHref ?? routes.admin.events.index
 </script>
 
 <template>
-    <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03] dark:ring-white/[0.06]">
+    <Card class="rounded-2xl border-border/70 shadow-sm ring-1 ring-black/[0.03]">
         <CardHeader class="flex flex-row items-start justify-between gap-3 space-y-0 pb-3">
             <div>
                 <CardTitle class="font-display text-lg font-bold tracking-[-0.02em]">Acara terbaru</CardTitle>

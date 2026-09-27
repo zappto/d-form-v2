@@ -135,7 +135,7 @@ const isPdfPreview = computed((): boolean => {
 
 const attachmentCardClass = cn(
     'overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm',
-    'ring-1 ring-black/[0.04] dark:ring-white/[0.06]'
+    'ring-1 ring-black/[0.04]'
 );
 
 const attachmentToolbarClass = cn(
@@ -238,7 +238,7 @@ const attachmentKindLabel = computed((): string => {
                 <div :class="attachmentToolbarClass">
                     <div class="flex min-w-0 items-center gap-3">
                         <div
-                            class="grid size-10 shrink-0 place-items-center rounded-full bg-emerald-500/[0.12] text-emerald-700 dark:text-emerald-400"
+                            class="grid size-10 shrink-0 place-items-center rounded-full bg-emerald-500/[0.12] text-emerald-700"
                             aria-hidden="true"
                         >
                             <FileImage class="size-5" stroke-width="2" />
@@ -271,7 +271,7 @@ const attachmentKindLabel = computed((): string => {
                     <img
                         :src="publicFileUrl"
                         alt=""
-                        class="mx-auto max-h-[min(15rem,44vh)] max-w-full rounded-lg object-contain shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:opacity-[0.98] dark:ring-white/10"
+                        class="mx-auto max-h-[min(15rem,44vh)] max-w-full rounded-lg object-contain shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:opacity-[0.98]"
                         loading="lazy"
                     />
                 </button>
@@ -282,7 +282,7 @@ const attachmentKindLabel = computed((): string => {
                 <div :class="attachmentToolbarClass">
                     <div class="flex min-w-0 items-center gap-3">
                         <div
-                            class="grid size-10 shrink-0 place-items-center rounded-full bg-rose-500/[0.11] text-rose-700 dark:text-rose-300"
+                            class="grid size-10 shrink-0 place-items-center rounded-full bg-rose-500/[0.11] text-rose-700"
                             aria-hidden="true"
                         >
                             <FileText class="size-5" stroke-width="2" />
@@ -320,9 +320,7 @@ const attachmentKindLabel = computed((): string => {
                     </div>
                 </div>
                 <div class="bg-muted/20 p-3 sm:p-4">
-                    <div
-                        class="overflow-hidden rounded-xl bg-background shadow-inner ring-1 ring-border/50 dark:bg-background/80"
-                    >
+                    <div class="overflow-hidden rounded-xl bg-background shadow-inner ring-1 ring-border/50">
                         <iframe
                             :src="publicFileUrl"
                             title="Pratinjau PDF"
