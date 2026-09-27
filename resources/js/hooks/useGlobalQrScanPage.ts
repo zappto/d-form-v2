@@ -2,7 +2,7 @@ import { computed, ref } from 'vue';
 import { useErrorToast } from './useErrorToast';
 import { useQrCamera } from '@/hooks/useQrCamera';
 import { useQrFeed, type TQrScanSource } from '@/hooks/useQrFeed';
-import type { TIScanEntry, TIScanResult } from '@/lib/qrScanUi';
+import type { IScanEntry, IScanResult } from '@/lib/qrScanUi';
 
 export interface IGlobalScanSessionTarget {
     id: string;
@@ -174,7 +174,7 @@ export function useGlobalQrScanPage(
      * kembali ke seluruh riwayat. Pencarian `logQuery` tetap diterapkan terpisah di
      * QrScanSidebar sehingga filter acara dan pencarian bisa dipakai bersamaan.
      */
-    const targetEntries = computed<TIScanEntry[]>(() => {
+    const targetEntries = computed<IScanEntry[]>(() => {
         const option = selectedTargetOption.value;
         if (option === null) {
             return feed.scanHistory.value;
@@ -201,9 +201,9 @@ export function useGlobalQrScanPage(
         });
     });
 
-    const logEntries = computed<TIScanEntry[]>(() => targetEntries.value);
+    const logEntries = computed<IScanEntry[]>(() => targetEntries.value);
 
-    const todayEntries = computed<TIScanEntry[]>(() => targetEntries.value.filter((entry) => feed.isTodayEntry(entry)));
+    const todayEntries = computed<IScanEntry[]>(() => targetEntries.value.filter((entry) => feed.isTodayEntry(entry)));
     const successfulScansCount = computed(
         () => todayEntries.value.filter((entry) => entry.status === 'success').length
     );
@@ -223,7 +223,7 @@ export function useGlobalQrScanPage(
      * target dipilih, hero menampilkan scan terakhir yang cocok target tersebut
      * (bisa null meski ada scan lain di acara lain).
      */
-    const heroResult = computed<TIScanResult | null>(() => {
+    const heroResult = computed<IScanResult | null>(() => {
         if (selectedTargetOption.value === null) {
             return feed.scanResult.value;
         }

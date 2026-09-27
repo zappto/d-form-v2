@@ -334,7 +334,7 @@ export function useFormFillPage(props: {
     function submit() {
         if (isBlocked.value) return;
 
-        const myEmail = (page.props as ITProps).auth?.user?.email?.trim().toLowerCase();
+        const myEmail = (page.props as TProps).auth?.user?.email?.trim().toLowerCase();
         if (myEmail && props.memberSlots > 0) {
             const emails = (answerForm.team_member_emails as string[] | undefined) ?? [];
             const clash = emails.some((e) => (e?.trim().toLowerCase() ?? '') === myEmail);

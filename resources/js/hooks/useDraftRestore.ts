@@ -3,7 +3,7 @@ import { RESPONDENT_DRAFT_DEBOUNCE_MS } from '@/lib/debounce';
 import { formatSavedTimeLabel } from '@/lib/format';
 import type { TFormFillAnswerMap } from '@/types/form';
 import { snapshotRespondentValues, useRespondentDraft, type IUseRespondentDraftResult } from './useRespondentDraft';
-import type { AutosaveStatus } from './useAutosaveSync';
+import type { TAutosaveStatus } from './useAutosaveSync';
 
 /** Snapshot draft tersimpan untuk form tanpa field ekstra: peta jawaban responden. */
 export interface IDraftValuesSnapshot {
@@ -19,7 +19,7 @@ export interface IDraftRestoreArgs {
 
 /** Hasil useDraftRestore: status, label jam, clear saat sukses, flush sebelum submit. */
 export interface IDraftRestoreResult {
-    status: Ref<AutosaveStatus>;
+    status: Ref<TAutosaveStatus>;
     lastSavedAt: Ref<Date | null>;
     savedTimeLabel: ComputedRef<string>;
     clear: () => void;

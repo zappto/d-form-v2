@@ -55,7 +55,7 @@ declare global {
     };
 
     type User = IUser;
-    type ITProps = TPageProps;
+    type TProps = TPageProps;
 }
 
 declare module '@inertiajs/core' {

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import type { UnwrapNestedRefs } from 'vue';
 import { Star, ImagePlus, Upload, X } from 'lucide-vue-next';
 import type { TFormFillPageContext } from '@/hooks/useFormFillPage';
@@ -86,9 +86,9 @@ function fillReady(): boolean {
 }
 
 /** Option rows as SearchableSelect options; value mirrors the label so stored answers stay labels. */
-const selectOptions = computed<SearchableSelectOption[]>(() =>
+const selectOptions = computed<TSearchableSelectOption[]>(() =>
     props.ctx.getOptionRows(props.field).map(
-        (row: TFormFillOptionRow): SearchableSelectOption => ({
+        (row: TFormFillOptionRow): TSearchableSelectOption => ({
             value: row.label,
             label: row.label,
             imageSrc: row.type === 'image' ? row.imageSrc : undefined,

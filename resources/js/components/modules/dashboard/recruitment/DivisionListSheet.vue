@@ -13,7 +13,7 @@ import { SAVING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors } = useErrorToast();
 
-export interface TIDashboardDivision {
+export interface IDashboardDivision {
     id: string;
     code: string;
     name: string;
@@ -25,7 +25,7 @@ export interface TIDashboardDivision {
 
 const props = defineProps<{
     open: boolean;
-    divisions: TIDashboardDivision[];
+    divisions: IDashboardDivision[];
 }>();
 
 const emit = defineEmits<{ close: [] }>();
@@ -52,7 +52,7 @@ watch(
     }
 );
 
-function startEdit(division: TIDashboardDivision): void {
+function startEdit(division: IDashboardDivision): void {
     editingId.value = division.id;
     editName.value = division.name;
     editIsActive.value = division.is_active;
@@ -63,7 +63,7 @@ function cancelEdit(): void {
     isSaving.value = false;
 }
 
-function saveDivision(division: TIDashboardDivision): void {
+function saveDivision(division: IDashboardDivision): void {
     if (isSaving.value || editName.value.trim() === '') return;
     isSaving.value = true;
     router.put(

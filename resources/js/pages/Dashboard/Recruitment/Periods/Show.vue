@@ -4,7 +4,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import PeriodApplicantSection, {
-    type TApplicationRow,
+    type IApplicationRow,
 } from '@/components/modules/dashboard/recruitment/PeriodApplicantSection.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import PeriodInterviewSection from '@/components/modules/dashboard/recruitment/PeriodInterviewSection.vue';
@@ -20,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { BarChart3, CalendarClock, Plus, Trash2, UserCheck, Users } from 'lucide-vue-next';
@@ -114,7 +114,7 @@ interface InterviewerCandidate {
 const props = withDefaults(
     defineProps<{
         period: IPeriod;
-        applications?: TApplicationRow[] | null;
+        applications?: IApplicationRow[] | null;
         queue_counts: Record<string, number>;
         divisionOptions: { id: string; name: string; code: string }[];
         stageOptions: { value: string; label: string }[];
@@ -211,7 +211,7 @@ const assignedPairKeys = computed<Set<string>>(
     () => new Set(props.assignments.map((a) => `${a.user_id}|${a.division_id}`))
 );
 
-const assignInterviewerOptions = computed<SearchableSelectOption[]>(() =>
+const assignInterviewerOptions = computed<TSearchableSelectOption[]>(() =>
     props.interviewerCandidates.map((u) => {
         const currentDivision: string = assignForm.recruitment_division_id;
         const isTaken: boolean = currentDivision.length > 0 && assignedPairKeys.value.has(`${u.id}|${currentDivision}`);
@@ -225,7 +225,7 @@ const assignInterviewerOptions = computed<SearchableSelectOption[]>(() =>
     })
 );
 
-const assignDivisionOptions = computed<SearchableSelectOption[]>(() =>
+const assignDivisionOptions = computed<TSearchableSelectOption[]>(() =>
     props.divisions.map((d) => {
         const currentUser: string = assignForm.user_id;
         const isTaken: boolean = currentUser.length > 0 && assignedPairKeys.value.has(`${currentUser}|${d.id}`);

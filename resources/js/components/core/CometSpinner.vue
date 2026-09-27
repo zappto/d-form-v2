@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-interface CometSpinnerProps {
+interface ICometSpinnerProps {
     size?: number;
     headScale?: number;
     radiusScale?: number;
     label?: string;
 }
 
-const props = withDefaults(defineProps<CometSpinnerProps>(), {
+const props = withDefaults(defineProps<ICometSpinnerProps>(), {
     size: 16,
     headScale: 0.2,
     radiusScale: 0.83,

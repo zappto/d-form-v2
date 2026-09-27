@@ -3,14 +3,14 @@ import {
     extractQrCandidate,
     parseGlobalScanCursor,
     parseGlobalScanFeedRows,
-    type TIGlobalScanFeedRow,
+    type IGlobalScanFeedRow,
 } from '../qrScanUi';
 
 /** Nilai JSON sembarang dari sumber eksternal; cukup konkret untuk menguji toleransi parser tanpa tipe longgar. */
 type TScanPayloadValue = string | number | boolean | null | TScanPayloadValue[] | { [key: string]: TScanPayloadValue };
 
 /** Bangun baris feed terketik dengan nilai default; dipakai agar ekspektasi fokus ke kolom yang diuji. */
-function feedRow(overrides: Partial<TIGlobalScanFeedRow>): TIGlobalScanFeedRow {
+function feedRow(overrides: Partial<IGlobalScanFeedRow>): IGlobalScanFeedRow {
     return {
         id: '',
         ts: '',
@@ -24,7 +24,7 @@ function feedRow(overrides: Partial<TIGlobalScanFeedRow>): TIGlobalScanFeedRow {
 }
 
 describe('toleransi parser payload QR scan', () => {
-    const feedRowCases: Array<[TScanPayloadValue, TIGlobalScanFeedRow[]]> = [
+    const feedRowCases: Array<[TScanPayloadValue, IGlobalScanFeedRow[]]> = [
         [{}, []],
         [{ rows: {} }, []],
         [{ rows: 'x' }, []],

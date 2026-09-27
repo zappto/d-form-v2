@@ -1,7 +1,7 @@
 import { ref, watch, type Ref } from 'vue';
 import { AUTOSAVE_DEBOUNCE_MS } from '@/lib/debounce';
 
-export type AutosaveStatus = 'idle' | 'saving' | 'saved';
+export type TAutosaveStatus = 'idle' | 'saving' | 'saved';
 
 export interface IAutosaveStorage {
     read(key: string): string | null;
@@ -18,7 +18,7 @@ export interface IUseAutosaveSyncOptions {
 }
 
 export interface IUseAutosaveSyncResult {
-    status: Ref<AutosaveStatus>;
+    status: Ref<TAutosaveStatus>;
     schedule: () => void;
     flush: () => Promise<void>;
     cancel: () => void;
@@ -39,7 +39,7 @@ export function useAutosaveSync(
     opts: IUseAutosaveSyncOptions = {}
 ): IUseAutosaveSyncResult {
     const debounceMs = opts.debounceMs ?? AUTOSAVE_DEBOUNCE_MS;
-    const status = ref<AutosaveStatus>('idle');
+    const status = ref<TAutosaveStatus>('idle');
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     let saveSeq = 0;
     let saving = false;

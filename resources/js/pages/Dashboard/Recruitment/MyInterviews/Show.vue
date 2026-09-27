@@ -34,7 +34,7 @@ const { handleInertiaFormErrors } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 
-interface DetailPayload {
+interface IDetailPayload {
     application: {
         id: string;
         registration_number: string;
@@ -89,7 +89,7 @@ interface IQueuePermission {
 }
 
 const props = defineProps<{
-    detail: DetailPayload | undefined;
+    detail: IDetailPayload | undefined;
     evaluateUrl: string;
     recommendationOptions: { value: string; label: string }[];
     flashMessage: string | null;

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { routes } from '@/lib/routes';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
@@ -43,7 +43,7 @@ const form = useForm({
 });
 
 const selectOptions = props.roleOptions.map(
-    (option): SearchableSelectOption => ({ value: option.value, label: option.label })
+    (option): TSearchableSelectOption => ({ value: option.value, label: option.label })
 );
 
 onMounted(() => {

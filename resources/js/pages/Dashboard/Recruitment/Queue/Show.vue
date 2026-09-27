@@ -19,7 +19,7 @@ import { toast } from 'vue-sonner';
 
 defineOptions({ layout: DashboardLayout });
 
-interface SessionDetail {
+interface ISessionDetail {
     id: string;
     session_date: string;
     starts_at: string;
@@ -31,7 +31,7 @@ interface SessionDetail {
 }
 
 const props = defineProps<{
-    session: SessionDetail;
+    session: ISessionDetail;
     queue: IQueueSnapshot;
     pollUrl: string;
     callNextUrl: string;

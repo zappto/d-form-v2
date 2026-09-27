@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Separator } from '@/components/ui/separator';
 import { routes } from '@/lib/routes';
 import { useErrorToast } from '@/hooks/useErrorToast';
@@ -123,21 +123,21 @@ const { clear: clearTrackEditDraft } = useDraftRestore({
     restoreIntoForm: applyTrackEditDraftValues,
 });
 
-const semesterOptions: SearchableSelectOption[] = [
+const semesterOptions: TSearchableSelectOption[] = [
     { value: '1', label: 'Semester 1' },
     { value: '3', label: 'Semester 3' },
 ];
 
-const divisionOptions = computed<SearchableSelectOption[]>(() =>
+const divisionOptions = computed<TSearchableSelectOption[]>(() =>
     (props.divisions ?? []).map(
-        (division: IDivisionOption): SearchableSelectOption => ({
+        (division: IDivisionOption): TSearchableSelectOption => ({
             value: division.id,
             label: division.name,
         })
     )
 );
 
-const secondaryDivisionOptions = computed<SearchableSelectOption[]>(() => [
+const secondaryDivisionOptions = computed<TSearchableSelectOption[]>(() => [
     { value: '', label: 'Tidak ada' },
     ...divisionOptions.value,
 ]);

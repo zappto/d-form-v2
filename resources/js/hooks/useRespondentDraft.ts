@@ -1,14 +1,14 @@
 import { computed, ref, type Ref } from 'vue';
 import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import { RESPONDENT_DRAFT_DEBOUNCE_MS } from '@/lib/debounce';
-import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
+import { useAutosaveSync, type TAutosaveStatus } from './useAutosaveSync';
 
 export interface IUseRespondentDraftOptions {
     debounceMs?: number;
 }
 
 export interface IUseRespondentDraftResult<T> {
-    status: Ref<AutosaveStatus>;
+    status: Ref<TAutosaveStatus>;
     lastSavedAt: Ref<Date | null>;
     restore: () => T | null;
     clear: () => void;
@@ -139,7 +139,7 @@ export function useRespondentDraft<T>(
         onError: () => {},
     });
 
-    const status = computed<AutosaveStatus>((): AutosaveStatus => {
+    const status = computed<TAutosaveStatus>((): TAutosaveStatus => {
         if (lastSavedAt.value !== null) return 'saved';
         if (autosave.status.value === 'saving') return 'saving';
         return 'idle';

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 
 const category = defineModel<string>('category', { default: 'all' });
 const session = defineModel<string>('session', { default: 'all' });
 
 defineProps<{
-    categoryOptions: SearchableSelectOption[];
-    sessionOptions: SearchableSelectOption[];
+    categoryOptions: TSearchableSelectOption[];
+    sessionOptions: TSearchableSelectOption[];
 }>();
 </script>
 

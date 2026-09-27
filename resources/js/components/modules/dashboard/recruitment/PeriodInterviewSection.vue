@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import InterviewSessionCreateSheet, {
-    type TInterviewDivisionChoice,
+    type IInterviewDivisionChoice,
 } from '@/components/modules/dashboard/recruitment/InterviewSessionCreateSheet.vue';
 import { routes } from '@/lib/routes';
 import type { IPaginator } from '@/lib/pagination';
@@ -27,7 +27,7 @@ interface ISessionRow {
 defineProps<{
     sessions: IPaginator<ISessionRow> | null;
     periodId: string;
-    divisionOptions: TInterviewDivisionChoice[];
+    divisionOptions: IInterviewDivisionChoice[];
     loading?: boolean;
 }>();
 

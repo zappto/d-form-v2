@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Input } from '@/components/ui/input';
 import SplitDateTimeField from '@/components/core/date-picker/SplitDateTimeField.vue';
 import { Label } from '@/components/ui/label';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import type { TFormPurpose, IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
 
 const closedAt = defineModel<string>('closedAt', { required: true });
@@ -39,17 +39,17 @@ const isTeamStyleRegistration = computed(() => {
 const registrationModeSelectSentinel = '__none__' as const;
 const requiresFormSelectSentinel = '__none__' as const;
 
-const purposeOptions: SearchableSelectOption[] = [
+const purposeOptions: TSearchableSelectOption[] = [
     { value: 'registration', label: 'Pendaftaran' },
     { value: 'other', label: 'Lainnya (feedback, survei, …)' },
 ];
 
-const requiresFormOptions = computed<SearchableSelectOption[]>(() => [
+const requiresFormOptions = computed<TSearchableSelectOption[]>(() => [
     { value: requiresFormSelectSentinel, label: 'Tidak ada' },
     ...props.siblingForms.map((sibling) => ({ value: sibling.id, label: sibling.title })),
 ]);
 
-const registrationModeOptions: SearchableSelectOption[] = [
+const registrationModeOptions: TSearchableSelectOption[] = [
     { value: registrationModeSelectSentinel, label: 'Not set (individual)' },
     { value: 'single', label: 'Single' },
     { value: 'bundle', label: 'Bundle' },

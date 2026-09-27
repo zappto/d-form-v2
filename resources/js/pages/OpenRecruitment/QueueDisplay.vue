@@ -6,7 +6,7 @@ import LandingLayout from '@/layouts/LandingLayout.vue';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Megaphone, WifiOff } from 'lucide-vue-next';
 import { padQueueNumber } from '@/lib/format';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
@@ -78,7 +78,7 @@ function entryStatusLabel(entry: IQueueDisplayEntry): string {
 
 const entries = computed<IQueueDisplayEntry[]>(() => live.value.entries ?? []);
 
-function uniqueOptions(values: (string | null | undefined)[], allLabel: string): SearchableSelectOption[] {
+function uniqueOptions(values: (string | null | undefined)[], allLabel: string): TSearchableSelectOption[] {
     const seen = new Map<string, string>();
     for (const raw of values) {
         const value = (raw ?? '').trim();
@@ -87,21 +87,21 @@ function uniqueOptions(values: (string | null | undefined)[], allLabel: string):
     return [{ value: '', label: allLabel }, ...[...seen.entries()].map(([value, label]) => ({ value, label }))];
 }
 
-const divisionOptions = computed<SearchableSelectOption[]>(() =>
+const divisionOptions = computed<TSearchableSelectOption[]>(() =>
     uniqueOptions(
         entries.value.map((e) => e.division),
         'Semua divisi'
     )
 );
 
-const roomOptions = computed<SearchableSelectOption[]>(() =>
+const roomOptions = computed<TSearchableSelectOption[]>(() =>
     uniqueOptions(
         entries.value.map((e) => e.room),
         'Semua ruang'
     )
 );
 
-const statusOptions = computed<SearchableSelectOption[]>(() => {
+const statusOptions = computed<TSearchableSelectOption[]>(() => {
     const seen = new Map<string, string>();
     for (const entry of entries.value) {
         const value = (entry.status ?? '').trim();

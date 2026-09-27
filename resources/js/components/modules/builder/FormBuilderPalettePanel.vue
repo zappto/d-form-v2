@@ -4,7 +4,7 @@ import DraggableItem from '@/components/modules/builder/DraggableItem.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SplitDateTimeField from '@/components/core/date-picker/SplitDateTimeField.vue';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { ChevronRight, ChevronDown, Search, Settings2 } from 'lucide-vue-next';
 import type { ITFormBuilderPaletteCategory } from '@/components/modules/builder/formBuilderPalette';
 import type { IFormRegistrationMetadata, IFormSiblingOption } from '@/types/form';
@@ -37,17 +37,17 @@ defineEmits<{
 /** Kunci select "Memerlukan form" / "Registration mode" saat memilih opsi kosong. */
 const noSelectionSentinel = '__none__' as const;
 
-const purposeOptions: SearchableSelectOption[] = [
+const purposeOptions: TSearchableSelectOption[] = [
     { value: 'registration', label: 'Pendaftaran' },
     { value: 'other', label: 'Lainnya (feedback, survei, …)' },
 ];
 
-const requiresFormOptions = computed<SearchableSelectOption[]>(() => [
+const requiresFormOptions = computed<TSearchableSelectOption[]>(() => [
     { value: noSelectionSentinel, label: 'Tidak ada' },
     ...props.siblingForms.map((sibling) => ({ value: sibling.id, label: sibling.title })),
 ]);
 
-const registrationModeOptions: SearchableSelectOption[] = [
+const registrationModeOptions: TSearchableSelectOption[] = [
     { value: noSelectionSentinel, label: 'Not set (individual)' },
     { value: 'single', label: 'Single' },
     { value: 'bundle', label: 'Bundle' },

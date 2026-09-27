@@ -22,7 +22,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { routes } from '@/lib/routes';
 import { MY_INTERVIEWS_PAGE_SIZE, type IPaginator } from '@/lib/pagination';
 import { padQueueNumber } from '@/lib/format';
@@ -32,7 +32,7 @@ import { ClipboardCheck, ListOrdered, RotateCcw, Search } from 'lucide-vue-next'
 
 defineOptions({ layout: DashboardLayout });
 
-interface TInterviewRow {
+interface IInterviewRow {
     interview_id: string;
     scheduled_at: string | null;
     status_label: string;
@@ -106,7 +106,7 @@ interface InterviewGroup {
     key: TInterviewGroupKey;
     title: string;
     hint: string;
-    rows: TInterviewRow[];
+    rows: IInterviewRow[];
 }
 
 interface IStatusBadge {
@@ -143,7 +143,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 const props = withDefaults(
     defineProps<{
-        interviews: IPaginator<TInterviewRow>;
+        interviews: IPaginator<IInterviewRow>;
         query: IMyInterviewsQuery;
         queue_counts: Record<string, number>;
         today_sessions: ITodaySession[];
@@ -356,12 +356,12 @@ const divisionOptions = computed<IFilterOption[]>((): IFilterOption[] => {
     return [{ value: '', label: 'Semua divisi' }, ...fallback];
 });
 
-const sessionOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => {
+const sessionOptions = computed<TSearchableSelectOption[]>((): TSearchableSelectOption[] => {
     if (props.session_options.length > 0) {
         return [{ value: '', label: 'Semua sesi' }, ...props.session_options];
     }
-    const fallback: SearchableSelectOption[] = props.today_sessions.map(
-        (session: ITodaySession): SearchableSelectOption => ({
+    const fallback: TSearchableSelectOption[] = props.today_sessions.map(
+        (session: ITodaySession): TSearchableSelectOption => ({
             value: session.id,
             label: sessionFallbackLabel(session),
         })
@@ -369,8 +369,8 @@ const sessionOptions = computed<SearchableSelectOption[]>((): SearchableSelectOp
     return [{ value: '', label: 'Semua sesi' }, ...fallback];
 });
 
-const evalOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => EVAL_OPTIONS);
-const sortOptions = computed<SearchableSelectOption[]>((): SearchableSelectOption[] => SORT_OPTIONS);
+const evalOptions = computed<TSearchableSelectOption[]>((): TSearchableSelectOption[] => EVAL_OPTIONS);
+const sortOptions = computed<TSearchableSelectOption[]>((): TSearchableSelectOption[] => SORT_OPTIONS);
 
 function queueBadgeCount(key: string): number | null {
     if (key === '') return props.queue_counts.all ?? null;
@@ -419,7 +419,7 @@ function startOfCalendarDay(value: Date): Date {
     return day;
 }
 
-function groupKeyForRow(row: TInterviewRow, now: Date): TInterviewGroupKey {
+function groupKeyForRow(row: IInterviewRow, now: Date): TInterviewGroupKey {
     if (row.evaluation_locked || row.has_evaluation) return 'done';
     const scheduled: Date | null = parseSchedule(row.scheduled_at);
     if (scheduled === null) return row.needs_evaluation ? 'urgent' : 'upcoming';
@@ -430,7 +430,7 @@ function groupKeyForRow(row: TInterviewRow, now: Date): TInterviewGroupKey {
 
 const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
     const now: Date = new Date();
-    const buckets: Record<TInterviewGroupKey, TInterviewRow[]> = {
+    const buckets: Record<TInterviewGroupKey, IInterviewRow[]> = {
         urgent: [],
         today: [],
         upcoming: [],
@@ -475,14 +475,14 @@ const interviewGroups = computed<InterviewGroup[]>((): InterviewGroup[] => {
     return groups;
 });
 
-function statusBadge(row: TInterviewRow): IStatusBadge {
+function statusBadge(row: IInterviewRow): IStatusBadge {
     if (row.needs_evaluation) return { label: 'Perlu dinilai', variant: 'default' };
     if (row.evaluation_locked) return { label: 'Terkunci', variant: 'secondary' };
     if (row.has_evaluation) return { label: 'Sudah dinilai', variant: 'outline' };
     return { label: row.status_label, variant: 'outline' };
 }
 
-function actionLabel(row: TInterviewRow): string {
+function actionLabel(row: IInterviewRow): string {
     if (row.needs_evaluation) return 'Nilai';
     if (row.has_evaluation && !row.evaluation_locked) return 'Ubah';
     return 'Detail';

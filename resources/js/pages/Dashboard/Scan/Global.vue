@@ -11,7 +11,7 @@ import ScanExportDialog, {
 } from '@/components/modules/dashboard/ScanExportDialog.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { FileSpreadsheet, FileText } from 'lucide-vue-next';
 import { routes } from '@/lib/routes';
 import { useGlobalQrScanPage, type IGlobalScanTargets } from '@/hooks/useGlobalQrScanPage';
@@ -41,7 +41,7 @@ const s = reactive(
     useGlobalQrScanPage('global-qr-scanner-region', props.globalScanStoreUrl, feedUrl.value, () => props.targets)
 );
 
-const targetFilterOptions = computed<SearchableSelectOption[]>(() => [
+const targetFilterOptions = computed<TSearchableSelectOption[]>(() => [
     { value: 'all', label: 'Semua acara' },
     ...s.targetOptions.map((option) => ({
         value: option.id,

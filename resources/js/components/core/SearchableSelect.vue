@@ -8,7 +8,7 @@ import { Check, ChevronDown, Plus, Search } from 'lucide-vue-next';
 
 defineOptions({ inheritAttrs: false });
 
-export type SearchableSelectOption = {
+export type TSearchableSelectOption = {
     value: string;
     label: string;
     sublabel?: string;
@@ -21,7 +21,7 @@ const props = withDefaults(
     defineProps<{
         id?: string;
         modelValue: string;
-        options: SearchableSelectOption[];
+        options: TSearchableSelectOption[];
         placeholder?: string;
         searchPlaceholder?: string;
         emptyText?: string;
@@ -69,7 +69,7 @@ const popoverContentClass = cn(
     'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1'
 );
 
-function optionInitials(opt: SearchableSelectOption): string {
+function optionInitials(opt: TSearchableSelectOption): string {
     const custom: string | undefined = opt.initials?.trim();
     if (custom === undefined || custom.length === 0) return '';
     return custom.toUpperCase().slice(0, 2);
@@ -77,7 +77,7 @@ function optionInitials(opt: SearchableSelectOption): string {
 
 const normalizedQuery = computed<string>(() => query.value.trim().toLowerCase());
 
-const filteredOptions = computed<SearchableSelectOption[]>(() => {
+const filteredOptions = computed<TSearchableSelectOption[]>(() => {
     const q: string = normalizedQuery.value;
     if (q.length === 0) return props.options;
     return props.options.filter((opt) => {
@@ -86,11 +86,11 @@ const filteredOptions = computed<SearchableSelectOption[]>(() => {
     });
 });
 
-const enabledFiltered = computed<SearchableSelectOption[]>(() =>
+const enabledFiltered = computed<TSearchableSelectOption[]>(() =>
     filteredOptions.value.filter((opt) => opt.disabled !== true)
 );
 
-const selectedOption = computed<SearchableSelectOption | undefined>(() =>
+const selectedOption = computed<TSearchableSelectOption | undefined>(() =>
     props.options.find((o) => o.value === props.modelValue)
 );
 
@@ -130,7 +130,7 @@ watch(open, (isOpen: boolean) => {
     }
 });
 
-watch(filteredOptions, (list: SearchableSelectOption[]) => {
+watch(filteredOptions, (list: TSearchableSelectOption[]) => {
     const stillVisible: boolean = list.some((o) => o.value === highlightedValue.value && o.disabled !== true);
     if (!stillVisible) {
         highlightedValue.value = enabledFiltered.value[0]?.value ?? null;
@@ -140,7 +140,7 @@ watch(filteredOptions, (list: SearchableSelectOption[]) => {
 onMounted(() => window.addEventListener('resize', syncContentWidth));
 onBeforeUnmount(() => window.removeEventListener('resize', syncContentWidth));
 
-function choose(opt: SearchableSelectOption): void {
+function choose(opt: TSearchableSelectOption): void {
     if (opt.disabled === true) return;
     if (opt.value === props.modelValue) {
         open.value = false;
@@ -156,7 +156,7 @@ function onActionClick(): void {
 }
 
 function moveHighlight(step: 1 | -1): void {
-    const list: SearchableSelectOption[] = enabledFiltered.value;
+    const list: TSearchableSelectOption[] = enabledFiltered.value;
     if (list.length === 0) return;
     const currentIndex: number = list.findIndex((o) => o.value === highlightedValue.value);
     if (currentIndex === -1) {
@@ -175,7 +175,7 @@ function onListKeydown(event: KeyboardEvent): void {
         event.preventDefault();
         moveHighlight(-1);
     } else if (event.key === 'Enter') {
-        const target: SearchableSelectOption | undefined = enabledFiltered.value.find(
+        const target: TSearchableSelectOption | undefined = enabledFiltered.value.find(
             (o) => o.value === highlightedValue.value
         );
         if (target) {

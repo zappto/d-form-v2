@@ -1,6 +1,6 @@
 export type TScanStatus = 'success' | 'already' | 'invalid';
 
-export interface TIScanEntry {
+export interface IScanEntry {
     id: string;
     name: string;
     email: string;
@@ -12,7 +12,7 @@ export interface TIScanEntry {
     queueNumber: number | null;
 }
 
-export interface TIScanResult {
+export interface IScanResult {
     name: string;
     email: string;
     status: TScanStatus;
@@ -55,7 +55,7 @@ export function extractQrCandidate(decodedText: string): string {
 }
 
 /** Bentuk entri riwayat scan dari hasil scan; dipakai untuk menambah baris riwayat scan. */
-export function createScanHistoryEntry(result: TIScanResult): TIScanEntry {
+export function createScanHistoryEntry(result: IScanResult): IScanEntry {
     return {
         id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         name: result.name,
@@ -69,7 +69,7 @@ export function createScanHistoryEntry(result: TIScanResult): TIScanEntry {
     };
 }
 
-export interface TIGlobalScanFeedRow {
+export interface IGlobalScanFeedRow {
     id: string;
     ts: string;
     type: 'recruitment' | 'event';
@@ -142,13 +142,13 @@ export function isGlobalScanFeedPayload(payload: unknown): boolean {
 }
 
 /** Parse baris feed scan global menjadi daftar terketik sambil melewati baris rusak; dipakai saat memuat feed scan. */
-export function parseGlobalScanFeedRows(payload: unknown): TIGlobalScanFeedRow[] {
+export function parseGlobalScanFeedRows(payload: unknown): IGlobalScanFeedRow[] {
     if (!isGlobalScanRawPayload(payload)) {
         return [];
     }
 
     const rawRows: IGlobalScanRawRow[] = Array.isArray(payload.rows) ? payload.rows : [];
-    const rows: TIGlobalScanFeedRow[] = [];
+    const rows: IGlobalScanFeedRow[] = [];
     for (const item of rawRows) {
         if (!isGlobalScanRawRow(item)) {
             continue;

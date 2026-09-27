@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { routes } from '@/lib/routes';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { SAVING_LABEL } from '@/lib/uiLabels';
@@ -60,7 +60,7 @@ const interviewerRoutes = computed<TInterviewerRoutes>(() => routes.admin.recrui
 /** Selaras dengan kontrak backend lane paralel; fallback dipakai sampai helper store mendarat. */
 const storeUrl = computed<string>(() => interviewerRoutes.value.store ?? '/admin/recruitment/interviewers');
 
-const divisionOptions = computed<SearchableSelectOption[]>(() =>
+const divisionOptions = computed<TSearchableSelectOption[]>(() =>
     props.divisions.map((d) => ({
         value: d.id,
         label: d.name,

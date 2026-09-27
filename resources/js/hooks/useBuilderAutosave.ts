@@ -29,7 +29,7 @@ import { AUTOSAVE_DEBOUNCE_MS } from '@/lib/debounce';
 import { jsonRequestHeaders } from '@/lib/jsonRequest';
 import { toFormMetadataPayload, type IFormRegistrationMetadata } from '@/types/form';
 import type { BackendField, BuilderField } from '@/types/formBuilder';
-import { useAutosaveSync, type AutosaveStatus } from './useAutosaveSync';
+import { useAutosaveSync, type TAutosaveStatus } from './useAutosaveSync';
 import { useInertiaRequest } from './useInertiaRequest';
 
 /** State builder langsung yang dibaca hook tiap save; sumber tetap milik halaman. */
@@ -58,7 +58,7 @@ export interface IBuilderAutosaveResult {
     snapshot: () => string;
     /** Dipanggil watch dengan snapshot terbaru sebagai pemicu; state dibaca live saat save. */
     save: (snapshot: string) => Promise<boolean>;
-    status: Ref<AutosaveStatus>;
+    status: Ref<TAutosaveStatus>;
     flush: () => Promise<void>;
     evaluateHydrate: (formId: string, pending: boolean) => boolean;
     registerHydrated: (formId: string) => void;

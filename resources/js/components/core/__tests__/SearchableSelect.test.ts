@@ -2,9 +2,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { nextTick } from 'vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import SearchableSelect from '../SearchableSelect.vue';
-import type { SearchableSelectOption } from '../SearchableSelect.vue';
+import type { TSearchableSelectOption } from '../SearchableSelect.vue';
 
-const BASIC_OPTIONS: SearchableSelectOption[] = [
+const BASIC_OPTIONS: TSearchableSelectOption[] = [
     { value: 'ayu', label: 'Ayu Lestari', sublabel: 'ayu@example.com' },
     { value: 'budi', label: 'Budi Santoso', sublabel: 'budi@example.com' },
     { value: 'citra', label: 'Citra Dewi', sublabel: 'citra@example.com' },
@@ -14,7 +14,7 @@ const mountedWrappers: VueWrapper[] = [];
 
 type TSelectOverrides = {
     modelValue?: string;
-    options?: SearchableSelectOption[];
+    options?: TSearchableSelectOption[];
     placeholder?: string;
     searchPlaceholder?: string;
     emptyText?: string;

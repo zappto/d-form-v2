@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
-import DivisionListSheet, { type TIDashboardDivision } from '../DivisionListSheet.vue';
+import DivisionListSheet, { type IDashboardDivision } from '../DivisionListSheet.vue';
 const { handleInertiaFormErrors } = vi.hoisted(() => ({
     handleInertiaFormErrors: vi.fn(),
 }));
@@ -57,7 +57,7 @@ function lastPutOptions(): InertiaMutationOptions {
     return options as InertiaMutationOptions;
 }
 
-const demoDivision: TIDashboardDivision = {
+const demoDivision: IDashboardDivision = {
     id: 'div-1',
     code: 'DV',
     name: 'Divisi A',

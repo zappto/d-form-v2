@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
 import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
@@ -62,7 +62,7 @@ function builderType(field: IFormField): string {
     return formFieldBuilderType(field);
 }
 
-function dropdownOptions(field: IFormField): SearchableSelectOption[] {
+function dropdownOptions(field: IFormField): TSearchableSelectOption[] {
     return getFormFieldOptionRows(field).map((row) => ({ value: row.label, label: row.label }));
 }
 

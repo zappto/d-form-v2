@@ -17,7 +17,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { ArrowRight, Check, X } from 'lucide-vue-next';
 import { Input } from '@/components/ui/input';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import CometSpinner from '@/components/core/CometSpinner.vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useErrorToast } from '@/hooks/useErrorToast';
@@ -27,7 +27,7 @@ import { PERIOD_APPLICANTS_PAGE_SIZE } from '@/lib/pagination';
 const { handleInertiaFormErrors, showErrorToast, showFlashToast } = useErrorToast();
 
 /** Satu-satunya definisi baris aplikan periode; diimpor oleh Periods/Show.vue. */
-export interface TApplicationRow {
+export interface IApplicationRow {
     id: string;
     registration_number: string;
     full_name: string;
@@ -56,7 +56,7 @@ const QUEUE_OPTIONS = [
 const props = withDefaults(
     defineProps<{
         periodId: string;
-        applications: TApplicationRow[] | null;
+        applications: IApplicationRow[] | null;
         queueCounts: Record<string, number>;
         divisionOptions: { id: string; name: string; code: string }[];
         stageOptions: { value: string; label: string }[];
@@ -132,12 +132,12 @@ const semester = ref<string>('');
 const perPage = ref<number>(PERIOD_APPLICANTS_PAGE_SIZE);
 const currentPage = ref<number>(1);
 
-const divisionSelectOptions = computed<SearchableSelectOption[]>(() => [
+const divisionSelectOptions = computed<TSearchableSelectOption[]>(() => [
     { value: '', label: 'Semua divisi' },
     ...props.divisionOptions.map((division) => ({ value: division.id, label: division.name })),
 ]);
 
-const queueSelectOptions = computed<SearchableSelectOption[]>(() =>
+const queueSelectOptions = computed<TSearchableSelectOption[]>(() =>
     QUEUE_OPTIONS.map((option) => {
         const count = option.key === '' ? (props.queueCounts.all ?? 0) : (props.queueCounts[option.key] ?? 0);
         return {
@@ -147,13 +147,13 @@ const queueSelectOptions = computed<SearchableSelectOption[]>(() =>
     })
 );
 
-const stageSelectOptions = computed<SearchableSelectOption[]>(() => [
+const stageSelectOptions = computed<TSearchableSelectOption[]>(() => [
     { value: '', label: 'Semua tahap' },
     ...props.stageOptions.map((option) => ({ value: option.value, label: option.label })),
 ]);
 
-const semesterSelectOptions = computed<SearchableSelectOption[]>(() => {
-    const options: SearchableSelectOption[] = [
+const semesterSelectOptions = computed<TSearchableSelectOption[]>(() => {
+    const options: TSearchableSelectOption[] = [
         { value: '', label: 'Semua semester' },
         ...(props.semesterOptions ?? []).map((option) => ({ value: option.value, label: option.label })),
     ];
@@ -176,7 +176,7 @@ const queueModel = computed<string>({
     },
 });
 
-function matchesQueue(row: TApplicationRow, activeQueue: string): boolean {
+function matchesQueue(row: IApplicationRow, activeQueue: string): boolean {
     switch (activeQueue) {
         case 'screening':
             return (
@@ -197,7 +197,7 @@ function matchesQueue(row: TApplicationRow, activeQueue: string): boolean {
     }
 }
 
-const filteredRows = computed<TApplicationRow[]>(() => {
+const filteredRows = computed<IApplicationRow[]>(() => {
     const needle: string = search.value.trim().toLowerCase();
     return (props.applications ?? []).filter((row) => {
         if (needle !== '') {
@@ -223,13 +223,13 @@ const filteredRows = computed<TApplicationRow[]>(() => {
 const totalCount = computed<number>(() => filteredRows.value.length);
 const lastPage = computed<number>(() => Math.max(1, Math.ceil(totalCount.value / perPage.value)));
 
-const pagedRows = computed<TApplicationRow[]>(() => {
+const pagedRows = computed<IApplicationRow[]>(() => {
     const page: number = Math.max(1, Math.min(currentPage.value, lastPage.value));
     const start: number = (page - 1) * perPage.value;
     return filteredRows.value.slice(start, start + perPage.value);
 });
 
-const perPageOptions = computed<SearchableSelectOption[]>(() =>
+const perPageOptions = computed<TSearchableSelectOption[]>(() =>
     [5, 10, 20, 50].map((size) => ({ value: String(size), label: `${size} / halaman` }))
 );
 
@@ -274,7 +274,7 @@ const REJECT_REASONS: IRejectReasonOption[] = [
     { value: 'other', label: 'Lainnya' },
 ];
 
-function canDecide(row: TApplicationRow): boolean {
+function canDecide(row: IApplicationRow): boolean {
     if (!props.canScreen) return false;
     if (row.revision_required) return false;
     if (row.result !== 'pending') return false;
@@ -282,10 +282,10 @@ function canDecide(row: TApplicationRow): boolean {
 }
 
 const processingId = ref<string | null>(null);
-const passTarget = ref<TApplicationRow | null>(null);
+const passTarget = ref<IApplicationRow | null>(null);
 const passDialogOpen = ref(false);
 
-const rejectTarget = ref<TApplicationRow | null>(null);
+const rejectTarget = ref<IApplicationRow | null>(null);
 const rejectDialogOpen = ref(false);
 const rejectLocalError = ref<string | null>(null);
 const rejectForm = useForm({
@@ -307,7 +307,7 @@ const rejectApplicationError = computed<string | null>(() => {
     return message !== undefined && message.length > 0 ? message : null;
 });
 
-function openPass(row: TApplicationRow): void {
+function openPass(row: IApplicationRow): void {
     if (!canDecide(row) || processingId.value !== null) return;
     passTarget.value = row;
     passDialogOpen.value = true;
@@ -342,7 +342,7 @@ function confirmPass(): void {
     );
 }
 
-function openReject(row: TApplicationRow): void {
+function openReject(row: IApplicationRow): void {
     if (!canDecide(row) || processingId.value !== null) return;
     rejectTarget.value = row;
     rejectForm.reset();

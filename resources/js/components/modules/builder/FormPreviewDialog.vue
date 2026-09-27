@@ -12,7 +12,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Textarea } from '@/components/ui/textarea';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
 import { Checkbox } from '@/components/ui/checkbox';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import type { TFormFieldMetadataBag } from '@/types/form';
 
 /** Mirrors canvas builder field shape used by Show/Create, dengan metadata terketik. */
@@ -84,7 +84,7 @@ function optionEntries(field: IFormPreviewField): IFieldOptionEntry[] {
     });
 }
 
-function dropdownOptions(field: IFormPreviewField): SearchableSelectOption[] {
+function dropdownOptions(field: IFormPreviewField): TSearchableSelectOption[] {
     return optionEntries(field).map((opt, oi) => ({
         value: String(opt.id || `option-${oi}`),
         label: optionLabel(opt),

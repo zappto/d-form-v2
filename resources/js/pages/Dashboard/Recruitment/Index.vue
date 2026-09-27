@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import DivisionListSheet, {
-    type TIDashboardDivision,
+    type IDashboardDivision,
 } from '@/components/modules/dashboard/recruitment/DivisionListSheet.vue';
 import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { routes } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
@@ -86,7 +86,7 @@ const props = withDefaults(
         periods?: IPaginator<IPeriodRow> | null;
         query?: { search?: string; status?: string };
         statusOptions?: { value: string; label: string }[];
-        divisions?: TIDashboardDivision[];
+        divisions?: IDashboardDivision[];
     }>(),
     { periods: null, query: () => ({}), statusOptions: () => [], divisions: () => [] }
 );
@@ -105,7 +105,7 @@ const periodCurrentPage = computed<number>(() => props.periods?.current_page ?? 
 const periodLastPage = computed<number>(() => props.periods?.last_page ?? 1);
 const periodTotal = computed<number>(() => props.periods?.total ?? 0);
 
-const divisionRows = computed<TIDashboardDivision[]>(() => props.divisions ?? []);
+const divisionRows = computed<IDashboardDivision[]>(() => props.divisions ?? []);
 const divisionDrawerOpen = ref<boolean>(false);
 
 function openDivisionDrawer(): void {
@@ -132,7 +132,7 @@ const periodSearch = ref<string>(props.query?.search ?? '');
 const periodStatus = ref<string>(props.query?.status ?? '');
 
 /** Opsi dropdown status — nilai dari backend, UI SearchableSelect seperti admin/events. */
-const periodStatusOptions = computed<SearchableSelectOption[]>(() => [
+const periodStatusOptions = computed<TSearchableSelectOption[]>(() => [
     { value: '', label: 'Semua status' },
     ...props.statusOptions,
 ]);

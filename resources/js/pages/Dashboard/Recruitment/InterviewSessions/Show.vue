@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { routes } from '@/lib/routes';
 import { initialsOf } from '@/lib/format';
 import { useErrorToast } from '@/hooks/useErrorToast';
@@ -23,7 +23,7 @@ const { showErrorToast, showFlashToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 
-interface TInterviewRow {
+interface IInterviewRow {
     id: string;
     scheduled_at: string | null;
     location: string;
@@ -38,7 +38,7 @@ interface TInterviewRow {
     interviewer: { id: string; name: string } | null;
 }
 
-interface SessionDetail {
+interface ISessionDetail {
     id: string;
     session_date: string;
     starts_at: string;
@@ -50,7 +50,7 @@ interface SessionDetail {
     interviews_count: number;
     period: { id: string; name: string } | null;
     division: { id: string; name: string; code: string } | null;
-    interviews: TInterviewRow[];
+    interviews: IInterviewRow[];
 }
 
 interface IApplicantOption {
@@ -61,7 +61,7 @@ interface IApplicantOption {
 }
 
 const props = defineProps<{
-    session: SessionDetail | undefined;
+    session: ISessionDetail | undefined;
     eligibleApplicants: IApplicantOption[];
     interviewerOptions: { id: string; name: string }[];
     otherSessions: { id: string; session_date: string; starts_at: string; division: { name: string } | null }[];
@@ -112,7 +112,7 @@ function scheduleSelected() {
     });
 }
 
-function reassignOptionsFor(currentInterviewerId: string | null): SearchableSelectOption[] {
+function reassignOptionsFor(currentInterviewerId: string | null): TSearchableSelectOption[] {
     return props.interviewerOptions.map((opt) => ({
         value: opt.id,
         label: opt.name,

@@ -2,13 +2,13 @@
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { MailIcon } from 'lucide-vue-next';
 
-type ITProps = {
+type TProps = {
     id: string;
     icon?: boolean;
     focus?: boolean;
 };
 
-const { id, icon = false, focus = false } = defineProps<ITProps>();
+const { id, icon = false, focus = false } = defineProps<TProps>();
 </script>
 
 <template>

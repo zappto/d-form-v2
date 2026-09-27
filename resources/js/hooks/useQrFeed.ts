@@ -13,9 +13,9 @@ import {
     isGlobalScanFeedPayload,
     parseGlobalScanCursor,
     parseGlobalScanFeedRows,
-    type TIGlobalScanFeedRow,
-    type TIScanEntry,
-    type TIScanResult,
+    type IGlobalScanFeedRow,
+    type IScanEntry,
+    type IScanResult,
 } from '@/lib/qrScanUi';
 import { useScanFeedback } from '@/hooks/useScanFeedback';
 
@@ -45,13 +45,13 @@ export interface ISubmitScanArgs {
 
 export interface IQrFeedControls {
     deskId: string;
-    scanResult: Ref<TIScanResult | null>;
-    scanHistory: Ref<TIScanEntry[]>;
+    scanResult: Ref<IScanResult | null>;
+    scanHistory: Ref<IScanEntry[]>;
     scanBusy: Ref<boolean>;
     acceptScanInput: (raw: string) => boolean;
     submitScan: (args: ISubmitScanArgs) => Promise<void>;
-    isTodayEntry: (entry: TIScanEntry) => boolean;
-    toScanResult: (entry: TIScanEntry) => TIScanResult;
+    isTodayEntry: (entry: IScanEntry) => boolean;
+    toScanResult: (entry: IScanEntry) => IScanResult;
     clearHistory: () => void;
 }
 
@@ -100,7 +100,7 @@ interface IDuplicateScanContext extends IScanResultContext {
 
 /** Hasil duplikat 409: entri riwayat + deskripsi toast peringatan. */
 interface IDuplicateScanOutcome {
-    result: TIScanResult;
+    result: IScanResult;
     warningDescription: string;
 }
 
@@ -165,7 +165,7 @@ function mapEnvelopeKind(type: string | undefined): 'event' | 'oprec' {
 }
 
 /** Rakit hasil scan sukses dari envelope check-in (cabang event & oprec). */
-function buildCheckInResult(data: IGlobalScanEnvelope, context: IScanResultContext): TIScanResult {
+function buildCheckInResult(data: IGlobalScanEnvelope, context: IScanResultContext): IScanResult {
     const kind = mapEnvelopeKind(data.type);
     const eventTitle = formatGlobalEventTitle(kind, data.eventTitle ?? '');
     const name = data.attendee.name?.trim() || 'Tanpa nama';
@@ -196,7 +196,7 @@ function buildCheckInResult(data: IGlobalScanEnvelope, context: IScanResultConte
 }
 
 /** Tampilkan toast sukses check-in; cabang oprec memuat nomor antrean ter-pad. */
-function showCheckInSuccessToast(data: IGlobalScanEnvelope, result: TIScanResult): void {
+function showCheckInSuccessToast(data: IGlobalScanEnvelope, result: IScanResult): void {
     toast.success(data.attendee.name?.trim() || 'Check-in berhasil.', {
         description:
             result.eventKind === 'oprec'
@@ -248,7 +248,7 @@ function buildDuplicateScan(
 }
 
 /** Rakit hasil scan gagal (status `invalid`) dari nama sebab dan konteks event terakhir. */
-function buildInvalidScanResult(context: IInvalidScanContext): TIScanResult {
+function buildInvalidScanResult(context: IInvalidScanContext): IScanResult {
     return {
         name: context.name,
         email: '-',
@@ -273,8 +273,8 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
     const deskId = resolveDeskId();
     const { playScanBeep } = useScanFeedback();
 
-    const scanResult = ref<TIScanResult | null>(null);
-    const scanHistory = ref<TIScanEntry[]>([]);
+    const scanResult = ref<IScanResult | null>(null);
+    const scanHistory = ref<IScanEntry[]>([]);
     const lastRaw = ref('');
     const lastAt = ref(0);
     const scanBusy = ref(false);
@@ -287,7 +287,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
     let pollTimer: number | null = null;
     let pollAbort: AbortController | null = null;
 
-    function isTodayEntry(entry: TIScanEntry): boolean {
+    function isTodayEntry(entry: IScanEntry): boolean {
         const epoch: number | undefined = scanEntryEpochMs.get(entry.id);
         if (epoch === undefined) {
             return true;
@@ -296,7 +296,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         return new Date(epoch).toDateString() === new Date().toDateString();
     }
 
-    function toScanResult(entry: TIScanEntry): TIScanResult {
+    function toScanResult(entry: IScanEntry): IScanResult {
         return {
             name: entry.name,
             email: entry.email,
@@ -309,10 +309,10 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         };
     }
 
-    function pushResult(result: TIScanResult): void {
+    function pushResult(result: IScanResult): void {
         localEntryIdentities.add(scanIdentity(result.eventKind, result.email, result.queueNumber, result.eventTitle));
         scanResult.value = result;
-        const entry: TIScanEntry = createScanHistoryEntry(result);
+        const entry: IScanEntry = createScanHistoryEntry(result);
         scanEntryEpochMs.set(entry.id, Date.now());
         rawCodeByEntryId.set(entry.id, result.rawCode);
         scanHistory.value.unshift(entry);
@@ -462,7 +462,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         toast('Riwayat scan dibersihkan');
     }
 
-    function ingestFeedRow(row: TIGlobalScanFeedRow): void {
+    function ingestFeedRow(row: IGlobalScanFeedRow): void {
         if (seenFeedIds.has(row.id)) {
             return;
         }
@@ -480,7 +480,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         const parsed = new Date(row.ts);
         const epoch = Number.isNaN(parsed.getTime()) ? Date.now() : parsed.getTime();
 
-        const entry: TIScanEntry = {
+        const entry: IScanEntry = {
             id: row.id,
             name,
             email: identifier,

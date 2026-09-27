@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { cn } from '@/lib/utils';
 import { fieldInvalidClass } from '@/lib/fieldInvalidClass';
 import { routes } from '@/lib/routes';
@@ -19,7 +19,7 @@ import { SAVING_LABEL } from '@/lib/uiLabels';
 
 const { handleInertiaFormErrors } = useErrorToast();
 
-export interface TInterviewDivisionChoice {
+export interface IInterviewDivisionChoice {
     id: string;
     name: string;
     code: string;
@@ -28,7 +28,7 @@ export interface TInterviewDivisionChoice {
 const props = defineProps<{
     open: boolean;
     periodId: string;
-    divisions: TInterviewDivisionChoice[];
+    divisions: IInterviewDivisionChoice[];
 }>();
 
 const emit = defineEmits<{ close: [] }>();
@@ -52,7 +52,7 @@ const form = useForm({
     is_active: true,
 });
 
-const divisionOptions = computed<SearchableSelectOption[]>(() =>
+const divisionOptions = computed<TSearchableSelectOption[]>(() =>
     props.divisions.map((division) => ({
         value: division.id,
         label: division.name,

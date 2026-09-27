@@ -5,7 +5,7 @@ import TrackShow from '../Show.vue';
 import TrackFeedback from '../Feedback.vue';
 
 /** Tipe payload tracking diturunkan dari props komponen agar fixture tak menduplikasi bentuk. */
-type ITrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>;
+type TTrackingPayload = NonNullable<InstanceType<typeof TrackShow>['$props']['tracking']>;
 
 /** Tipe aplikasi ringkas Feedback diturunkan dari props komponen. */
 type TFeedbackApplication = NonNullable<InstanceType<typeof TrackFeedback>['$props']['application']>;
@@ -43,7 +43,7 @@ vi.mock('@inertiajs/vue3', async () => {
 
 vi.mock('@/layouts/FormFillLayout.vue', () => ({ default: { template: '<slot />' } }));
 
-function demoTracking(): ITrackingPayload {
+function demoTracking(): TTrackingPayload {
     return {
         application: {
             registration_number: 'OPREC-2026-00001',
@@ -82,7 +82,7 @@ function demoTracking(): ITrackingPayload {
     };
 }
 
-function mountTrackShow(tracking: ITrackingPayload | undefined): VueWrapper<InstanceType<typeof TrackShow>> {
+function mountTrackShow(tracking: TTrackingPayload | undefined): VueWrapper<InstanceType<typeof TrackShow>> {
     const props: InstanceType<typeof TrackShow>['$props'] = {
         tracking,
         logoutUrl: '/recruitment/track/logout',

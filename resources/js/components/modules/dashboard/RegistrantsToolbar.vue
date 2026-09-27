@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import SearchableSelect, { type SearchableSelectOption } from '@/components/core/SearchableSelect.vue';
+import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Search } from 'lucide-vue-next';
 import { REGISTRANTS_TAB_ITEMS } from '@/lib/registrantsUi';
 
@@ -19,7 +19,7 @@ const props = defineProps<{
     forms: { id: string; title: string }[];
 }>();
 
-const formFilterOptions = computed<SearchableSelectOption[]>(() => [
+const formFilterOptions = computed<TSearchableSelectOption[]>(() => [
     { value: 'all', label: 'Semua formulir' },
     ...props.forms.map((f) => ({ value: f.id, label: f.title })),
 ]);
