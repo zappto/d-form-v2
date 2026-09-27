@@ -41,7 +41,7 @@ class FieldOperationController extends Controller
 
         try {
             // Upload banner form builder: file opsional `banner_file`
-            // (image, max 10MB — mengikuti pola banner event). Disimpan ke disk
+            // (image, max 5MB — mengikuti pola banner event). Disimpan ke disk
             // public `forms/banners`; DB hanya menyimpan path, bukan base64.
             // Tanpa banner_file berperilaku seperti sekarang (path string terus).
             $storedBannerPath = null;

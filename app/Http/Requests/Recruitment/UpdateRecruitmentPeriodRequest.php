@@ -24,7 +24,7 @@ class UpdateRecruitmentPeriodRequest extends FormRequest
             'interview_starts_at' => ['nullable', 'date'],
             'interview_ends_at' => ['nullable', 'date', 'after_or_equal:interview_starts_at'],
             'finalization_deadline_at' => ['nullable', 'date'],
-            'banner' => ['sometimes', 'nullable', 'image', 'max:10240', 'mimes:jpg,jpeg,png,webp'],
+            'banner' => ['sometimes', 'nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ];
     }
 
@@ -35,7 +35,7 @@ class UpdateRecruitmentPeriodRequest extends FormRequest
     {
         return [
             'banner.image' => 'Banner harus berupa file gambar.',
-            'banner.max' => 'Ukuran banner tidak boleh lebih dari 10 MB.',
+            'banner.max' => 'Ukuran banner tidak boleh lebih dari 5 MB.',
             'banner.mimes' => 'Banner harus berformat JPG, JPEG, PNG, atau WEBP.',
         ];
     }

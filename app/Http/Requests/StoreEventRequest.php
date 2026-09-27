@@ -37,7 +37,7 @@ class StoreEventRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0'],
             'session' => ['required', 'string', 'max:2048', new CommaSeparatedEventSessions()],
             'category' => ['required', 'string', 'max:2048', new CommaSeparatedEventCategories()],
-            'banner' => ['required', 'image', 'max:10240'],
+            'banner' => ['required', 'image', 'max:5120'],
             'publish' => ['sometimes', 'boolean'],
         ];
     }
@@ -86,7 +86,7 @@ class StoreEventRequest extends FormRequest
             'category.max' => 'Event categories cannot exceed 2,048 characters.',
             'banner.required' => 'Please upload a banner image for the event.',
             'banner.image' => 'Banner must be an image file (JPG, PNG, etc.).',
-            'banner.max' => 'Banner image size cannot exceed 10 MB.',
+            'banner.max' => 'Banner image size cannot exceed 5 MB.',
             'publish.boolean' => 'Publish status must be true or false.',
         ];
     }

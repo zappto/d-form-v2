@@ -189,6 +189,40 @@ class EventManagementTest extends TestCase
         $response->assertSessionHasErrors('banner');
     }
 
+    public function test_store_rejects_banner_over_5mb(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $registrationStart = now()->startOfDay();
+        $registrationEnd = now()->addDays(3)->endOfDay();
+        $startDate = now()->addDays(10)->startOfDay();
+        $endDate = now()->addDays(11)->startOfDay();
+
+        $response = $this->actingAs($admin)->post(route('dashboard.events.store'), [
+            'title' => 'Conference Oversized',
+            'location' => 'Campus Hall',
+            'description' => 'Description here.',
+            'registration_start' => $registrationStart->toDateString(),
+            'registration_end' => $registrationEnd->toDateString(),
+            'start_date' => $startDate->toDateString(),
+            'end_date' => $endDate->toDateString(),
+            'quota' => 50,
+            'price' => '5000',
+            'session' => 'general',
+            'category' => 'rkt',
+            'banner' => UploadedFile::fake()->image('banner.jpg')->size(5121),
+            'publish' => false,
+        ]);
+
+        $response->assertSessionHasErrors([
+            'banner' => 'Banner image size cannot exceed 5 MB.',
+        ]);
+        $this->assertDatabaseMissing('events', ['title' => 'Conference Oversized']);
+    }
+
     public function test_admin_can_soft_delete_and_restore_event(): void
     {
         Storage::fake('public');

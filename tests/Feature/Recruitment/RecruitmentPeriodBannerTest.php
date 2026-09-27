@@ -141,4 +141,20 @@ class RecruitmentPeriodBannerTest extends TestCase
 
         $this->assertDatabaseMissing('recruitment_periods', ['name' => 'OpRec File Salah']);
     }
+
+    public function test_store_menolak_banner_lebih_dari_5mb(): void
+    {
+        Storage::fake('public');
+
+        $admin = $this->admin();
+
+        $this->actingAs($admin)
+            ->post(route('dashboard.recruitment.periods.store'), [
+                'name' => 'OpRec Banner Kegedean',
+                'banner' => UploadedFile::fake()->image('banner.jpg')->size(5121),
+            ])
+            ->assertSessionHasErrors(['banner' => 'Ukuran banner tidak boleh lebih dari 5 MB.']);
+
+        $this->assertDatabaseMissing('recruitment_periods', ['name' => 'OpRec Banner Kegedean']);
+    }
 }
