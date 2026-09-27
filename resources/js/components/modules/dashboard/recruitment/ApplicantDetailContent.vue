@@ -17,7 +17,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import { applicantAllowsTrackingResend, userAllowsTrackingResend } from '@/lib/recruitmentApplicantCapabilities'
 import { formatBytes, formatSubmissionDateTime } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { showErrorToast, showFlashToast } from '@/lib/error-message'
@@ -170,10 +169,6 @@ const canScreen = computed(
     () => props.application.can_screen && user.value?.can_screen_recruitment_applications === true,
 )
 const canVerify = computed(() => props.application.can_verify && user.value?.can_screen_recruitment_applications === true)
-const canResendTracking = computed(
-    () =>
-        applicantAllowsTrackingResend(props.application) && userAllowsTrackingResend(user.value),
-)
 const canReviewCorrections = computed(() => user.value?.can_review_recruitment_corrections === true)
 const canDecideFinal = computed(
     () => props.application.can_decide_final && user.value?.can_decide_recruitment_final === true,
