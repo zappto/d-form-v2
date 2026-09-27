@@ -51,14 +51,25 @@ const openMenuId = ref<string | null>(null);
 const menuRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLElement | null>(null);
 
-/** Simpan elemen pemicu menu; ref komponen non-elemen diabaikan agar berhenti bertipe elemen. */
-function setTriggerRef(el: Element | ComponentPublicInstance | null): void {
-    triggerRef.value = el instanceof HTMLElement ? el : null;
+/**
+ * Resolve a template ref to its DOM element. A `ref` on a component (e.g. `Button`) yields the
+ * component instance, not the node, so fall back to its `$el` (VueUse `unrefElement` idiom).
+ */
+function toHtmlElement(refValue: Element | ComponentPublicInstance | null): HTMLElement | null {
+    if (refValue instanceof HTMLElement) return refValue;
+    if (refValue instanceof Element) return null;
+    const root = refValue?.$el;
+    return root instanceof HTMLElement ? root : null;
 }
 
-/** Simpan elemen panel menu; ref komponen non-elemen diabaikan agar berhenti bertipe elemen. */
+/** Simpan elemen pemicu menu (fallback `$el` untuk ref komponen) agar eksklusi klik pemicu hidup. */
+function setTriggerRef(el: Element | ComponentPublicInstance | null): void {
+    triggerRef.value = toHtmlElement(el);
+}
+
+/** Simpan elemen panel menu (fallback `$el` untuk ref komponen) agar eksklusi klik dalam panel hidup. */
 function setMenuRef(el: Element | ComponentPublicInstance | null): void {
-    menuRef.value = el instanceof HTMLElement ? el : null;
+    menuRef.value = toHtmlElement(el);
 }
 
 function toggleMenu(): void {
