@@ -3,9 +3,10 @@ import { nextTick } from 'vue';
 import { config, mount, type VueWrapper, type DOMWrapper } from '@vue/test-utils';
 import PeriodCreate from '../Create.vue';
 import PeriodEdit from '../Edit.vue';
-const { handleInertiaFormErrors, showFlashToast } = vi.hoisted(() => ({
+const { handleInertiaFormErrors, showFlashToast, showErrorToast } = vi.hoisted(() => ({
     handleInertiaFormErrors: vi.fn(),
     showFlashToast: vi.fn(),
+    showErrorToast: vi.fn(),
 }));
 import { toast } from 'vue-sonner';
 import { routes } from '@/lib/routes';
@@ -55,7 +56,7 @@ vi.mock('@inertiajs/vue3', async () => {
 vi.mock('@/layouts/DashboardLayout.vue', () => ({ default: { template: '<slot />' } }));
 
 vi.mock('@/hooks/useErrorToast', () => ({
-    useErrorToast: () => ({ handleInertiaFormErrors, showFlashToast }),
+    useErrorToast: () => ({ handleInertiaFormErrors, showFlashToast, showErrorToast }),
 }));
 
 vi.mock('vue-sonner', () => ({
@@ -65,7 +66,7 @@ vi.mock('vue-sonner', () => ({
 interface InertiaMutationOptions {
     forceFormData?: boolean;
     preserveScroll?: boolean;
-    onSuccess?: () => void;
+    onSuccess?: (page?: { component?: string; props?: { errors?: Record<string, string> } }) => void;
     onError?: (errors: Record<string, string>) => void;
     onFinish?: () => void;
 }
@@ -174,13 +175,17 @@ describe('Periods/Create submit (Task 6)', () => {
             await wrapper.find('#period-form').trigger('submit');
             await nextTick();
 
-            lastMutationOptions().onSuccess?.();
+            lastMutationOptions().onSuccess?.({
+                component: 'Dashboard/Recruitment/Periods/Show',
+                props: { errors: {} },
+            });
             // Inertia menyelesaikan request → processing pulih.
             finishProcessing();
             await nextTick();
 
             expect(toast.success).not.toHaveBeenCalled();
             expect(showFlashToast).not.toHaveBeenCalled();
+            expect(showErrorToast).not.toHaveBeenCalled();
             expect(handleInertiaFormErrors).not.toHaveBeenCalled();
 
             const btn = submitButton(wrapper);
@@ -204,13 +209,35 @@ describe('Periods/Create submit (Task 6)', () => {
 
             expect(handleInertiaFormErrors).toHaveBeenCalledWith(
                 { name: 'Nama wajib diisi.' },
-                { title: 'Gagal membuat periode' }
+                {
+                    title: 'Gagal membuat periode',
+                    fieldLabels: expect.objectContaining({ name: 'Nama periode' }),
+                }
             );
             expect(toast.success).not.toHaveBeenCalled();
 
             finishProcessing();
             await nextTick();
             expect(submitButton(wrapper).attributes('disabled')).toBeUndefined();
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('sukses tapi masih di halaman Create tanpa error → toast sesi kedaluwarsa', async () => {
+        const wrapper = mountCreate();
+        try {
+            await wrapper.find('#period-form').trigger('submit');
+            await nextTick();
+
+            lastMutationOptions().onSuccess?.({
+                component: 'Dashboard/Recruitment/Periods/Create',
+                props: { errors: {} },
+            });
+            await nextTick();
+
+            expect(showErrorToast).toHaveBeenCalledTimes(1);
+            expect(handleInertiaFormErrors).not.toHaveBeenCalled();
         } finally {
             wrapper.unmount();
         }
