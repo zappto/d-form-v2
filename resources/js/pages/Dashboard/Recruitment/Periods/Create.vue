@@ -17,9 +17,21 @@ import { setTopbar } from '@/hooks/useDashboardTopbar';
 import { BannerPickerField } from '@/components/core/field';
 import { SAVING_LABEL } from '@/lib/uiLabels';
 
-const { handleInertiaFormErrors } = useErrorToast();
+const { handleInertiaFormErrors, showErrorToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
+
+/** Label field periode agar pesan validasi di toast mudah dicocokkan dengan form. */
+const errorPeriodFieldLabels: Record<string, string> = {
+    name: 'Nama periode',
+    description: 'Deskripsi',
+    registration_opens_at: 'Buka pendaftaran',
+    registration_closes_at: 'Tutup pendaftaran',
+    interview_starts_at: 'Mulai interview',
+    interview_ends_at: 'Akhir interview',
+    finalization_deadline_at: 'Target finalisasi',
+    banner: 'Banner',
+};
 
 interface IPeriodFormData {
     name: string;
@@ -54,7 +66,18 @@ function submit(): void {
     form.post(routes.admin.recruitment.periods.store, {
         forceFormData: true,
         onError: (errors) => {
-            handleInertiaFormErrors(errors, { title: 'Gagal membuat periode' });
+            handleInertiaFormErrors(errors, { title: 'Gagal membuat periode', fieldLabels: errorPeriodFieldLabels });
+        },
+        onSuccess: (page) => {
+            // Server selalu mengalihkan dari halaman ini saat penyimpanan berhasil.
+            // Kalau masih di halaman ini tanpa error, permintaan dibatalkan tanpa
+            // pesan (mis. sesi kedaluwarsa) sehingga perlu diberi tahu ke pengguna.
+            const hasErrors = Object.keys(page.props.errors ?? {}).length > 0;
+            if (page.component === 'Dashboard/Recruitment/Periods/Create' && hasErrors === false) {
+                showErrorToast(
+                    'Periode gagal disimpan. Sesi Anda mungkin sudah berakhir, muat ulang halaman lalu coba lagi.'
+                );
+            }
         },
     });
 }
