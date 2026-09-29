@@ -14,14 +14,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
+        // UserSeeder sengaja tidak di-commit (file lokal/dev). Lewati bila
+        // kelasnya tidak ada agar db:seed pada build fresh tidak abort.
+        $seeders = [
             RoleSeeder::class,
             RecruitmentDivisionSeeder::class,
             EventSeeder::class,
             FormSeeder::class,
             OprecFormSeeder::class,
-            UserSeeder::class,
-        ]);
+        ];
+
+        if (class_exists(UserSeeder::class)) {
+            $seeders[] = UserSeeder::class;
+        }
+
+        $this->call($seeders);
 
         // Dev/local only: periode oprec dummy agar /recruitment langsung bisa submit,
         // + data scan test. Prod TIDAK memakai seeder ini — cukup migrate
