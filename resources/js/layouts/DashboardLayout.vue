@@ -7,9 +7,11 @@ import { Toaster } from '@/components/ui/sonner';
 import Sidebar from '@/components/layout/Sidebar.vue';
 import Topbar from '@/components/layout/Topbar.vue';
 import { usePageFlashToast } from '@/hooks/usePageFlashToast';
+import { useHttpErrorToast } from '@/hooks/useHttpErrorToast';
 import { clearTopbar } from '@/hooks/useDashboardTopbar';
 
 usePageFlashToast();
+useHttpErrorToast();
 
 // Reset state topbar saat navigasi Inertia ke halaman lain,
 // supaya judul/subtitle halaman sebelumnya tidak bocor.
