@@ -150,13 +150,17 @@ function formatFeedTime(ts: string): string {
     return parsed.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function scanIdentity(
-    kind: 'event' | 'oprec',
-    identifier: string,
-    queueNumber: number | null,
-    eventTitle: string
-): string {
-    return `${kind}|${eventTitle}|${identifier}|${queueNumber === null ? '-' : String(queueNumber)}`;
+/** Argumen identitas dedup scan (jenis + pengenal + antrean + judul event). */
+interface IScanIdentityArgs {
+    kind: 'event' | 'oprec';
+    identifier: string;
+    queueNumber: number | null;
+    eventTitle: string;
+}
+
+/** Kunci dedup hasil scan agar pantulan kamera & baris feed yang sama tak tercatat ganda. */
+function scanIdentity(args: IScanIdentityArgs): string {
+    return `${args.kind}|${args.eventTitle}|${args.identifier}|${args.queueNumber === null ? '-' : String(args.queueNumber)}`;
 }
 
 /** Petakan tipe envelope server ke jenis event internal. */
@@ -310,7 +314,14 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
     }
 
     function pushResult(result: IScanResult): void {
-        localEntryIdentities.add(scanIdentity(result.eventKind, result.email, result.queueNumber, result.eventTitle));
+        localEntryIdentities.add(
+            scanIdentity({
+                kind: result.eventKind,
+                identifier: result.email,
+                queueNumber: result.queueNumber,
+                eventTitle: result.eventTitle,
+            })
+        );
         scanResult.value = result;
         const entry: IScanEntry = createScanHistoryEntry(result);
         scanEntryEpochMs.set(entry.id, Date.now());
@@ -473,7 +484,7 @@ export function useQrFeed(args: IQrFeedArgs): IQrFeedControls {
         const identifier = row.identifier.trim().length > 0 ? row.identifier.trim() : '-';
         const eventTitle = formatGlobalEventTitle(kind, row.eventTitle);
 
-        if (localEntryIdentities.has(scanIdentity(kind, identifier, row.queueNumber, eventTitle))) {
+        if (localEntryIdentities.has(scanIdentity({ kind, identifier, queueNumber: row.queueNumber, eventTitle }))) {
             return;
         }
 

@@ -14,7 +14,7 @@ describe('useAutosaveSync debounce', () => {
     it('default 800 ms: save belum jalan di 799 ms, jalan tepat di 800 ms', async () => {
         const source = ref('a');
         const save = vi.fn(async () => true);
-        const sync = useAutosaveSync(() => source.value, save);
+        const sync = useAutosaveSync({ source: () => source.value, save });
 
         sync.schedule();
         await vi.advanceTimersByTimeAsync(799);
@@ -28,7 +28,7 @@ describe('useAutosaveSync debounce', () => {
     it('debounceMs eksplisit menang atas default (mis. 0 di test)', async () => {
         const source = ref('a');
         const save = vi.fn(async () => true);
-        const sync = useAutosaveSync(() => source.value, save, { debounceMs: 0 });
+        const sync = useAutosaveSync({ source: () => source.value, save, debounceMs: 0 });
 
         sync.schedule();
         await vi.advanceTimersByTimeAsync(0);

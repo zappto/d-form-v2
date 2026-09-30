@@ -14,7 +14,7 @@ function toastFailedMutatingVisitErrorPage(component: string, status: number): v
     if (lastMutatingVisitMethod === 'get') return;
     if (component !== 'Error') return;
     const { showHttpErrorToast } = useErrorToast();
-    showHttpErrorToast(status);
+    showHttpErrorToast({ status });
 }
 
 /** Daftarkan toast submit gagal yang mendarat di halaman Error (mis. 403/500); dipanggil sekali di layout dashboard. */

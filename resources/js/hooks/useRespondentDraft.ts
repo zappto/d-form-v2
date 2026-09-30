@@ -125,7 +125,9 @@ export function useRespondentDraft<T>(
 ): IUseRespondentDraftResult<T> {
     const lastSavedAt = ref<Date | null>(null);
 
-    const autosave = useAutosaveSync(source, async () => false, {
+    const autosave = useAutosaveSync({
+        source,
+        save: async () => false,
         debounceMs: opts.debounceMs ?? RESPONDENT_DRAFT_DEBOUNCE_MS,
         storageKey,
         storage: {

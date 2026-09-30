@@ -192,9 +192,18 @@ interface IUploadBodyRequest {
 /** Pilih body multipart banner-only vs banner+opsi sesuai file pending. */
 function buildUploadBody(request: IUploadBodyRequest): FormData {
     if (request.optionFiles.length === 0 && request.bannerFile !== null) {
-        return buildBannerFieldsFormData(request.dirty, request.deletedIds, request.bannerFile);
+        return buildBannerFieldsFormData({
+            dirty: request.dirty,
+            deletedIds: request.deletedIds,
+            file: request.bannerFile,
+        });
     }
-    return buildOptionImageFieldsFormData(request.dirty, request.deletedIds, request.optionFiles, request.bannerFile);
+    return buildOptionImageFieldsFormData({
+        dirty: request.dirty,
+        deletedIds: request.deletedIds,
+        optionFiles: request.optionFiles,
+        bannerFile: request.bannerFile,
+    });
 }
 
 /** Argumen sinkronisasi state pasca-upload: state live + file terkirim + respons server. */
@@ -216,7 +225,11 @@ interface ISaveRequest {
 function applyUploadResults(request: IUploadResultRequest): void {
     const storedBannerPath = readBannerPathFromResponse(request.response);
     if (storedBannerPath !== null) {
-        applyBannerUploadSuccess(request.state.banner, storedBannerPath, request.bannerFile?.name);
+        applyBannerUploadSuccess({
+            state: request.state.banner,
+            storedPath: storedBannerPath,
+            fileName: request.bannerFile?.name,
+        });
     } else if (request.bannerFile !== null) {
         request.state.banner.bannerFile = null;
         request.state.banner.bannerPreviewUrl = '';
@@ -353,7 +366,9 @@ export function useBuilderAutosave(options: IBuilderAutosaveOptions): IBuilderAu
     }
 
     // Debounce stabil pipeline autosave builder.
-    const sync = useAutosaveSync(snapshot, save, {
+    const sync = useAutosaveSync({
+        source: snapshot,
+        save,
         debounceMs: AUTOSAVE_DEBOUNCE_MS,
         enabled: computed(() => options.readEnabled()),
         onError: options.notifySaveError,

@@ -99,13 +99,16 @@ function normalizeMatchText(value: string): string {
         .trim();
 }
 
+/** Argumen halaman scan QR global (id kontainer kamera + endpoint + pemasok target filter). */
+export interface IGlobalQrScanPageArgs {
+    scannerContainerId: string;
+    storeUrl: string;
+    feedUrl: string;
+    getTargets: () => IGlobalScanTargets;
+}
+
 /** Kamera QR, umpan hasil scan, opsi target filter, dan ringkasan halaman scan QR global. */
-export function useGlobalQrScanPage(
-    scannerContainerId: string,
-    storeUrl: string,
-    feedUrl: string,
-    getTargets: () => IGlobalScanTargets
-) {
+export function useGlobalQrScanPage(args: IGlobalQrScanPageArgs) {
     const { showErrorToast } = useErrorToast();
     const registrationCodeInput = ref('');
     const selectedTarget = ref('all');
@@ -113,10 +116,10 @@ export function useGlobalQrScanPage(
     const logQuery = ref('');
 
     const camera = useQrCamera({
-        containerId: scannerContainerId,
+        containerId: args.scannerContainerId,
         onDecode: (decodedText) => processScan(decodedText, 'camera'),
     });
-    const feed = useQrFeed({ storeUrl, feedUrl });
+    const feed = useQrFeed({ storeUrl: args.storeUrl, feedUrl: args.feedUrl });
 
     function processScan(decodedText: string, source: TQrScanSource): void {
         if (source === 'camera' && camera.isShutterActive.value) {
@@ -139,7 +142,7 @@ export function useGlobalQrScanPage(
     }
 
     const targetOptions = computed<IGlobalScanTargetOption[]>(() => {
-        const targets = getTargets();
+        const targets = args.getTargets();
 
         return [
             ...targets.sessions.map((session) => ({
@@ -262,7 +265,7 @@ export function useGlobalQrScanPage(
     }
 
     return {
-        scannerContainerId,
+        scannerContainerId: args.scannerContainerId,
         cameras: camera.cameras,
         selectedCameraId: camera.selectedCameraId,
         isCameraReady: camera.isCameraReady,
