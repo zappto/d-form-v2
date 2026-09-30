@@ -15,6 +15,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class UserManagementService
 {
@@ -28,6 +29,18 @@ class UserManagementService
         'member',
         'recruitment-staff',
         'recruitment-interviewer',
+    ];
+
+    /**
+     * Label user-visible per role key; kunci wajib selaras ASSIGNABLE_ROLES.
+     *
+     * @var array<string, string>
+     */
+    private const ROLE_LABELS = [
+        'admin' => 'Admin',
+        'member' => 'Member',
+        'recruitment-staff' => 'Recruitment Staff',
+        'recruitment-interviewer' => 'Recruitment Interviewer',
     ];
 
     /**
@@ -402,21 +415,36 @@ class UserManagementService
     }
 
     /**
+     * Label satu role; role tak dikenal dicatat lalu dihumanisasi eksplisit.
+     */
+    public function roleLabel(string $role): string
+    {
+        if (isset(self::ROLE_LABELS[$role])) {
+            return self::ROLE_LABELS[$role];
+        }
+
+        Log::warning('UserManagementService: label hilang untuk role tak dikenal.', ['role' => $role]);
+
+        return $this->humanizeRoleKey($role);
+    }
+
+    /**
+     * Ubah role key menjadi label default ("recruitment-staff" jadi "Recruitment Staff").
+     */
+    private function humanizeRoleKey(string $role): string
+    {
+        return ucwords(str_replace(['-', '_'], ' ', $role));
+    }
+
+    /**
      * @return list<array{value: string, label: string}>
      */
     public function roleOptions(): array
     {
-        $labels = [
-            'admin' => 'Admin',
-            'member' => 'Member',
-            'recruitment-staff' => 'Recruitment Staff',
-            'recruitment-interviewer' => 'Recruitment Interviewer',
-        ];
-
         return array_map(
             fn (string $role) => [
                 'value' => $role,
-                'label' => $labels[$role] ?? $role,
+                'label' => $this->roleLabel($role),
             ],
             self::ASSIGNABLE_ROLES
         );
