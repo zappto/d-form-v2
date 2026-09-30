@@ -48,21 +48,31 @@ const formSegments = computed((): TFormSegment[] => {
     return out;
 });
 
-function slotStorageKey(
-    ctx: UnwrapNestedRefs<TFormFillPageContext>,
-    field: IFormField,
-    slot: { slotIndex: number | null }
-): string {
-    return ctx.answerKeyForSlot(field, slot.slotIndex);
+/** Argumen kunci storage satu slot partisipasi (konteks + field + slot). */
+interface ISlotStorageKeyArgs {
+    ctx: UnwrapNestedRefs<TFormFillPageContext>;
+    field: IFormField;
+    slot: { slotIndex: number | null };
 }
 
-function imageUploadFillReadyForField(
-    ctx: UnwrapNestedRefs<TFormFillPageContext>,
-    field: IFormField,
-    storageKey: string
-): boolean {
+/** Kunci storage jawaban satu slot partisipasi; dipakai mengikat slot ke state form induk. */
+function slotStorageKey(args: ISlotStorageKeyArgs): string {
+    return args.ctx.answerKeyForSlot(args.field, args.slot.slotIndex);
+}
+
+/** Argumen cek kesiapan upload gambar satu slot (konteks + field + kunci storage). */
+interface IImageUploadFillReadyArgs {
+    ctx: UnwrapNestedRefs<TFormFillPageContext>;
+    field: IFormField;
+    storageKey: string;
+}
+
+/** True bila field image_upload slot sudah punya file + preview lokal; dipakai indikator slot siap. */
+function imageUploadFillReadyForField(args: IImageUploadFillReadyArgs): boolean {
     return (
-        ctx.builderType(field) === 'image_upload' && !!ctx.answerForm[storageKey] && !!ctx.filePreviewUrls[storageKey]
+        args.ctx.builderType(args.field) === 'image_upload' &&
+        !!args.ctx.answerForm[args.storageKey] &&
+        !!args.ctx.filePreviewUrls[args.storageKey]
     );
 }
 
@@ -162,10 +172,12 @@ function confirmSubmit() {
                                 :ctx="ctx"
                                 :field="field"
                                 :participation-slot="slot"
-                                :storage-key="slotStorageKey(ctx, field, slot)"
+                                :storage-key="slotStorageKey({ ctx, field, slot })"
                                 variant="linear"
                                 :stack-index="0"
-                                :image-upload-fill-ready-fn="(k) => imageUploadFillReadyForField(ctx, field, k)"
+                                :image-upload-fill-ready-fn="
+                                    (k) => imageUploadFillReadyForField({ ctx, field, storageKey: k })
+                                "
                                 @open-lightbox="
                                     (src, title) => {
                                         openUploadLightbox(src, title);
@@ -204,10 +216,10 @@ function confirmSubmit() {
                         :ctx="ctx"
                         :field="field"
                         :participation-slot="slot"
-                        :storage-key="slotStorageKey(ctx, field, slot)"
+                        :storage-key="slotStorageKey({ ctx, field, slot })"
                         variant="bundleParticipant"
                         :stack-index="fi"
-                        :image-upload-fill-ready-fn="(k) => imageUploadFillReadyForField(ctx, field, k)"
+                        :image-upload-fill-ready-fn="(k) => imageUploadFillReadyForField({ ctx, field, storageKey: k })"
                         @open-lightbox="
                             (src, title) => {
                                 openUploadLightbox(src, title);

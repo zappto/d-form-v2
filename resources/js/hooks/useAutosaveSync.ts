@@ -33,12 +33,14 @@ export interface IUseAutosaveSyncResult {
  * setelah save aktif selesai (bukan paralel). Guard seq dipertahankan untuk
  * status agar hasil basi tidak menimpa status terbaru.
  */
-export function useAutosaveSync(
-    source: () => string,
-    save: (snapshot: string) => Promise<boolean>,
-    opts: IUseAutosaveSyncOptions = {}
-): IUseAutosaveSyncResult {
-    const debounceMs = opts.debounceMs ?? AUTOSAVE_DEBOUNCE_MS;
+/** Argumen auto-sync global (sumber snapshot + penyimpan + opsi debounce/storage/gerbang). */
+export interface IUseAutosaveSyncArgs extends IUseAutosaveSyncOptions {
+    source: () => string;
+    save: (snapshot: string) => Promise<boolean>;
+}
+
+export function useAutosaveSync(args: IUseAutosaveSyncArgs): IUseAutosaveSyncResult {
+    const debounceMs = args.debounceMs ?? AUTOSAVE_DEBOUNCE_MS;
     const status = ref<TAutosaveStatus>('idle');
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     let saveSeq = 0;
@@ -46,8 +48,8 @@ export function useAutosaveSync(
     let queued = false;
 
     function isEnabled(): boolean {
-        if (typeof opts.enabled === 'boolean') return opts.enabled;
-        if (opts.enabled) return opts.enabled.value;
+        if (typeof args.enabled === 'boolean') return args.enabled;
+        if (args.enabled) return args.enabled.value;
         return true;
     }
 
@@ -60,8 +62,8 @@ export function useAutosaveSync(
 
     function schedule(): void {
         if (!isEnabled()) return;
-        if (opts.storage && opts.storageKey) {
-            opts.storage.write(opts.storageKey, source());
+        if (args.storage && args.storageKey) {
+            args.storage.write(args.storageKey, args.source());
         }
         clearTimer();
         debounceTimer = setTimeout(() => {
@@ -83,12 +85,12 @@ export function useAutosaveSync(
                 const seq = ++saveSeq;
                 status.value = 'saving';
                 try {
-                    const didWork = await save(source());
+                    const didWork = await args.save(args.source());
                     if (seq === saveSeq && !queued) status.value = didWork ? 'saved' : 'idle';
                 } catch (err) {
                     if (seq === saveSeq && !queued) {
                         status.value = 'idle';
-                        (opts.onError ?? (() => {}))(err instanceof Error ? err.message : 'Gagal menyimpan otomatis.');
+                        (args.onError ?? (() => {}))(err instanceof Error ? err.message : 'Gagal menyimpan otomatis.');
                     }
                 }
             } while (queued);
@@ -101,7 +103,7 @@ export function useAutosaveSync(
         clearTimer();
     }
 
-    watch(source, () => {
+    watch(args.source, () => {
         schedule();
     });
 

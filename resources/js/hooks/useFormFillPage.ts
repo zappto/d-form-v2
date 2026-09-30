@@ -4,7 +4,7 @@ import { buildValuesDraftSnapshot, useDraftRestore } from '@/hooks/useDraftResto
 import type { IDraftValuesSnapshot } from '@/hooks/useDraftRestore';
 import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import { pickFormBannerField } from '@/components/modules/builder/formBanner';
-import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
+import { createCheckboxToggleHandler, isCheckboxOptionSelected } from '@/lib/formCheckboxAnswers';
 import { IMAGE_UPLOAD_RECOMMENDED_SIZE } from '@/lib/displayLimits';
 import { buildFieldLabelMap, getFieldError, type TErrorMessageContext } from '@/lib/errorMessage';
 import { useErrorToast } from './useErrorToast';
@@ -302,9 +302,13 @@ export function useFormFillPage(props: {
             .join(',');
     }
 
-    function onCheckboxToggle(fieldName: string, option: string, checked: boolean) {
-        answerForm[fieldName] = toggleCheckboxSelection(answerForm[fieldName], option, checked);
-    }
+    /** Alihkan centang checkbox responden ke state form induk; satu sumber dengan undangan tim. */
+    const onCheckboxToggle = createCheckboxToggleHandler({
+        read: (fieldName: string): unknown => answerForm[fieldName],
+        write: (fieldName: string, selected: string[]): void => {
+            answerForm[fieldName] = selected;
+        },
+    });
 
     function isCheckboxSelected(fieldName: string, option: string): boolean {
         return isCheckboxOptionSelected(answerForm[fieldName], option);

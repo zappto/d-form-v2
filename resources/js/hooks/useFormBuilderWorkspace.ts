@@ -28,6 +28,13 @@ export interface IFormBuilderWorkspaceModels {
     successContent?: Ref<string>;
 }
 
+/** Argumen mulai-drag kartu kanvas (event drag + field + indeks asal). */
+export interface ICanvasDragStartArgs {
+    dragEvent: DragEvent;
+    field: BuilderField;
+    index: number;
+}
+
 /** Kategori palette terbuka. `null` = semua tertutup (single-expand). */
 export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, options: { onSave: () => void }) {
     const { showErrorToast } = useErrorToast();
@@ -252,13 +259,14 @@ export function useFormBuilderWorkspace(models: IFormBuilderWorkspaceModels, opt
         dragSourceId.value = null;
     }
 
-    function onCanvasDragStart(e: DragEvent, field: BuilderField, index: number): void {
-        dragSourceId.value = field.id;
-        if (e.dataTransfer) {
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData(
+    /** Tandai sumber drag kartu kanvas + titipkan payload pindah ke dataTransfer; dipakai kanvas builder. */
+    function onCanvasDragStart(args: ICanvasDragStartArgs): void {
+        dragSourceId.value = args.field.id;
+        if (args.dragEvent.dataTransfer) {
+            args.dragEvent.dataTransfer.effectAllowed = 'move';
+            args.dragEvent.dataTransfer.setData(
                 'application/json',
-                JSON.stringify({ id: field.id, fromIndex: index, isNew: false })
+                JSON.stringify({ id: args.field.id, fromIndex: args.index, isNew: false })
             );
         }
         requestAnimationFrame(() => {

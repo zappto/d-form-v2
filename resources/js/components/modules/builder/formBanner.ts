@@ -193,23 +193,37 @@ export function ensureBannerRowDirty(backend: BackendField[], dirty: BackendFiel
  * `fields` + `deleted_ids` sebagai JSON-string part (Laravel parse native
  * via FormData; decode di server) + `banner_file` sebagai file part.
  */
-export function buildBannerFieldsFormData(dirty: BackendField[], deletedIds: string[], file: File): FormData {
+/** Argumen multipart autosave banner (dirty + deleted eksplisit + file banner baru). */
+export interface IBuildBannerFieldsFormDataArgs {
+    dirty: BackendField[];
+    deletedIds: string[];
+    file: File;
+}
+
+export function buildBannerFieldsFormData(args: IBuildBannerFieldsFormDataArgs): FormData {
     const formData = new FormData();
-    formData.append('fields', JSON.stringify(dirty));
-    formData.append('deleted_ids', JSON.stringify(deletedIds));
-    formData.append('banner_file', file, file.name);
+    formData.append('fields', JSON.stringify(args.dirty));
+    formData.append('deleted_ids', JSON.stringify(args.deletedIds));
+    formData.append('banner_file', args.file, args.file.name);
     return formData;
 }
 
+/** Argumen sinkronisasi state banner pasca-upload sukses (state live + path tersimpan + nama file). */
+export interface IApplyBannerUploadSuccessArgs {
+    state: ITFormBannerState;
+    storedPath: string;
+    fileName?: string;
+}
+
 /** Setelah upload sukses: state pegang path string, bukan File/base64. */
-export function applyBannerUploadSuccess(state: ITFormBannerState, storedPath: string, fileName?: string): void {
-    revokeBannerPreview(state);
-    state.bannerUrl = storedPath;
-    if (typeof fileName === 'string' && fileName.trim() !== '') {
-        state.bannerFileName = fileName;
+export function applyBannerUploadSuccess(args: IApplyBannerUploadSuccessArgs): void {
+    revokeBannerPreview(args.state);
+    args.state.bannerUrl = args.storedPath;
+    if (typeof args.fileName === 'string' && args.fileName.trim() !== '') {
+        args.state.bannerFileName = args.fileName;
     }
-    state.bannerFile = null;
-    state.bannerPreviewUrl = '';
+    args.state.bannerFile = null;
+    args.state.bannerPreviewUrl = '';
 }
 
 /** True bila value berupa objek JSON-like non-null; menyempitkan body respons HTTP tanpa cast. */

@@ -35,12 +35,19 @@ function to12h(value: string): { h12: number; meridian: 'AM' | 'PM'; minute: str
     return { h12, meridian, minute };
 }
 
+/** Argumen konversi jam 12-jam ke 24-jam (jam + meridian + menit). */
+interface ITo24hArgs {
+    h12: number;
+    meridian: 'AM' | 'PM';
+    minute: string;
+}
+
 /** "1-12" + meridian → "HH:mm" 24-jam */
-function to24h(h12: number, meridian: 'AM' | 'PM', minute: string): string {
-    let h = h12 % 12;
-    if (meridian === 'PM') h += 12;
+function to24h(args: ITo24hArgs): string {
+    let h = args.h12 % 12;
+    if (args.meridian === 'PM') h += 12;
     const hh = String(h).padStart(2, '0');
-    const mm = (minute || '00').slice(0, 2).padStart(2, '0');
+    const mm = (args.minute || '00').slice(0, 2).padStart(2, '0');
     return `${hh}:${mm}`;
 }
 
@@ -54,7 +61,7 @@ function onHourInput(v: string): void {
     let h = parseInt(digits, 10);
     if (!Number.isFinite(h) || h < 1) h = 1;
     if (h > 12) h = 12;
-    emit('update:modelValue', to24h(h, meridian.value, minute.value));
+    emit('update:modelValue', to24h({ h12: h, meridian: meridian.value, minute: minute.value }));
 }
 
 function onMinuteInput(v: string): void {
@@ -62,7 +69,10 @@ function onMinuteInput(v: string): void {
     let m = parseInt(digits, 10);
     if (!Number.isFinite(m)) m = 0;
     if (m > 59) m = 59;
-    emit('update:modelValue', to24h(state.value.h12, meridian.value, String(m).padStart(2, '0')));
+    emit(
+        'update:modelValue',
+        to24h({ h12: state.value.h12, meridian: meridian.value, minute: String(m).padStart(2, '0') })
+    );
 }
 
 function onMinuteBlur(): void {
@@ -70,11 +80,14 @@ function onMinuteBlur(): void {
     let mm = parseInt(digits, 10);
     if (!Number.isFinite(mm)) mm = 0;
     if (mm > 59) mm = 59;
-    emit('update:modelValue', to24h(state.value.h12, meridian.value, String(mm).padStart(2, '0')));
+    emit(
+        'update:modelValue',
+        to24h({ h12: state.value.h12, meridian: meridian.value, minute: String(mm).padStart(2, '0') })
+    );
 }
 
 function setMeridian(m: 'AM' | 'PM'): void {
-    emit('update:modelValue', to24h(state.value.h12, m, minute.value));
+    emit('update:modelValue', to24h({ h12: state.value.h12, meridian: m, minute: minute.value }));
 }
 </script>
 

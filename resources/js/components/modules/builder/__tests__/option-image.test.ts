@@ -67,7 +67,12 @@ describe('option image upload (base64 → file storage)', () => {
         expect(pendingOptionImagesSnapshotKey(fields)).toContain('f1:o1:kucing.jpg');
 
         const backend = toBackendFields(fields);
-        const fd = buildOptionImageFieldsFormData(backend, [], collectPendingOptionImageFiles(fields), null);
+        const fd = buildOptionImageFieldsFormData({
+            dirty: backend,
+            deletedIds: [],
+            optionFiles: collectPendingOptionImageFiles(fields),
+            bannerFile: null,
+        });
         // fields + deleted_ids sebagai JSON-string part (tanpa data:).
         const fieldsPart = fd.get('fields');
         expect(typeof fieldsPart).toBe('string');

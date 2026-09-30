@@ -70,9 +70,17 @@ function metaString(field: IFormPreviewField, key: string): string {
     return typeof v === 'string' ? v : '';
 }
 
-function metaNumber(field: IFormPreviewField, key: string, fallback: number): number {
-    const v = field.metadata?.[key];
-    return typeof v === 'number' && !Number.isNaN(v) ? v : fallback;
+/** Argumen baca angka metadata field pratinjau (field + kunci + fallback). */
+interface IMetaNumberArgs {
+    field: IFormPreviewField;
+    key: string;
+    fallback: number;
+}
+
+/** Baca angka metadata field pratinjau; fallback bila hilang atau NaN. */
+function metaNumber(args: IMetaNumberArgs): number {
+    const v = args.field.metadata?.[args.key];
+    return typeof v === 'number' && !Number.isNaN(v) ? v : args.fallback;
 }
 
 function optionEntries(field: IFormPreviewField): IFieldOptionEntry[] {
@@ -104,7 +112,7 @@ function optKey(opt: IFieldOptionEntry, i: number): string {
 }
 
 function ratingStars(field: IFormPreviewField): number[] {
-    const n = Math.min(Math.max(metaNumber(field, 'maxStars', 5), 1), 10);
+    const n = Math.min(Math.max(metaNumber({ field, key: 'maxStars', fallback: 5 }), 1), 10);
     return Array.from({ length: n }, (_, i) => i + 1);
 }
 </script>

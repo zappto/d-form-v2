@@ -13,7 +13,7 @@ import SearchableSelect, { type TSearchableSelectOption } from '@/components/cor
 import { readFieldMetadata, readFieldRules } from '@/lib/formFieldMetadata';
 import type { TFormFillAnswerMap, TFormFillAnswerValue } from '@/types/form';
 import FormParagraphContent from '@/components/modules/dashboard/FormParagraphContent.vue';
-import { isCheckboxOptionSelected, toggleCheckboxSelection } from '@/lib/formCheckboxAnswers';
+import { isCheckboxOptionSelected, createCheckboxToggleHandler } from '@/lib/formCheckboxAnswers';
 import { getFormFieldOptionRows, formFieldBuilderType } from '@/lib/formFieldOptions';
 import { normalizeBannerSrc } from '@/lib/bannerSrc';
 import FormFieldAnswerDisplay from '@/components/modules/dashboard/FormFieldAnswerDisplay.vue';
@@ -142,9 +142,13 @@ const { clear: clearInviteDraft } = useDraftRestore({
 const declineDialogOpen = ref(false);
 const acceptConfirmOpen = ref(false);
 
-function onCheckboxToggle(fieldName: string, option: string, checked: boolean) {
-    confirmForm[fieldName] = toggleCheckboxSelection(confirmForm[fieldName], option, checked);
-}
+/** Alihkan centang checkbox undangan ke state konfirmasi; satu sumber dengan halaman isi form. */
+const onCheckboxToggle = createCheckboxToggleHandler({
+    read: (fieldName: string): unknown => confirmForm[fieldName],
+    write: (fieldName: string, selected: string[]): void => {
+        confirmForm[fieldName] = selected;
+    },
+});
 
 function submitConfirm() {
     if (confirmForm.processing) return;
@@ -395,7 +399,11 @@ function submitDeclineFromDialog() {
                                             :model-value="isCheckboxOptionSelected(confirmForm[field.name], row.label)"
                                             @update:model-value="
                                                 (v: boolean | 'indeterminate') =>
-                                                    onCheckboxToggle(field.name, row.label, v === true)
+                                                    onCheckboxToggle({
+                                                        fieldName: field.name,
+                                                        option: row.label,
+                                                        checked: v === true,
+                                                    })
                                             "
                                         />
                                         <img

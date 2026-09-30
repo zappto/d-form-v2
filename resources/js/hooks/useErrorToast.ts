@@ -45,9 +45,16 @@ function handleInertiaFormErrors(errors: TValidationErrors, ctx?: TErrorToastCon
 
 /**
  * Tampilkan toast untuk status HTTP gagal, pesan body diprioritaskan di atas peta bawaan; dipakai di penangan error HTTP.
- * `body` sengaja `unknown` karena berasal dari respons HTTP eksternal dan disempitkan oleh `parseApiErrorMessage`.
  */
-function showHttpErrorToast(status: number, body?: unknown, overrides?: Partial<Record<number, string>>): void {
+/** Argumen toast error HTTP (status + body opsional + peta pesan kustom per status). */
+export interface IShowHttpErrorToastArgs {
+    status: number;
+    /** Body respons HTTP eksternal; disempitkan `parseApiErrorMessage` sebelum dipakai. */
+    body?: unknown;
+    overrides?: Partial<Record<number, string>>;
+}
+
+function showHttpErrorToast(args: IShowHttpErrorToastArgs): void {
     const defaults: Record<number, string> = {
         401: 'Anda perlu masuk terlebih dahulu.',
         403: 'Anda tidak memiliki izin untuk tindakan ini.',
@@ -57,16 +64,16 @@ function showHttpErrorToast(status: number, body?: unknown, overrides?: Partial<
         429: 'Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.',
         500: 'Terjadi kesalahan server. Coba lagi nanti.',
         503: 'Layanan sedang sibuk. Coba lagi nanti.',
-        ...overrides,
+        ...args.overrides,
     };
 
-    const fromBody = body ? parseApiErrorMessage(body, '') : '';
+    const fromBody = args.body ? parseApiErrorMessage(args.body, '') : '';
     if (fromBody) {
         toast.error(fromBody);
         return;
     }
 
-    toast.error(defaults[status] ?? `Permintaan gagal (kode ${status}).`);
+    toast.error(defaults[args.status] ?? `Permintaan gagal (kode ${args.status}).`);
 }
 
 /** Tampilkan toast error generik dengan opsi judul/deskripsi/durasi; dipakai untuk pesan error non-validasi. */

@@ -90,19 +90,22 @@ export function appendOptionImageFiles(formData: FormData, files: ITPendingOptio
  * (pola buildBannerFieldsFormData): `fields` + `deleted_ids` sebagai
  * JSON-string part + `banner_file` opsional + part file per opsi.
  */
-export function buildOptionImageFieldsFormData(
-    dirty: BackendField[],
-    deletedIds: string[],
-    optionFiles: ITPendingOptionImageFile[],
-    bannerFile?: File | null
-): FormData {
+/** Argumen multipart autosave opsi bergambar (dirty + deleted eksplisit + file pending + banner opsional). */
+export interface IBuildOptionImageFieldsFormDataArgs {
+    dirty: BackendField[];
+    deletedIds: string[];
+    optionFiles: ITPendingOptionImageFile[];
+    bannerFile?: File | null;
+}
+
+export function buildOptionImageFieldsFormData(args: IBuildOptionImageFieldsFormDataArgs): FormData {
     const formData = new FormData();
-    formData.append('fields', JSON.stringify(dirty));
-    formData.append('deleted_ids', JSON.stringify(deletedIds));
-    if (bannerFile instanceof File) {
-        formData.append('banner_file', bannerFile, bannerFile.name);
+    formData.append('fields', JSON.stringify(args.dirty));
+    formData.append('deleted_ids', JSON.stringify(args.deletedIds));
+    if (args.bannerFile instanceof File) {
+        formData.append('banner_file', args.bannerFile, args.bannerFile.name);
     }
-    appendOptionImageFiles(formData, optionFiles);
+    appendOptionImageFiles(formData, args.optionFiles);
     return formData;
 }
 

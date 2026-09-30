@@ -101,7 +101,7 @@ describe('spaced ordering (Fase 1-C)', () => {
     });
 
     it('allocateOrderRun mengembalikan null bila slot habis', () => {
-        expect(allocateOrderRun(0, 1, 1)).toBeNull();
-        expect(allocateOrderRun(null, 0, 1)).toBeNull();
+        expect(allocateOrderRun({ prev: 0, next: 1, count: 1 })).toBeNull();
+        expect(allocateOrderRun({ prev: null, next: 0, count: 1 })).toBeNull();
     });
 });
