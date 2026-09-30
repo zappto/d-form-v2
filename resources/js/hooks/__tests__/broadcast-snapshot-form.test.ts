@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DEFAULT_BROADCAST_SNAPSHOT_SOURCES, BROADCAST_SNAPSHOT_SOURCE_OPTIONS } from '@/lib/broadcastDataset';
 import { useBroadcastSnapshotForm } from '../useBroadcastSnapshotForm';
 
 /**
@@ -57,9 +58,12 @@ beforeEach(() => {
 describe('useBroadcastSnapshotForm', () => {
     it('sumber bawaan users; generate memetakan sumber ke datasets', () => {
         const snapshot = useBroadcastSnapshotForm({ broadcastId: 'b-1' });
-        expect(snapshot.selectedSources.value).toEqual(['users']);
+        expect(snapshot.selectedSources.value).toEqual([...DEFAULT_BROADCAST_SNAPSHOT_SOURCES]);
 
-        snapshot.selectedSources.value = ['users', 'event_participants'];
+        snapshot.selectedSources.value = [
+            ...DEFAULT_BROADCAST_SNAPSHOT_SOURCES,
+            ...BROADCAST_SNAPSHOT_SOURCE_OPTIONS.slice(0, 1),
+        ];
         snapshot.generateSnapshot();
 
         expect(formPostMock).toHaveBeenCalledTimes(1);

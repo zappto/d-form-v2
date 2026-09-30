@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { BROADCAST_MANUAL_SAMPLE_NAME, BROADCAST_SNAPSHOT_SOURCE_OPTIONS } from '@/lib/broadcastDataset';
 import { useBroadcastAttachments } from '@/hooks/useBroadcastAttachments';
 import { useBroadcastContentForm } from '@/hooks/useBroadcastContentForm';
 import { useBroadcastLifecycleActions } from '@/hooks/useBroadcastLifecycleActions';
@@ -62,6 +63,9 @@ const { scheduleForm, testForm, doSchedule, updateSchedule, sendTest, cancelBroa
         initialScheduleTime: props.broadcast.schedule_time ?? '',
     });
 const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id });
+
+/** Contoh placeholder input manual; nama contoh satu sumber dari lib broadcast. */
+const manualSamplePlaceholder: string = `${BROADCAST_MANUAL_SAMPLE_NAME},nafan@gmail.com\nbudi@gmail.com`;
 </script>
 
 <template>
@@ -70,7 +74,7 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-semibold tracking-tight">{{ broadcast.name }}</h1>
-                <p class="text-muted-foreground text-sm">
+                <p class="text-sm text-muted-foreground">
                     Status: <Badge variant="outline">{{ broadcast.status }}</Badge>
                     <span class="ml-2">Jadwal: {{ broadcast.scheduled_at ?? '—' }}</span>
                     <span class="ml-2">Delay: {{ broadcast.delay_min }}–{{ broadcast.delay_max }} dtk</span>
@@ -79,7 +83,9 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
             <div class="flex flex-wrap gap-2">
                 <Button v-if="isDraft" variant="default" @click="doSchedule">Schedule Broadcast</Button>
                 <Button v-if="canCancel" variant="destructive" @click="cancelBroadcast">Cancel</Button>
-                <Button v-if="broadcast.failed_count > 0" variant="outline" @click="retryFailed">Retry Failed ({{ broadcast.failed_count }})</Button>
+                <Button v-if="broadcast.failed_count > 0" variant="outline" @click="retryFailed"
+                    >Retry Failed ({{ broadcast.failed_count }})</Button
+                >
                 <Button variant="ghost" @click="deleteBroadcast">Hapus</Button>
             </div>
         </div>
@@ -89,11 +95,26 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
             <CardHeader><CardTitle>Monitoring</CardTitle></CardHeader>
             <CardContent>
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
-                    <div class="rounded-xl border p-3 text-center"><div class="text-2xl font-bold">{{ broadcast.recipients_count }}</div><div class="text-muted-foreground text-xs">Total</div></div>
-                    <div class="rounded-xl border p-3 text-center"><div class="text-2xl font-bold">{{ broadcast.sent_count }}</div><div class="text-muted-foreground text-xs">Sent</div></div>
-                    <div class="rounded-xl border p-3 text-center"><div class="text-2xl font-bold">{{ broadcast.failed_count }}</div><div class="text-muted-foreground text-xs">Failed</div></div>
-                    <div class="rounded-xl border p-3 text-center"><div class="text-2xl font-bold">{{ broadcast.pending_count }}</div><div class="text-muted-foreground text-xs">Pending</div></div>
-                    <div class="rounded-xl border p-3 text-center"><div class="text-2xl font-bold">{{ progress }}%</div><div class="text-muted-foreground text-xs">Progress</div></div>
+                    <div class="rounded-xl border p-3 text-center">
+                        <div class="text-2xl font-bold">{{ broadcast.recipients_count }}</div>
+                        <div class="text-xs text-muted-foreground">Total</div>
+                    </div>
+                    <div class="rounded-xl border p-3 text-center">
+                        <div class="text-2xl font-bold">{{ broadcast.sent_count }}</div>
+                        <div class="text-xs text-muted-foreground">Sent</div>
+                    </div>
+                    <div class="rounded-xl border p-3 text-center">
+                        <div class="text-2xl font-bold">{{ broadcast.failed_count }}</div>
+                        <div class="text-xs text-muted-foreground">Failed</div>
+                    </div>
+                    <div class="rounded-xl border p-3 text-center">
+                        <div class="text-2xl font-bold">{{ broadcast.pending_count }}</div>
+                        <div class="text-xs text-muted-foreground">Pending</div>
+                    </div>
+                    <div class="rounded-xl border p-3 text-center">
+                        <div class="text-2xl font-bold">{{ progress }}%</div>
+                        <div class="text-xs text-muted-foreground">Progress</div>
+                    </div>
                 </div>
             </CardContent>
         </Card>
@@ -103,14 +124,19 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
             <CardHeader><CardTitle>02–03 · Dataset & Snapshot</CardTitle></CardHeader>
             <CardContent class="flex flex-col gap-4">
                 <div class="flex flex-wrap gap-4 text-sm">
-                    <label v-for="opt in ['event_participants', 'recruitment_applicants', 'users']" :key="opt" class="flex items-center gap-2">
+                    <label v-for="opt in BROADCAST_SNAPSHOT_SOURCE_OPTIONS" :key="opt" class="flex items-center gap-2">
                         <input v-model="selectedSources" type="checkbox" :value="opt" class="size-4" />
                         {{ opt }}
                     </label>
                 </div>
                 <div class="grid gap-2">
                     <Label>Manual (satu per baris: <code>Nama,email</code> atau <code>email</code>)</Label>
-                    <textarea v-model="manualRows" rows="3" class="border-input bg-background rounded-md border p-2 text-sm" placeholder="Nafan,nafan@gmail.com&#10;budi@gmail.com" />
+                    <textarea
+                        v-model="manualRows"
+                        rows="3"
+                        class="rounded-md border border-input bg-background p-2 text-sm"
+                        :placeholder="manualSamplePlaceholder"
+                    />
                 </div>
                 <div class="grid gap-2">
                     <Label>CSV (header <code>name,email</code> atau <code>email</code>, maks 2 MB)</Label>
@@ -119,9 +145,12 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
                 <Button :disabled="snapshotForm.processing" @click="generateSnapshot">
                     {{ snapshotForm.processing ? 'Memproses…' : 'Generate Snapshot' }}
                 </Button>
-                <div v-if="duplicateSummary && duplicateSummary.duplicates > 0" class="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                    {{ duplicateSummary.duplicates }} duplicate terdeteksi (tidak dihapus otomatis).
-                    Contoh: {{ duplicateSummary.duplicate_emails.slice(0, 5).join(', ') }}
+                <div
+                    v-if="duplicateSummary && duplicateSummary.duplicates > 0"
+                    class="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+                >
+                    {{ duplicateSummary.duplicates }} duplicate terdeteksi (tidak dihapus otomatis). Contoh:
+                    {{ duplicateSummary.duplicate_emails.slice(0, 5).join(', ') }}
                 </div>
             </CardContent>
         </Card>
@@ -134,18 +163,30 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
             </CardHeader>
             <CardContent class="flex flex-col gap-4">
                 <div v-if="isDraft" class="flex flex-col gap-2 sm:flex-row sm:items-end">
-                    <div class="grid flex-1 gap-2"><Label>Nama</Label><Input v-model="recipientForm.name" placeholder="Opsional" /></div>
-                    <div class="grid flex-1 gap-2"><Label>Email</Label><Input v-model="recipientForm.email" placeholder="nama@email.com" /></div>
+                    <div class="grid flex-1 gap-2">
+                        <Label>Nama</Label><Input v-model="recipientForm.name" placeholder="Opsional" />
+                    </div>
+                    <div class="grid flex-1 gap-2">
+                        <Label>Email</Label><Input v-model="recipientForm.email" placeholder="nama@email.com" />
+                    </div>
                     <Button @click="addRecipient">+ Tambah</Button>
                 </div>
                 <div v-if="recipients?.data?.length" class="overflow-x-auto">
                     <Table>
-                        <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Email</TableHead><TableHead>Status</TableHead><TableHead class="text-right">Attempt</TableHead><TableHead v-if="isDraft" class="text-right">Aksi</TableHead></TableRow></TableHeader>
+                        <TableHeader
+                            ><TableRow
+                                ><TableHead>Nama</TableHead><TableHead>Email</TableHead><TableHead>Status</TableHead
+                                ><TableHead class="text-right">Attempt</TableHead
+                                ><TableHead v-if="isDraft" class="text-right">Aksi</TableHead></TableRow
+                            ></TableHeader
+                        >
                         <TableBody>
                             <TableRow v-for="r in recipients.data" :key="r.id">
                                 <TableCell>{{ r.name ?? '—' }}</TableCell>
                                 <TableCell class="font-mono text-xs">{{ r.email }}</TableCell>
-                                <TableCell><Badge variant="outline">{{ r.status }}</Badge></TableCell>
+                                <TableCell
+                                    ><Badge variant="outline">{{ r.status }}</Badge></TableCell
+                                >
                                 <TableCell class="text-right">{{ r.attempts }}</TableCell>
                                 <TableCell v-if="isDraft" class="text-right">
                                     <Button variant="ghost" size="sm" @click="deleteRecipient(r.id)">Hapus</Button>
@@ -154,7 +195,9 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
                         </TableBody>
                     </Table>
                 </div>
-                <p v-else class="text-muted-foreground text-sm">Klik “Muat recipients” untuk melihat snapshot. Status awal: <code>pending</code>.</p>
+                <p v-else class="text-sm text-muted-foreground">
+                    Klik “Muat recipients” untuk melihat snapshot. Status awal: <code>pending</code>.
+                </p>
             </CardContent>
         </Card>
 
@@ -163,12 +206,18 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
             <CardHeader><CardTitle>04 · Email (Tiptap)</CardTitle></CardHeader>
             <CardContent class="flex flex-col gap-4">
                 <div class="grid gap-2">
-                    <Label>Subject (mendukung <code v-pre>{{name}}</code> <code v-pre>{{event_name}}</code>)</Label>
+                    <Label
+                        >Subject (mendukung <code v-pre>{{ name }}</code> <code v-pre>{{ event_name }}</code
+                        >)</Label
+                    >
                     <Input v-model="contentForm.subject" placeholder="Pengumuman Hasil Seleksi" />
                 </div>
                 <div class="grid gap-2">
                     <Label>Event context</Label>
-                    <select v-model="contentForm.event_id" class="border-input bg-background rounded-md border px-3 py-2 text-sm">
+                    <select
+                        v-model="contentForm.event_id"
+                        class="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
                         <option value="">— Tanpa event —</option>
                         <option v-for="e in events" :key="e.id" :value="e.id">{{ e.title }}</option>
                     </select>
@@ -176,15 +225,24 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
                 <div class="grid gap-2">
                     <Label>Konten</Label>
                     <TipTapEditor v-model="contentForm.content" />
-                    <p class="text-muted-foreground text-xs">Inline image otomatis base64, maks 1.5 MB/gambar. Hanya <code v-pre>{{name}}</code> dan <code v-pre>{{event_name}}</code> yang didukung.</p>
+                    <p class="text-xs text-muted-foreground">
+                        Inline image otomatis base64, maks 1.5 MB/gambar. Hanya <code v-pre>{{ name }}</code> dan
+                        <code v-pre>{{ event_name }}</code> yang didukung.
+                    </p>
                 </div>
                 <Button :disabled="contentForm.processing" @click="saveContent">Simpan email</Button>
 
                 <div class="border-t pt-4">
                     <Label>Attachments (masing-masing maks 1.5 MB)</Label>
                     <ul class="mt-2 flex flex-col gap-1 text-sm">
-                        <li v-for="a in broadcast.attachments" :key="a.id" class="flex items-center justify-between gap-2">
-                            <span class="font-mono text-xs">{{ a.file_name }} ({{ (a.file_size / 1024).toFixed(1) }} KB)</span>
+                        <li
+                            v-for="a in broadcast.attachments"
+                            :key="a.id"
+                            class="flex items-center justify-between gap-2"
+                        >
+                            <span class="font-mono text-xs"
+                                >{{ a.file_name }} ({{ (a.file_size / 1024).toFixed(1) }} KB)</span
+                            >
                             <Button variant="ghost" size="sm" @click="deleteAttachment(a.id)">Hapus</Button>
                         </li>
                     </ul>
@@ -207,13 +265,19 @@ const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id })
                     <p><strong>From:</strong> {{ preview.from }}</p>
                     <p><strong>Subject:</strong> {{ preview.subject }}</p>
                     <div class="prose mt-2 max-w-none" v-html="preview.content" />
-                    <p class="text-muted-foreground mt-2 text-xs">Attachments: {{ preview.attachments.join(', ') || '—' }}</p>
+                    <p class="mt-2 text-xs text-muted-foreground">
+                        Attachments: {{ preview.attachments.join(', ') || '—' }}
+                    </p>
                 </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
-                    <div class="grid flex-1 gap-2"><Label>Test email</Label><Input v-model="testForm.email" placeholder="admin@example.com" /></div>
+                    <div class="grid flex-1 gap-2">
+                        <Label>Test email</Label><Input v-model="testForm.email" placeholder="admin@example.com" />
+                    </div>
                     <Button variant="outline" @click="sendTest">Kirim test</Button>
                 </div>
-                <p class="text-muted-foreground text-xs">Test email tidak masuk snapshot & tidak memengaruhi statistik.</p>
+                <p class="text-xs text-muted-foreground">
+                    Test email tidak masuk snapshot & tidak memengaruhi statistik.
+                </p>
             </CardContent>
         </Card>
 

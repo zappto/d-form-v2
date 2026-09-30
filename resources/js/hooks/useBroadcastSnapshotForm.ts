@@ -3,11 +3,9 @@ import type { Ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import type { InertiaForm } from '@inertiajs/vue3';
 import { routes } from '@/lib/routes';
+import { DEFAULT_BROADCAST_SNAPSHOT_SOURCES } from '@/lib/broadcastDataset';
 import { useErrorToast } from './useErrorToast';
 import type { IBroadcastSnapshotManualEntry } from './useBroadcastShowTypes';
-
-/** Sumber dataset yang dicentang bawaan saat kartu snapshot dibuka. */
-const DEFAULT_SNAPSHOT_SOURCES: string[] = ['users'];
 
 /** Isian form snapshot broadcast (dataset + manual + berkas CSV). */
 export interface IBroadcastSnapshotFields {
@@ -44,7 +42,7 @@ function toSnapshotManualEntry(line: string): IBroadcastSnapshotManualEntry {
 /** Form dataset & snapshot broadcast (sumber + manual + CSV → generate); dipakai kartu Dataset Show. */
 export function useBroadcastSnapshotForm(args: IBroadcastSnapshotFormArgs): IBroadcastSnapshotFormResult {
     const { showErrorToast } = useErrorToast();
-    const selectedSources: Ref<string[]> = ref<string[]>([...DEFAULT_SNAPSHOT_SOURCES]);
+    const selectedSources: Ref<string[]> = ref<string[]>([...DEFAULT_BROADCAST_SNAPSHOT_SOURCES]);
     const manualRows: Ref<string> = ref<string>('');
     const snapshotForm: InertiaForm<IBroadcastSnapshotFields> = useForm<IBroadcastSnapshotFields>({
         datasets: [],
