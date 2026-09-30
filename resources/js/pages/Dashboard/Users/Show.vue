@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDisplayDate, formatDisplayDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
@@ -104,15 +105,8 @@ const props = defineProps<{
     recruitment_applications: IRecruitmentAppRow[];
     staff: IStaffInfo;
     permissions: { can_edit: boolean; can_delete: boolean };
+    roleLabels: Record<string, string>;
 }>();
-
-const roleLabels: Record<string, string> = {
-    'super-admin': 'Super Admin',
-    admin: 'Admin',
-    member: 'Member',
-    'recruitment-staff': 'Recruitment Staff',
-    'recruitment-interviewer': 'Recruitment Interviewer',
-};
 
 const { isDeleting, showDeleteModal, confirmDelete } = useUserDeletion({
     userId: props.user.id,
@@ -130,30 +124,6 @@ const hasStaffActivity = computed(
 onMounted(() => {
     setTopbar({ title: props.user.name, subtitle: 'Detail pengguna' });
 });
-
-function formatDate(value: string | null | undefined): string {
-    if (!value) return '—';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-    });
-}
-
-function formatDateTime(value: string | null | undefined): string {
-    if (!value) return '—';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-}
 
 function reviewLabel(status: string | null): string {
     if (!status) return '—';
@@ -282,7 +252,9 @@ function reviewLabel(status: string | null): string {
                 <CardContent class="space-y-3 text-sm">
                     <div class="flex justify-between gap-3">
                         <span class="text-muted-foreground">Email terverifikasi</span>
-                        <span>{{ user.email_verified_at ? formatDateTime(user.email_verified_at) : 'Belum' }}</span>
+                        <span>{{
+                            user.email_verified_at ? formatDisplayDateTime(user.email_verified_at) : 'Belum'
+                        }}</span>
                     </div>
                     <div class="flex justify-between gap-3">
                         <span class="text-muted-foreground">Password lokal</span>
@@ -301,11 +273,11 @@ function reviewLabel(status: string | null): string {
                     </div>
                     <div class="flex justify-between gap-3">
                         <span class="text-muted-foreground">Dibuat</span>
-                        <span>{{ formatDateTime(user.created_at) }}</span>
+                        <span>{{ user.created_at ? formatDisplayDateTime(user.created_at) : '—' }}</span>
                     </div>
                     <div class="flex justify-between gap-3">
                         <span class="text-muted-foreground">Diperbarui</span>
-                        <span>{{ formatDateTime(user.updated_at) }}</span>
+                        <span>{{ user.updated_at ? formatDisplayDateTime(user.updated_at) : '—' }}</span>
                     </div>
                     <div v-if="stats.registrations_pending > 0" class="flex justify-between gap-3">
                         <span class="text-muted-foreground">Registrasi pending</span>
@@ -352,7 +324,12 @@ function reviewLabel(status: string | null): string {
                                                     <p class="mt-0.5 text-xs text-muted-foreground">
                                                         {{ row.form?.title || 'Form' }}
                                                         <span v-if="row.event?.start_date">
-                                                            · {{ formatDate(row.event.start_date) }}
+                                                            ·
+                                                            {{
+                                                                row.event?.start_date
+                                                                    ? formatDisplayDate(row.event.start_date)
+                                                                    : ''
+                                                            }}
                                                         </span>
                                                     </p>
                                                 </div>
@@ -364,7 +341,7 @@ function reviewLabel(status: string | null): string {
                                                 {{ row.registration_code || '—' }}
                                             </TableCell>
                                             <TableCell class="text-sm">
-                                                {{ row.attended_at ? formatDateTime(row.attended_at) : '—' }}
+                                                {{ row.attended_at ? formatDisplayDateTime(row.attended_at) : '—' }}
                                             </TableCell>
                                         </TableRow>
                                     </TableBody>
@@ -491,7 +468,8 @@ function reviewLabel(status: string | null): string {
                                         {{ event.title }}
                                     </Link>
                                     <span class="text-xs text-muted-foreground">
-                                        {{ event.status }} · {{ formatDate(event.start_date) }}
+                                        {{ event.status }} ·
+                                        {{ event.start_date ? formatDisplayDate(event.start_date) : '—' }}
                                     </span>
                                 </li>
                             </ul>

@@ -102,7 +102,8 @@ class UserManagementService
      *     events_created: list<array<string, mixed>>,
      *     recruitment_applications: list<array<string, mixed>>,
      *     staff: array<string, mixed>,
-     *     permissions: array{can_edit: bool, can_delete: bool}
+     *     permissions: array{can_edit: bool, can_delete: bool},
+     *     roleLabels: array<string, string>
      * }
      */
     public function toDetailPayload(User $user, User $actor, ?Request $request = null): array
@@ -130,6 +131,7 @@ class UserManagementService
             'recruitment_applications' => $recruitmentHistory,
             'staff' => $staffActivity,
             'permissions' => $permissions,
+            'roleLabels' => $this->detailRoleLabels(),
         ];
     }
 
@@ -441,6 +443,22 @@ class UserManagementService
     private function humanizeRoleKey(string $role): string
     {
         return ucwords(str_replace(['-', '_'], ' ', $role));
+    }
+
+    /**
+     * Label display untuk badge role di halaman detail; super-admin ikut tampil tapi tetap tak assignable.
+     *
+     * @return array<string, string>
+     */
+    public function detailRoleLabels(): array
+    {
+        $labels = ['super-admin' => $this->humanizeRoleKey('super-admin')];
+
+        foreach (self::ASSIGNABLE_ROLES as $role) {
+            $labels[$role] = $this->roleLabel($role);
+        }
+
+        return $labels;
     }
 
     /**

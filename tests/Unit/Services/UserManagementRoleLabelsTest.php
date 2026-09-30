@@ -49,4 +49,22 @@ class UserManagementRoleLabelsTest extends TestCase
             array_column($service->roleOptions(), 'value')
         );
     }
+
+    public function test_detail_role_labels_cover_display_without_warning(): void
+    {
+        Log::shouldReceive('warning')->never();
+
+        $service = new UserManagementService();
+
+        $this->assertSame(
+            [
+                'super-admin' => 'Super Admin',
+                'admin' => 'Admin',
+                'member' => 'Member',
+                'recruitment-staff' => 'Recruitment Staff',
+                'recruitment-interviewer' => 'Recruitment Interviewer',
+            ],
+            $service->detailRoleLabels()
+        );
+    }
 }
