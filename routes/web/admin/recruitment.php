@@ -63,6 +63,7 @@ Route::middleware(['auth', 'recruitment.access'])
         Route::post('applications/{application}/verify', [RecruitmentApplicationController::class, 'verify'])
             ->name('applications.verify');
         Route::post('applications/{application}/resend-tracking', [RecruitmentApplicationController::class, 'resendTracking'])
+            ->middleware('throttle:recruitment-resend')
             ->name('applications.resend-tracking');
         Route::post('applications/{application}/evaluation', [RecruitmentEvaluationController::class, 'override'])
             ->name('applications.evaluation.override');
