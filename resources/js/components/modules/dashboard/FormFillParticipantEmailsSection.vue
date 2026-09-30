@@ -133,13 +133,22 @@ function validEmailFormat(emailAddress: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress.trim());
 }
 
-function setCheckState(slot: number, status: TCheckStatus, found?: IFoundUser, helper?: string) {
-    statusBySlot.value = { ...statusBySlot.value, [slot]: status };
-    if (arguments.length >= 3) {
-        foundUserBySlot.value = { ...foundUserBySlot.value, [slot]: found };
+/** Argumen tulis status verifikasi email satu slot; `found`/`helper` opsional per-kehadiran kunci. */
+interface IEmailCheckStateArgs {
+    slot: number;
+    status: TCheckStatus;
+    found?: IFoundUser;
+    helper?: string;
+}
+
+/** Tulis status verifikasi email satu slot; kunci yang tak disebut mempertahankan nilai lama. */
+function setCheckState(args: IEmailCheckStateArgs): void {
+    statusBySlot.value = { ...statusBySlot.value, [args.slot]: args.status };
+    if ('found' in args) {
+        foundUserBySlot.value = { ...foundUserBySlot.value, [args.slot]: args.found };
     }
-    if (arguments.length >= 4) {
-        helperBySlot.value = { ...helperBySlot.value, [slot]: helper ?? '' };
+    if ('helper' in args) {
+        helperBySlot.value = { ...helperBySlot.value, [args.slot]: args.helper ?? '' };
     }
 }
 
@@ -148,23 +157,33 @@ async function runEmailCheck(slot: number) {
     abortBySlot.get(slot)?.abort();
 
     if (!raw) {
-        setCheckState(slot, 'idle', undefined, '');
+        setCheckState({ slot, status: 'idle', found: undefined, helper: '' });
         return;
     }
     if (!validEmailFormat(raw)) {
-        setCheckState(slot, 'invalid', undefined, humanizeErrorMessage('Enter a valid email address.'));
+        setCheckState({
+            slot,
+            status: 'invalid',
+            found: undefined,
+            helper: humanizeErrorMessage('Enter a valid email address.'),
+        });
         return;
     }
 
     const selfEmail = currentUserEmail.value;
     if (selfEmail && raw.toLowerCase() === selfEmail) {
-        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.');
+        setCheckState({
+            slot,
+            status: 'invalid',
+            found: undefined,
+            helper: 'Gunakan email peserta lain — bukan email akun Anda.',
+        });
         return;
     }
 
     const controller = new AbortController();
     abortBySlot.set(slot, controller);
-    setCheckState(slot, 'loading');
+    setCheckState({ slot, status: 'loading' });
 
     try {
         const url = `${CHECK_EMAIL_URL}?${new URLSearchParams({ email: raw }).toString()}`;
@@ -185,30 +204,40 @@ async function runEmailCheck(slot: number) {
         }
 
         if (!response.ok) {
-            setCheckState(
+            setCheckState({
                 slot,
-                'error',
-                undefined,
-                humanizeErrorMessage(body.message || 'Could not verify this email.')
-            );
+                status: 'error',
+                found: undefined,
+                helper: humanizeErrorMessage(body.message || 'Could not verify this email.'),
+            });
             return;
         }
 
         if (body.exists && body.data) {
-            setCheckState(slot, 'found', body.data, humanizeErrorMessage(body.message ?? ''));
-        } else {
-            setCheckState(
+            setCheckState({
                 slot,
-                'not_found',
-                undefined,
-                humanizeErrorMessage(body.message ?? 'No account exists for this email.')
-            );
+                status: 'found',
+                found: body.data,
+                helper: humanizeErrorMessage(body.message ?? ''),
+            });
+        } else {
+            setCheckState({
+                slot,
+                status: 'not_found',
+                found: undefined,
+                helper: humanizeErrorMessage(body.message ?? 'No account exists for this email.'),
+            });
         }
     } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
             return;
         }
-        setCheckState(slot, 'error', undefined, humanizeErrorMessage('Could not verify this email. Try again.'));
+        setCheckState({
+            slot,
+            status: 'error',
+            found: undefined,
+            helper: humanizeErrorMessage('Could not verify this email. Try again.'),
+        });
     }
 }
 
@@ -217,32 +246,42 @@ function scheduleCheck(slot: number) {
     if (!raw) {
         abortBySlot.get(slot)?.abort();
         debouncedEmailCheck.cancel(slot);
-        setCheckState(slot, 'idle', undefined, '');
+        setCheckState({ slot, status: 'idle', found: undefined, helper: '' });
         return;
     }
     if (!validEmailFormat(raw)) {
         abortBySlot.get(slot)?.abort();
         debouncedEmailCheck.cancel(slot);
-        setCheckState(slot, 'invalid', undefined, humanizeErrorMessage('Enter a valid email address.'));
+        setCheckState({
+            slot,
+            status: 'invalid',
+            found: undefined,
+            helper: humanizeErrorMessage('Enter a valid email address.'),
+        });
         return;
     }
     const selfEmail = currentUserEmail.value;
     if (selfEmail && raw.toLowerCase() === selfEmail) {
         abortBySlot.get(slot)?.abort();
         debouncedEmailCheck.cancel(slot);
-        setCheckState(slot, 'invalid', undefined, 'Gunakan email peserta lain — bukan email akun Anda.');
+        setCheckState({
+            slot,
+            status: 'invalid',
+            found: undefined,
+            helper: 'Gunakan email peserta lain — bukan email akun Anda.',
+        });
         return;
     }
 
     if (isBundleMode.value) {
         abortBySlot.get(slot)?.abort();
         debouncedEmailCheck.cancel(slot);
-        setCheckState(
+        setCheckState({
             slot,
-            'valid',
-            undefined,
-            humanizeErrorMessage('Participant will receive their ticket by email.')
-        );
+            status: 'valid',
+            found: undefined,
+            helper: humanizeErrorMessage('Participant will receive their ticket by email.'),
+        });
         return;
     }
 

@@ -117,7 +117,7 @@ const revisionSectionOptions: { value: string; label: string }[] = [
 ];
 
 function toggleRevisionSection(value: string, checked: boolean) {
-    screeningForm.sections = toggleCheckboxSelection(screeningForm.sections, value, checked);
+    screeningForm.sections = toggleCheckboxSelection({ selected: screeningForm.sections, option: value, checked });
 }
 
 const finalAcceptForm = useForm({
@@ -513,7 +513,7 @@ const defaultTab = computed(() => {
 
         <Tabs :default-value="defaultTab" class="w-full">
             <TabsList
-                class="flex h-auto w-full items-center justify-start gap-6 overflow-x-auto overflow-y-hidden rounded-none border-0 border-b border-border bg-transparent p-0 whitespace-nowrap text-muted-foreground [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                class="flex h-auto w-full [scrollbar-width:none] items-center justify-start gap-6 overflow-x-auto overflow-y-hidden rounded-none border-0 border-b border-border bg-transparent p-0 whitespace-nowrap text-muted-foreground [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
                 <TabsTrigger
                     value="profile"

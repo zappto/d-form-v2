@@ -413,11 +413,15 @@ function submitSubmissionReview(action: 'accept' | 'reject', submission: IFormSu
             });
 
             if (!result.ok) {
-                showHttpErrorToast(result.status, result.body, {
-                    409: parseApiErrorMessage(result.body, 'Jawaban ini sudah pernah direview.'),
-                    422: parseApiErrorMessage(result.body, 'Status review tidak valid.'),
-                    403: 'Anda tidak punya izin untuk mereview jawaban ini.',
-                    404: 'Jawaban tidak ditemukan.',
+                showHttpErrorToast({
+                    status: result.status,
+                    body: result.body,
+                    overrides: {
+                        409: parseApiErrorMessage(result.body, 'Jawaban ini sudah pernah direview.'),
+                        422: parseApiErrorMessage(result.body, 'Status review tidak valid.'),
+                        403: 'Anda tidak punya izin untuk mereview jawaban ini.',
+                        404: 'Jawaban tidak ditemukan.',
+                    },
                 });
                 if (result.status === 409 || result.status === 422) {
                     router.reload({

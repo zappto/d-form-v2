@@ -38,7 +38,12 @@ const feedUrl = computed<string>(() => {
 });
 
 const s = reactive(
-    useGlobalQrScanPage('global-qr-scanner-region', props.globalScanStoreUrl, feedUrl.value, () => props.targets)
+    useGlobalQrScanPage({
+        scannerContainerId: 'global-qr-scanner-region',
+        storeUrl: props.globalScanStoreUrl,
+        feedUrl: feedUrl.value,
+        getTargets: () => props.targets,
+    })
 );
 
 const targetFilterOptions = computed<TSearchableSelectOption[]>(() => [

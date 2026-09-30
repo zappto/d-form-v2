@@ -87,13 +87,11 @@ function fillReady(): boolean {
 
 /** Option rows as SearchableSelect options; value mirrors the label so stored answers stay labels. */
 const selectOptions = computed<TSearchableSelectOption[]>(() =>
-    props.ctx.getOptionRows(props.field).map(
-        (row: TFormFillOptionRow): TSearchableSelectOption => ({
-            value: row.label,
-            label: row.label,
-            imageSrc: row.type === 'image' ? row.imageSrc : undefined,
-        })
-    )
+    props.ctx.getOptionRows(props.field).map((row: TFormFillOptionRow): TSearchableSelectOption => ({
+        value: row.label,
+        label: row.label,
+        imageSrc: row.type === 'image' ? row.imageSrc : undefined,
+    }))
 );
 </script>
 
@@ -202,7 +200,11 @@ const selectOptions = computed<TSearchableSelectOption[]>(() =>
                     :model-value="ctx.isCheckboxSelected(storageKey, row.label)"
                     @update:model-value="
                         (value: boolean | 'indeterminate') =>
-                            ctx.onCheckboxToggle(storageKey, row.label, value === true)
+                            ctx.onCheckboxToggle({
+                                fieldName: storageKey,
+                                option: row.label,
+                                checked: value === true,
+                            })
                     "
                 />
                 <div
