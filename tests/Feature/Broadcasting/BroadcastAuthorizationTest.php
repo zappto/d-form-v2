@@ -11,9 +11,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Mengunci perilaku otorisasi jalur update broadcast SAAT INI (DFORM-55):
- * request jalur simpan memakai gate CREATE sementara controller memakai policy 'update'.
- * Test ini mengunci perilaku kini, bukan perilaku ideal — lihat KEPUTUSAN-PM-TERTUNDA.
+ * Mengunci perilaku otorisasi jalur update broadcast (DFORM-55 + DFORM-79):
+ * request jalur simpan memakai gate CREATE sementara controller memakai policy 'update';
+ * policy 'update' kini butuh CREATE + scope pemilik (DFORM-79, keputusan final —
+ * menggantikan KEPUTUSAN-PM-TERTUNDA). Scope pemilik dikunci di BroadcastOwnershipTest.
  */
 class BroadcastAuthorizationTest extends TestCase
 {
