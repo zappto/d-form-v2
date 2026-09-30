@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Dashboard\Broadcasting;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Broadcasting\StoreBroadcastRecipientRequest;
-use App\Http\Requests\Broadcasting\UpdateBroadcastRecipientRequest;
+use App\Http\Requests\Broadcasting\SaveBroadcastRecipientRequest;
 use App\Models\EmailBroadcast;
 use App\Models\EmailBroadcastRecipient;
 use App\Services\Broadcasting\BroadcastSnapshotService;
@@ -49,7 +48,7 @@ class BroadcastRecipientController extends Controller
     }
 
     public function store(
-        StoreBroadcastRecipientRequest $request,
+        SaveBroadcastRecipientRequest $request,
         EmailBroadcast $broadcast,
         BroadcastSnapshotService $snapshots,
     ): RedirectResponse {
@@ -68,7 +67,7 @@ class BroadcastRecipientController extends Controller
     }
 
     public function update(
-        UpdateBroadcastRecipientRequest $request,
+        SaveBroadcastRecipientRequest $request,
         EmailBroadcast $broadcast,
         EmailBroadcastRecipient $recipient,
     ): RedirectResponse {

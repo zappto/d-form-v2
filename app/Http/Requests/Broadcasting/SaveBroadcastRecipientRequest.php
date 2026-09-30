@@ -4,7 +4,7 @@ namespace App\Http\Requests\Broadcasting;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBroadcastRecipientRequest extends FormRequest
+class SaveBroadcastRecipientRequest extends FormRequest
 {
     public function authorize(): bool
     {
