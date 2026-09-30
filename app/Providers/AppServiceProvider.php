@@ -68,6 +68,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('broadcast-test', function (Request $request) {
+            return Limit::perHour(10)->by($request->user()?->id ?: $request->ip());
+        });
+
         // Temporary scan-test helper: redirect ALL outgoing mail to one inbox.
         // Active only on local + MAIL_TEST_REDIRECT set. Production untouched.
         $testRedirect = config('mail.test_redirect');
