@@ -7,6 +7,7 @@ use App\Models\EmailDataset;
 use App\Models\FormAnswer;
 use App\Models\Recruitment\RecruitmentApplication;
 use App\Models\User;
+use App\Support\EmailAddress;
 
 /**
  * Resolve dataset sources menjadi daftar [name, email].
@@ -64,10 +65,10 @@ class BroadcastDatasetResolver
 
         foreach ($query->cursor() as $answer) {
             /** @var FormAnswer $answer */
-            $email = $answer->user?->email ?? $answer->invited_email;
-            $email = is_string($email) ? strtolower(trim($email)) : '';
+            $rawEmail = $answer->user?->email ?? $answer->invited_email;
+            $email = EmailAddress::normalizeEmail(is_string($rawEmail) ? $rawEmail : null);
 
-            if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            if ($email === null) {
                 continue;
             }
 
@@ -94,9 +95,10 @@ class BroadcastDatasetResolver
         $rows = [];
 
         foreach ($query->cursor(['full_name', 'personal_email', 'student_email']) as $app) {
-            $email = strtolower(trim((string) ($app->personal_email !== '' ? $app->personal_email : $app->student_email)));
+            // Fallback pemilihan field tetap di call-site: personal_email utama, student_email cadangan.
+            $email = EmailAddress::normalizeEmail((string) ($app->personal_email !== '' ? $app->personal_email : $app->student_email));
 
-            if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            if ($email === null) {
                 continue;
             }
 
@@ -117,9 +119,9 @@ class BroadcastDatasetResolver
         $rows = [];
 
         foreach (User::query()->cursor(['name', 'email']) as $user) {
-            $email = strtolower(trim((string) $user->email));
+            $email = EmailAddress::normalizeEmail((string) $user->email);
 
-            if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            if ($email === null) {
                 continue;
             }
 
@@ -145,8 +147,8 @@ class BroadcastDatasetResolver
 
         return $dataset->recipients()
             ->get(['name', 'email'])
-            ->map(fn ($r) => ['name' => $r->name, 'email' => strtolower(trim((string) $r->email))])
-            ->filter(fn ($r) => $r['email'] !== '' && filter_var($r['email'], FILTER_VALIDATE_EMAIL) !== false)
+            ->map(fn ($r) => ['name' => $r->name, 'email' => EmailAddress::normalizeEmail((string) $r->email)])
+            ->filter(fn ($r) => $r['email'] !== null)
             ->values()
             ->all();
     }

@@ -5,6 +5,7 @@ namespace App\Services\Broadcasting;
 use App\Enums\EmailBroadcastRecipientStatus;
 use App\Enums\EmailBroadcastStatus;
 use App\Models\EmailBroadcast;
+use App\Support\EmailAddress;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -31,14 +32,14 @@ class BroadcastSnapshotService
             array_map(fn ($r) => ['name' => $r['name'] ?? null, 'email' => $r['email']], $resolved),
             array_map(fn ($r) => [
                 'name' => $r['name'] ?? null,
-                'email' => strtolower(trim((string) ($r['email'] ?? ''))),
+                'email' => EmailAddress::normalizeEmail((string) ($r['email'] ?? '')),
             ], $extraRows),
         );
 
         // Filter email valid saja; invalid sudah ditolak di request layer.
         $merged = array_values(array_filter(
             $merged,
-            fn ($r) => $r['email'] !== '' && filter_var($r['email'], FILTER_VALIDATE_EMAIL) !== false
+            fn ($r) => $r['email'] !== null
         ));
 
         $summary = $this->resolver->duplicateSummary(array_column($merged, 'email'));

@@ -2,6 +2,8 @@
 
 namespace App\Services\Broadcasting;
 
+use App\Support\EmailAddress;
+
 /**
  * Parse isi CSV menjadi baris recipient ternormalisasi.
  * Dipakai snapshot & dataset agar semantik CSV tunggal (header + fallback tanpa header).
@@ -101,26 +103,29 @@ class CsvRecipientParser
      */
     private function normalizeRow(array $row, array $indexes): array
     {
-        $email = trim((string) ($row[$indexes['email']] ?? ''));
+        $rawEmail = (string) ($row[$indexes['email']] ?? '');
         $name = $indexes['name'] !== null ? trim((string) ($row[$indexes['name']] ?? '')) : null;
 
         if ($name === null && $indexes['email'] === 0 && count($row) >= self::MIN_PAIR_COLUMNS) {
-            $maybeEmail = trim((string) ($row[1] ?? ''));
+            $maybeEmail = (string) ($row[1] ?? '');
 
-            if (filter_var($maybeEmail, FILTER_VALIDATE_EMAIL) !== false) {
+            if (EmailAddress::normalizeEmail($maybeEmail) !== null) {
                 $name = trim((string) ($row[0] ?? ''));
-                $email = $maybeEmail;
+                $rawEmail = $maybeEmail;
             }
         }
 
-        $email = strtolower($email);
+        $email = EmailAddress::normalizeEmail($rawEmail);
 
-        if ($email === '') {
-            return ['valid' => null, 'invalid' => null];
-        }
+        if ($email === null) {
+            // Gema invalid tetap lowercase-trim seperti semula; baris kosong dilewati diam-diam.
+            $rejected = strtolower(trim($rawEmail));
 
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            return ['valid' => null, 'invalid' => $email];
+            if ($rejected === '') {
+                return ['valid' => null, 'invalid' => null];
+            }
+
+            return ['valid' => null, 'invalid' => $rejected];
         }
 
         return ['valid' => ['name' => $name === '' || $name === null ? null : $name, 'email' => $email], 'invalid' => null];
