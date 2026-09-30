@@ -203,8 +203,8 @@ class BroadcastRecipientValidationTest extends TestCase
             array_keys((new \ReflectionClass(\App\Http\Requests\Broadcasting\UpdateBroadcastScheduleRequest::class))->getTraits())
         );
         $this->assertSame(
-            (new \ReflectionClass(\App\Http\Requests\Broadcasting\StoreBroadcastRequest::class))->getMethod('scheduledAt')->getDeclaringClass()->getName(),
-            (new \ReflectionClass(\App\Http\Requests\Broadcasting\UpdateBroadcastScheduleRequest::class))->getMethod('scheduledAt')->getDeclaringClass()->getName()
+            (new \ReflectionClass(\App\Http\Requests\Broadcasting\StoreBroadcastRequest::class))->getMethod('scheduledAt')->getFileName(),
+            (new \ReflectionClass(\App\Http\Requests\Broadcasting\UpdateBroadcastScheduleRequest::class))->getMethod('scheduledAt')->getFileName()
         );
     }
 }

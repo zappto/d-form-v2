@@ -10,15 +10,14 @@ use Illuminate\Support\Str;
 
 class BroadcastAttachmentService
 {
-    public const MAX_FILE_BYTES = 1572864; // 1.5 MB
-
-    public const MAX_INLINE_IMAGE_BYTES = 1572864; // 1.5 MB ukuran file asli
+    /** Batas unggah broadcast 1.5 MB (1572864 byte) untuk attachment dan inline image; pecah lagi bila kebutuhan keduanya berbeda. */
+    public const MAX_BROADCAST_UPLOAD_BYTES = 1572864;
 
     public function store(EmailBroadcast $broadcast, UploadedFile $file): EmailBroadcastAttachment
     {
         $size = $file->getSize() ?? 0;
 
-        abort_if($size > self::MAX_FILE_BYTES, 422, 'Attachment melebihi 1.5 MB.');
+        abort_if($size > self::MAX_BROADCAST_UPLOAD_BYTES, 422, 'Attachment melebihi 1.5 MB.');
 
         $path = $file->storeAs(
             'broadcasts/'.$broadcast->id,
@@ -75,7 +74,7 @@ class BroadcastAttachmentService
                 return ['ok' => false, 'message' => 'Inline image tidak valid (base64).'];
             }
 
-            if (strlen($binary) > self::MAX_INLINE_IMAGE_BYTES) {
+            if (strlen($binary) > self::MAX_BROADCAST_UPLOAD_BYTES) {
                 return ['ok' => false, 'message' => 'Inline image melebihi 1.5 MB.'];
             }
         }
