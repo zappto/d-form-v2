@@ -36,7 +36,6 @@ erDiagram
 | Period | `RecruitmentPeriod` | Divisions (config per period atau global — lihat DB design) |
 | Application | `RecruitmentApplication` | Document, Screenings, CorrectionRequests, Interview, Attendance, QueueEntry, Evaluation, FinalDecision, Feedback, ActivityLogs |
 | Interview Session | `RecruitmentInterviewSession` | Interviews (assignments) |
-| Email Template | `RecruitmentEmailTemplate` | — |
 
 ---
 

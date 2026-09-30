@@ -173,7 +173,6 @@ php artisan test --filter=Recruitment
 | P-05 | Final decision | staff | 200 |
 | P-06 | Manage periods | staff | 403 |
 | P-07 | Manage periods | admin | 200 |
-| P-08 | Edit email template | staff | 403 |
 | P-09 | Evaluate assigned interview | interviewer | 200 |
 | P-10 | Download CV unassigned | interviewer | 403 |
 | P-11 | Download CV assigned | interviewer | 200 |
@@ -320,7 +319,6 @@ States:
 - [ ] CRUD period (draft → open → closed)
 - [ ] Manage divisions
 - [ ] Assign interviewers
-- [ ] Edit email templates
 - [ ] View activity logs
 
 ---

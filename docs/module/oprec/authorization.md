@@ -89,10 +89,6 @@ recruitment.final.decide
 recruitment.reports.view
 recruitment.reports.export
 
-# Email templates (Admin)
-recruitment.templates.list
-recruitment.templates.edit
-
 # Activity log (Staff + Admin)
 recruitment.activity.view
 
@@ -118,7 +114,6 @@ recruitment.dashboard.view
 | `recruitment.evaluations.view` | ✓ | ✓ | ✓ (assigned) |
 | `recruitment.final.decide` | ✓ | ✓ | **✗** |
 | `recruitment.reports.*` | ✓ | ✓ | — |
-| `recruitment.templates.*` | ✓ | — | — |
 | `recruitment.activity.view` | ✓ | ✓ | — |
 | `recruitment.dashboard.view` | ✓ | ✓ | ✓ (subset) |
 
@@ -134,7 +129,6 @@ recruitment.dashboard.view
 | `RecruitmentEvaluation` | `RecruitmentEvaluationPolicy` | create, update (before lock), override (staff) |
 | `RecruitmentFinalDecision` | `RecruitmentFinalDecisionPolicy` | create, update — **Staff only** |
 | `RecruitmentDocument` | `RecruitmentDocumentPolicy` | download — staff/interviewer assigned |
-| `RecruitmentEmailTemplate` | `RecruitmentEmailTemplatePolicy` | Admin only |
 
 ### 4.1 Policy Rules Kritis
 

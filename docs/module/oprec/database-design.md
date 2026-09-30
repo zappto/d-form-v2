@@ -357,7 +357,9 @@ History screening (many rows per application).
 
 ---
 
-## 18. Tabel: `recruitment_email_templates`
+## 18. Tabel email (legacy — tidak dipakai kode)
+
+Tabel `recruitment_email_templates` masih terbuat via migration foundation tetapi tidak dipakai kode — model, seeder, policy, route, dan permission dibuang di 9a8224f; email memakai template hardcoded di `RecruitmentEmailRenderer::renderTemplate` per `event_type`.
 
 | Kolom | Tipe | Constraint |
 |-------|------|------------|
@@ -408,14 +410,13 @@ Satu migration file per logical group (disarankan 2–3 file):
 
 1. `create_recruitment_periods_table` + `recruitment_divisions` + `recruitment_interviewer_divisions` + `recruitment_registration_sequences`
 2. `create_recruitment_applications_table` + `recruitment_documents` + `recruitment_screenings` + `recruitment_correction_requests`
-3. `create_recruitment_interview_sessions_table` + interviews + attendances + queue + evaluations + final_decisions + feedbacks + activity_logs + email_templates
+3. `create_recruitment_interview_sessions_table` + interviews + attendances + queue + evaluations + final_decisions + feedbacks + activity_logs
 
 Atau satu migration besar untuk MVP simplicity — pilih sesuai preferensi tim (back-end rules: weak entity boleh digabung).
 
 ### Seeders
 
 - `RecruitmentDivisionSeeder` — 5 divisi default (termasuk Humas / Public Relations)
-- `RecruitmentEmailTemplateSeeder` — template default per event type
 - `RecruitmentPeriodSeeder` — hanya non-production (OpRec 2026 dummy)
 
 ---
