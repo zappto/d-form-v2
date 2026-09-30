@@ -19,6 +19,7 @@ class EmailDataset extends Model
     protected $fillable = [
         'name',
         'source_type',
+        'source_id',
         'created_by',
     ];
 
