@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Support\BroadcastPermissions;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
@@ -98,12 +99,12 @@ class RoleSeeder extends Seeder
             'form_submissions.delete',
 
             // email broadcasting (PRD v1.0 — MVP hanya Superadmin)
-            'email-broadcast.view',
-            'email-broadcast.create',
-            'email-broadcast.schedule',
-            'email-broadcast.cancel',
-            'email-broadcast.retry',
-            'email-broadcast.delete',
+            BroadcastPermissions::VIEW,
+            BroadcastPermissions::CREATE,
+            BroadcastPermissions::SCHEDULE,
+            BroadcastPermissions::CANCEL,
+            BroadcastPermissions::RETRY,
+            BroadcastPermissions::DELETE,
         ];
 
         $roles = [

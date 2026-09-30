@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Broadcasting;
 
 use App\Enums\EmailDatasetSourceType;
+use App\Support\BroadcastPermissions;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -10,7 +11,7 @@ class GenerateSnapshotRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('email-broadcast.create') ?? false;
+        return $this->user()?->can(BroadcastPermissions::CREATE) ?? false;
     }
 
     /** @return array<string, mixed> */

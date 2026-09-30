@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Broadcasting;
 
 use App\Http\Requests\Concerns\ResolvesBroadcastSchedule;
+use App\Support\BroadcastPermissions;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBroadcastRequest extends FormRequest
@@ -11,7 +12,7 @@ class StoreBroadcastRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return $this->user()?->can('email-broadcast.create') ?? false;
+        return $this->user()?->can(BroadcastPermissions::CREATE) ?? false;
     }
 
     /** @return array<string, mixed> */

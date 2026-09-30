@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Broadcasting;
 
+use App\Support\BroadcastPermissions;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SaveBroadcastContentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('email-broadcast.create') ?? false;
+        return $this->user()?->can(BroadcastPermissions::CREATE) ?? false;
     }
 
     /** @return array<string, mixed> */

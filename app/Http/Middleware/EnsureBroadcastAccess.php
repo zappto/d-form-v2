@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\BroadcastPermissions;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +21,7 @@ class EnsureBroadcastAccess
             return redirect()->guest(route('auth.login'));
         }
 
-        if (! $user->can('email-broadcast.view')) {
+        if (! $user->can(BroadcastPermissions::VIEW)) {
             return redirect()->route('dashboard');
         }
 

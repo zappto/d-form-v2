@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Broadcasting;
 
 use App\Http\Requests\Concerns\ResolvesBroadcastSchedule;
+use App\Support\BroadcastPermissions;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateBroadcastScheduleRequest extends FormRequest
@@ -11,7 +12,7 @@ class UpdateBroadcastScheduleRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return $this->user()?->can('email-broadcast.schedule') ?? false;
+        return $this->user()?->can(BroadcastPermissions::SCHEDULE) ?? false;
     }
 
     /** @return array<string, mixed> */
