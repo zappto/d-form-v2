@@ -135,9 +135,62 @@ class UserManagementTest extends TestCase
                 'password_confirmation' => 'password123',
                 'role' => 'super-admin',
             ])
-            ->assertSessionHasErrors('role');
+            ->assertSessionHasErrors(['role' => 'Role tidak valid.']);
 
         $this->assertDatabaseMissing('users', ['email' => 'another-super@example.com']);
+    }
+
+    public function test_store_user_validation_messages_use_indonesian_text(): void
+    {
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole('super-admin');
+
+        $this->actingAs($superAdmin)
+            ->post(route('dashboard.users.store'), [
+                'name' => '',
+                'email' => '',
+                'role' => '',
+            ])
+            ->assertSessionHasErrors([
+                'name' => 'Nama wajib diisi.',
+                'email' => 'Email wajib diisi.',
+                'password' => 'Password wajib diisi.',
+                'role' => 'Role wajib dipilih.',
+            ]);
+
+        $this->actingAs($superAdmin)
+            ->post(route('dashboard.users.store'), [
+                'name' => 'Format Salah',
+                'email' => 'bukan-email',
+                'password' => 'short',
+                'password_confirmation' => 'beda',
+                'role' => 'super-admin',
+            ])
+            ->assertSessionHasErrors([
+                'email' => 'Format email tidak valid.',
+                'password' => 'Password minimal 8 karakter.',
+                'role' => 'Role tidak valid.',
+            ]);
+
+        $this->actingAs($superAdmin)
+            ->post(route('dashboard.users.store'), [
+                'name' => 'Konfirmasi Beda',
+                'email' => 'konfirmasi-beda@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'beda',
+                'role' => 'admin',
+            ])
+            ->assertSessionHasErrors(['password' => 'Konfirmasi password tidak cocok.']);
+
+        $this->actingAs($superAdmin)
+            ->post(route('dashboard.users.store'), [
+                'name' => 'Email Duplikat',
+                'email' => $superAdmin->email,
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+                'role' => 'admin',
+            ])
+            ->assertSessionHasErrors(['email' => 'Email sudah digunakan.']);
     }
 
     public function test_super_admin_can_update_user_without_changing_password(): void
@@ -185,9 +238,62 @@ class UserManagementTest extends TestCase
                 'email' => $target->email,
                 'role' => 'super-admin',
             ])
-            ->assertSessionHasErrors('role');
+            ->assertSessionHasErrors(['role' => 'Role tidak valid.']);
 
         $this->assertTrue($target->fresh()->hasRole('member'));
+    }
+
+    public function test_update_user_validation_messages_use_indonesian_text(): void
+    {
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole('super-admin');
+
+        $target = User::factory()->create();
+        $target->assignRole('member');
+
+        $this->actingAs($superAdmin)
+            ->put(route('dashboard.users.update', $target), [
+                'name' => '',
+                'email' => '',
+                'role' => '',
+            ])
+            ->assertSessionHasErrors([
+                'name' => 'Nama wajib diisi.',
+                'email' => 'Email wajib diisi.',
+                'role' => 'Role wajib dipilih.',
+            ]);
+
+        $this->actingAs($superAdmin)
+            ->put(route('dashboard.users.update', $target), [
+                'name' => 'Format Salah',
+                'email' => 'bukan-email',
+                'password' => 'short',
+                'password_confirmation' => 'beda',
+                'role' => 'super-admin',
+            ])
+            ->assertSessionHasErrors([
+                'email' => 'Format email tidak valid.',
+                'password' => 'Password minimal 8 karakter.',
+                'role' => 'Role tidak valid.',
+            ]);
+
+        $this->actingAs($superAdmin)
+            ->put(route('dashboard.users.update', $target), [
+                'name' => $target->name,
+                'email' => $target->email,
+                'password' => 'password123',
+                'password_confirmation' => 'beda',
+                'role' => 'member',
+            ])
+            ->assertSessionHasErrors(['password' => 'Konfirmasi password tidak cocok.']);
+
+        $this->actingAs($superAdmin)
+            ->put(route('dashboard.users.update', $target), [
+                'name' => $target->name,
+                'email' => $superAdmin->email,
+                'role' => 'member',
+            ])
+            ->assertSessionHasErrors(['email' => 'Email sudah digunakan.']);
     }
 
     public function test_super_admin_can_soft_delete_user(): void
