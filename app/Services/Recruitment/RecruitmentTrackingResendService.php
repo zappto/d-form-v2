@@ -7,6 +7,7 @@ use App\Jobs\Recruitment\SendRecruitmentApplicationConfirmationJob;
 use App\Models\Recruitment\RecruitmentApplication;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -52,7 +53,7 @@ final class RecruitmentTrackingResendService
 
         SendRecruitmentApplicationConfirmationJob::dispatch(
             $application->id,
-            $trackingToken,
+            Crypt::encryptString($trackingToken),
         );
     }
 }

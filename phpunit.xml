@@ -20,6 +20,8 @@
     <php>
         <!-- Use <server> so values override Docker/CI process env (.env often sets APP_ENV=local, QUEUE_CONNECTION=redis). Laravel reads $_SERVER first. -->
         <server name="APP_ENV" value="testing"/>
+        <!-- Dummy key agar Crypt/encryptString bisa dipakai di test (resend/submit job kini enkripsi token); BUKAN secret produksi. -->
+        <server name="APP_KEY" value="base64:NM3SsmbuTlei7cfploKb/hvw8A9ovwUBdmArmdAfFVs="/>
         <server name="APP_MAINTENANCE_DRIVER" value="file"/>
         <server name="BCRYPT_ROUNDS" value="4"/>
         <server name="BROADCAST_CONNECTION" value="null"/>

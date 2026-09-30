@@ -11,6 +11,7 @@ use App\Models\Recruitment\RecruitmentPeriod;
 use App\Support\Database\UniqueConstraintViolation;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -120,7 +121,7 @@ final class ApplicationSubmitter
 
         SendRecruitmentApplicationConfirmationJob::dispatch(
             $result['application']->id,
-            $result['tracking_token'],
+            Crypt::encryptString($result['tracking_token']),
         );
 
         return $result;

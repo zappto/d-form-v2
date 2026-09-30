@@ -14,6 +14,7 @@ use App\Services\Recruitment\RecruitmentTrackingPortalUrlBuilder;
 use Database\Seeders\RecruitmentDivisionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -87,10 +88,10 @@ class RecruitmentTrackingResendEndToEndTest extends TestCase
             ->assertSessionHas('message');
 
         Queue::assertPushed(SendRecruitmentApplicationConfirmationJob::class, function (SendRecruitmentApplicationConfirmationJob $job) use (&$newToken): bool {
-            $newToken = $job->trackingToken;
+            $newToken = Crypt::decryptString($job->trackingToken);
 
             return $job->applicationId === $this->application->id
-                && strlen($job->trackingToken) === 8;
+                && strlen($newToken) === 8;
         });
 
         $this->assertNotNull($newToken);

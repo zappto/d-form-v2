@@ -10,8 +10,10 @@ use App\Models\EmailLog;
 use App\Models\Recruitment\RecruitmentApplication;
 use App\Services\Recruitment\RecruitmentEmailRenderer;
 use App\Services\Recruitment\RecruitmentTrackingPortalUrlBuilder;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -25,16 +27,52 @@ class SendRecruitmentApplicationConfirmationJob implements ShouldQueue
     /** @var list<int> */
     public array $backoff = [60, 300, 900];
 
+    /** Batas warisan vs rusak: ciphertext Crypt selalu >100 karakter, token generator tepat 8. */
+    private const LEGACY_PLAINTEXT_MAX_LENGTH = 64;
+
     public function __construct(
         public string $applicationId,
         public string $trackingToken,
     ) {
     }
 
+    /**
+     * Dekripsi toleran token: ciphertext jadi plaintext, warisan plaintext jadi fallback, rusak jadi null.
+     */
+    private function resolveTrackingToken(): ?string
+    {
+        try {
+            return Crypt::decryptString($this->trackingToken);
+        } catch (DecryptException) {
+            // Bukan ciphertext valid: warisan atau rusak, dibedakan di bawah.
+        }
+
+        if (strlen($this->trackingToken) <= self::LEGACY_PLAINTEXT_MAX_LENGTH) {
+            // TODO(DFORM-83): hapus fallback plaintext setelah retensi antrean (backoff 60+300+900 x tries=3).
+            Log::warning('[SendRecruitmentApplicationConfirmationJob] Legacy plaintext token payload deprecated.', [
+                'application_id' => $this->applicationId,
+            ]);
+
+            return $this->trackingToken;
+        }
+
+        Log::warning('[SendRecruitmentApplicationConfirmationJob] Undecryptable token payload dropped.', [
+            'application_id' => $this->applicationId,
+        ]);
+
+        return null;
+    }
+
     public function handle(
         RecruitmentEmailRenderer $renderer,
         RecruitmentTrackingPortalUrlBuilder $portalUrlBuilder,
     ): void {
+        $trackingToken = $this->resolveTrackingToken();
+
+        if ($trackingToken === null) {
+            return;
+        }
+
         $application = RecruitmentApplication::query()
             ->with(['period', 'primaryDivision'])
             ->find($this->applicationId);
@@ -51,7 +89,7 @@ class SendRecruitmentApplicationConfirmationJob implements ShouldQueue
         $trackingUrl = url(route('recruitment.track.login', absolute: false));
         $trackingPortalUrl = $portalUrlBuilder->loginUrl(
             $application->registration_number,
-            $this->trackingToken,
+            $trackingToken,
         );
 
         $variables = [
@@ -65,7 +103,7 @@ class SendRecruitmentApplicationConfirmationJob implements ShouldQueue
             'tracking_url' => $trackingUrl,
             'tracking_portal_url' => $trackingPortalUrl,
             'tracking_portal_button' => $portalUrlBuilder->loginButtonHtml($trackingPortalUrl),
-            'tracking_token' => $this->trackingToken,
+            'tracking_token' => $trackingToken,
         ];
 
         if ($recipientEmail === '') {

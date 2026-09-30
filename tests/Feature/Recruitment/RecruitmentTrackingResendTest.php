@@ -12,6 +12,7 @@ use App\Services\Recruitment\RecruitmentTrackingAuthenticator;
 use Database\Seeders\RecruitmentDivisionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -78,7 +79,7 @@ class RecruitmentTrackingResendTest extends TestCase
 
             $this->application->refresh();
 
-            return Hash::check($job->trackingToken, (string) $this->application->tracking_token_hash);
+            return Hash::check(Crypt::decryptString($job->trackingToken), (string) $this->application->tracking_token_hash);
         });
 
         $this->assertDatabaseHas('recruitment_activity_logs', [
@@ -103,7 +104,7 @@ class RecruitmentTrackingResendTest extends TestCase
 
             $application = $authenticator->attempt(
                 $this->application->registration_number,
-                $job->trackingToken,
+                Crypt::decryptString($job->trackingToken),
             );
 
             return $application?->is($this->application) === true;

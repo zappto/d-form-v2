@@ -13,6 +13,7 @@ use Database\Seeders\RecruitmentDivisionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -98,10 +99,12 @@ class RecruitmentPublicApplyTest extends TestCase
         Queue::assertPushed(
             SendRecruitmentApplicationConfirmationJob::class,
             function (SendRecruitmentApplicationConfirmationJob $job): bool {
-                return strlen($job->trackingToken) === 8
-                    && (bool) preg_match('/^[A-Z0-9]{8}$/', $job->trackingToken)
-                    && preg_match('/[A-Z]/', $job->trackingToken) === 1
-                    && preg_match('/[0-9]/', $job->trackingToken) === 1;
+                $trackingToken = Crypt::decryptString($job->trackingToken);
+
+                return strlen($trackingToken) === 8
+                    && (bool) preg_match('/^[A-Z0-9]{8}$/', $trackingToken)
+                    && preg_match('/[A-Z]/', $trackingToken) === 1
+                    && preg_match('/[0-9]/', $trackingToken) === 1;
             },
         );
 
