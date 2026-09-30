@@ -73,12 +73,26 @@ class BroadcastHtmlSanitizer
             if ($child instanceof \DOMElement) {
                 $tag = strtolower($child->tagName);
 
+                if (in_array($tag, ['script', 'style'], true)) {
+                    // Isi script/style dibuang seluruhnya, bukan di-unwrap (DFORM-76).
+                    $node->removeChild($child);
+
+                    continue;
+                }
+
                 if (! in_array($tag, self::ALLOWED_TAGS, true)) {
-                    // Unwrap: pindahkan children ke parent lalu hapus elemen.
+                    // Unwrap: pindahkan children ke parent lalu sanitasi rekursif (DFORM-76).
+                    $moved = [];
+
                     while ($child->firstChild) {
+                        $moved[] = $child->firstChild;
                         $node->insertBefore($child->firstChild, $child);
                     }
                     $node->removeChild($child);
+
+                    foreach ($moved as $movedChild) {
+                        $this->sanitizeMovedNode($node, $movedChild);
+                    }
 
                     continue;
                 }
@@ -89,6 +103,49 @@ class BroadcastHtmlSanitizer
                 $node->removeChild($child);
             }
         }
+    }
+
+    /**
+     * Sanitasi satu anak hasil unwrap: samakan dengan jalur utama (DFORM-76).
+     */
+    private function sanitizeMovedNode(\DOMNode $parent, \DOMNode $child): void
+    {
+        if ($child instanceof \DOMComment) {
+            $parent->removeChild($child);
+
+            return;
+        }
+
+        if (! $child instanceof \DOMElement) {
+            return;
+        }
+
+        $tag = strtolower($child->tagName);
+
+        if (in_array($tag, ['script', 'style'], true)) {
+            $parent->removeChild($child);
+
+            return;
+        }
+
+        if (! in_array($tag, self::ALLOWED_TAGS, true)) {
+            $nested = [];
+
+            while ($child->firstChild) {
+                $nested[] = $child->firstChild;
+                $parent->insertBefore($child->firstChild, $child);
+            }
+            $parent->removeChild($child);
+
+            foreach ($nested as $nestedChild) {
+                $this->sanitizeMovedNode($parent, $nestedChild);
+            }
+
+            return;
+        }
+
+        $this->sanitizeAttributes($child, $tag);
+        $this->sanitizeNode($child);
     }
 
     private function sanitizeAttributes(\DOMElement $el, string $tag): void

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Broadcasting\SendBroadcastTestRequest;
 use App\Mail\BroadcastMail;
 use App\Models\EmailBroadcast;
+use App\Services\Broadcasting\BroadcastHtmlSanitizer;
 use App\Services\Broadcasting\BroadcastPersonalization;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +22,7 @@ class BroadcastTestController extends Controller
 
         $eventName = $personalization->eventNameFor($broadcast);
         $subject = $personalization->render($broadcast->subject ?? '(tanpa subject)', 'Nafan', $eventName);
-        $html = $personalization->renderHtml($broadcast->content ?? '', 'Nafan', $eventName);
+        $html = app(BroadcastHtmlSanitizer::class)->sanitize($personalization->renderHtml($broadcast->content ?? '', 'Nafan', $eventName));
         $text = $personalization->render(BroadcastMail::textFallback($broadcast->content ?? ''), 'Nafan', $eventName);
 
         Mail::to($request->string('email')->toString())->send(

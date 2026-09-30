@@ -6,6 +6,7 @@ use App\Enums\EmailBroadcastRecipientStatus;
 use App\Mail\BroadcastMail;
 use App\Models\EmailBroadcastRecipient;
 use App\Services\Broadcasting\BroadcastDispatchService;
+use App\Services\Broadcasting\BroadcastHtmlSanitizer;
 use App\Services\Broadcasting\BroadcastPersonalization;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -64,7 +65,7 @@ class SendBroadcastRecipientJob implements ShouldQueue
 
         $eventName = $personalization->eventNameFor($broadcast);
         $subject = $personalization->render($broadcast->subject, $recipient->name, $eventName);
-        $html = $personalization->renderHtml($broadcast->content, $recipient->name, $eventName);
+        $html = app(BroadcastHtmlSanitizer::class)->sanitize($personalization->renderHtml($broadcast->content, $recipient->name, $eventName));
         $text = BroadcastMail::textFallback($broadcast->content ?? '');
         $text = $personalization->render($text, $recipient->name, $eventName);
 
