@@ -33,14 +33,6 @@ class BroadcastRecipientController extends Controller
 
         $summary = app(BroadcastSnapshotService::class)->duplicateSummary($broadcast);
 
-        // Inertia partial reload: kembalikan JSON bila diminta via X-Inertia-Partial-Data.
-        if (request()->header('X-Inertia-Partial-Data')) {
-            return Inertia::render('Dashboard/Broadcasts/Show', [
-                'recipients' => $recipients,
-                'duplicateSummary' => $summary,
-            ]);
-        }
-
         return Inertia::render('Dashboard/Broadcasts/Show', [
             'recipients' => $recipients,
             'duplicateSummary' => $summary,

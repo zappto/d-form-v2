@@ -136,12 +136,9 @@ function deleteRecipient(id: string): void {
     })
 }
 
+/** Muat daftar recipients via endpoint partial recipients.index; dipakai tombol "Muat recipients". */
 function loadRecipients(): void {
-    router.get(
-        routes.admin.broadcasts.show(props.broadcast.id),
-        { tab: 'recipients' },
-        { preserveState: true, preserveScroll: true, only: ['recipients', 'duplicateSummary', 'broadcast'] },
-    )
+    router.get(routes.admin.broadcasts.recipients(props.broadcast.id), {}, { preserveState: true, preserveScroll: true, only: ['recipients', 'duplicateSummary'] });
 }
 
 // --- Email content ---
