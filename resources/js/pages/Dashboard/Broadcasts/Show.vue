@@ -1,221 +1,67 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { Head, router, useForm } from '@inertiajs/vue3'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue'
-import DashboardLayout from '@/layouts/DashboardLayout.vue'
-import { routes } from '@/lib/routes'
-import { useErrorToast } from '@/hooks/useErrorToast'
-import { setTopbar } from '@/hooks/useDashboardTopbar'
+import { onMounted } from 'vue';
+import { Head } from '@inertiajs/vue3';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import TipTapEditor from '@/components/modules/dashboard/events/TipTapEditor.vue';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { useBroadcastAttachments } from '@/hooks/useBroadcastAttachments';
+import { useBroadcastContentForm } from '@/hooks/useBroadcastContentForm';
+import { useBroadcastLifecycleActions } from '@/hooks/useBroadcastLifecycleActions';
+import { useBroadcastPreview } from '@/hooks/useBroadcastPreview';
+import { useBroadcastRecipientsPanel } from '@/hooks/useBroadcastRecipientsPanel';
+import { useBroadcastSnapshotForm } from '@/hooks/useBroadcastSnapshotForm';
+import { useBroadcastStatusSummary } from '@/hooks/useBroadcastStatusSummary';
+import { setTopbar } from '@/hooks/useDashboardTopbar';
+import type {
+    IBroadcastShowBroadcast,
+    IBroadcastShowDuplicateSummary,
+    IBroadcastShowEventOption,
+    IBroadcastShowPreview,
+    IBroadcastShowRecipientsPage,
+} from '@/hooks/useBroadcastShowTypes';
 
-defineOptions({ layout: DashboardLayout })
-
-const { showErrorToast } = useErrorToast()
-
-interface Attachment {
-    id: string
-    file_name: string
-    mime_type: string | null
-    file_size: number
-}
-
-interface Broadcast {
-    id: string
-    name: string
-    status: string
-    scheduled_at: string | null
-    schedule_date: string | null
-    schedule_time: string | null
-    delay_min: number
-    delay_max: number
-    event_id: string | null
-    event_title: string | null
-    subject: string | null
-    content: string | null
-    datasets: Array<{ type: string; id?: string | null; event_id?: string | null; period_id?: string | null }>
-    total_recipients: number
-    total_sent: number
-    total_failed: number
-    sent_count: number
-    failed_count: number
-    pending_count: number
-    processing_count: number
-    cancelled_count: number
-    recipients_count: number
-    attachments: Attachment[]
-}
-
-interface RecipientRow {
-    id: string
-    name: string | null
-    email: string
-    status: string
-    attempts: number
-    sent_at: string | null
-    error_message: string | null
-}
-
-interface EventOption {
-    id: string
-    title: string
-}
+defineOptions({ layout: DashboardLayout });
 
 const props = defineProps<{
-    broadcast: Broadcast
-    events: EventOption[]
-    recipients?: { data: RecipientRow[]; current_page: number; last_page: number; total: number }
-    duplicateSummary?: { total: number; unique: number; duplicates: number; duplicate_emails: string[] }
-    preview?: { from: string; subject: string; content: string; sample_name: string; event_name: string; attachments: string[] }
-}>()
+    broadcast: IBroadcastShowBroadcast;
+    events: IBroadcastShowEventOption[];
+    recipients?: IBroadcastShowRecipientsPage;
+    duplicateSummary?: IBroadcastShowDuplicateSummary;
+    preview?: IBroadcastShowPreview;
+}>();
 
 onMounted(() => {
-    setTopbar({ title: props.broadcast.name, subtitle: `Status: ${props.broadcast.status}` })
-})
+    setTopbar({ title: props.broadcast.name, subtitle: `Status: ${props.broadcast.status}` });
+});
 
-const isDraft = computed(() => props.broadcast.status === 'draft')
-const isScheduled = computed(() => props.broadcast.status === 'scheduled')
-const canCancel = computed(() => ['scheduled', 'processing'].includes(props.broadcast.status))
-
-// --- Dataset / snapshot ---
-const selectedSources = ref<string[]>(['users'])
-const manualRows = ref('')
-
-const snapshotForm = useForm({
-    datasets: [] as Array<Record<string, string>>,
-    manual: [] as Array<{ name: string | null; email: string }>,
-    csv_file: null as File | null,
-})
-
-function generateSnapshot(): void {
-    const datasets = selectedSources.value.map((t) => ({ type: t }))
-    const manual = manualRows.value
-        .split('\n')
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => {
-            const parts = line.split(',').map((s) => s.trim())
-            if (parts.length >= 2 && parts[1]?.includes('@')) {
-                return { name: parts[0] || null, email: parts[1] as string }
-            }
-            return { name: null, email: line }
-        })
-    snapshotForm.datasets = datasets
-    snapshotForm.manual = manual
-    snapshotForm.post(routes.admin.broadcasts.snapshot(props.broadcast.id), {
-        preserveScroll: true,
-        forceFormData: true,
-        onError: () => showErrorToast('Gagal generate snapshot.'),
-    })
-}
-
-function onCsv(e: Event): void {
-    const input = e.target as HTMLInputElement
-    snapshotForm.csv_file = input.files?.[0] ?? null
-}
-
-// --- Recipients manual ---
-const recipientForm = useForm({ name: '', email: '' })
-
-function addRecipient(): void {
-    recipientForm.post(routes.admin.broadcasts.recipients(props.broadcast.id), {
-        preserveScroll: true,
-        onSuccess: () => recipientForm.reset(),
-        onError: () => showErrorToast('Gagal menambah recipient.'),
-    })
-}
-
-function deleteRecipient(id: string): void {
-    router.delete(`${routes.admin.broadcasts.recipients(props.broadcast.id)}/${id}`, {
-        preserveScroll: true,
-        onError: () => showErrorToast('Gagal menghapus recipient.'),
-    })
-}
-
-/** Muat daftar recipients via endpoint partial recipients.index; dipakai tombol "Muat recipients". */
-function loadRecipients(): void {
-    router.get(routes.admin.broadcasts.recipients(props.broadcast.id), {}, { preserveState: true, preserveScroll: true, only: ['recipients', 'duplicateSummary'] });
-}
-
-// --- Email content ---
-const contentForm = useForm({
-    subject: props.broadcast.subject ?? '',
-    content: props.broadcast.content ?? '',
-    event_id: props.broadcast.event_id ?? '',
-})
-
-function saveContent(): void {
-    contentForm.post(routes.admin.broadcasts.content(props.broadcast.id), {
-        preserveScroll: true,
-        onError: () => showErrorToast('Gagal menyimpan email. Periksa variable {{name}}/{{event_name}}.'),
-    })
-}
-
-// --- Attachments ---
-const attachForm = useForm({ file: null as File | null })
-
-function uploadAttachment(): void {
-    attachForm.post(routes.admin.broadcasts.attachments(props.broadcast.id), {
-        preserveScroll: true,
-        forceFormData: true,
-        onSuccess: () => attachForm.reset(),
-        onError: () => showErrorToast('Attachment maks 1.5 MB.'),
-    })
-}
-
-function deleteAttachment(id: string): void {
-    router.delete(`${routes.admin.broadcasts.attachments(props.broadcast.id)}/${id}`, { preserveScroll: true })
-}
-
-// --- Schedule / actions ---
-const scheduleForm = useForm({
-    schedule_date: props.broadcast.schedule_date ?? '',
-    schedule_time: props.broadcast.schedule_time ?? '',
-})
-
-const testForm = useForm({ email: '' })
-
-function doSchedule(): void {
-    router.post(routes.admin.broadcasts.schedule(props.broadcast.id), {}, { preserveScroll: true })
-}
-
-function updateSchedule(): void {
-    scheduleForm.patch(routes.admin.broadcasts.schedule(props.broadcast.id), { preserveScroll: true })
-}
-
-function sendTest(): void {
-    testForm.post(routes.admin.broadcasts.test(props.broadcast.id), {
-        preserveScroll: true,
-        onSuccess: () => testForm.reset(),
-    })
-}
-
-function cancelBroadcast(): void {
-    router.post(routes.admin.broadcasts.cancel(props.broadcast.id), {}, { preserveScroll: true })
-}
-
-function retryFailed(): void {
-    router.post(routes.admin.broadcasts.retry(props.broadcast.id), {}, { preserveScroll: true })
-}
-
-function deleteBroadcast(): void {
-    if (!confirm('Hapus broadcast beserta recipients & attachments?')) return
-    router.delete(routes.admin.broadcasts.destroy(props.broadcast.id))
-}
-
-function loadPreview(): void {
-    router.get(routes.admin.broadcasts.preview(props.broadcast.id), {}, { preserveState: true, preserveScroll: true, only: ['preview'] })
-}
-
-const progress = computed(() => {
-    const total = props.broadcast.recipients_count || 0
-    if (total === 0) return 0
-    return Math.round(((props.broadcast.sent_count || 0) / total) * 100)
-})
+const { isDraft, isScheduled, canCancel, progress } = useBroadcastStatusSummary({ broadcast: props.broadcast });
+const { selectedSources, manualRows, snapshotForm, generateSnapshot, onCsv } = useBroadcastSnapshotForm({
+    broadcastId: props.broadcast.id,
+});
+const { recipientForm, addRecipient, deleteRecipient, loadRecipients } = useBroadcastRecipientsPanel({
+    broadcastId: props.broadcast.id,
+});
+const { contentForm, saveContent } = useBroadcastContentForm({
+    broadcastId: props.broadcast.id,
+    initialSubject: props.broadcast.subject ?? '',
+    initialContent: props.broadcast.content ?? '',
+    initialEventId: props.broadcast.event_id ?? '',
+});
+const { attachForm, uploadAttachment, deleteAttachment, handleAttachmentFileInput } = useBroadcastAttachments({
+    broadcastId: props.broadcast.id,
+});
+const { scheduleForm, testForm, doSchedule, updateSchedule, sendTest, cancelBroadcast, retryFailed, deleteBroadcast } =
+    useBroadcastLifecycleActions({
+        broadcastId: props.broadcast.id,
+        initialScheduleDate: props.broadcast.schedule_date ?? '',
+        initialScheduleTime: props.broadcast.schedule_time ?? '',
+    });
+const { loadPreview } = useBroadcastPreview({ broadcastId: props.broadcast.id });
 </script>
 
 <template>
@@ -343,7 +189,7 @@ const progress = computed(() => {
                         </li>
                     </ul>
                     <div class="mt-2 flex gap-2">
-                        <Input type="file" @change="(e: Event) => { attachForm.file = (e.target as HTMLInputElement).files?.[0] ?? null }" />
+                        <Input type="file" @change="handleAttachmentFileInput" />
                         <Button variant="outline" @click="uploadAttachment">Upload</Button>
                     </div>
                 </div>
