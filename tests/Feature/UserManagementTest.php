@@ -292,6 +292,18 @@ class UserManagementTest extends TestCase
             'registration_code' => 'REG-DETAIL-1',
         ]);
 
+        $memberEvent = \App\Models\Event::factory()->create([
+            'title' => 'Member Created Event',
+            'status' => \App\Enums\EventStatus::Published,
+            'created_by' => $member->id,
+        ]);
+
+        \App\Models\Recruitment\RecruitmentApplication::factory()->create([
+            'personal_email' => 'detail-member@example.com',
+            'student_email' => 'detail-member@students.udinus.ac.id',
+            'full_name' => 'Detail Member',
+        ]);
+
         $this->actingAs($superAdmin)
             ->get(route('dashboard.users.show', $member))
             ->assertOk()
@@ -300,11 +312,28 @@ class UserManagementTest extends TestCase
                 ->component('Dashboard/Users/Show')
                 ->where('user.id', $member->id)
                 ->where('user.email', 'detail-member@example.com')
+                ->where('user.name', 'Detail Member')
+                ->has('user.roles')
+                ->has('user.oauth')
                 ->where('stats.events_joined', 1)
                 ->where('stats.registrations_accepted', 1)
+                ->where('stats.registrations_pending', 0)
+                ->where('stats.attendances_as_participant', 0)
+                ->where('stats.events_created', 1)
+                ->where('stats.recruitment_applications', 1)
+                ->where('stats.scans_recorded', 0)
+                ->where('stats.interviews_assigned', 0)
                 ->has('registrations', 1)
                 ->where('registrations.0.registration_code', 'REG-DETAIL-1')
                 ->where('registrations.0.event.title', 'Workshop Detail')
+                ->has('events_created', 1)
+                ->where('events_created.0.title', 'Member Created Event')
+                ->has('recruitment_applications', 1)
+                ->where('recruitment_applications.0.match', 'personal_email')
+                ->has('staff')
+                ->has('staff.interviewer_divisions', 0)
+                ->where('staff.interviews_assigned_count', 0)
+                ->where('staff.scans_recorded_count', 0)
                 ->where('permissions.can_edit', true)
                 ->where('permissions.can_delete', true)
             );
