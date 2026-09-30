@@ -90,11 +90,7 @@ class RecruitmentApplicationPolicy
             return false;
         }
 
-        if ($application->cancelled_at !== null) {
-            return false;
-        }
-
-        if (blank($application->personal_email)) {
+        if ($application->trackingResendBlocker() !== null) {
             return false;
         }
 

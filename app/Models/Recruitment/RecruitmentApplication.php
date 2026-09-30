@@ -4,6 +4,7 @@ namespace App\Models\Recruitment;
 
 use App\Enums\Recruitment\ApplicationResult;
 use App\Enums\Recruitment\ApplicationStage;
+use App\Enums\Recruitment\TrackingResendBlockReason;
 use App\Observers\RecruitmentApplicationObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -125,5 +126,19 @@ class RecruitmentApplication extends Model
     public function feedback(): HasOne
     {
         return $this->hasOne(RecruitmentFeedback::class, 'recruitment_application_id');
+    }
+
+    /** Guard kanonik kirim ulang tracking; null berarti boleh kirim ulang. */
+    public function trackingResendBlocker(): ?TrackingResendBlockReason
+    {
+        if ($this->cancelled_at !== null) {
+            return TrackingResendBlockReason::Cancelled;
+        }
+
+        if (blank($this->personal_email)) {
+            return TrackingResendBlockReason::MissingPersonalEmail;
+        }
+
+        return null;
     }
 }

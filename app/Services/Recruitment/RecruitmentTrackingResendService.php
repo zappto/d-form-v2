@@ -2,6 +2,7 @@
 
 namespace App\Services\Recruitment;
 
+use App\Enums\Recruitment\TrackingResendBlockReason;
 use App\Jobs\Recruitment\SendRecruitmentApplicationConfirmationJob;
 use App\Models\Recruitment\RecruitmentApplication;
 use App\Models\User;
@@ -20,15 +21,14 @@ final class RecruitmentTrackingResendService
 
     public function resend(User $actor, RecruitmentApplication $application, ?Request $request = null): void
     {
-        if ($application->cancelled_at !== null) {
-            throw ValidationException::withMessages([
-                'application' => ['Pendaftaran ini sudah dibatalkan.'],
-            ]);
-        }
+        $blocker = $application->trackingResendBlocker();
 
-        if (blank($application->personal_email)) {
+        if ($blocker !== null) {
             throw ValidationException::withMessages([
-                'application' => ['Applicant tidak memiliki email pribadi.'],
+                'application' => [match ($blocker) {
+                    TrackingResendBlockReason::Cancelled => 'Pendaftaran ini sudah dibatalkan.',
+                    TrackingResendBlockReason::MissingPersonalEmail => 'Applicant tidak memiliki email pribadi.',
+                }],
             ]);
         }
 

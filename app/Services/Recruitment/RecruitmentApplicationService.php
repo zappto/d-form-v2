@@ -350,11 +350,7 @@ final class RecruitmentApplicationService
 
     private function canResendTracking(RecruitmentApplication $application): bool
     {
-        if ($application->cancelled_at !== null) {
-            return false;
-        }
-
-        return filled($application->personal_email);
+        return $application->trackingResendBlocker() === null;
     }
 
     private function canDecideFinal(RecruitmentApplication $application): bool
