@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard\Recruitment;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Recruitment\ResendRecruitmentTrackingRequest;
 use App\Models\Recruitment\RecruitmentApplication;
+use App\Models\Recruitment\RecruitmentDocument;
 use App\Services\Recruitment\ApplicationVerificationService;
 use App\Services\Recruitment\RecruitmentTrackingResendService;
 use Illuminate\Http\RedirectResponse;
@@ -20,6 +21,7 @@ class RecruitmentApplicationController extends Controller
     ) {
     }
 
+    /** Unduh atau pratinjau satu dokumen applicant; orkestrator tipis di atas profil per tipe. */
     public function downloadDocument(Request $request, RecruitmentApplication $application, string $type): StreamedResponse
     {
         $this->authorize('downloadDocument', $application);
@@ -27,68 +29,57 @@ class RecruitmentApplicationController extends Controller
         $document = $application->document;
         abort_if($document === null, 404);
 
-        $preview = $request->boolean('preview');
+        $profile = $this->resolveRecruitmentDocumentProfile($document, $type);
+        abort_if($profile === null, 404);
 
-        if ($type === 'cv') {
-            abort_if(blank($document->cv_path), 404);
+        return $this->streamRecruitmentDocumentProfile($profile, $request->boolean('preview'));
+    }
 
-            if ($preview) {
-                return Storage::disk('local')->response(
-                    $document->cv_path,
-                    $document->cv_original_name,
-                    ['Content-Type' => 'application/pdf'],
-                    'inline',
-                );
-            }
+    /** Petakan tipe dokumen ke profil unduhan; null untuk tipe tak dikenal. */
+    private function resolveRecruitmentDocumentProfile(RecruitmentDocument $document, string $type): ?RecruitmentDocumentProfile
+    {
+        return match ($type) {
+            'cv' => new RecruitmentDocumentProfile(
+                path: $document->cv_path,
+                originalName: $document->cv_original_name,
+                mime: $document->cv_mime,
+                previewContentType: 'application/pdf',
+            ),
+            'portfolio' => new RecruitmentDocumentProfile(
+                path: $document->portfolio_path,
+                originalName: $document->portfolio_original_name ?? 'portfolio.pdf',
+                mime: $document->portfolio_mime ?? 'application/octet-stream',
+                previewContentType: 'application/pdf',
+            ),
+            'instagram_follow' => new RecruitmentDocumentProfile(
+                path: $document->instagram_follow_path,
+                originalName: $document->instagram_follow_original_name ?? 'instagram-follow',
+                mime: $document->instagram_follow_mime ?: 'image/jpeg',
+                previewContentType: $document->instagram_follow_mime ?: 'image/jpeg',
+            ),
+            default => null,
+        };
+    }
 
-            return Storage::disk('local')->download(
-                $document->cv_path,
-                $document->cv_original_name,
-                ['Content-Type' => $document->cv_mime],
+    /** Alirkan satu profil dokumen; preview inline, selain itu unduh. */
+    private function streamRecruitmentDocumentProfile(RecruitmentDocumentProfile $profile, bool $preview): StreamedResponse
+    {
+        abort_if(blank($profile->path), 404);
+
+        if ($preview) {
+            return Storage::disk('local')->response(
+                $profile->path,
+                $profile->originalName,
+                ['Content-Type' => $profile->previewContentType],
+                'inline',
             );
         }
 
-        if ($type === 'portfolio') {
-            abort_if(blank($document->portfolio_path), 404);
-
-            if ($preview) {
-                return Storage::disk('local')->response(
-                    $document->portfolio_path,
-                    $document->portfolio_original_name ?? 'portfolio.pdf',
-                    ['Content-Type' => 'application/pdf'],
-                    'inline',
-                );
-            }
-
-            return Storage::disk('local')->download(
-                $document->portfolio_path,
-                $document->portfolio_original_name ?? 'portfolio',
-                ['Content-Type' => $document->portfolio_mime ?? 'application/octet-stream'],
-            );
-        }
-
-        if ($type === 'instagram_follow') {
-            abort_if(blank($document->instagram_follow_path), 404);
-
-            $contentType = $document->instagram_follow_mime ?: 'image/jpeg';
-
-            if ($preview) {
-                return Storage::disk('local')->response(
-                    $document->instagram_follow_path,
-                    $document->instagram_follow_original_name ?? 'instagram-follow',
-                    ['Content-Type' => $contentType],
-                    'inline',
-                );
-            }
-
-            return Storage::disk('local')->download(
-                $document->instagram_follow_path,
-                $document->instagram_follow_original_name ?? 'instagram-follow',
-                ['Content-Type' => $contentType],
-            );
-        }
-
-        abort(404);
+        return Storage::disk('local')->download(
+            $profile->path,
+            $profile->originalName,
+            ['Content-Type' => $profile->mime],
+        );
     }
 
     public function verify(Request $request, RecruitmentApplication $application): RedirectResponse
