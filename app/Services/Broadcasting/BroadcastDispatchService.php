@@ -6,6 +6,7 @@ use App\Enums\EmailBroadcastRecipientStatus;
 use App\Enums\EmailBroadcastStatus;
 use App\Jobs\Broadcasting\SendBroadcastRecipientJob;
 use App\Models\EmailBroadcast;
+use App\Models\EmailBroadcastRecipient;
 use Illuminate\Support\Facades\DB;
 
 /**
