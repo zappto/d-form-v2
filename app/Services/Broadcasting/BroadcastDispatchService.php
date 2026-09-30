@@ -18,6 +18,9 @@ class BroadcastDispatchService
     /** Nama queue broadcast; nilai DIKUNCI identik dengan consumer/failed-job config. */
     public const QUEUE = 'broadcasts';
 
+    /**
+     * Validasi broadcast draft lalu ubah status ke Scheduled.
+     */
     public function schedule(EmailBroadcast $broadcast): void
     {
         abort_unless($broadcast->status === EmailBroadcastStatus::Draft, 422, 'Hanya broadcast draft yang dapat dijadwalkan.');
@@ -92,6 +95,9 @@ class BroadcastDispatchService
         }
     }
 
+    /**
+     * Batalkan broadcast scheduled/processing; recipient pending/processing jadi cancelled.
+     */
     public function cancel(EmailBroadcast $broadcast): void
     {
         abort_unless(
@@ -168,6 +174,9 @@ class BroadcastDispatchService
             ->onQueue(self::QUEUE);
     }
 
+    /**
+     * Tutup broadcast ke Completed bila tak ada recipient pending/processing; isi total_sent/total_failed.
+     */
     public function maybeComplete(EmailBroadcast $broadcast): void
     {
         $broadcast->refresh();

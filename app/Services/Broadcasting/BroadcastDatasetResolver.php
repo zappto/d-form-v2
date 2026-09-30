@@ -16,6 +16,8 @@ use App\Support\EmailAddress;
 class BroadcastDatasetResolver
 {
     /**
+     * Gabungkan seluruh sumber dataset menjadi daftar [name, email]; dipakai saat snapshot recipient broadcast.
+     *
      * @param  array<int, array{type:string, id?:string|null, event_id?:string|null, period_id?:string|null}>  $datasets
      * @return array<int, array{name:string|null, email:string, source:string}>
      */
@@ -49,6 +51,8 @@ class BroadcastDatasetResolver
     }
 
     /**
+     * Ambil peserta event dari roster FormAnswer; dipakai saat sumber dataset event_participants.
+     *
      * @return array<int, array{name:string|null, email:string}>
      */
     public function eventParticipants(?string $eventId = null): array
@@ -82,6 +86,8 @@ class BroadcastDatasetResolver
     }
 
     /**
+     * Ambil pelamar recruitment per periode; dipakai saat sumber dataset recruitment_applicants.
+     *
      * @return array<int, array{name:string|null, email:string}>
      */
     public function recruitmentApplicants(?string $periodId = null): array
@@ -112,6 +118,8 @@ class BroadcastDatasetResolver
     }
 
     /**
+     * Ambil seluruh user terdaftar; dipakai saat sumber dataset users.
+     *
      * @return array<int, array{name:string|null, email:string}>
      */
     public function users(): array
@@ -135,6 +143,8 @@ class BroadcastDatasetResolver
     }
 
     /**
+     * Ambil recipient dataset kustom; dipakai saat sumber dataset custom.
+     *
      * @return array<int, array{name:string|null, email:string}>
      */
     public function customDataset(string $datasetId): array
@@ -154,6 +164,8 @@ class BroadcastDatasetResolver
     }
 
     /**
+     * Hitung total/unik/duplikat email; dipakai saat pratinjau dedup dataset broadcast.
+     *
      * @return array{total:int, unique:int, duplicates:int, duplicate_emails:array<int,string>}
      */
     public function duplicateSummary(array $emails): array

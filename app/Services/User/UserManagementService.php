@@ -370,6 +370,8 @@ class UserManagementService
     }
 
     /**
+     * Buat user baru + sync role; dipakai super-admin.
+     *
      * @param  array{name: string, email: string, password: string, role: string}  $data
      */
     public function create(array $data): User
@@ -388,6 +390,8 @@ class UserManagementService
     }
 
     /**
+     * Perbarui user + sync role; dipakai super-admin.
+     *
      * @param  array{name: string, email: string, password?: string|null, role: string}  $data
      */
     public function update(User $user, array $data): User
@@ -409,6 +413,9 @@ class UserManagementService
         });
     }
 
+    /**
+     * Soft-delete user; dipakai super-admin.
+     */
     public function delete(User $user): void
     {
         $user->delete();
