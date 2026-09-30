@@ -391,30 +391,40 @@ function asKnownOrder(value: unknown): number | null {
  * Alokasikan `count` order integer >=0 strictly di antara anchor.
  * Null bila tak ada slot integer (pemanggil fallback rebalance penuh).
  */
-export function allocateOrderRun(prev: number | null, next: number | null, count: number): number[] | null {
-    if (count <= 0) return [];
-    if (prev === null) {
-        if (next === null) {
-            return Array.from({ length: count }, (_, i) => (i + 1) * FIELD_ORDER_GAP);
+/** Argumen alokasi order berderet (jangkar tetangga + jumlah slot). */
+export interface IAllocateOrderRunArgs {
+    prev: number | null;
+    next: number | null;
+    count: number;
+}
+
+export function allocateOrderRun(args: IAllocateOrderRunArgs): number[] | null {
+    const runCount = args.count;
+    const prevAnchor = args.prev;
+    const nextAnchor = args.next;
+    if (runCount <= 0) return [];
+    if (prevAnchor === null) {
+        if (nextAnchor === null) {
+            return Array.from({ length: runCount }, (_, i) => (i + 1) * FIELD_ORDER_GAP);
         }
-        const spacedFirst = next - count * FIELD_ORDER_GAP;
+        const spacedFirst = nextAnchor - runCount * FIELD_ORDER_GAP;
         if (spacedFirst >= 0) {
-            return Array.from({ length: count }, (_, i) => spacedFirst + i * FIELD_ORDER_GAP);
+            return Array.from({ length: runCount }, (_, i) => spacedFirst + i * FIELD_ORDER_GAP);
         }
         // Fallback padat: [next-count, .., next-1] bila muat di >=0.
-        if (next >= count && next > 0) {
-            return Array.from({ length: count }, (_, i) => next - count + i);
+        if (nextAnchor >= runCount && nextAnchor > 0) {
+            return Array.from({ length: runCount }, (_, i) => nextAnchor - runCount + i);
         }
         return null;
     }
-    if (next === null) {
-        return Array.from({ length: count }, (_, i) => prev + (i + 1) * FIELD_ORDER_GAP);
+    if (nextAnchor === null) {
+        return Array.from({ length: runCount }, (_, i) => prevAnchor + (i + 1) * FIELD_ORDER_GAP);
     }
-    const gap = next - prev;
-    if (gap <= count) return null;
-    const step = Math.floor(gap / (count + 1));
+    const gap = nextAnchor - prevAnchor;
+    if (gap <= runCount) return null;
+    const step = Math.floor(gap / (runCount + 1));
     if (step < 1) return null;
-    return Array.from({ length: count }, (_, i) => prev + (i + 1) * step);
+    return Array.from({ length: runCount }, (_, i) => prevAnchor + (i + 1) * step);
 }
 
 function prevMapFrom(prevOrders: Map<string, number> | BackendField[] | null | undefined): Map<string, number> {
@@ -485,7 +495,7 @@ export function toBackendFields(
             const count = j - i;
             const prevVal: number | null = i > 0 ? resultOrders[i - 1] : null;
             const nextVal: number | null = j < fieldCount ? known[j] : null;
-            const alloc = allocateOrderRun(prevVal, nextVal, count);
+            const alloc = allocateOrderRun({ prev: prevVal, next: nextVal, count });
             if (alloc === null) {
                 return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP));
             }
@@ -509,7 +519,7 @@ export function toBackendFields(
     const prevAnchor: number | null = firstInvSeq > 0 ? knownSeq[firstInvSeq - 1].order : null;
     const nextAnchor: number | null = lastInvSeq + 1 < knownSeq.length ? knownSeq[lastInvSeq + 1].order : null;
     const windowSize = inversionHighIndex - inversionLowIndex + 1;
-    const windowAlloc = allocateOrderRun(prevAnchor, nextAnchor, windowSize);
+    const windowAlloc = allocateOrderRun({ prev: prevAnchor, next: nextAnchor, count: windowSize });
     if (windowAlloc === null) {
         return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP));
     }
@@ -543,7 +553,7 @@ export function toBackendFields(
                 nextVal = knownNext === null ? null : knownNext;
             }
         }
-        const alloc = allocateOrderRun(prevVal, nextVal, count);
+        const alloc = allocateOrderRun({ prev: prevVal, next: nextVal, count });
         if (alloc === null) {
             return builderFields.map((f, k) => toBackendField(f, (k + 1) * FIELD_ORDER_GAP));
         }

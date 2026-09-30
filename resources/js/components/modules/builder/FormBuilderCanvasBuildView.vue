@@ -16,6 +16,7 @@ import {
     PlusCircle,
 } from 'lucide-vue-next';
 import type { BuilderField } from '@/types/formBuilder';
+import type { ICanvasDragStartArgs } from '@/hooks/useFormBuilderWorkspace';
 import { TITLE_MAX_LENGTH } from '@/lib/displayLimits';
 import FormBuilderBannerBlock from './FormBuilderBannerBlock.vue';
 import FormSuccessMessageCard from './FormSuccessMessageCard.vue';
@@ -46,7 +47,7 @@ defineEmits<{
     canvasDragLeave: [e: DragEvent];
     canvasDrop: [e: DragEvent];
     gapDragEnter: [index: number];
-    canvasDragStart: [e: DragEvent, field: BuilderField, index: number];
+    canvasDragStart: [args: ICanvasDragStartArgs];
     dragEnd: [];
     selectField: [id: string, isMobile?: boolean];
     updateField: [field: BuilderField];
@@ -353,7 +354,11 @@ const showDropChrome = computed(
                                                     draggable="true"
                                                     title="Seret untuk memindahkan urutan — atau pakai tombol naik/turun"
                                                     @dragstart="
-                                                        $emit('canvasDragStart', $event, field, sliceStart + localIdx)
+                                                        $emit('canvasDragStart', {
+                                                            dragEvent: $event,
+                                                            field,
+                                                            index: sliceStart + localIdx,
+                                                        })
                                                     "
                                                     @dragend="$emit('dragEnd')"
                                                 >
