@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { computed, onMounted } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useErrorToast } from '@/hooks/useErrorToast';
 import { routes } from '@/lib/routes';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { setTopbar } from '@/hooks/useDashboardTopbar';
+import { useUserDeletion } from '@/hooks/useUserDeletion';
 import {
     ArrowLeft,
     CalendarDays,
@@ -23,8 +23,6 @@ import {
     Trash2,
     UserRound,
 } from 'lucide-vue-next';
-
-const { showErrorToast } = useErrorToast();
 
 defineOptions({ layout: DashboardLayout });
 
@@ -116,8 +114,10 @@ const roleLabels: Record<string, string> = {
     'recruitment-interviewer': 'Recruitment Interviewer',
 };
 
-const isDeleting = ref(false);
-const showDeleteModal = ref(false);
+const { isDeleting, showDeleteModal, confirmDelete } = useUserDeletion({
+    userId: props.user.id,
+    canDelete: props.permissions.can_delete,
+});
 
 const hasStaffActivity = computed(
     () =>
@@ -163,18 +163,6 @@ function reviewLabel(status: string | null): string {
         rejected: 'Ditolak',
     };
     return map[status] ?? status;
-}
-
-function confirmDelete(): void {
-    if (isDeleting.value || !props.permissions.can_delete) return;
-    isDeleting.value = true;
-    router.delete(routes.admin.users.destroy(props.user.id), {
-        onError: () => showErrorToast('Gagal menghapus akun.'),
-        onFinish: () => {
-            isDeleting.value = false;
-            showDeleteModal.value = false;
-        },
-    });
 }
 </script>
 

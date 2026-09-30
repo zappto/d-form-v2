@@ -20,3 +20,5 @@ export * from './useQrFeed';
 export * from './useRecruitmentQueue';
 export * from './useRespondentDraft';
 export * from './useScanFeedback';
+export * from './useUserDeletion';
+export * from './useUserListFilter';

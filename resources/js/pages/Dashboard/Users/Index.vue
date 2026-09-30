@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import ConfirmationModal from '@/components/core/ConfirmationModal.vue';
 import EmptyState from '@/components/modules/dashboard/EmptyState.vue';
@@ -11,6 +11,7 @@ import DataPagination from '@/components/modules/dashboard/DataPagination.vue';
 import SearchableSelect, { type TSearchableSelectOption } from '@/components/core/SearchableSelect.vue';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { useUserListFilter, type IUserListQuery } from '@/hooks/useUserListFilter';
 import { USERS_PAGE_SIZE, type IPaginator } from '@/lib/pagination';
 import { routes } from '@/lib/routes';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
@@ -36,23 +37,18 @@ interface IRoleOption {
     label: string;
 }
 
-interface IUsersQuery {
-    search?: string;
-    role?: string | null;
-    per_page?: number;
-}
-
 const props = defineProps<{
     users: IPaginator<IManagedUser>;
     roleOptions: IRoleOption[];
-    query: IUsersQuery;
+    query: IUserListQuery;
 }>();
 
 const page = usePage();
 const authUser = useAuth(page.props);
 
-const search = ref(props.query.search ?? '');
-const role = ref(props.query.role ?? '');
+const { search, role, hasActiveFilters, applyFilters, resetFilters } = useUserListFilter({
+    initialQuery: props.query,
+});
 
 const roleFilterOptions = computed<TSearchableSelectOption[]>(() => [
     { value: '', label: 'Semua role' },
@@ -62,8 +58,6 @@ const roleFilterOptions = computed<TSearchableSelectOption[]>(() => [
 const roleLabelMap = computed(() =>
     Object.fromEntries(props.roleOptions.map((option) => [option.value, option.label]))
 );
-
-const hasActiveFilters = computed(() => Boolean(search.value || role.value));
 
 const perPage = computed(() => props.users.per_page || props.query.per_page || USERS_PAGE_SIZE);
 
@@ -77,25 +71,6 @@ const rangeLabel = computed(() => {
 onMounted(() => {
     setTopbar({ title: 'Pengguna', subtitle: 'Kelola akun admin dan member' });
 });
-
-function applyFilters(pageNumber: number = 1): void {
-    router.get(
-        routes.admin.users.index,
-        {
-            search: search.value || undefined,
-            role: role.value || undefined,
-            page: pageNumber > 1 ? pageNumber : undefined,
-        },
-        { preserveState: true, replace: true }
-    );
-}
-
-watch([search, role], () => applyFilters());
-
-function resetFilters(): void {
-    search.value = '';
-    role.value = '';
-}
 
 function formatRoles(roles: string[]): string {
     if (roles.length === 0) return '—';
