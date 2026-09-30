@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Enums\EventStatus;
 use App\Enums\FormAnswerReviewStatus;
 use App\Enums\MemberConfirmationStatus;
 use App\Models\Event;
@@ -95,6 +96,62 @@ class UserManagementService
     {
         $user->loadMissing('roles:id,name');
 
+        $profile = $this->buildProfileSummary($user, $request);
+        $registrationHistory = $this->buildRegistrationHistory($user);
+        $createdEvents = $this->buildCreatedEvents($user);
+        $recruitmentHistory = $this->buildRecruitmentHistory($user);
+        $staffActivity = $this->buildStaffActivity($user);
+        $permissions = $this->buildDetailPermissions($user, $actor);
+
+        return [
+            'user' => $profile,
+            'stats' => [
+                ...$registrationHistory['stats'],
+                'events_created' => count($createdEvents),
+                'recruitment_applications' => count($recruitmentHistory),
+                'scans_recorded' => $staffActivity['scans_recorded_count'],
+                'interviews_assigned' => $staffActivity['interviews_assigned_count'],
+            ],
+            'registrations' => $registrationHistory['registrations'],
+            'events_created' => $createdEvents,
+            'recruitment_applications' => $recruitmentHistory,
+            'staff' => $staffActivity,
+            'permissions' => $permissions,
+        ];
+    }
+
+    /**
+     * Ringkasan profil inti + avatar/oauth untuk payload detail.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildProfileSummary(User $user, ?Request $request = null): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'avatar_url' => UserAvatarService::resolvePublicUrl($user->avatar, $request),
+            'email_verified_at' => $user->email_verified_at?->toIso8601String(),
+            'created_at' => $user->created_at?->toIso8601String(),
+            'updated_at' => $user->updated_at?->toIso8601String(),
+            'deleted_at' => $user->deleted_at?->toIso8601String(),
+            'roles' => $user->getRoleNames()->values()->all(),
+            'has_local_password' => filled($user->getRawOriginal('password')),
+            'oauth' => [
+                'google' => filled($user->google_id),
+                'github' => filled($user->github_id),
+            ],
+        ];
+    }
+
+    /**
+     * Riwayat registrasi FormAnswer + statistik partisipan satu domain.
+     *
+     * @return array{registrations: list<array<string, mixed>>, stats: array<string, int>}
+     */
+    private function buildRegistrationHistory(User $user): array
+    {
         $formAnswers = FormAnswer::query()
             ->where('user_id', $user->id)
             ->excludeTerminatedInvitationMembers()
@@ -108,52 +165,73 @@ class UserManagementService
             ->limit(50)
             ->get();
 
-        $registrations = $formAnswers->map(function (FormAnswer $answer): array {
-            $event = $answer->form?->event;
-            $firstAttendance = $answer->attendances->first();
+        $registrations = $formAnswers
+            ->map(fn (FormAnswer $answer): array => $this->mapRegistrationRow($answer))
+            ->values()
+            ->all();
 
-            return [
-                'form_answer_id' => $answer->id,
-                'registration_code' => $answer->registration_code,
-                'review_status' => $answer->review_status?->value,
-                'registration_role' => $answer->registration_role?->value,
-                'member_confirmation_status' => $answer->member_confirmation_status?->value,
-                'created_at' => $answer->created_at?->toIso8601String(),
-                'attended_at' => $firstAttendance?->scanned_at?->toIso8601String(),
-                'event' => $event ? [
-                    'id' => $event->id,
-                    'title' => $event->title,
-                    'slug' => $event->slug,
-                    'start_date' => $event->start_date?->toDateString(),
-                    'status' => $event->status?->value ?? $event->status,
-                ] : null,
-                'form' => $answer->form ? [
-                    'id' => $answer->form->id,
-                    'title' => $answer->form->title,
-                ] : null,
-            ];
-        })->values()->all();
+        return [
+            'registrations' => $registrations,
+            'stats' => [
+                'events_joined' => $formAnswers
+                    ->pluck('form.event_id')
+                    ->filter()
+                    ->unique()
+                    ->count(),
+                'registrations_pending' => $formAnswers->filter(function (FormAnswer $answer): bool {
+                    return $answer->review_status === FormAnswerReviewStatus::Pending
+                        || $answer->member_confirmation_status === MemberConfirmationStatus::Pending;
+                })->count(),
+                'registrations_accepted' => $formAnswers->filter(
+                    fn (FormAnswer $answer): bool => $answer->review_status === FormAnswerReviewStatus::Accepted
+                )->count(),
+                'attendances_as_participant' => $formAnswers->filter(
+                    fn (FormAnswer $answer): bool => $answer->attendances->isNotEmpty()
+                )->count(),
+            ],
+        ];
+    }
 
-        $eventsJoined = $formAnswers
-            ->pluck('form.event_id')
-            ->filter()
-            ->unique()
-            ->count();
+    /**
+     * Petakan satu FormAnswer + relasi event/form menjadi baris registrasi.
+     *
+     * @return array<string, mixed>
+     */
+    private function mapRegistrationRow(FormAnswer $answer): array
+    {
+        $event = $answer->form?->event;
+        $firstAttendance = $answer->attendances->first();
 
-        $pendingRegistrations = $formAnswers->filter(function (FormAnswer $answer): bool {
-            return $answer->review_status === FormAnswerReviewStatus::Pending
-                || $answer->member_confirmation_status === MemberConfirmationStatus::Pending;
-        })->count();
+        return [
+            'form_answer_id' => $answer->id,
+            'registration_code' => $answer->registration_code,
+            'review_status' => $answer->review_status?->value,
+            'registration_role' => $answer->registration_role?->value,
+            'member_confirmation_status' => $answer->member_confirmation_status?->value,
+            'created_at' => $answer->created_at?->toIso8601String(),
+            'attended_at' => $firstAttendance?->scanned_at?->toIso8601String(),
+            'event' => $event ? [
+                'id' => $event->id,
+                'title' => $event->title,
+                'slug' => $event->slug,
+                'start_date' => $event->start_date?->toDateString(),
+                'status' => $this->eventStatusValue($event->status),
+            ] : null,
+            'form' => $answer->form ? [
+                'id' => $answer->form->id,
+                'title' => $answer->form->title,
+            ] : null,
+        ];
+    }
 
-        $acceptedRegistrations = $formAnswers->filter(
-            fn (FormAnswer $answer): bool => $answer->review_status === FormAnswerReviewStatus::Accepted
-        )->count();
-
-        $attendancesAsParticipant = $formAnswers->filter(
-            fn (FormAnswer $answer): bool => $answer->attendances->isNotEmpty()
-        )->count();
-
-        $eventsCreated = Event::query()
+    /**
+     * Daftar event yang dibuat user (20 terbaru) untuk payload detail.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function buildCreatedEvents(User $user): array
+    {
+        return Event::query()
             ->where('created_by', $user->id)
             ->orderByDesc('created_at')
             ->limit(20)
@@ -162,15 +240,28 @@ class UserManagementService
                 'id' => $event->id,
                 'title' => $event->title,
                 'slug' => $event->slug,
-                'status' => $event->status?->value ?? $event->status,
+                'status' => $this->eventStatusValue($event->status),
                 'start_date' => $event->start_date?->toDateString(),
                 'created_at' => $event->created_at?->toIso8601String(),
             ])
             ->values()
             ->all();
+    }
 
+    /**
+     * Riwayat aplikasi recruitment via email-match; kosong bila email kosong.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function buildRecruitmentHistory(User $user): array
+    {
         $email = strtolower(trim((string) $user->email));
-        $recruitmentApplications = RecruitmentApplication::query()
+
+        if ($email === '') {
+            return [];
+        }
+
+        return RecruitmentApplication::query()
             ->with(['period:id,name', 'primaryDivision:id,name'])
             ->where(function ($q) use ($email): void {
                 $q->whereRaw('LOWER(personal_email) = ?', [$email])
@@ -179,29 +270,45 @@ class UserManagementService
             ->orderByDesc('submitted_at')
             ->limit(20)
             ->get()
-            ->map(function (RecruitmentApplication $app) use ($email): array {
-                $match = strtolower((string) $app->personal_email) === $email
-                    ? 'personal_email'
-                    : 'student_email';
-
-                return [
-                    'id' => $app->id,
-                    'registration_number' => $app->registration_number,
-                    'full_name' => $app->full_name,
-                    'stage' => $app->stage?->value,
-                    'result' => $app->result?->value,
-                    'submitted_at' => $app->submitted_at?->toIso8601String(),
-                    'match' => $match,
-                    'period' => $app->period ? [
-                        'id' => $app->period->id,
-                        'name' => $app->period->name,
-                    ] : null,
-                    'primary_division' => $app->primaryDivision?->name,
-                ];
-            })
+            ->map(fn (RecruitmentApplication $app): array => $this->mapRecruitmentRow($app, $email))
             ->values()
             ->all();
+    }
 
+    /**
+     * Petakan satu aplikasi recruitment + sumber email yang cocok.
+     *
+     * @return array<string, mixed>
+     */
+    private function mapRecruitmentRow(RecruitmentApplication $app, string $email): array
+    {
+        $match = strtolower((string) $app->personal_email) === $email
+            ? 'personal_email'
+            : 'student_email';
+
+        return [
+            'id' => $app->id,
+            'registration_number' => $app->registration_number,
+            'full_name' => $app->full_name,
+            'stage' => $app->stage?->value,
+            'result' => $app->result?->value,
+            'submitted_at' => $app->submitted_at?->toIso8601String(),
+            'match' => $match,
+            'period' => $app->period ? [
+                'id' => $app->period->id,
+                'name' => $app->period->name,
+            ] : null,
+            'primary_division' => $app->primaryDivision?->name,
+        ];
+    }
+
+    /**
+     * Aktivitas staff: divisi interviewer + hitungan interview/scan.
+     *
+     * @return array{interviewer_divisions: list<array<string, mixed>>, interviews_assigned_count: int, scans_recorded_count: int}
+     */
+    private function buildStaffActivity(User $user): array
+    {
         $interviewerDivisions = RecruitmentInterviewerDivision::query()
             ->with('division:id,name,code')
             ->where('user_id', $user->id)
@@ -215,52 +322,38 @@ class UserManagementService
             ->values()
             ->all();
 
-        $interviewsAssigned = RecruitmentInterview::query()
-            ->where('interviewer_id', $user->id)
-            ->count();
-
-        $scansRecorded = $user->attendanceScansRecorded()->count();
-
         return [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'avatar_url' => UserAvatarService::resolvePublicUrl($user->avatar, $request),
-                'email_verified_at' => $user->email_verified_at?->toIso8601String(),
-                'created_at' => $user->created_at?->toIso8601String(),
-                'updated_at' => $user->updated_at?->toIso8601String(),
-                'deleted_at' => $user->deleted_at?->toIso8601String(),
-                'roles' => $user->getRoleNames()->values()->all(),
-                'has_local_password' => filled($user->getRawOriginal('password')),
-                'oauth' => [
-                    'google' => filled($user->google_id),
-                    'github' => filled($user->github_id),
-                ],
-            ],
-            'stats' => [
-                'events_joined' => $eventsJoined,
-                'registrations_pending' => $pendingRegistrations,
-                'registrations_accepted' => $acceptedRegistrations,
-                'attendances_as_participant' => $attendancesAsParticipant,
-                'events_created' => count($eventsCreated),
-                'recruitment_applications' => count($recruitmentApplications),
-                'scans_recorded' => $scansRecorded,
-                'interviews_assigned' => $interviewsAssigned,
-            ],
-            'registrations' => $registrations,
-            'events_created' => $eventsCreated,
-            'recruitment_applications' => $recruitmentApplications,
-            'staff' => [
-                'interviewer_divisions' => $interviewerDivisions,
-                'interviews_assigned_count' => $interviewsAssigned,
-                'scans_recorded_count' => $scansRecorded,
-            ],
-            'permissions' => [
-                'can_edit' => Gate::forUser($actor)->allows('update', $user),
-                'can_delete' => Gate::forUser($actor)->allows('delete', $user),
-            ],
+            'interviewer_divisions' => $interviewerDivisions,
+            'interviews_assigned_count' => RecruitmentInterview::query()
+                ->where('interviewer_id', $user->id)
+                ->count(),
+            'scans_recorded_count' => $user->attendanceScansRecorded()->count(),
         ];
+    }
+
+    /**
+     * Izin edit/hapus aktor terhadap user via Gate policy.
+     *
+     * @return array{can_edit: bool, can_delete: bool}
+     */
+    private function buildDetailPermissions(User $user, User $actor): array
+    {
+        return [
+            'can_edit' => Gate::forUser($actor)->allows('update', $user),
+            'can_delete' => Gate::forUser($actor)->allows('delete', $user),
+        ];
+    }
+
+    /**
+     * Samakan mapping status event enum ke string di seluruh payload detail.
+     */
+    private function eventStatusValue(EventStatus|string|null $status): ?string
+    {
+        if ($status instanceof \BackedEnum) {
+            return (string) $status->value;
+        }
+
+        return $status;
     }
 
     /**
