@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
  */
 class BroadcastDispatchService
 {
+    /** Nama queue broadcast; nilai DIKUNCI identik dengan consumer/failed-job config. */
+    public const QUEUE = 'broadcasts';
+
     public function schedule(EmailBroadcast $broadcast): void
     {
         abort_unless($broadcast->status === EmailBroadcastStatus::Draft, 422, 'Hanya broadcast draft yang dapat dijadwalkan.');
@@ -75,19 +78,12 @@ class BroadcastDispatchService
 
         $broadcast->refresh();
 
-        $min = max(0, (int) $broadcast->delay_min);
-        $max = max($min, (int) $broadcast->delay_max);
-
         $ids = $broadcast->recipients()
             ->where('status', EmailBroadcastRecipientStatus::Pending->value)
             ->pluck('id');
 
         foreach ($ids as $recipientId) {
-            $delaySeconds = $max === $min ? $min : random_int($min, $max);
-
-            SendBroadcastRecipientJob::dispatch((string) $recipientId)
-                ->delay(now()->addSeconds($delaySeconds))
-                ->onQueue('broadcasts');
+            $this->dispatchRecipientWithDelay((string) $recipientId, $broadcast);
         }
 
         // Edge: tanpa recipient pending → langsung completed.
@@ -144,9 +140,6 @@ class BroadcastDispatchService
             ])->save();
         }
 
-        $min = max(0, (int) $broadcast->delay_min);
-        $max = max($min, (int) $broadcast->delay_max);
-
         foreach ($failedIds as $recipientId) {
             EmailBroadcastRecipient::query()->whereKey($recipientId)->update([
                 'status' => EmailBroadcastRecipientStatus::Pending->value,
@@ -155,14 +148,24 @@ class BroadcastDispatchService
                 'updated_at' => now(),
             ]);
 
-            $delaySeconds = $max === $min ? $min : random_int($min, $max);
-
-            SendBroadcastRecipientJob::dispatch((string) $recipientId)
-                ->delay(now()->addSeconds($delaySeconds))
-                ->onQueue('broadcasts');
+            $this->dispatchRecipientWithDelay((string) $recipientId, $broadcast);
         }
 
         return $failedIds->count();
+    }
+
+    /**
+     * Dispatch satu job recipient dengan delay acak sesuai batas broadcast.
+     */
+    private function dispatchRecipientWithDelay(string $recipientId, EmailBroadcast $broadcast): void
+    {
+        $min = max(0, (int) $broadcast->delay_min);
+        $max = max($min, (int) $broadcast->delay_max);
+        $delaySeconds = $max === $min ? $min : random_int($min, $max);
+
+        SendBroadcastRecipientJob::dispatch($recipientId)
+            ->delay(now()->addSeconds($delaySeconds))
+            ->onQueue(self::QUEUE);
     }
 
     public function maybeComplete(EmailBroadcast $broadcast): void
