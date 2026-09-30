@@ -12,8 +12,9 @@ Ticket Jira: **DFORM-76** — `[security] Stored XSS via unwrap sanitizer broadc
 
 1. `BroadcastHtmlSanitizer.php` — hapus `continue` buta: anak hasil unwrap dikumpulkan lalu wajib lewat `sanitizeMovedNode()` baru (rekursif: unwrap bersarang diurai ulang, tag allowlist dibersihkan atribut+URL+style, komentar dibuang). `script`/`style` non-allowlist kini dibuang beserta isinya (bukan di-unwrap). Aturan `on*`/URL/`style` yang ada dipertahankan; NOL ubah allowlist; TANPA paket baru (htmlpurifier butuh konfirmasi user).
 2. Defense-in-depth satu baris per titik render (sanitizer yang sama, tanpa ubah signature/alur): `SendBroadcastRecipientJob:67`, `BroadcastPreviewController` (`content` preview), `BroadcastTestController:24` — `app(BroadcastHtmlSanitizer::class)->sanitize($personalization->renderHtml(...))`.
-3. Test baru `tests/Unit/Broadcasting/BroadcastHtmlSanitizerTest.php` (7 test): 6 payload recon + 1 anti over-strip (tag/atribut allowlist valid + teks dipertahankan). TDD: merah dulu (5 failed, 2 passed: kontrol + allowlist), hijau setelah fix (7 passed).
-4. Batas: data lama di DB yang sudah beracun tetap perlu render-sanitize — kini tertutup oleh poin 2.
+3. Test baru `tests/Unit/Broadcasting/BroadcastHtmlSanitizerTest.php` (8 test): 6 payload recon + 1 `expression()` pada prop allowlist (`<p style="color: expression(alert(1))">` → style dibuang, teks kept) + 1 anti over-strip (tag/atribut allowlist valid + teks dipertahankan). TDD: merah dulu, hijau setelah fix.
+4. Susulan: `sanitizeStyle()` kini menolak deklarasi yang nilainya mengandung `expression\s*\(` (case-insensitive); 3 properti allowlist + regex charset + allowlist tag/atribut tidak berubah.
+5. Batas: data lama di DB yang sudah beracun tetap perlu render-sanitize — kini tertutup oleh poin 2.
 
 ## AKAR MASALAH (yang diselesaikan)
 
@@ -26,6 +27,7 @@ Ticket Jira: **DFORM-76** — `[security] Stored XSS via unwrap sanitizer broadc
 | Waktu | Commit | Author | Issue | Deskripsi |
 |-------|--------|--------|-------|-----------|
 | — | _(fix ini)_ | PM+sapto | DFORM-76 | fix: tutup XSS unwrap sanitizer + sanitasi ulang render |
+| — | _(fix susulan ini)_ | PM+sapto | DFORM-76 | fix: tolak expression() pada style sanitizer |
 | — | _(docs ini)_ | PM+sapto | DFORM-76 | docs: changelog + README |
 
 ## Verifikasi PM (runtime via podman, independen)
@@ -39,6 +41,6 @@ Ticket Jira: **DFORM-76** — `[security] Stored XSS via unwrap sanitizer broadc
 
 ## Utang di luar scope
 
-- `sanitizeStyle()` regex nilai masih meloloskan `expression(...)` pada prop allowlist di tag allowlist (terbukti: `<p style="color: expression(alert(1))">` lolos) — aturan style dipertahankan per scope; kandidat tiket lanjutan (perketat allowlist nilai CSS).
+- `sanitizeStyle()` menolak `expression(` (TERTUTUP commit susulan ini, terbukti tinker: `<p style="">x</p>`) — pola CSS aktif-lainnya (`-moz-binding`, `behaviour`) belum diaudit; kandidat tiket hardening lanjutan.
 - `Show.vue` `v-html` + `broadcast-html.blade.php` `{!! !!}` tetap sink mentah bila konten non-sanitizer lewat — kini tertutup berlapis, tetapi CSP header email/preview belum ada (kandidat tiket).
 - Push `dev` menunggu auth pemilik. Merge menunggu review PM + security review.

@@ -63,6 +63,15 @@ class BroadcastHtmlSanitizerTest extends TestCase
         $this->assertStringContainsString('teks', $clean);
     }
 
+    /** Style expression() pada prop allowlist wajib dibuang, teks kept (DFORM-76). */
+    public function test_style_expression_pada_prop_allowlist_dibuang(): void
+    {
+        $clean = $this->sanitize('<p style="color: expression(alert(1))">x</p>');
+
+        $this->assertStringNotContainsString('expression(', $clean);
+        $this->assertStringContainsString('x', $clean);
+    }
+
     /** Tag dan atribut allowlist yang valid tidak ikut terbuang (anti over-strip). */
     public function test_allowlist_valid_dipertahankan(): void
     {

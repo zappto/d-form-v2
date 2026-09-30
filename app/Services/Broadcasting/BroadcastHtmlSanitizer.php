@@ -213,6 +213,10 @@ class BroadcastHtmlSanitizer
                 continue;
             }
 
+            if (preg_match('/expression\s*\(/i', $val)) {
+                continue;
+            }
+
             if (! preg_match('/^[a-zA-Z0-9#(),.\s%-]+$/', $val)) {
                 continue;
             }
