@@ -58,3 +58,5 @@ pnpm-workspace.yaml
 .superpowers/
 docs/big-changes/
 /docs/big-changes
+.playwright-cli
+/
